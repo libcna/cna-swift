@@ -26,6 +26,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/GamePadTests.swift",
     ROOT / "Tests/CNATests/DisplayOrientationContractTests.swift",
     ROOT / "Tests/CNATests/BufferUsageContractTests.swift",
+    ROOT / "Tests/CNATests/DepthFormatContractTests.swift",
     ROOT / "Tests/CNATests/FillModeContractTests.swift",
     ROOT / "Tests/CNATests/SurfaceFormatContractTests.swift",
 ]
@@ -88,6 +89,7 @@ def main() -> int:
                 "GAMEPAD_CAPABILITIES": "GamePadCapabilities",
                 "DISPLAY_ORIENTATION": "DisplayOrientationXnaContract",
                 "BUFFER_USAGE": "BufferUsageXnaContract",
+                "DEPTH_FORMAT": "DepthFormatXnaContract",
                 "FILL_MODE": "FillModeXnaContract",
                 "SURFACE_FORMAT": "SurfaceFormatXnaContract",
             }.items()
@@ -109,6 +111,18 @@ def main() -> int:
             "values": {
                 "None": 0,
                 "WriteOnly": 1,
+            },
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "depthFormatContract": {
+            "kind": "enum",
+            "flags": False,
+            "underlyingType": "System.Int32",
+            "values": {
+                "None": 0,
+                "Depth16": 1,
+                "Depth24": 2,
+                "Depth24Stencil8": 3,
             },
             "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },

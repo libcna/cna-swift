@@ -16,6 +16,8 @@ and vibration routes. It also includes the standalone managed
 `DisplayOrientation` flags type without claiming platform rotation or window
 orientation functionality, plus the standalone managed `BufferUsage` flags
 type without claiming buffer or GPU resource support, plus the standalone
+managed non-flags `DepthFormat` enum without claiming depth/stencil buffers or
+renderer support, plus the standalone
 managed non-flags `FillMode` enum without claiming rasterizer or wireframe
 rendering support, plus the standalone managed non-flags `SurfaceFormat` enum
 without claiming texture, render-target, display, DXT, HDR, or GPU format
@@ -28,12 +30,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=70
-TARGET_MEMBERS=1403
-TOTAL_DIAGNOSTICS=338
-COMPLETE_TYPES=65
+TARGET_TYPES=71
+TARGET_MEMBERS=1407
+TOTAL_DIAGNOSTICS=337
+COMPLETE_TYPES=66
 PARTIAL_TYPES=5
-MISSING_TYPES=187
+MISSING_TYPES=186
 MISSING_MEMBER=131
 ```
 
@@ -50,8 +52,25 @@ BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
-FillMode, and SurfaceFormat. Every implemented member has qualified behavior;
+DepthFormat, FillMode, and SurfaceFormat. Every implemented member has
+qualified behavior;
 missing members remain absent.
+
+## Managed DepthFormat
+
+`Microsoft.Xna.Framework.Graphics.DepthFormat` is the exact managed non-flags
+`Int32` enum with `None=0`, `Depth16=1`, `Depth24=2`, and
+`Depth24Stencil8=3`. The CLR `value__` storage identity is the existing
+enum-storage language mapping. Swift raw-value initialization accepts the
+complete 0...3 table, rejects representative unknown positive and negative
+values with `nil`, and preserves ordinary value-copy behavior without adding
+XNA members.
+
+This is managed metadata only. GraphicsAdapter, PresentationParameters,
+RenderTarget2D, RenderTargetCube, GraphicsDeviceManager depth-format members,
+DepthStencilState, depth/stencil allocation or testing, renderer capability,
+and native DepthFormat mapping remain deferred. See
+`docs/depth-format-evidence.md`.
 
 ## Managed SurfaceFormat
 

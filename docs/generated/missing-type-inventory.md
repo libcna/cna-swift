@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=70
-TARGET_MEMBERS=1403
-TOTAL_DIAGNOSTICS=338
-COMPLETE_TYPES=65
+TARGET_TYPES=71
+TARGET_MEMBERS=1407
+TOTAL_DIAGNOSTICS=337
+COMPLETE_TYPES=66
 PARTIAL_TYPES=5
-MISSING_TYPES=187
-MISSING_TYPE=187
+MISSING_TYPES=186
+MISSING_TYPE=186
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -70,6 +70,7 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 - `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.BufferUsage`
+- `Microsoft.Xna.Framework.Graphics.DepthFormat`
 - `Microsoft.Xna.Framework.Graphics.FillMode`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
@@ -364,7 +365,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.CompareFunction`
 - `Microsoft.Xna.Framework.Graphics.CubeMapFace`
 - `Microsoft.Xna.Framework.Graphics.CullMode`
-- `Microsoft.Xna.Framework.Graphics.DepthFormat`
 - `Microsoft.Xna.Framework.Graphics.DepthStencilState`
 - `Microsoft.Xna.Framework.Graphics.DeviceLostException`
 - `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`

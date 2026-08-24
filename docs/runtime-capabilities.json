@@ -13,6 +13,7 @@
     {"operation":"Pure math/value foundation","status":"VERIFIED_MANAGED","evidence":"MathHelper, Point, Rectangle, GameTime, the binary32/geometry closure, Color, and both packed-vector protocols are strict-complete managed Swift"},
     {"operation":"DisplayOrientation","status":"VERIFIED_MANAGED","evidence":"exact root-framework Int32 OptionSet with Default=0, LandscapeLeft=1, LandscapeRight=2, and Portrait=4; no runtime orientation claim"},
     {"operation":"BufferUsage","status":"VERIFIED_MANAGED","evidence":"exact Graphics Int32 OptionSet with None=0 and WriteOnly=1; no buffer or GPU resource capability is claimed"},
+    {"operation":"DepthFormat","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with None=0, Depth16=1, Depth24=2, and Depth24Stencil8=3; no depth buffer, stencil, render-target, GPU-format, or native capability is claimed"},
     {"operation":"FillMode","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with Solid=0 and WireFrame=1; no RasterizerState, polygon mode, or wireframe rendering capability is claimed"},
     {"operation":"SurfaceFormat","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with all twenty pinned literals; no texture, render-target, display, GPU-format, DXT, HDR, or native capability is claimed"},
     {"operation":"Game lifecycle","status":"VERIFIED_NATIVE","evidence":"Initialize/LoadContent/BeginRun/Update/Draw/EndRun/UnloadContent/Exiting execute through CNA callbacks; 60/600 runs pass"},

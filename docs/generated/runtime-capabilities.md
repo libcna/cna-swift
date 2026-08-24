@@ -9,6 +9,7 @@ Qualified boundary: Swift 6.0.3, `x86_64-pc-linux-gnu`, canonical CNA C ABI
 | Pure math/value foundation | VERIFIED_MANAGED | MathHelper, Point, Rectangle, GameTime, the binary32/geometry closure, Color, and both packed-vector protocols are strict-complete managed Swift. |
 | DisplayOrientation | VERIFIED_MANAGED | Exact root-framework Int32 OptionSet values 0/1/2/4; no display rotation or window-orientation capability is claimed. |
 | BufferUsage | VERIFIED_MANAGED | Exact Graphics Int32 OptionSet values None=0 and WriteOnly=1; no buffer or GPU resource capability is claimed. |
+| DepthFormat | VERIFIED_MANAGED | Exact Graphics non-flags Int32 enum values None=0, Depth16=1, Depth24=2, and Depth24Stencil8=3; no depth buffer, stencil, render-target, GPU-format, or native capability is claimed. |
 | FillMode | VERIFIED_MANAGED | Exact Graphics non-flags Int32 enum values Solid=0 and WireFrame=1; no RasterizerState, polygon mode, or wireframe rendering capability is claimed. |
 | SurfaceFormat | VERIFIED_MANAGED | Exact Graphics non-flags Int32 enum with all twenty pinned literals; no texture, render-target, display, GPU-format, DXT, HDR, or native capability is claimed. |
 | Game lifecycle | VERIFIED_NATIVE | CNA drives Initialize through shutdown; 60/600 frames pass. |

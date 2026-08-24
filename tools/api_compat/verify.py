@@ -1851,11 +1851,99 @@ def self_test() -> None:
     }:
         failures.append("SurfaceFormat value__ treated as required did not fail")
 
+    depth_name = "Microsoft.Xna.Framework.Graphics.DepthFormat"
+    depth_expected = {
+        depth_name: copy.deepcopy(all_expected[depth_name]),
+    }
+    depth_good = copy.deepcopy(depth_expected)
+    depth_good[depth_name].identifier = depth_name
+    for index, member in enumerate(depth_good[depth_name].members):
+        member.identifier = f"{depth_name}:{index}"
+
+    def depth_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(
+            member for member in models[depth_name].members
+            if member.name == name
+        )
+
+    def depth_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {
+            item["category"] for item in compare(depth_expected, models)
+        }
+
+    depth_mutations: list[tuple[str, str, Any]] = [
+        ("DepthFormat missing type", "MISSING_TYPE",
+         lambda m: m.pop(depth_name)),
+        ("DepthFormat wrong namespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.DepthFormat",
+             m.pop(depth_name),
+         )),
+        ("DepthFormat struct instead of enum", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[depth_name], "kind", "struct")),
+        ("DepthFormat OptionSet instead of ordinary enum", "FLAGS_MAPPING_MISMATCH",
+         lambda m: (setattr(m[depth_name], "kind", "struct"),
+                    setattr(m[depth_name], "flags", True))),
+        ("DepthFormat wrong raw type", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[depth_name], "raw_type", "UInt32")),
+        ("DepthFormat flags metadata present", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[depth_name], "flags", True)),
+        ("DepthFormat wrong None", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(depth_member(m, "None"), "raw_value", 1)),
+        ("DepthFormat wrong Depth16", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(depth_member(m, "Depth16"), "raw_value", 2)),
+        ("DepthFormat wrong Depth24", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(depth_member(m, "Depth24"), "raw_value", 3)),
+        ("DepthFormat wrong Depth24Stencil8", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(depth_member(m, "Depth24Stencil8"), "raw_value", 4)),
+        ("DepthFormat missing Depth24", "MISSING_MEMBER",
+         lambda m: m[depth_name].members.remove(depth_member(m, "Depth24"))),
+        ("DepthFormat missing Depth24Stencil8", "MISSING_MEMBER",
+         lambda m: m[depth_name].members.remove(depth_member(m, "Depth24Stencil8"))),
+        ("DepthFormat renamed Depth24Stencil8", "MISSING_MEMBER",
+         lambda m: setattr(depth_member(m, "Depth24Stencil8"), "name", "Depth24Stencil")),
+        ("DepthFormat unexpected extra enum case", "UNEXPECTED_MEMBER",
+         lambda m: m[depth_name].members.append(Member(
+             depth_name, "field", "Depth32", True,
+             return_type=depth_name, mutable=False, raw_value=4,
+             identifier="invented-depth-format-case",
+         ))),
+        ("DepthFormat public description helper", "UNEXPECTED_MEMBER",
+         lambda m: m[depth_name].members.append(Member(
+             depth_name, "property", "description", False,
+             return_type="String", mutable=False,
+             identifier="invented-depth-format-description",
+         ))),
+    ]
+    for label, wanted, mutate in depth_mutations:
+        models = copy.deepcopy(depth_good)
+        mutate(models)
+        if wanted not in depth_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    if any(
+        member.name == "value__"
+        for member in depth_expected[depth_name].members
+    ):
+        failures.append("DepthFormat value__ was not excluded from the Swift contract")
+    depth_value_storage_expected = copy.deepcopy(depth_expected)
+    depth_value_storage_expected[depth_name].members.append(Member(
+        depth_name, "field", "value__", False,
+        return_type="Int32", mutable=True,
+        identifier="incorrectly-required-depth-format-storage",
+    ))
+    if "MISSING_MEMBER" not in {
+        item["category"] for item in compare(
+            depth_value_storage_expected, depth_good,
+        )
+    }:
+        failures.append("DepthFormat value__ treated as required did not fail")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

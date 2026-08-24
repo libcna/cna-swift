@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1249,
-  "ASSERTIONS": 1249,
+  "OBSERVATIONS": 1251,
+  "ASSERTIONS": 1251,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -74,6 +74,7 @@
     "testGamePadVibrationInputUsesPinnedUncheckedInt16Words",
     "testDisplayOrientationXnaContract",
     "testBufferUsageXnaContract",
+    "testDepthFormatXnaContract",
     "testFillModeXnaContract",
     "testSurfaceFormatXnaContract"
   ],
@@ -119,6 +120,7 @@
     "GAMEPAD_CAPABILITIES": 1,
     "DISPLAY_ORIENTATION": 1,
     "BUFFER_USAGE": 1,
+    "DEPTH_FORMAT": 1,
     "FILL_MODE": 1,
     "SURFACE_FORMAT": 1
   },
@@ -139,6 +141,18 @@
     "values": {
       "None": 0,
       "WriteOnly": 1
+    },
+    "swiftProjectionQualificationCountedAsXnaBehavior": false
+  },
+  "depthFormatContract": {
+    "kind": "enum",
+    "flags": false,
+    "underlyingType": "System.Int32",
+    "values": {
+      "None": 0,
+      "Depth16": 1,
+      "Depth24": 2,
+      "Depth24Stencil8": 3
     },
     "swiftProjectionQualificationCountedAsXnaBehavior": false
   },

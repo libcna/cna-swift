@@ -1,14 +1,15 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestone 10 final status:** COMPLETE.
+**Foundation Milestone 11 final status:** COMPLETE.
 
 The milestone closes exactly
-`Microsoft.Xna.Framework.Graphics.SurfaceFormat`: one XNA public type, 21 CLR
-identities, and 20 mapped Swift identities. It is an exact managed non-flags
-`Int32` enum with the complete pinned 0...19 literal table. CNA source, the
-canonical ABI, display/adapter/presentation APIs, texture and render-target
-APIs, every GraphicsDevice/GraphicsDeviceManager member, the five runtime-
-partial types, and maintained template source are unchanged.
+`Microsoft.Xna.Framework.Graphics.DepthFormat`: one XNA public type, five CLR
+identities, and four mapped Swift identities. It is an exact managed non-flags
+`Int32` enum with `None=0`, `Depth16=1`, `Depth24=2`, and
+`Depth24Stencil8=3`. CNA source, the canonical ABI, adapter/presentation and
+render-target APIs, every depth/stencil runtime feature, every
+GraphicsDeviceManager member, the five runtime-partial types, and maintained
+template source are unchanged.
 
 ## Qualified environment and gates
 
@@ -18,15 +19,15 @@ SWIFT_TARGET=x86_64-pc-linux-gnu
 SWIFT_TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS
 RELEASE_BUILD=PASS
-DEBUG_TESTS=85 PASS
-RELEASE_TESTS=85 PASS
-MANAGED_TESTS=75 PASS_WITHOUT_CNA_NATIVE_LIBRARY
+DEBUG_TESTS=87 PASS
+RELEASE_TESTS=87 PASS
+MANAGED_TESTS=77 PASS_WITHOUT_CNA_NATIVE_LIBRARY
 WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE
 SYMBOL_GRAPH=PASS
-API_SELF_TESTS=145 PASS
+API_SELF_TESTS=161 PASS
 NORMAL_STRICT=EXPECTED_RED_DEFERRED_PROFILE_ONLY
 LEAK_ONLY=PASS
-PURE_XNA_DERIVED=1249/1249/0
+PURE_XNA_DERIVED=1251/1251/0
 GAMEPAD_NATIVE_FAILURES=0
 SWIFT_ASAN=PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED
 NATIVE_CNA_SANITIZER=NOT_INSTRUMENTED
@@ -40,14 +41,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=70
-TARGET_MEMBERS=1403
-TOTAL_DIAGNOSTICS=338
-MISSING_TYPE=187
+TARGET_TYPES=71
+TARGET_MEMBERS=1407
+TOTAL_DIAGNOSTICS=337
+MISSING_TYPE=186
 MISSING_MEMBER=131
-COMPLETE_TYPES=65
+COMPLETE_TYPES=66
 PARTIAL_TYPES=5
-MISSING_TYPES=187
+MISSING_TYPES=186
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -91,53 +92,43 @@ overload mismatches remain owned exclusively by Game, GraphicsDeviceManager,
 GraphicsDevice, Texture2D, and SpriteBatch. Every other mismatch,
 unexpected-surface, leak, allowlist, and unmeasured category is zero.
 
-## SurfaceFormat type matrix
+## DepthFormat type matrix
 
 | Type | CLR / expected / target | Kind | Raw type | Flags | Diagnostics |
 |---|---:|---|---|---|---:|
-| `SurfaceFormat` | 21 / 20 / 20 | CLR enum → Swift `enum` | `Int32` | false | 0 |
+| `DepthFormat` | 5 / 4 / 4 | CLR enum → Swift `enum` | `Int32` | false | 0 |
 
-| Case | Raw | Case | Raw |
-|---|---:|---|---:|
-| Color | 0 | Rg32 | 10 |
-| Bgr565 | 1 | Rgba64 | 11 |
-| Bgra5551 | 2 | Alpha8 | 12 |
-| Bgra4444 | 3 | Single | 13 |
-| Dxt1 | 4 | Vector2 | 14 |
-| Dxt3 | 5 | Vector4 | 15 |
-| Dxt5 | 6 | HalfSingle | 16 |
-| NormalizedByte2 | 7 | HalfVector2 | 17 |
-| NormalizedByte4 | 8 | HalfVector4 | 18 |
-| Rgba1010102 | 9 | HdrBlendable | 19 |
+| Case | Raw |
+|---|---:|
+| `None` | 0 |
+| `Depth16` | 1 |
+| `Depth24` | 2 |
+| `Depth24Stencil8` | 3 |
 
 The synthetic CLR `value__` identity is the existing enum-storage language
 mapping. Swift `rawValue`, `init?(rawValue:)`, equality, and value copying are
 compiler language surface and produce no unexpected XNA member. All raw values
-0...19 construct the exact cases; 20, -1, and `Int32.max` return `nil`.
+0...3 construct the exact cases; 4, -1, and `Int32.max` return `nil`.
 
-SurfaceFormat is not an OptionSet and has no custom string/helper surface or
-PackedVector dependency. See `docs/surface-format-evidence.md` for the exact
-contract, strict-zero matrix, mutation coverage, and dependency evidence.
+DepthFormat is not an OptionSet and has no custom string or helper surface.
+`Depth24Stencil8` is a single ordinary literal, not flags composition. See
+`docs/depth-format-evidence.md` for the exact contract, strict-zero matrix,
+mutation coverage, and dependency boundary.
 
 ## Dependency effect and deferred boundary
 
-The regenerated public-signature graph retains nine still-missing direct
-reverse dependents: DisplayMode, DisplayModeCollection, GraphicsAdapter,
-PresentationParameters, RenderTarget2D, RenderTargetCube, Texture, Texture3D,
-and TextureCube. Texture2D and GraphicsDeviceManager are two additional direct
-partial consumers and remain unchanged. The transitive reverse closure is 56
-missing types plus the same five partial types.
+The regenerated public-signature graph retains four still-missing direct
+reverse consumers: GraphicsAdapter, PresentationParameters, RenderTarget2D,
+and RenderTargetCube. GraphicsDeviceManager is the one direct partial consumer
+and remains unchanged. The transitive reverse closure is 54 missing types plus
+all five unchanged partial types.
 
-DisplayMode now has only complete public-signature XNA dependencies
-(SurfaceFormat and Rectangle), but neither DisplayMode nor any other dependent
-was implemented or started. There is no DisplayModeCollection, GraphicsAdapter,
-PresentationParameters, Texture constructor, Texture/RenderTarget family,
-GraphicsDeviceManager format property, GraphicsDevice format operation, pixel
-conversion, DXT implementation, HDR support, GPU negotiation, or CNA-native
-SurfaceFormat mapping.
-
-Capability is limited to `SurfaceFormat: VERIFIED_MANAGED`. Enum completeness
-is not evidence of actual renderer/GPU support for any format.
+No GraphicsAdapter, PresentationParameters, RenderTarget2D, RenderTargetCube,
+GraphicsDeviceManager.PreferredDepthStencilFormat, DepthStencilState,
+depth/stencil buffer, attachment, clear, test, renderer capability, native
+constant, or native format mapping was implemented or started. Capability is
+limited to `DepthFormat: VERIFIED_MANAGED`; the enum does not prove GPU support
+for Depth16, Depth24, or Depth24Stencil8.
 
 ## Retained native evidence
 
@@ -189,23 +180,20 @@ self-referential source content.
 
 ## Exactly one next dependency-complete milestone
 
-The regenerated graph contains 67 missing types whose XNA public-signature
-dependencies are complete. Foundation Milestone 11 selects exactly the
-standalone managed `Microsoft.Xna.Framework.Graphics.DepthFormat` enum. It has
-no XNA dependency and four mapped Swift literals (`value__` excluded).
+The regenerated graph contains 66 missing types whose XNA public-signature
+dependencies are complete. Foundation Milestone 12 selects exactly
+`Microsoft.Xna.Framework.Graphics.DisplayMode`.
 
-DepthFormat and DisplayMode each lead to 54 still-missing types by transitive
-reverse reach. The consistent tie-break selects DepthFormat because it has four
-direct missing reverse dependents versus DisplayMode's two, while remaining a
-bounded dependency-free managed enum. DisplayMode was evaluated after becoming
-dependency-complete; it was not selected automatically merely because
-SurfaceFormat unlocked it. Design-time converter closures remain outside this
-runtime ranking because their external System.ComponentModel projection is not
-established.
+This is not an automatic choice based on its earlier eligibility. The ranking
+was recomputed after DepthFormat completion: DisplayMode has the highest
+transitive missing reverse reach at 54, with two direct missing reverse
+consumers and one direct partial consumer. The next candidate,
+RenderTargetUsage, has reverse reach 53. DisplayMode's dependencies,
+SurfaceFormat and Rectangle, are both strict-complete.
 
-This is selection only. `DepthFormat` has not been started and must not be
-combined with PresentationParameters, render targets, depth-stencil state,
-format negotiation, or CNA ABI work.
+This is selection only. `DisplayMode` has not been started and must not be
+combined with DisplayModeCollection, GraphicsAdapter, presentation, device, or
+renderer work.
 
 ```text
 SELECTED_ONLY=true
