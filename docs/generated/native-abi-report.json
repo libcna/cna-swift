@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "CNA_ABI_VERSION": "0.7.0",
+  "CNA_ABI_ENCODED": 1792,
+  "LOADED_ABI_ENCODED": 1792,
+  "BOUND_FUNCTIONS": 25,
+  "PROTOTYPE_TYPE_POSITIONS": 72,
+  "C_SWIFT_MEASUREMENTS": 72,
+  "LAYOUTS": 15,
+  "CALLBACKS": 2,
+  "CONSTANTS": 168,
+  "MISSING_HEADER_SYMBOLS": 0,
+  "MISSING_LIBRARY_SYMBOLS": 0,
+  "ABI_MISMATCHES": 0,
+  "missingLibrarySymbols": [],
+  "mismatches": [],
+  "probeOutput": {
+    "ABI_VERSION": "1792",
+    "LAYOUTS": "15",
+    "CALLBACKS": "2",
+    "CONSTANTS": "8",
+    "CNA_BOOL_SIZE": "1"
+  },
+  "library": {
+    "filename": "libcna_c_api.so",
+    "sha256": "42e099146bf3b470f82fd963a516f8bdd7ff0406da8c37dd53747699117db086"
+  }
+}

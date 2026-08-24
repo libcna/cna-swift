@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "qualifiedEnvironment": {
+    "platform": "Linux x86-64",
+    "swift": "6.0.3",
+    "target": "x86_64-pc-linux-gnu",
+    "cnaAbi": "0.7.0",
+    "renderer": "HEADLESS",
+    "audio": "NULL"
+  },
+  "capabilities": [
+    {"operation":"XNA namespace projection","status":"VERIFIED_MANAGED","evidence":"Swift Symbol Graph emits the strict Microsoft.Xna.Framework path; marker symbols are measured exclusions"},
+    {"operation":"Pure math/value foundation","status":"VERIFIED_MANAGED","evidence":"MathHelper, Point, Rectangle and GameTime are strict-complete; selected Vector2 and Color behavior is real but structurally partial"},
+    {"operation":"Game lifecycle","status":"VERIFIED_NATIVE","evidence":"Initialize/LoadContent/BeginRun/Update/Draw/EndRun/UnloadContent/Exiting execute through CNA callbacks; 60/600 runs pass"},
+    {"operation":"Game callback error containment","status":"VERIFIED_NATIVE","evidence":"Initialize, LoadContent, Update, Draw and UnloadContent errors are caught in C trampolines and rethrown at controlled Swift boundaries"},
+    {"operation":"Game recreation","status":"VERIFIED_NATIVE","evidence":"20 create/run/exit/destroy cycles pass; stale generations reject use"},
+    {"operation":"GraphicsDevice","status":"VERIFIED_NATIVE","evidence":"callback-scoped borrowed device returned by cna_game_get_graphics_device"},
+    {"operation":"Clear","status":"VERIFIED_NATIVE","evidence":"cna_graphics_device_clear_rgba executes on qualified HEADLESS device"},
+    {"operation":"Texture2D stream load","status":"VERIFIED_NATIVE","evidence":"Foundation.InputStream bytes decode through CNA; logo reports native 128x128 and stress fixture reports 1x1"},
+    {"operation":"SpriteBatch Begin/Draw/End","status":"VERIFIED_NATIVE","evidence":"begin, scaled submit, and end execute for 60/600 template frames and 20 ownership cycles"},
+    {"operation":"Keyboard","status":"VERIFIED_NATIVE","evidence":"native HEADLESS state route executes; empty state is observed backend evidence, not fabricated"},
+    {"operation":"Visible renderer output","status":"BACKEND_BLOCKED","evidence":"qualified renderer is HEADLESS; native graphics submission is verified but no window/pixels are claimed"},
+    {"operation":"Content/XNB","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"deferred; fake ContentManager was removed"},
+    {"operation":"Effects/3D","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"deferred; fake BasicEffect/cube/capability route was removed"},
+    {"operation":"Audio","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"outside Foundation-1 selected profile"},
+    {"operation":"Media","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"outside Foundation-1 selected profile"},
+    {"operation":"Storage","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"outside Foundation-1 selected profile"},
+    {"operation":"Canonical CNA HEAD C API build","status":"UPSTREAM_CNA_BLOCKED","evidence":"read-only HEAD 1bb2145 fails on missing GameUpdateRequiredException.hpp; retained exact ABI-0.7 artifact independently passes"},
+    {"operation":"Linux runtime","status":"VERIFIED_NATIVE","evidence":"Swift 6.0.3 x86_64-pc-linux-gnu, exact ABI-0.7 HEADLESS/NULL"},
+    {"operation":"macOS runtime","status":"PLATFORM_PENDING","evidence":"not compiled or executed; no support claim"},
+    {"operation":"iOS/tvOS/visionOS runtime","status":"PLATFORM_PENDING","evidence":"not compiled or executed; package platform declarations removed"},
+    {"operation":"Windows runtime","status":"PLATFORM_PENDING","evidence":"no LoadLibrary implementation or qualification"},
+    {"operation":"Browser/Wasm runtime","status":"PLATFORM_PENDING","evidence":"no Swift/Wasm CNA artifact or loader qualification"}
+  ]
+}

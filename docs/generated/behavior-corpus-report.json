@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "authority": "PURE_XNA_DERIVED",
+  "OBSERVATIONS": 47,
+  "ASSERTIONS": 47,
+  "FAILURES": 0,
+  "testCases": [
+    "testNamespaceAndTypeKindsCompile",
+    "testMathHelperReferenceObservations",
+    "testPointCompleteContractBehavior",
+    "testRectangleCompleteContractBehavior",
+    "testVector2ImplementedMembersAreRealBinary32Math",
+    "testColorPackingAndCanaryValues",
+    "testGameTimeDurationMappingIsExactAtHundredNanoseconds",
+    "testKeyboardStateAndPinnedKeys"
+  ],
+  "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
+  "nativeLibraryRequired": false
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "profile": "XNA 4.0 Windows runtime",
+  "namespaceRoot": "Microsoft.Xna.Framework",
+  "namespaceMarkers": [
+    "Microsoft",
+    "Microsoft.Xna",
+    "Microsoft.Xna.Framework",
+    "Microsoft.Xna.Framework.Graphics",
+    "Microsoft.Xna.Framework.Input",
+    "Microsoft.Xna.Framework.Content"
+  ],
+  "typeKinds": {
+    "class": "class",
+    "struct": "struct",
+    "interface": "protocol",
+    "enum": "enum",
+    "flagsEnum": "OptionSet"
+  },
+  "genericCollisionTypeNames": {
+    "Microsoft.Xna.Framework.Content.ContentTypeReader`1": "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT"
+  },
+  "memberOmissions": [
+    {"kind": "field", "name": "value__", "reason": "Swift raw-value/OptionSet storage is LANGUAGE_MAPPING"},
+    {"kind": "method", "name": "Finalize", "reason": "Swift deinit is non-public lifetime syntax and not a callable member"}
+  ],
+  "operators": {
+    "op_UnaryNegation": "prefix -",
+    "op_Equality": "==",
+    "op_Inequality": "!=",
+    "op_Addition": "+",
+    "op_Subtraction": "-",
+    "op_Multiply": "*",
+    "op_Division": "/",
+    "op_Implicit": "init"
+  },
+  "constructor": "init",
+  "indexer": "subscript",
+  "parameterLabels": {
+    "constructors": "class constructor labels preserve CLR metadata names; value-type constructor external labels are _",
+    "methods": "first external label is _; later labels preserve CLR metadata names",
+    "operators": "all external labels are _"
+  },
+  "typeMappings": {
+    "System.Void": "Void",
+    "System.Boolean": "Bool",
+    "System.Byte": "UInt8",
+    "System.SByte": "Int8",
+    "System.Int16": "Int16",
+    "System.UInt16": "UInt16",
+    "System.Int32": "Int32",
+    "System.UInt32": "UInt32",
+    "System.Int64": "Int64",
+    "System.UInt64": "UInt64",
+    "System.Single": "Float",
+    "System.Double": "Double",
+    "System.String": "String",
+    "System.Object": "Any?",
+    "System.EventArgs": "CNAEventArgs",
+    "System.TimeSpan": "Duration",
+    "System.IO.Stream": "Foundation.InputStream",
+    "System.IntPtr": "Int"
+  },
+  "refOutMapping": "inout",
+  "nullableMapping": "Optional",
+  "throwsMapping": "Swift throws is LANGUAGE_MAPPING and does not add an XNA member",
+  "protectedVirtualMapping": "open",
+  "inheritedPublicMemberProjection": "A selected public inherited member may be declared on a partial Swift subtype until its XNA base exists; the verifier requires an exact ancestor identity. System.IDisposable maps to a public Dispose() member.",
+  "nestedTypeMapping": "replace CLR + nesting separator with Swift . nesting",
+  "systemInterfaceMappings": {
+    "System.IEquatable`1": "Equals/operator members; no Swift Equatable conformance required",
+    "System.IDisposable": "Dispose member; no public helper protocol",
+    "System.Collections.IEnumerable": "sequence members; no automatic conformance"
+  },
+  "referenceContractSha256": "7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc"
+}

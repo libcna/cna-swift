@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "GAME_CYCLES": 20,
+  "GAME_RECREATION_CYCLES": 20,
+  "TEXTURE2D_CYCLES": 20,
+  "SPRITEBATCH_CYCLES": 20,
+  "CALLBACK_ERROR_CYCLES": 20,
+  "NATIVE_CRASHES": 0,
+  "OBSERVED_UAF": 0,
+  "OBSERVED_DOUBLE_FREE": 0,
+  "SWIFT_ASAN_STATUS": "PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED_PTRACE",
+  "NATIVE_CNA_SANITIZER_STATUS": "NOT_INSTRUMENTED",
+  "MODE_FAILURES": 0,
+  "modes": [
+    {
+      "mode": "game_recreation",
+      "test": "NativeLifecycleTests.testTwentyGameRecreations",
+      "exitCode": 0
+    },
+    {
+      "mode": "resources",
+      "test": "NativeLifecycleTests.testTwentyTextureAndSpriteBatchCycles",
+      "exitCode": 0
+    },
+    {
+      "mode": "callback_errors",
+      "test": "NativeLifecycleTests.testTwentyCallbackErrorCycles",
+      "exitCode": 0
+    },
+    {
+      "mode": "wrong_thread",
+      "test": "NativeLifecycleTests.testWrongThreadDisposeKeepsHandleForOwnerRetry",
+      "exitCode": 0
+    }
+  ]
+}

@@ -1,0 +1,760 @@
+#!/usr/bin/env python3
+"""Compiler-Symbol-Graph verifier for the strict CNA-Swift XNA projection."""
+
+from __future__ import annotations
+
+import argparse
+import collections
+import dataclasses
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[2]
+REFERENCE = ROOT / "tools/api_compat/reference/xna40-windows-runtime-contract.json"
+RULES = ROOT / "tools/api_compat/mapping-rules.json"
+
+CATEGORIES = (
+    "MISSING_TYPE", "MISSING_MEMBER", "UNEXPECTED_TYPE", "UNEXPECTED_MEMBER",
+    "TYPE_KIND_MISMATCH", "BASE_MAPPING_MISMATCH", "INTERFACE_MAPPING_MISMATCH",
+    "FIELD_MAPPING_MISMATCH", "PROPERTY_MAPPING_MISMATCH",
+    "METHOD_SIGNATURE_MAPPING_MISMATCH", "PARAMETER_MAPPING_MISMATCH",
+    "RETURN_MAPPING_MISMATCH", "OVERLOAD_MAPPING_MISMATCH", "GENERIC_MAPPING_MISMATCH",
+    "ENUM_VALUE_MISMATCH", "FLAGS_MAPPING_MISMATCH", "EVENT_MAPPING_MISMATCH",
+    "OPERATOR_MAPPING_MISMATCH", "REF_OUT_MAPPING_MISMATCH", "LANGUAGE_MAPPING_MISMATCH",
+    "INTERNAL_TYPE_LEAK", "RAW_HANDLE_LEAK", "PUBLIC_NATIVE_FFI_LEAK",
+    "UNMEASURED_STRUCTURAL_CATEGORY",
+)
+
+TYPE_KINDS = {
+    "swift.class": "class",
+    "swift.struct": "struct",
+    "swift.protocol": "protocol",
+    "swift.enum": "enum",
+}
+
+OPERATOR_FROM_SWIFT = {
+    "==": "op_Equality", "!=": "op_Inequality", "+": "op_Addition",
+    "*": "op_Multiply", "/": "op_Division",
+}
+
+
+@dataclasses.dataclass
+class Member:
+    owner: str
+    kind: str
+    name: str
+    static: bool
+    parameters: tuple[str, ...] = ()
+    labels: tuple[str, ...] = ()
+    directions: tuple[str, ...] = ()
+    return_type: str = "Void"
+    mutable: bool | None = None
+    raw_value: int | None = None
+    declaration: str = ""
+    identifier: str = ""
+
+    @property
+    def display(self) -> str:
+        params = ",".join(
+            f"{direction + ' ' if direction else ''}{label}:{kind}"
+            for label, kind, direction in zip(self.labels, self.parameters, self.directions)
+        )
+        return f"{self.owner}.{self.name}({params})"
+
+
+@dataclasses.dataclass
+class TypeModel:
+    name: str
+    kind: str
+    flags: bool = False
+    base: str | None = None
+    interfaces: tuple[str, ...] = ()
+    generic_count: int = 0
+    declaration: str = ""
+    identifier: str = ""
+    members: list[Member] = dataclasses.field(default_factory=list)
+
+
+def load_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def map_type_name(name: str, rules: dict[str, Any]) -> str:
+    collision = rules["genericCollisionTypeNames"].get(name)
+    if collision:
+        return collision
+    name = name.replace("+", ".")
+    return re.sub(r"`\d+", "", name)
+
+
+def split_generic_arguments(text: str) -> list[str]:
+    result: list[str] = []
+    start = 0
+    depth = 0
+    for index, char in enumerate(text):
+        if char in "[<":
+            depth += 1
+        elif char in "]>":
+            depth -= 1
+        elif char == "," and depth == 0:
+            result.append(text[start:index])
+            start = index + 1
+    result.append(text[start:])
+    return [item.strip() for item in result if item.strip()]
+
+
+def map_clr_type(clr: str | None, rules: dict[str, Any]) -> str:
+    if clr is None:
+        return "Void"
+    text = clr.rstrip("&")
+    if text.endswith("[]"):
+        return f"[{map_clr_type(text[:-2], rules)}]"
+    direct = rules["typeMappings"].get(text)
+    if direct:
+        return direct
+    nullable = re.fullmatch(r"System\.Nullable`1\[(.+)]", text)
+    if nullable:
+        return f"{map_clr_type(nullable.group(1), rules)}?"
+    generic = re.fullmatch(r"(.+)`(\d+)\[(.*)]", text)
+    if generic:
+        base = map_type_name(f"{generic.group(1)}`{generic.group(2)}", rules)
+        args = ", ".join(map_clr_type(item, rules) for item in split_generic_arguments(generic.group(3)))
+        return f"{base}<{args}>"
+    return map_type_name(text, rules)
+
+
+def member_is_omitted(member: dict[str, Any]) -> bool:
+    return (member["kind"] == "field" and member["name"] == "value__") or member["name"] == "Finalize"
+
+
+def expected_member(owner: str, source: dict[str, Any], rules: dict[str, Any], owner_kind: str) -> Member:
+    kind = source["kind"]
+    name = source["name"]
+    if kind == "constructor":
+        mapped_name = ".ctor"
+    elif kind == "property" and source.get("parameters"):
+        mapped_name = "Item"
+    else:
+        mapped_name = name
+
+    parameters = source.get("parameters", [])
+    labels: list[str] = []
+    directions: list[str] = []
+    types: list[str] = []
+    for index, parameter in enumerate(parameters):
+        if kind == "constructor":
+            labels.append(parameter["name"] if owner_kind == "class" else "_")
+        else:
+            labels.append("_" if index == 0 or name.startswith("op_") else parameter["name"])
+        direction = "inout" if parameter.get("ref") or parameter.get("out") else ""
+        directions.append(direction)
+        types.append(map_clr_type(parameter["type"], rules))
+
+    mutable: bool | None = None
+    if kind == "property":
+        mutable = bool(source.get("set"))
+    elif kind == "field":
+        mutable = not bool(source.get("constant"))
+
+    raw: int | None = None
+    if kind == "field" and source.get("value") is not None:
+        try:
+            raw = int(source["value"], 0)
+        except (TypeError, ValueError):
+            try:
+                raw = int(source["value"])
+            except (TypeError, ValueError):
+                raw = None
+
+    return Member(
+        owner=owner,
+        kind=kind,
+        name=mapped_name,
+        static=bool(source.get("static")),
+        parameters=tuple(types),
+        labels=tuple(labels),
+        directions=tuple(directions),
+        return_type=map_clr_type(source.get("returnType") or source.get("type"), rules),
+        mutable=mutable,
+        raw_value=raw,
+    )
+
+
+def build_expected(contract: dict[str, Any], rules: dict[str, Any]) -> dict[str, TypeModel]:
+    models: dict[str, TypeModel] = {}
+    for source_type in contract["types"]:
+        name = map_type_name(source_type["name"], rules)
+        kind = source_type["kind"]
+        flags = bool(source_type.get("flags"))
+        swift_kind = "struct" if kind == "enum" and flags else rules["typeKinds"][kind]
+        generic_count = len(source_type.get("genericParameters", []))
+        model = TypeModel(
+            name=name,
+            kind=swift_kind,
+            flags=flags,
+            base=map_clr_type(source_type.get("baseType"), rules) if source_type.get("baseType") else None,
+            interfaces=tuple(map_clr_type(value, rules) for value in source_type.get("directInterfaces", [])),
+            generic_count=generic_count,
+        )
+        model.members = [
+            expected_member(name, member, rules, source_type["kind"])
+            for member in source_type["members"] if not member_is_omitted(member)
+        ]
+        models[name] = model
+    return models
+
+
+def declaration(symbol: dict[str, Any]) -> str:
+    return "".join(part.get("spelling", "") for part in symbol.get("declarationFragments", []))
+
+
+def normalize_swift_type(text: str) -> str:
+    value = re.sub(r"\s+", " ", text.strip())
+    value = value.replace("Swift.", "").replace("CNA.", "")
+    if value == "InputStream":
+        value = "Foundation.InputStream"
+    value = value.replace("()", "Void") if value == "()" else value
+    return value
+
+
+def parse_parameter(fragment: str) -> tuple[str, str]:
+    if ":" not in fragment:
+        return "", normalize_swift_type(fragment)
+    _, value = fragment.split(":", 1)
+    value = normalize_swift_type(value)
+    if value.startswith("inout "):
+        return "inout", value[6:]
+    return "", value
+
+
+def actual_member(owner: str, symbol: dict[str, Any], raw_values: dict[tuple[str, str], int]) -> Member:
+    swift_kind = symbol["kind"]["identifier"]
+    title = symbol["names"]["title"]
+    decl = declaration(symbol)
+    if swift_kind == "swift.init":
+        kind, name = "constructor", ".ctor"
+    elif swift_kind == "swift.subscript":
+        kind, name = "property", "Item"
+    elif swift_kind == "swift.enum.case":
+        kind, name = "field", symbol["pathComponents"][-1]
+    elif swift_kind == "swift.func.op":
+        kind = "method"
+        operator = title.split("(", 1)[0]
+        if operator == "-":
+            count = len(symbol.get("functionSignature", {}).get("parameters", []))
+            name = "op_UnaryNegation" if count == 1 else "op_Subtraction"
+        else:
+            name = OPERATOR_FROM_SWIFT.get(operator, operator)
+    elif swift_kind in ("swift.method", "swift.type.method"):
+        kind, name = "method", title.split("(", 1)[0]
+    elif swift_kind in ("swift.property", "swift.type.property"):
+        kind, name = "property", title
+    else:
+        kind, name = "unknown", title
+
+    signature = symbol.get("functionSignature", {})
+    parameter_types: list[str] = []
+    directions: list[str] = []
+    for parameter in signature.get("parameters", []):
+        text = "".join(item.get("spelling", "") for item in parameter.get("declarationFragments", []))
+        direction, mapped = parse_parameter(text)
+        parameter_name = parameter.get("name", "")
+        if "inout" in text or re.search(rf"(?:_\s+)?{re.escape(parameter_name)}:\s*inout\b", decl):
+            direction = "inout"
+        directions.append(direction)
+        parameter_types.append(mapped)
+    labels = tuple(
+        item["spelling"] for item in symbol.get("declarationFragments", [])
+        if item.get("kind") == "externalParam"
+    )
+    if swift_kind == "swift.func.op":
+        labels = tuple("_" for _ in parameter_types)
+    elif len(labels) != len(parameter_types):
+        labels = tuple("_" if index == 0 else parameter.get("name", "_") for index, parameter in enumerate(signature.get("parameters", [])))
+
+    returns = normalize_swift_type("".join(item.get("spelling", "") for item in signature.get("returns", [])))
+    if not returns:
+        if kind in ("property", "field") and ":" in decl:
+            returns = normalize_swift_type(decl.split(":", 1)[1].split("{", 1)[0])
+        else:
+            returns = "Void"
+    mutable: bool | None = None
+    if kind == "property":
+        mutable = not ("let " in decl or ("{ get" in decl and " set" not in decl))
+    elif kind == "field":
+        mutable = False
+        returns = owner
+
+    return Member(
+        owner=owner,
+        kind=kind,
+        name=name,
+        static=swift_kind.startswith("swift.type.") or swift_kind == "swift.enum.case" or swift_kind == "swift.func.op" or "static " in decl,
+        parameters=tuple(parameter_types),
+        labels=labels,
+        directions=tuple(directions),
+        return_type=returns,
+        mutable=mutable,
+        raw_value=raw_values.get((owner.rsplit(".", 1)[-1], name)),
+        declaration=decl,
+        identifier=symbol["identifier"]["precise"],
+    )
+
+
+def enum_raw_values(source_root: Path) -> dict[tuple[str, str], int]:
+    values: dict[tuple[str, str], int] = {}
+    enum_name: str | None = None
+    brace_depth = 0
+    for path in source_root.rglob("*.swift"):
+        enum_name = None
+        brace_depth = 0
+        for line in path.read_text(encoding="utf-8").splitlines():
+            match = re.search(r"public enum\s+(\w+)\s*:\s*(?:U?Int\d+)", line)
+            option_set = re.search(r"public struct\s+(\w+)\s*:\s*OptionSet", line)
+            if option_set:
+                enum_name = option_set.group(1)
+                brace_depth = line.count("{") - line.count("}")
+                continue
+            if match:
+                enum_name = match.group(1)
+                brace_depth = line.count("{") - line.count("}")
+                continue
+            if enum_name:
+                brace_depth += line.count("{") - line.count("}")
+                case = re.search(r"\bcase\s+(\w+)\s*=\s*(-?(?:0x[0-9A-Fa-f_]+|\d[\d_]*))", line)
+                if case:
+                    values[(enum_name, case.group(1))] = int(case.group(2).replace("_", ""), 0)
+                option = re.search(r"static let\s+(\w+)\s*=\s*\w+\(rawValue:\s*(-?(?:0x[0-9A-Fa-f_]+|\d[\d_]*))\)", line)
+                if option:
+                    values[(enum_name, option.group(1))] = int(option.group(2).replace("_", ""), 0)
+                empty_option = re.search(r"static let\s+(\w+)\s*=\s*\w+\(\[\]\)", line)
+                if empty_option:
+                    values[(enum_name, empty_option.group(1))] = 0
+                if brace_depth <= 0:
+                    enum_name = None
+    return values
+
+
+def relationship_name(relationship: dict[str, Any], symbols: dict[str, dict[str, Any]]) -> str | None:
+    target = symbols.get(relationship.get("target", ""))
+    if target:
+        return ".".join(target["pathComponents"])
+    fallback = relationship.get("targetFallback")
+    return fallback.replace("Swift.", "") if fallback else None
+
+
+def is_synthesized_language_member(owner: TypeModel, member: Member) -> bool:
+    if "::SYNTHESIZED::" in member.identifier:
+        return True
+    if owner.kind in ("enum", "struct") and member.name in {"rawValue", "hashValue", "hash", ".ctor", "op_Equality", "op_Inequality"}:
+        if owner.kind == "enum" or owner.flags:
+            return True
+    return False
+
+
+def parse_symbol_graph(path: Path, markers: set[str], source_root: Path) -> tuple[dict[str, TypeModel], list[dict[str, Any]], int]:
+    graph = load_json(path)
+    symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
+    raw_values = enum_raw_values(source_root)
+    types: dict[str, TypeModel] = {}
+    strict_symbols = 0
+    for symbol in graph["symbols"]:
+        path_name = ".".join(symbol["pathComponents"])
+        if symbol.get("accessLevel") not in ("public", "open"):
+            continue
+        if path_name.startswith("Microsoft.Xna.Framework"):
+            strict_symbols += 1
+        swift_kind = symbol["kind"]["identifier"]
+        if swift_kind not in TYPE_KINDS or not path_name.startswith("Microsoft.Xna.Framework") or path_name in markers:
+            continue
+        generic_count = declaration(symbol).count("<")
+        types[path_name] = TypeModel(
+            name=path_name,
+            kind=TYPE_KINDS[swift_kind],
+            flags="OptionSet" in declaration(symbol),
+            generic_count=generic_count,
+            declaration=declaration(symbol),
+            identifier=symbol["identifier"]["precise"],
+        )
+
+    member_relationships: dict[str, str] = {}
+    diagnostics_context: list[dict[str, Any]] = []
+    for relation in graph.get("relationships", []):
+        if relation["kind"] == "memberOf" and relation.get("target") in symbols:
+            parent = ".".join(symbols[relation["target"]]["pathComponents"])
+            member_relationships[relation["source"]] = parent
+        elif relation["kind"] in ("inheritsFrom", "conformsTo") and relation.get("source") in symbols:
+            source_name = ".".join(symbols[relation["source"]]["pathComponents"])
+            if source_name in types:
+                target_name = relationship_name(relation, symbols)
+                if relation["kind"] == "inheritsFrom":
+                    types[source_name].base = target_name
+                elif target_name:
+                    types[source_name].interfaces += (target_name,)
+                    if target_name in ("OptionSet", "Swift.OptionSet"):
+                        types[source_name].flags = True
+
+    for precise, parent in member_relationships.items():
+        if parent not in types or precise not in symbols:
+            continue
+        symbol = symbols[precise]
+        if symbol.get("accessLevel") not in ("public", "open"):
+            continue
+        member = actual_member(parent, symbol, raw_values)
+        if not is_synthesized_language_member(types[parent], member):
+            types[parent].members.append(member)
+
+    return types, diagnostics_context, strict_symbols
+
+
+def comparable_kind(expected: Member, actual: Member) -> bool:
+    if expected.kind == actual.kind:
+        return True
+    if expected.kind == "field" and actual.kind == "property":
+        return "{ get" not in actual.declaration
+    if expected.kind == "event" and actual.kind == "property":
+        return True
+    return False
+
+
+def system_interface_is_language_mapped(name: str) -> bool:
+    return name.startswith("System.")
+
+
+def diagnostic(category: str, subject: str, detail: str) -> dict[str, str]:
+    return {"category": category, "subject": subject, "detail": detail}
+
+
+def same_callable_identity(expected: Member, actual: Member) -> bool:
+    return (
+        expected.name == actual.name and
+        comparable_kind(expected, actual) and
+        expected.static == actual.static and
+        expected.parameters == actual.parameters and
+        expected.labels == actual.labels and
+        expected.directions == actual.directions
+    )
+
+
+def is_inherited_language_projection(
+    owner: TypeModel,
+    member: Member,
+    expected: dict[str, TypeModel],
+) -> bool:
+    if any(same_callable_identity(item, member) for item in owner.members):
+        return False
+    if "System.IDisposable" in owner.interfaces and member.name == "Dispose" and not member.parameters:
+        return True
+    visited: set[str] = set()
+    base = owner.base
+    while base and base not in visited:
+        visited.add(base)
+        ancestor = expected.get(base)
+        if ancestor is None:
+            break
+        if any(same_callable_identity(item, member) for item in ancestor.members):
+            return True
+        base = ancestor.base
+    return False
+
+
+def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> list[dict[str, str]]:
+    result: list[dict[str, str]] = []
+    consumed: dict[str, set[str]] = collections.defaultdict(set)
+
+    for name, expected_type in expected.items():
+        actual_type = actual.get(name)
+        if actual_type is None:
+            result.append(diagnostic("MISSING_TYPE", name, "mapped XNA type is absent from the Swift Symbol Graph"))
+            continue
+        if actual_type.kind != expected_type.kind:
+            result.append(diagnostic("TYPE_KIND_MISMATCH", name, f"expected {expected_type.kind}, found {actual_type.kind}"))
+        if expected_type.flags and not actual_type.flags:
+            result.append(diagnostic("FLAGS_MAPPING_MISMATCH", name, "CLR [Flags] enum is not a Swift OptionSet"))
+        if expected_type.generic_count != actual_type.generic_count:
+            result.append(diagnostic("GENERIC_MAPPING_MISMATCH", name, f"expected {expected_type.generic_count} generic parameters, found {actual_type.generic_count}"))
+
+        expected_base = expected_type.base
+        if expected_base and expected_base.startswith("Microsoft.Xna.Framework") and actual_type.base != expected_base:
+            result.append(diagnostic("BASE_MAPPING_MISMATCH", name, f"expected base {expected_base}, found {actual_type.base}"))
+        expected_interfaces = {
+            item for item in expected_type.interfaces
+            if not system_interface_is_language_mapped(item) and item.split("<", 1)[0] in expected
+        }
+        actual_interfaces = set(actual_type.interfaces)
+        if not expected_interfaces.issubset(actual_interfaces):
+            result.append(diagnostic("INTERFACE_MAPPING_MISMATCH", name, f"missing protocols {sorted(expected_interfaces - actual_interfaces)}"))
+
+        def exact_shape_exists(member: Member) -> bool:
+            return any(
+                item.name == member.name and
+                comparable_kind(member, item) and
+                item.static == member.static and
+                item.parameters == member.parameters and
+                item.labels == member.labels and
+                item.directions == member.directions
+                for item in actual_type.members
+            )
+
+        # Reserve exact overload identities before considering malformed or
+        # absent overloads. A greedy name-only walk can otherwise consume the
+        # one real nine-parameter Draw while diagnosing an absent four-
+        # parameter Draw, and then falsely call the real overload missing.
+        ordered_expected_members = sorted(
+            enumerate(expected_type.members),
+            key=lambda pair: (not exact_shape_exists(pair[1]), pair[0]),
+        )
+        for _, expected_member_model in ordered_expected_members:
+            candidates = [item for item in actual_type.members if item.name == expected_member_model.name and item.identifier not in consumed[name]]
+            if not candidates:
+                result.append(diagnostic("MISSING_MEMBER", expected_member_model.display, "mapped member is absent"))
+                if any(item.name == expected_member_model.name for item in actual_type.members):
+                    result.append(diagnostic("OVERLOAD_MAPPING_MISMATCH", expected_member_model.display, "required overload is absent"))
+                continue
+
+            arity_candidates = [
+                item for item in candidates
+                if len(item.parameters) == len(expected_member_model.parameters)
+            ]
+            if not arity_candidates:
+                result.append(diagnostic("MISSING_MEMBER", expected_member_model.display, "mapped overload is absent"))
+                result.append(diagnostic("OVERLOAD_MAPPING_MISMATCH", expected_member_model.display, "required overload is absent"))
+                continue
+
+            def distance(item: Member) -> int:
+                return (
+                    (0 if comparable_kind(expected_member_model, item) else 8) +
+                    (0 if expected_member_model.static == item.static else 4) +
+                    abs(len(expected_member_model.parameters) - len(item.parameters)) * 3 +
+                    sum(a != b for a, b in zip(expected_member_model.parameters, item.parameters)) +
+                    sum(a != b for a, b in zip(expected_member_model.labels, item.labels))
+                )
+
+            candidate = min(arity_candidates, key=distance)
+            consumed[name].add(candidate.identifier)
+            subject = expected_member_model.display
+            if not comparable_kind(expected_member_model, candidate):
+                category = {
+                    "field": "FIELD_MAPPING_MISMATCH", "property": "PROPERTY_MAPPING_MISMATCH",
+                    "event": "EVENT_MAPPING_MISMATCH",
+                }.get(expected_member_model.kind, "METHOD_SIGNATURE_MAPPING_MISMATCH")
+                result.append(diagnostic(category, subject, f"expected {expected_member_model.kind}, found {candidate.kind}"))
+            if expected_member_model.static != candidate.static:
+                category = "PROPERTY_MAPPING_MISMATCH" if expected_member_model.kind in ("property", "field") else "METHOD_SIGNATURE_MAPPING_MISMATCH"
+                result.append(diagnostic(category, subject, "static/instance identity differs"))
+            if len(expected_member_model.parameters) != len(candidate.parameters):
+                result.append(diagnostic("OVERLOAD_MAPPING_MISMATCH", subject, f"expected {len(expected_member_model.parameters)} parameters, found {len(candidate.parameters)}"))
+            else:
+                if expected_member_model.labels != candidate.labels or expected_member_model.parameters != candidate.parameters:
+                    result.append(diagnostic("PARAMETER_MAPPING_MISMATCH", subject, f"expected labels/types {list(zip(expected_member_model.labels, expected_member_model.parameters))}, found {list(zip(candidate.labels, candidate.parameters))}"))
+                if expected_member_model.directions != candidate.directions:
+                    result.append(diagnostic("REF_OUT_MAPPING_MISMATCH", subject, f"expected {expected_member_model.directions}, found {candidate.directions}"))
+            if expected_member_model.kind in ("method", "property", "field") and expected_member_model.return_type != candidate.return_type:
+                category = "RETURN_MAPPING_MISMATCH" if expected_member_model.kind == "method" else ("FIELD_MAPPING_MISMATCH" if expected_member_model.kind == "field" else "PROPERTY_MAPPING_MISMATCH")
+                result.append(diagnostic(category, subject, f"expected {expected_member_model.return_type}, found {candidate.return_type}"))
+            if expected_member_model.mutable is not None and candidate.mutable is not None and expected_member_model.mutable != candidate.mutable:
+                category = "FIELD_MAPPING_MISMATCH" if expected_member_model.kind == "field" else "PROPERTY_MAPPING_MISMATCH"
+                result.append(diagnostic(category, subject, f"expected mutable={expected_member_model.mutable}, found mutable={candidate.mutable}"))
+            if expected_member_model.raw_value is not None:
+                if candidate.raw_value is None:
+                    result.append(diagnostic("UNMEASURED_STRUCTURAL_CATEGORY", subject, "enum raw value unavailable from Symbol Graph supplement"))
+                elif expected_member_model.raw_value != candidate.raw_value:
+                    result.append(diagnostic("ENUM_VALUE_MISMATCH", subject, f"expected {expected_member_model.raw_value}, found {candidate.raw_value}"))
+            if expected_member_model.name.startswith("op_") and candidate.kind != "method":
+                result.append(diagnostic("OPERATOR_MAPPING_MISMATCH", subject, "operator did not map to a Swift operator function"))
+            if ("<" in expected_member_model.return_type or any("<" in item for item in expected_member_model.parameters)) != ("<" in candidate.declaration):
+                result.append(diagnostic("GENERIC_MAPPING_MISMATCH", subject, "generic member shape differs"))
+
+        for member in actual_type.members:
+            if member.identifier not in consumed[name]:
+                if is_inherited_language_projection(expected_type, member, expected):
+                    continue
+                result.append(diagnostic("UNEXPECTED_MEMBER", member.display, "public XNA-namespace member has no mapped reference identity"))
+
+    for name, actual_type in actual.items():
+        if name not in expected:
+            result.append(diagnostic("UNEXPECTED_TYPE", name, "public XNA-namespace type has no mapped reference identity"))
+            if any(part.startswith("_") or part in {"Runtime", "Native", "Internal"} for part in name.split(".")):
+                result.append(diagnostic("INTERNAL_TYPE_LEAK", name, "implementation type leaked into strict XNA namespace"))
+
+    pointer_pattern = re.compile(r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle|CNASwift_|CNA_Handle")
+    raw_pattern = re.compile(r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle")
+    for model in actual.values():
+        for member in model.members:
+            if raw_pattern.search(member.declaration):
+                result.append(diagnostic("RAW_HANDLE_LEAK", member.display, member.declaration))
+            if pointer_pattern.search(member.declaration):
+                result.append(diagnostic("PUBLIC_NATIVE_FFI_LEAK", member.display, member.declaration))
+    return result
+
+
+def self_test() -> None:
+    base_member = Member("Microsoft.Xna.Framework.Foo", "method", "Bar", False, ("Int32",), ("_",), ("",), "Bool", identifier="bar")
+    expected = {
+        "Microsoft.Xna.Framework.Foo": TypeModel("Microsoft.Xna.Framework.Foo", "class", base="Microsoft.Xna.Framework.Base", interfaces=("Microsoft.Xna.Framework.IFoo",), members=[base_member]),
+        "Microsoft.Xna.Framework.Base": TypeModel("Microsoft.Xna.Framework.Base", "class"),
+        "Microsoft.Xna.Framework.IFoo": TypeModel("Microsoft.Xna.Framework.IFoo", "protocol"),
+    }
+    good = {
+        "Microsoft.Xna.Framework.Foo": TypeModel("Microsoft.Xna.Framework.Foo", "class", base="Microsoft.Xna.Framework.Base", interfaces=("Microsoft.Xna.Framework.IFoo",), members=[dataclasses.replace(base_member)]),
+        "Microsoft.Xna.Framework.Base": TypeModel("Microsoft.Xna.Framework.Base", "class"),
+        "Microsoft.Xna.Framework.IFoo": TypeModel("Microsoft.Xna.Framework.IFoo", "protocol"),
+    }
+
+    def categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(expected, models)}
+
+    mutations: list[tuple[str, str, Any]] = []
+    mutations.append(("missing type", "MISSING_TYPE", lambda m: m.pop("Microsoft.Xna.Framework.Foo")))
+    mutations.append(("missing method", "MISSING_MEMBER", lambda m: m["Microsoft.Xna.Framework.Foo"].members.clear()))
+    mutations.append(("wrong kind", "TYPE_KIND_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"], "kind", "struct")))
+    mutations.append(("wrong namespace", "MISSING_TYPE", lambda m: m.__setitem__("Microsoft.Xna.Wrong.Foo", m.pop("Microsoft.Xna.Framework.Foo"))))
+    mutations.append(("wrong base", "BASE_MAPPING_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"], "base", None)))
+    mutations.append(("wrong protocol", "INTERFACE_MAPPING_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"], "interfaces", ())))
+    mutations.append(("wrong constructor", "MISSING_MEMBER", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "name", ".ctor")))
+    mutations.append(("missing overload", "OVERLOAD_MAPPING_MISMATCH", lambda m: m["Microsoft.Xna.Framework.Foo"].members[0].parameters.__class__))
+    mutations.append(("wrong label", "PARAMETER_MAPPING_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "labels", ("value",))))
+    mutations.append(("wrong parameter", "PARAMETER_MAPPING_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "parameters", ("Float",))))
+    mutations.append(("wrong return", "RETURN_MAPPING_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "return_type", "Int32")))
+    mutations.append(("wrong static", "METHOD_SIGNATURE_MAPPING_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "static", True)))
+    mutations.append(("ref mismatch", "REF_OUT_MAPPING_MISMATCH", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "directions", ("inout",))))
+    mutations.append(("unexpected type", "UNEXPECTED_TYPE", lambda m: m.__setitem__("Microsoft.Xna.Framework.Extra", TypeModel("Microsoft.Xna.Framework.Extra", "class"))))
+    mutations.append(("unexpected member", "UNEXPECTED_MEMBER", lambda m: m["Microsoft.Xna.Framework.Foo"].members.append(Member("Microsoft.Xna.Framework.Foo", "method", "Extra", False, identifier="extra"))))
+    mutations.append(("raw pointer", "RAW_HANDLE_LEAK", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "declaration", "func Bar(_ value: UnsafeRawPointer)")))
+    mutations.append(("native handle", "PUBLIC_NATIVE_FFI_LEAK", lambda m: setattr(m["Microsoft.Xna.Framework.Foo"].members[0], "declaration", "func Bar(_ value: CNA_Handle)")))
+    mutations.append(("internal helper", "INTERNAL_TYPE_LEAK", lambda m: m.__setitem__("Microsoft.Xna.Framework.Internal.Helper", TypeModel("Microsoft.Xna.Framework.Internal.Helper", "class"))))
+
+    failures: list[str] = []
+    import copy
+    for label, wanted, mutate in mutations:
+        models = copy.deepcopy(good)
+        if label == "missing overload":
+            models["Microsoft.Xna.Framework.Foo"].members.append(Member("Microsoft.Xna.Framework.Foo", "method", "Bar", False, (), (), (), "Bool", identifier="other"))
+            models["Microsoft.Xna.Framework.Foo"].members.pop(0)
+        else:
+            mutate(models)
+        if wanted not in categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    enum_expected = {"Microsoft.Xna.Framework.E": TypeModel("Microsoft.Xna.Framework.E", "enum", members=[Member("Microsoft.Xna.Framework.E", "field", "A", True, return_type="Microsoft.Xna.Framework.E", mutable=False, raw_value=1)])}
+    enum_actual = {"Microsoft.Xna.Framework.E": TypeModel("Microsoft.Xna.Framework.E", "enum", members=[Member("Microsoft.Xna.Framework.E", "field", "A", True, return_type="Microsoft.Xna.Framework.E", mutable=False, raw_value=2, identifier="a")])}
+    if "ENUM_VALUE_MISMATCH" not in {item["category"] for item in compare(enum_expected, enum_actual)}:
+        failures.append("enum raw value mutation")
+    flags_expected = {"Microsoft.Xna.Framework.F": TypeModel("Microsoft.Xna.Framework.F", "struct", flags=True)}
+    flags_actual = {"Microsoft.Xna.Framework.F": TypeModel("Microsoft.Xna.Framework.F", "struct", flags=False)}
+    if "FLAGS_MAPPING_MISMATCH" not in {item["category"] for item in compare(flags_expected, flags_actual)}:
+        failures.append("flags mutation")
+    generic_expected = {"Microsoft.Xna.Framework.GOfT": TypeModel("Microsoft.Xna.Framework.GOfT", "class", generic_count=1)}
+    generic_actual = {"Microsoft.Xna.Framework.GOfT": TypeModel("Microsoft.Xna.Framework.GOfT", "class", generic_count=0)}
+    if "GENERIC_MAPPING_MISMATCH" not in {item["category"] for item in compare(generic_expected, generic_actual)}:
+        failures.append("generic collision mutation")
+    property_expected = {"Microsoft.Xna.Framework.P": TypeModel("Microsoft.Xna.Framework.P", "struct", members=[Member("Microsoft.Xna.Framework.P", "property", "Value", False, return_type="Int32", mutable=True)])}
+    property_actual = {"Microsoft.Xna.Framework.P": TypeModel("Microsoft.Xna.Framework.P", "struct", members=[Member("Microsoft.Xna.Framework.P", "property", "Value", False, return_type="Int32", mutable=False, identifier="value")])}
+    if "PROPERTY_MAPPING_MISMATCH" not in {item["category"] for item in compare(property_expected, property_actual)}:
+        failures.append("property mutability mutation")
+    unmeasured_actual = {"Microsoft.Xna.Framework.E": TypeModel("Microsoft.Xna.Framework.E", "enum", members=[Member("Microsoft.Xna.Framework.E", "field", "A", True, return_type="Microsoft.Xna.Framework.E", mutable=False, raw_value=None, identifier="a")])}
+    if "UNMEASURED_STRUCTURAL_CATEGORY" not in {item["category"] for item in compare(enum_expected, unmeasured_actual)}:
+        failures.append("unmeasured category mutation")
+
+    if failures:
+        raise SystemExit("self-test failures:\n" + "\n".join(failures))
+    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 4}")
+    print("API_COMPAT_SELF_TEST_STATUS=PASS")
+
+
+def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[str, TypeModel], actual: dict[str, TypeModel], diagnostics: list[dict[str, str]], graph_path: Path) -> dict[str, Any]:
+    counts = collections.Counter(item["category"] for item in diagnostics)
+    type_diagnostics: dict[str, list[dict[str, str]]] = collections.defaultdict(list)
+    for item in diagnostics:
+        owner = item["subject"]
+        while owner not in expected and "." in owner:
+            owner = owner.rsplit(".", 1)[0]
+        if owner in expected:
+            type_diagnostics[owner].append(item)
+    missing_types = sorted(name for name in expected if name not in actual)
+    complete_types = sorted(name for name in expected if name in actual and not type_diagnostics[name])
+    partial_types = sorted(name for name in expected if name in actual and type_diagnostics[name])
+    expected_members = sum(len(model.members) for model in expected.values())
+    target_members = sum(len(model.members) for model in actual.values())
+    summary: dict[str, Any] = {
+        "REFERENCE_TYPES": len(contract["types"]),
+        "REFERENCE_MEMBERS": sum(len(item["members"]) for item in contract["types"]),
+        "EXPECTED_SWIFT_TYPES": len(expected),
+        "EXPECTED_SWIFT_MEMBERS": expected_members,
+        "TARGET_TYPES": len(actual),
+        "TARGET_MEMBERS": target_members,
+        "TOTAL_DIAGNOSTICS": len(diagnostics),
+        "COMPLETE_TYPES": len(complete_types),
+        "PARTIAL_TYPES": len(partial_types),
+        "MISSING_TYPES": len(missing_types),
+    }
+    summary.update({category: counts[category] for category in CATEGORIES})
+    inherited_projections = sum(
+        is_inherited_language_projection(expected[name], member, expected)
+        for name, model in actual.items() if name in expected
+        for member in model.members
+    )
+    summary["ALLOWLIST_ENTRIES"] = 28 + 49 + len(rules["namespaceMarkers"]) + inherited_projections
+    return {
+        "schemaVersion": 1,
+        "profile": contract["profile"],
+        "reference": {
+            "path": str(REFERENCE.relative_to(ROOT)),
+            "sha256": hashlib.sha256(REFERENCE.read_bytes()).hexdigest(),
+        },
+        "symbolGraph": str(graph_path),
+        "summary": summary,
+        "completeTypes": complete_types,
+        "partialTypes": partial_types,
+        "missingTypes": missing_types,
+        "diagnostics": diagnostics,
+        "typeScoreboard": [
+            {
+                "type": name,
+                "status": "MISSING" if name in missing_types else ("COMPLETE" if name in complete_types else "PARTIAL"),
+                "expectedMembers": len(model.members),
+                "targetMembers": len(actual[name].members) if name in actual else 0,
+                "diagnostics": type_diagnostics[name],
+            }
+            for name, model in sorted(expected.items())
+        ],
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--symbol-graph", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--leak-only", action="store_true")
+    args = parser.parse_args()
+    if args.self_test:
+        self_test()
+        return 0
+    if not args.symbol_graph:
+        parser.error("--symbol-graph is required unless --self-test is used")
+    contract = load_json(REFERENCE)
+    rules = load_json(RULES)
+    expected = build_expected(contract, rules)
+    actual, _, _ = parse_symbol_graph(args.symbol_graph, set(rules["namespaceMarkers"]), ROOT / "Sources/CNA")
+    diagnostics = compare(expected, actual)
+    report = make_report(contract, rules, expected, actual, diagnostics, args.symbol_graph)
+    text = json.dumps(report, indent=2, sort_keys=False) + "\n"
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(text, encoding="utf-8")
+    else:
+        print(text, end="")
+    summary = report["summary"]
+    print(" ".join(f"{key}={value}" for key, value in summary.items() if isinstance(value, int)), file=sys.stderr)
+    if args.leak_only:
+        return 1 if any(summary[key] for key in ("INTERNAL_TYPE_LEAK", "RAW_HANDLE_LEAK", "PUBLIC_NATIVE_FFI_LEAK")) else 0
+    return 1 if summary["TOTAL_DIAGNOSTICS"] else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
