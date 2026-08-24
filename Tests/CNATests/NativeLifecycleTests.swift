@@ -37,6 +37,30 @@ private final class LockedErrorBox: @unchecked Sendable {
     }
 }
 
+private final class LockedGamePadBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var state: Microsoft.Xna.Framework.Input.GamePadState?
+    private var error: Error?
+
+    func store(state: Microsoft.Xna.Framework.Input.GamePadState) {
+        lock.lock()
+        self.state = state
+        lock.unlock()
+    }
+
+    func store(error: Error) {
+        lock.lock()
+        self.error = error
+        lock.unlock()
+    }
+
+    func take() -> (Microsoft.Xna.Framework.Input.GamePadState?, Error?) {
+        lock.lock()
+        defer { lock.unlock() }
+        return (state, error)
+    }
+}
+
 private final class LifecycleProbeGame: Microsoft.Xna.Framework.Game {
     let frameLimit: Int
     var events: [String] = []
@@ -197,6 +221,63 @@ private final class FailingProbeGame: Microsoft.Xna.Framework.Game {
     }
 }
 
+private final class GamePadProbeGame: Microsoft.Xna.Framework.Game {
+    var defaultState: Microsoft.Xna.Framework.Input.GamePadState?
+    var noneState: Microsoft.Xna.Framework.Input.GamePadState?
+    var independentAxesState: Microsoft.Xna.Framework.Input.GamePadState?
+    var circularState: Microsoft.Xna.Framework.Input.GamePadState?
+    var capabilities: Microsoft.Xna.Framework.Input.GamePadCapabilities?
+    var vibrationApplied: Bool?
+    var stateCycles = 0
+    var capabilityCycles = 0
+
+    override func LoadContent() throws {
+        typealias I = Microsoft.Xna.Framework.Input
+        for _ in 0..<50 {
+            defaultState = try I.GamePad.GetState(.One)
+            noneState = try I.GamePad.GetState(.One, deadZoneMode: .None)
+            independentAxesState = try I.GamePad.GetState(
+                .One, deadZoneMode: .IndependentAxes
+            )
+            circularState = try I.GamePad.GetState(.One, deadZoneMode: .Circular)
+            stateCycles += 1
+        }
+        for _ in 0..<20 {
+            capabilities = try I.GamePad.GetCapabilities(.One)
+            capabilityCycles += 1
+        }
+        vibrationApplied = try I.GamePad.SetVibration(.One, leftMotor: 0, rightMotor: 0)
+    }
+
+    override func Update(_ gameTime: Microsoft.Xna.Framework.GameTime) throws { try Exit() }
+}
+
+private final class GamePadThreadProbeGame: Microsoft.Xna.Framework.Game {
+    let result = LockedGamePadBox()
+
+    override func LoadContent() throws {
+        let finished = DispatchSemaphore(value: 0)
+        let result = self.result
+        Thread.detachNewThread {
+            do {
+                result.store(state: try Microsoft.Xna.Framework.Input.GamePad.GetState(.One))
+            } catch {
+                result.store(error: error)
+            }
+            finished.signal()
+        }
+        guard finished.wait(timeout: .now() + 10) == .success else {
+            throw CNAError.nativeFailure(
+                operation: "GamePad wrong-thread qualification",
+                result: UInt32.max,
+                message: "detached query did not return"
+            )
+        }
+    }
+
+    override func Update(_ gameTime: Microsoft.Xna.Framework.GameTime) throws { try Exit() }
+}
+
 final class NativeLifecycleTests: XCTestCase {
     private var nativeConfigured: Bool {
         guard let value = ProcessInfo.processInfo.environment["CNA_NATIVE_LIBRARY"] else { return false }
@@ -317,5 +398,156 @@ final class NativeLifecycleTests: XCTestCase {
             return XCTFail("expected owner-thread error, got \(String(describing: error))")
         }
         try game.Dispose()
+    }
+
+    func testGamePadNativeRoutesAndDisconnectedOrHardwareSnapshot() throws {
+        try requireNative()
+        let game = try GamePadProbeGame()
+        try game.Run()
+        XCTAssertEqual(game.stateCycles, 50)
+        XCTAssertEqual(game.capabilityCycles, 20)
+        let states = [
+            game.defaultState, game.noneState,
+            game.independentAxesState, game.circularState,
+        ]
+        XCTAssertTrue(states.allSatisfy { $0 != nil })
+        guard let capabilities = game.capabilities,
+              let defaultState = game.defaultState else {
+            return XCTFail("GamePad native routes did not return snapshots")
+        }
+        if !capabilities.IsConnected {
+            XCTAssertEqual(capabilities.GamePadType, .Unknown)
+            XCTAssertFalse(capabilities.HasAButton)
+            XCTAssertFalse(capabilities.HasBackButton)
+            XCTAssertFalse(capabilities.HasBButton)
+            XCTAssertFalse(capabilities.HasDPadDownButton)
+            XCTAssertFalse(capabilities.HasDPadLeftButton)
+            XCTAssertFalse(capabilities.HasDPadRightButton)
+            XCTAssertFalse(capabilities.HasDPadUpButton)
+            XCTAssertFalse(capabilities.HasLeftShoulderButton)
+            XCTAssertFalse(capabilities.HasLeftStickButton)
+            XCTAssertFalse(capabilities.HasRightShoulderButton)
+            XCTAssertFalse(capabilities.HasRightStickButton)
+            XCTAssertFalse(capabilities.HasStartButton)
+            XCTAssertFalse(capabilities.HasXButton)
+            XCTAssertFalse(capabilities.HasYButton)
+            XCTAssertFalse(capabilities.HasBigButton)
+            XCTAssertFalse(capabilities.HasLeftXThumbStick)
+            XCTAssertFalse(capabilities.HasLeftYThumbStick)
+            XCTAssertFalse(capabilities.HasRightXThumbStick)
+            XCTAssertFalse(capabilities.HasRightYThumbStick)
+            XCTAssertFalse(capabilities.HasLeftTrigger)
+            XCTAssertFalse(capabilities.HasRightTrigger)
+            XCTAssertFalse(capabilities.HasLeftVibrationMotor)
+            XCTAssertFalse(capabilities.HasRightVibrationMotor)
+            XCTAssertFalse(capabilities.HasVoiceSupport)
+            XCTAssertFalse(defaultState.IsConnected)
+            XCTAssertEqual(defaultState.PacketNumber, 0)
+            XCTAssertEqual(defaultState.ThumbSticks.Left.X, 0)
+            XCTAssertEqual(defaultState.ThumbSticks.Left.Y, 0)
+            XCTAssertEqual(defaultState.ThumbSticks.Right.X, 0)
+            XCTAssertEqual(defaultState.ThumbSticks.Right.Y, 0)
+            XCTAssertEqual(defaultState.Triggers.Left, 0)
+            XCTAssertEqual(defaultState.Triggers.Right, 0)
+            XCTAssertEqual(game.vibrationApplied, false)
+        }
+
+        if let output = ProcessInfo.processInfo.environment["CNA_GAMEPAD_EVIDENCE_OUTPUT"] {
+            let payload: [String: Any] = [
+                "backend": "HEADLESS/NULL",
+                "playerSlot": 0,
+                "connected": capabilities.IsConnected,
+                "gamePadType": capabilities.GamePadType.rawValue,
+                "default": Self.stateEvidence(game.defaultState),
+                "none": Self.stateEvidence(game.noneState),
+                "independentAxes": Self.stateEvidence(game.independentAxesState),
+                "circular": Self.stateEvidence(game.circularState),
+                "capabilities": Self.capabilityEvidence(capabilities),
+                "vibrationApplied": game.vibrationApplied as Any,
+                "stateCycles": game.stateCycles,
+                "capabilityCycles": game.capabilityCycles,
+            ]
+            let data = try JSONSerialization.data(
+                withJSONObject: payload, options: [.prettyPrinted, .sortedKeys]
+            )
+            try data.write(to: URL(fileURLWithPath: output))
+        }
+        try game.Dispose()
+        XCTAssertThrowsError(try Microsoft.Xna.Framework.Input.GamePad.GetState(.One))
+    }
+
+    func testGamePadQueriesFollowCurrentGeneration() throws {
+        try requireNative()
+        let first = try GamePadProbeGame()
+        try first.Run()
+        XCTAssertNotNil(first.defaultState)
+        try first.Dispose()
+        let second = try GamePadProbeGame()
+        try second.Run()
+        XCTAssertNotNil(second.defaultState)
+        try second.Dispose()
+    }
+
+    func testGamePadWrongThreadQueryRejectsBeforeNativeEntry() throws {
+        try requireNative()
+        let game = try GamePadThreadProbeGame()
+        try game.Run()
+        let (state, error) = game.result.take()
+        XCTAssertNil(state)
+        guard case .ownerThreadViolation("GamePad.GetState")? = error as? CNAError else {
+            try game.Dispose()
+            return XCTFail("wrong-thread GamePad query did not report owner-thread failure")
+        }
+        try game.Dispose()
+    }
+
+    private static func stateEvidence(
+        _ state: Microsoft.Xna.Framework.Input.GamePadState?
+    ) -> [String: Any] {
+        guard let state else { return ["returned": false] }
+        return [
+            "returned": true,
+            "isConnected": state.IsConnected,
+            "packetNumber": state.PacketNumber,
+            "leftX": state.ThumbSticks.Left.X,
+            "leftY": state.ThumbSticks.Left.Y,
+            "rightX": state.ThumbSticks.Right.X,
+            "rightY": state.ThumbSticks.Right.Y,
+            "leftTrigger": state.Triggers.Left,
+            "rightTrigger": state.Triggers.Right,
+        ]
+    }
+
+    private static func capabilityEvidence(
+        _ value: Microsoft.Xna.Framework.Input.GamePadCapabilities
+    ) -> [String: Any] {
+        [
+            "gamePadType": value.GamePadType.rawValue,
+            "isConnected": value.IsConnected,
+            "hasAButton": value.HasAButton,
+            "hasBackButton": value.HasBackButton,
+            "hasBButton": value.HasBButton,
+            "hasDPadDownButton": value.HasDPadDownButton,
+            "hasDPadLeftButton": value.HasDPadLeftButton,
+            "hasDPadRightButton": value.HasDPadRightButton,
+            "hasDPadUpButton": value.HasDPadUpButton,
+            "hasLeftShoulderButton": value.HasLeftShoulderButton,
+            "hasLeftStickButton": value.HasLeftStickButton,
+            "hasRightShoulderButton": value.HasRightShoulderButton,
+            "hasRightStickButton": value.HasRightStickButton,
+            "hasStartButton": value.HasStartButton,
+            "hasXButton": value.HasXButton,
+            "hasYButton": value.HasYButton,
+            "hasBigButton": value.HasBigButton,
+            "hasLeftXThumbStick": value.HasLeftXThumbStick,
+            "hasLeftYThumbStick": value.HasLeftYThumbStick,
+            "hasRightXThumbStick": value.HasRightXThumbStick,
+            "hasRightYThumbStick": value.HasRightYThumbStick,
+            "hasLeftTrigger": value.HasLeftTrigger,
+            "hasRightTrigger": value.HasRightTrigger,
+            "hasLeftVibrationMotor": value.HasLeftVibrationMotor,
+            "hasRightVibrationMotor": value.HasRightVibrationMotor,
+            "hasVoiceSupport": value.HasVoiceSupport,
+        ]
     }
 }

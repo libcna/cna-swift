@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 986,
-  "ASSERTIONS": 986,
+  "OBSERVATIONS": 1239,
+  "ASSERTIONS": 1239,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -60,7 +60,18 @@
     "testCurveCollectionEnumeratorLiveOrderFreshnessAndInvalidation",
     "testCurveDefaultsCloneTangentsAndInvalidIndexes",
     "testCurveEvaluateSegmentsStepHermitePrecisionAndLoops",
-    "testCurveLoopsConstantLinearCycleOffsetOscillateAndBoundaries"
+    "testCurveLoopsConstantLinearCycleOffsetOscillateAndBoundaries",
+    "testGamePadEnumsAndButtonsOptionSet",
+    "testGamePadButtonsPhysicalPropertiesEqualityHashStringAndCopy",
+    "testGamePadDPadAsymmetricOrderingEqualityHashStringAndCopy",
+    "testGamePadTriggersClampSpecialFloatsEqualityHashStringAndCopy",
+    "testGamePadThumbSticksSquareClampSpecialFloatsHashStringAndCopy",
+    "testGamePadStateConstructorsPropertiesArrayUnionAndCopies",
+    "testGamePadStatePhysicalButtonQueriesAreExact",
+    "testGamePadStateVirtualButtonQueriesAndBinary32Boundaries",
+    "testGamePadStateEqualityHashStringAndNativeSnapshotFieldSet",
+    "testGamePadCapabilitiesAllPropertiesAndValueCopy",
+    "testGamePadVibrationInputUsesPinnedUncheckedInt16Words"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -92,7 +103,16 @@
     "CURVE_COLLECTION": 2,
     "CURVE_TANGENTS": 1,
     "CURVE_EVALUATE": 1,
-    "CURVE_LOOPS": 1
+    "CURVE_LOOPS": 1,
+    "BUTTON_STATE": 1,
+    "BUTTONS": 1,
+    "GAMEPAD_BUTTONS": 1,
+    "GAMEPAD_DPAD": 1,
+    "GAMEPAD_TRIGGERS": 1,
+    "GAMEPAD_THUMBSTICKS": 1,
+    "GAMEPAD_STATE": 4,
+    "GAMEPAD_ENUMS": 1,
+    "GAMEPAD_CAPABILITIES": 1
   },
   "colorPaletteGoldenEntries": 141,
   "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",

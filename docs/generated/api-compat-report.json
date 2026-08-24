@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 55,
-    "TARGET_MEMBERS": 1247,
-    "TOTAL_DIAGNOSTICS": 353,
-    "COMPLETE_TYPES": 50,
+    "TARGET_TYPES": 66,
+    "TARGET_MEMBERS": 1375,
+    "TOTAL_DIAGNOSTICS": 342,
+    "COMPLETE_TYPES": 61,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 202,
-    "MISSING_TYPE": 202,
+    "MISSING_TYPES": 191,
+    "MISSING_TYPE": 191,
     "MISSING_MEMBER": 131,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -91,6 +91,17 @@
     "Microsoft.Xna.Framework.Graphics.SpriteEffects",
     "Microsoft.Xna.Framework.Graphics.SpriteSortMode",
     "Microsoft.Xna.Framework.Graphics.Viewport",
+    "Microsoft.Xna.Framework.Input.ButtonState",
+    "Microsoft.Xna.Framework.Input.Buttons",
+    "Microsoft.Xna.Framework.Input.GamePad",
+    "Microsoft.Xna.Framework.Input.GamePadButtons",
+    "Microsoft.Xna.Framework.Input.GamePadCapabilities",
+    "Microsoft.Xna.Framework.Input.GamePadDPad",
+    "Microsoft.Xna.Framework.Input.GamePadDeadZone",
+    "Microsoft.Xna.Framework.Input.GamePadState",
+    "Microsoft.Xna.Framework.Input.GamePadThumbSticks",
+    "Microsoft.Xna.Framework.Input.GamePadTriggers",
+    "Microsoft.Xna.Framework.Input.GamePadType",
     "Microsoft.Xna.Framework.Input.KeyState",
     "Microsoft.Xna.Framework.Input.Keyboard",
     "Microsoft.Xna.Framework.Input.KeyboardState",
@@ -267,17 +278,6 @@
     "Microsoft.Xna.Framework.IGameComponent",
     "Microsoft.Xna.Framework.IGraphicsDeviceManager",
     "Microsoft.Xna.Framework.IUpdateable",
-    "Microsoft.Xna.Framework.Input.ButtonState",
-    "Microsoft.Xna.Framework.Input.Buttons",
-    "Microsoft.Xna.Framework.Input.GamePad",
-    "Microsoft.Xna.Framework.Input.GamePadButtons",
-    "Microsoft.Xna.Framework.Input.GamePadCapabilities",
-    "Microsoft.Xna.Framework.Input.GamePadDPad",
-    "Microsoft.Xna.Framework.Input.GamePadDeadZone",
-    "Microsoft.Xna.Framework.Input.GamePadState",
-    "Microsoft.Xna.Framework.Input.GamePadThumbSticks",
-    "Microsoft.Xna.Framework.Input.GamePadTriggers",
-    "Microsoft.Xna.Framework.Input.GamePadType",
     "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.MouseState",
     "Microsoft.Xna.Framework.Input.Touch.GestureSample",
@@ -1828,61 +1828,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.IUpdateable",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.ButtonState",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.Buttons",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePad",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadButtons",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadCapabilities",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadDPad",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadDeadZone",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadState",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadThumbSticks",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadTriggers",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.GamePadType",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -5356,146 +5301,80 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Input.ButtonState",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.ButtonState",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Buttons",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 25,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.Buttons",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 25,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePad",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 4,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePad",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 4,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadButtons",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 17,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadButtons",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 17,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadCapabilities",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 26,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadCapabilities",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 26,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadDPad",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadDPad",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadDeadZone",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadDeadZone",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadState",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 15,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadState",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 15,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadThumbSticks",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 8,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadThumbSticks",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 8,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadTriggers",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 8,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadTriggers",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 8,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePadType",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.GamePadType",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.KeyState",

@@ -10,8 +10,9 @@ reviewed typed function table, owner-thread/generation/ownership enforcement,
 callback error containment, and a native Game/2D/input canary. Its managed
 surface includes exact binary32 linear algebra and intersection types, Color,
 both packed-vector protocols, all 17 concrete PackedVector formats, and the
-complete six-type Curve family. The old flat API and known fake behaviors are
-absent.
+complete six-type Curve family. It also includes the exact eleven-type XNA
+GamePad family through real canonical CNA state, capability, packet, dead-zone,
+and vibration routes. The old flat API and known fake behaviors are absent.
 
 ## Measured surface
 
@@ -20,12 +21,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=55
-TARGET_MEMBERS=1247
-TOTAL_DIAGNOSTICS=353
-COMPLETE_TYPES=50
+TARGET_TYPES=66
+TARGET_MEMBERS=1375
+TOTAL_DIAGNOSTICS=342
+COMPLETE_TYPES=61
 PARTIAL_TYPES=5
-MISSING_TYPES=202
+MISSING_TYPES=191
 MISSING_MEMBER=131
 ```
 
@@ -40,9 +41,9 @@ The strict-complete managed foundation includes MathHelper, Point, Rectangle,
 GameTime, PlayerIndex, Vector2/3/4, Quaternion, Matrix, Viewport, Plane, Ray,
 BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
-and Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType, and
-CurveTangent. Every implemented member has qualified behavior; missing members
-remain absent.
+Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
+CurveTangent, and all eleven GamePad-family types. Every implemented member has
+qualified behavior; missing members remain absent.
 
 ## Managed Curve family
 
@@ -64,6 +65,22 @@ See `docs/curve-evidence.md` for exact formulas, clone depth, collection
 versioning, null policy, projection rules, and authority provenance. Earlier
 managed families are documented in the other evidence files under `docs/`.
 
+## Qualified GamePad family
+
+`Buttons` is an exact `Int32` OptionSet with all 25 XNA flags. The six public
+GamePad value types remain Swift structs; capabilities expose 26 read-only
+properties and no public initializer. State constructors, physical and virtual
+button queries, all-bit combination behavior, packet/connection fields,
+binary32 clamps, equality, hashing, and strings follow the pinned XNA IL.
+
+The four static GamePad methods bind only existing canonical CNA 0.7.0 C ABI
+routes. Native snapshots carry real packet numbers and per-control capabilities;
+vibration returns CNA's device-accepted Boolean. The current HEADLESS/NULL host
+has no controller, so disconnected routes are verified while positive state,
+capability diversity, and physical rumble remain `HARDWARE_PENDING`. See
+`docs/gamepad-evidence.md`, `docs/gamepad-native-inventory.md`, and the separate
+generated native qualification report.
+
 ## Qualified runtime
 
 The qualified host is Linux x86-64 with Swift 6.0.3
@@ -77,12 +94,13 @@ swift test
 
 `CNA_NATIVE_LIBRARY` must be absolute. Without it Linux tries only an installed
 `libcna_c_api.so`; there is no developer-tree fallback. ABI 0.8 is rejected,
-and no native binary ships in the source package. Managed Curve tests require
-no native library.
+and no native binary ships in the source package. Managed Curve and GamePad
+value tests require no native library.
 
-HEADLESS executes real viewport, clear, PNG decode, SpriteBatch, and keyboard
-routes but has no visible window. Visible output is backend-blocked, not
-claimed. macOS, iOS, tvOS, visionOS, Windows, and Web/Wasm are unqualified.
+HEADLESS executes real viewport, clear, PNG decode, SpriteBatch, keyboard, and
+GamePad disconnected routes but has no visible window or attached controller.
+Visible output and positive controller behavior are not claimed. macOS, iOS,
+tvOS, visionOS, Windows, and Web/Wasm are unqualified.
 
 ## Verification
 
@@ -100,6 +118,9 @@ python3 tools/api_compat/verify.py \
 python3 tools/native_abi/verify.py \
   --cna-include /path/to/cna/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY"
+python3 tools/gamepad_native/run.py \
+  --library "$CNA_NATIVE_LIBRARY" \
+  --output docs/generated/gamepad-native-report.json
 ```
 
 The normal API verifier exits nonzero until the full selected profile is

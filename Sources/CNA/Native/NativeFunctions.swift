@@ -21,6 +21,10 @@ internal final class NativeFunctions {
     typealias SpriteSubmitScaled = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteScaledCommand>?, UInt64) -> UInt32
     typealias KeyboardGet = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_KeyboardState>?) -> UInt32
     typealias KeyboardGetPlayer = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_KeyboardState>?) -> UInt32
+    typealias GamePadGet = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_GamePadState>?) -> UInt32
+    typealias GamePadGetDeadZone = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<CNASwift_GamePadState>?) -> UInt32
+    typealias GamePadCapabilitiesGet = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_GamePadCapabilities>?) -> UInt32
+    typealias GamePadSetVibration = @convention(c) (UInt64, UInt32, Float, Float, UnsafeMutablePointer<UInt8>?) -> UInt32
 
     private static let lock = NSLock()
     private static var cached: Result<NativeFunctions, Error>?
@@ -51,6 +55,10 @@ internal final class NativeFunctions {
     let spriteBatchDestroy: HandleOperation
     let keyboardGetState: KeyboardGet
     let keyboardGetStateForPlayer: KeyboardGetPlayer
+    let gamePadGetState: GamePadGet
+    let gamePadGetStateWithDeadZone: GamePadGetDeadZone
+    let gamePadGetCapabilities: GamePadCapabilitiesGet
+    let gamePadSetVibration: GamePadSetVibration
 
     static func load() throws -> NativeFunctions {
         lock.lock()
@@ -98,6 +106,10 @@ internal final class NativeFunctions {
         spriteBatchDestroy = try library.resolve("cna_sprite_batch_destroy", as: HandleOperation.self)
         keyboardGetState = try library.resolve("cna_keyboard_get_state", as: KeyboardGet.self)
         keyboardGetStateForPlayer = try library.resolve("cna_keyboard_get_state_for_player", as: KeyboardGetPlayer.self)
+        gamePadGetState = try library.resolve("cna_gamepad_get_state", as: GamePadGet.self)
+        gamePadGetStateWithDeadZone = try library.resolve("cna_gamepad_get_state_with_dead_zone", as: GamePadGetDeadZone.self)
+        gamePadGetCapabilities = try library.resolve("cna_gamepad_get_capabilities", as: GamePadCapabilitiesGet.self)
+        gamePadSetVibration = try library.resolve("cna_gamepad_set_vibration", as: GamePadSetVibration.self)
     }
 
     func check(_ result: UInt32, operation: String) throws {

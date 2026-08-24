@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=55
-TARGET_MEMBERS=1247
-TOTAL_DIAGNOSTICS=353
-COMPLETE_TYPES=50
+TARGET_TYPES=66
+TARGET_MEMBERS=1375
+TOTAL_DIAGNOSTICS=342
+COMPLETE_TYPES=61
 PARTIAL_TYPES=5
-MISSING_TYPES=202
-MISSING_TYPE=202
+MISSING_TYPES=191
+MISSING_TYPE=191
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -90,6 +90,17 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
+- `Microsoft.Xna.Framework.Input.ButtonState`
+- `Microsoft.Xna.Framework.Input.Buttons`
+- `Microsoft.Xna.Framework.Input.GamePad`
+- `Microsoft.Xna.Framework.Input.GamePadButtons`
+- `Microsoft.Xna.Framework.Input.GamePadCapabilities`
+- `Microsoft.Xna.Framework.Input.GamePadDPad`
+- `Microsoft.Xna.Framework.Input.GamePadDeadZone`
+- `Microsoft.Xna.Framework.Input.GamePadState`
+- `Microsoft.Xna.Framework.Input.GamePadThumbSticks`
+- `Microsoft.Xna.Framework.Input.GamePadTriggers`
+- `Microsoft.Xna.Framework.Input.GamePadType`
 - `Microsoft.Xna.Framework.Input.KeyState`
 - `Microsoft.Xna.Framework.Input.Keyboard`
 - `Microsoft.Xna.Framework.Input.KeyboardState`
@@ -438,17 +449,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.IGameComponent`
 - `Microsoft.Xna.Framework.IGraphicsDeviceManager`
 - `Microsoft.Xna.Framework.IUpdateable`
-- `Microsoft.Xna.Framework.Input.ButtonState`
-- `Microsoft.Xna.Framework.Input.Buttons`
-- `Microsoft.Xna.Framework.Input.GamePad`
-- `Microsoft.Xna.Framework.Input.GamePadButtons`
-- `Microsoft.Xna.Framework.Input.GamePadCapabilities`
-- `Microsoft.Xna.Framework.Input.GamePadDPad`
-- `Microsoft.Xna.Framework.Input.GamePadDeadZone`
-- `Microsoft.Xna.Framework.Input.GamePadState`
-- `Microsoft.Xna.Framework.Input.GamePadThumbSticks`
-- `Microsoft.Xna.Framework.Input.GamePadTriggers`
-- `Microsoft.Xna.Framework.Input.GamePadType`
 - `Microsoft.Xna.Framework.Input.Mouse`
 - `Microsoft.Xna.Framework.Input.MouseState`
 - `Microsoft.Xna.Framework.Input.Touch.GestureSample`

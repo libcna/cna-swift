@@ -1,12 +1,13 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestone 5 final status:** COMPLETE.
+**Foundation Milestone 6 final status:** COMPLETE.
 
-The milestone closes exactly `Curve`, `CurveKey`, `CurveKeyCollection`,
-`CurveContinuity`, `CurveLoopType`, and `CurveTangent`: six XNA public types
-and 49 mapped member identities. All behavior is managed Swift. CNA source,
-the CNA C ABI, the five runtime-partial types, and maintained template source
-are unchanged.
+The milestone closes exactly `ButtonState`, `Buttons`, `GamePad`,
+`GamePadButtons`, `GamePadCapabilities`, `GamePadDPad`, `GamePadDeadZone`,
+`GamePadState`, `GamePadThumbSticks`, `GamePadTriggers`, and `GamePadType`: 11
+XNA public types, 132 CLR identities, and 128 mapped Swift identities. CNA
+source, the canonical ABI, the five runtime-partial types, and maintained
+template source are unchanged.
 
 ## Qualified environment and gates
 
@@ -16,14 +17,16 @@ SWIFT_TARGET=x86_64-pc-linux-gnu
 SWIFT_TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS
 RELEASE_BUILD=PASS
-DEBUG_TESTS=63 PASS
-RELEASE_TESTS=63 PASS
-MANAGED_TESTS=56 PASS_WITHOUT_CNA_NATIVE_LIBRARY
+DEBUG_TESTS=77 PASS
+RELEASE_TESTS=77 PASS
+MANAGED_TESTS=67 PASS_WITHOUT_CNA_NATIVE_LIBRARY
 WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE
 SYMBOL_GRAPH=PASS
-API_SELF_TESTS=66 PASS
+API_SELF_TESTS=90 PASS
 NORMAL_STRICT=EXPECTED_RED_DEFERRED_PROFILE_ONLY
 LEAK_ONLY=PASS
+PURE_XNA_DERIVED=1239/1239/0
+GAMEPAD_NATIVE_FAILURES=0
 SWIFT_ASAN=PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED
 NATIVE_CNA_SANITIZER=NOT_INSTRUMENTED
 ```
@@ -35,14 +38,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=55
-TARGET_MEMBERS=1247
-TOTAL_DIAGNOSTICS=353
-MISSING_TYPE=202
+TARGET_TYPES=66
+TARGET_MEMBERS=1375
+TOTAL_DIAGNOSTICS=342
+MISSING_TYPE=191
 MISSING_MEMBER=131
-COMPLETE_TYPES=50
+COMPLETE_TYPES=61
 PARTIAL_TYPES=5
-MISSING_TYPES=202
+MISSING_TYPES=191
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -82,81 +85,51 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 ```
 
 The two base mismatches, one interface mismatch, one property mismatch, and 16
-overload mismatches still belong exclusively to Game, GraphicsDeviceManager,
-GraphicsDevice, Texture2D, and SpriteBatch. No Curve type owns a diagnostic.
+overload mismatches remain owned exclusively by Game, GraphicsDeviceManager,
+GraphicsDevice, Texture2D, and SpriteBatch. Every GamePad-family mismatch
+category is zero.
 
-## Curve type matrix
+## GamePad type matrix
 
-| Type | Expected/target | Kind | Behavior | Local diagnostics |
-|---|---:|---|---|---:|
-| `Curve` | 11/11 | open class | XNA-qualified | 0 |
-| `CurveKey` | 15/15 | open class | XNA-qualified | 0 |
-| `CurveKeyCollection` | 13/13 | open class | XNA-qualified | 0 |
-| `CurveContinuity` | 2/2 | Int32 enum | XNA-qualified | 0 |
-| `CurveLoopType` | 5/5 | Int32 enum | XNA-qualified | 0 |
-| `CurveTangent` | 3/3 | Int32 enum | XNA-qualified | 0 |
+| Type | CLR / expected / target | Kind | Behavior | Native | Diagnostics |
+|---|---:|---|---|---|---:|
+| ButtonState | 3 / 2 / 2 | Int32 enum | verified | N/A | 0 |
+| Buttons | 26 / 25 / 25 | Int32 OptionSet | verified | explicit bits | 0 |
+| GamePad | 4 / 4 / 4 | final class/private init | verified | route verified | 0 |
+| GamePadButtons | 17 / 17 / 17 | struct | verified | copied value | 0 |
+| GamePadCapabilities | 26 / 26 / 26 | struct/no public init | verified | route verified | 0 |
+| GamePadDPad | 10 / 10 / 10 | struct | verified | copied value | 0 |
+| GamePadDeadZone | 4 / 3 / 3 | Int32 enum | verified | explicit modes | 0 |
+| GamePadState | 15 / 15 / 15 | struct | verified | route verified | 0 |
+| GamePadThumbSticks | 8 / 8 / 8 | struct | verified | copied value | 0 |
+| GamePadTriggers | 8 / 8 / 8 | struct | verified | copied value | 0 |
+| GamePadType | 11 / 10 / 10 | Int32 enum | verified | explicit mapping | 0 |
 
-The classes are non-sealed in pinned metadata and preserve reference identity.
-CurveKey constructors, immutable Position, mutable value/tangents/continuity,
-distinct clone, field equality, null-aware operators, deterministic CLR-style
-hash, and null-reference failure are exact.
+Buttons has all 25 explicit raw values and retains arbitrary combinations.
+The state implements all physical/DPad/stick-click/BigButton identities, eight
+virtual stick directions, both virtual triggers, all-bit combinations, zero,
+and unknown-bit behavior. Public constructors set connected=true and packet=0;
+native construction alone copies real connection and PacketNumber. Equality and
+hash include connection and packet as well as all four public nested values;
+the exact string reports only connection.
 
-The authoritative XNA IL for `CurveKey.CompareTo` compares Position with direct
-`==`, then `<`, then returns +1. Consequently finite order and signed zero are
-ordinary; `NaN/finite=+1`, `finite/NaN=+1`, and `NaN/NaN=+1`. This independently
-resolves the sibling discrepancy; no sibling repository was modified.
+Triggers use the XNA Min-then-Max clamp and preserve NaN; thumbsticks use the
+XNA square Vector2 Min-then-Max clamp. Their special values, signed zero,
+equality, hashes, strings, and value copies are qualified. Capabilities expose
+all 26 real copied fields and no public initializer.
 
-## Collection, tangents, and evaluation
-
-`ICollection<CurveKey>` maps to the concrete seven-member interface contract;
-no fake BCL or Swift Collection conformance exists. Transitive enumeration maps
-to root `CNAEnumerator<CurveKey>` with throwing `Next`, a fresh live cursor,
-source order/reference preservation, and exact version invalidation. Successful
-Add/Remove/RemoveAt/Clear and item replacement invalidate; Clear invalidates an
-empty collection; failed Remove and CopyTo do not. Indexing is one CLR property
-projected as throwing `Item(Int32)` and `SetItem(Int32, CurveKey)` symbols.
-
-Add uses the XNA List binary-search path and inserts normal equal positions
-after their run; same references may repeat. Replacement stays in place only
-when positions compare equal, otherwise it removes/reinserts. Contains,
-IndexOf, and Remove use field equality and first match. CopyTo mutates `inout`
-destination storage without cloning keys. Collection and Curve clones own new
-collection shape but share contained CurveKey references.
-
-Curve defaults both loops to Constant, preserves one Keys identity, and defines
-IsConstant as Count <= 1. Flat tangents are zero; Linear uses raw value
-differences; Smooth uses the XNA position-scaled formula and Single epsilon.
-Mixed modes are independent, whole-curve computation is forward and stable,
-and invalid indices throw.
-
-Evaluate covers empty/single curves, duplicate positions, Step at exactly one,
-exact Float Hermite grouping, and the reference Double-widened interpolation
-fraction. Constant, Linear, Cycle, CycleOffset, and Oscillate match reference
-IL, including exact negative cycle boundaries, negative parity, large values,
-and unchecked CLR-like float-to-Int32 behavior.
-
-## Behavior, ABI, native, and template evidence
+## Native GamePad evidence
 
 ```text
-AUTHORITY=PURE_XNA_DERIVED
-PURE_OBSERVATIONS=986
-PURE_ASSERTIONS=986
-PURE_FAILURES=0
-CURVE_ENUMS=1
-CURVE_KEY=1
-CURVE_COLLECTION=2
-CURVE_TANGENTS=1
-CURVE_EVALUATE=1
-CURVE_LOOPS=1
 CNA_SOURCE_REVISION=a09196a6477f69a7a57c8364f990658d31531a5b
 CNA_ABI_VERSION=0.7.0
 NATIVE_LIBRARY_SHA256=42e099146bf3b470f82fd963a516f8bdd7ff0406da8c37dd53747699117db086
-BOUND_FUNCTIONS=25
-PROTOTYPE_TYPE_POSITIONS=72
-C_SWIFT_MEASUREMENTS=72
-LAYOUTS=15
+BOUND_FUNCTIONS=29
+PROTOTYPE_TYPE_POSITIONS=91
+C_SWIFT_MEASUREMENTS=91
+LAYOUTS=18
 CALLBACKS=2
-CONSTANTS=168
+CONSTANTS=214
 MISSING_HEADER_SYMBOLS=0
 MISSING_LIBRARY_SYMBOLS=0
 ABI_MISMATCHES=0
@@ -165,17 +138,34 @@ GAME_RECREATION_CYCLES=20
 TEXTURE2D_CYCLES=20
 SPRITEBATCH_CYCLES=20
 CALLBACK_ERROR_CYCLES=20
+GAMEPAD_GET_STATE_CYCLES_PER_MODE=50
+GAMEPAD_GET_STATE_CALLS=200
+GAMEPAD_CAPABILITIES_CYCLES=20
 NATIVE_CRASHES=0
 OBSERVED_UAF=0
 OBSERVED_DOUBLE_FREE=0
 ```
 
-The maintained template remains clean at commit
-`86687f62c3a13ee2b59798f338fc083f7399f447`, source tree
-`70e6bab6a86db65324a60b04c4cde8aa4bce662e`, and passes maintained 60/600
-runs with exact update/draw counts, viewport 800x480, and texture 128x128.
-Final source-archive identity and isolated-consumer results are release handoff
-artifacts rather than self-referential source content.
+The only added native routes are canonical `cna_gamepad_get_state`,
+`cna_gamepad_get_state_with_dead_zone`, `cna_gamepad_get_capabilities`, and
+`cna_gamepad_set_vibration`. Default state is IndependentAxes. None,
+IndependentAxes, and Circular route directly to CNA without double processing.
+Player slots, all selected button bits, controller type, and fields map
+explicitly. Each operation resolves the current Game generation and validates
+the owner thread before native entry.
+
+This HEADLESS/NULL host has no connected controller. Real successful
+disconnected state and capability snapshots and `SetVibration=false` are
+verified. Positive controller state/capabilities/type/voice/motors and physical
+rumble remain `HARDWARE_PENDING`; repeated rumble stress was intentionally not
+run. No result is fabricated. See `docs/gamepad-evidence.md`,
+`docs/gamepad-native-inventory.md`, and generated GamePad native evidence.
+
+The unchanged maintained template remains at commit
+`86687f62c3a13ee2b59798f338fc083f7399f447` and passes debug 60 / release 600
+with exact callback counts, viewport 800x480, and texture 128x128. Exact source
+archive identity and isolated-consumer results are final handoff artifacts, not
+self-referential source content.
 
 ## Unchanged partial types
 
@@ -187,14 +177,12 @@ artifacts rather than self-referential source content.
 
 ## Exactly one next dependency-complete milestone
 
-The regenerated scoreboard selects the XNA GamePad family as the next single
-dependency-complete milestone: `ButtonState`, `Buttons`, `GamePad`,
-`GamePadButtons`, `GamePadCapabilities`, `GamePadDPad`, `GamePadDeadZone`,
-`GamePadState`, `GamePadThumbSticks`, `GamePadTriggers`, and `GamePadType`.
-These 11 missing types contain 128 mapped identities and close publicly over
-the already-complete PlayerIndex and Vector2 plus Swift/System primitives.
+The regenerated scoreboard selects the standalone managed
+`Microsoft.Xna.Framework.DisplayOrientation` flags enum as Foundation
+Milestone 7. Its exact closure is one CLR type with five CLR identities and four
+mapped Swift identities (`value__` excluded), no missing XNA dependency, and it
+reuses the established Int32 OptionSet rule. This selection deliberately does
+not infer Mouse or Touch from the completed input work.
 
-This is selection only. The GamePad family is not started here. Its future run
-must independently audit exact native-input requirements and the pinned 0.7
-function table; it must not be combined with runtime-partial cleanup, Touch,
-Design, Content, Effects/Model, Audio, Media, Storage, or GamerServices.
+This is selection only. DisplayOrientation is not started here and must not be
+combined with runtime-partial cleanup or any other family.

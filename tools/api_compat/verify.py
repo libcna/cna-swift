@@ -57,6 +57,8 @@ class Member:
     raw_value: int | None = None
     declaration: str = ""
     identifier: str = ""
+    parameter_names: tuple[str, ...] = ()
+    verify_parameter_order: bool = False
 
     @property
     def display(self) -> str:
@@ -79,6 +81,8 @@ class TypeModel:
     declaration: str = ""
     identifier: str = ""
     members: list[Member] = dataclasses.field(default_factory=list)
+    raw_type: str | None = None
+    verify_raw_type: bool = False
 
 
 def load_json(path: Path) -> Any:
@@ -238,6 +242,13 @@ def expected_member(
             if kind == "method" and owner_kind == "interface" else None
         ),
         raw_value=raw,
+        parameter_names=tuple(
+            parameter.get("name", "") for parameter in parameters
+        ),
+        verify_parameter_order=(
+            f"{owner}.{mapped_name.lstrip('.')}" in
+            rules.get("internalParameterOrderChecks", [])
+        ),
     )
 
 
@@ -259,6 +270,11 @@ def build_expected(contract: dict[str, Any], rules: dict[str, Any]) -> dict[str,
             interfaces=tuple(map_clr_type(value, rules) for value in source_type.get("directInterfaces", [])),
             generic_count=len(generic_parameters),
             generic_parameters=generic_parameters,
+            raw_type=(
+                map_clr_type(source_type.get("underlyingType"), rules)
+                if source_type.get("underlyingType") else None
+            ),
+            verify_raw_type=name in rules.get("rawTypeChecks", []),
         )
         model.members = [
             expected_member(
@@ -367,6 +383,9 @@ def actual_member(owner: str, symbol: dict[str, Any], raw_values: dict[tuple[str
         raw_value=raw_values.get((owner.rsplit(".", 1)[-1], name)),
         declaration=decl,
         identifier=symbol["identifier"]["precise"],
+        parameter_names=tuple(
+            item.get("name", "") for item in signature.get("parameters", [])
+        ),
     )
 
 
@@ -408,6 +427,41 @@ def source_constant_values(source_root: Path) -> dict[tuple[str, str], int]:
                 if brace_depth <= 0:
                     container_name = None
                     container_kind = None
+    return values
+
+
+def source_raw_types(source_root: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    for path in source_root.rglob("*.swift"):
+        container_name: str | None = None
+        option_set = False
+        brace_depth = 0
+        for line in path.read_text(encoding="utf-8").splitlines():
+            declaration_match = re.search(
+                r"(?:public|open)\s+(?:final\s+)?(enum|struct)\s+(\w+)"
+                r"(?:\s*:\s*([^\{]+))?", line,
+            )
+            if declaration_match:
+                container_name = declaration_match.group(2)
+                inheritance = (declaration_match.group(3) or "").strip()
+                option_set = "OptionSet" in inheritance
+                brace_depth = line.count("{") - line.count("}")
+                if declaration_match.group(1) == "enum" and inheritance:
+                    values[container_name] = normalize_swift_type(
+                        inheritance.split(",", 1)[0].strip()
+                    )
+                continue
+            if container_name:
+                brace_depth += line.count("{") - line.count("}")
+                if option_set:
+                    raw = re.search(
+                        r"public\s+let\s+rawValue\s*:\s*([A-Za-z0-9_.]+)", line,
+                    )
+                    if raw:
+                        values[container_name] = normalize_swift_type(raw.group(1))
+                if brace_depth <= 0:
+                    container_name = None
+                    option_set = False
     return values
 
 
@@ -509,6 +563,7 @@ def parse_symbol_graph(
     symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
     markers = set(rules["namespaceMarkers"])
     raw_values = source_constant_values(source_root)
+    raw_types = source_raw_types(source_root)
     types: dict[str, TypeModel] = {}
     strict_symbols = 0
     for symbol in graph["symbols"]:
@@ -536,6 +591,7 @@ def parse_symbol_graph(
             generic_parameters=generic_parameters,
             declaration=decl,
             identifier=symbol["identifier"]["precise"],
+            raw_type=raw_types.get(path_name.rsplit(".", 1)[-1]),
         )
 
     member_relationships: dict[str, str] = {}
@@ -800,6 +856,15 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
             result.append(diagnostic("TYPE_KIND_MISMATCH", name, f"expected {expected_type.kind}, found {actual_type.kind}"))
         if expected_type.flags and not actual_type.flags:
             result.append(diagnostic("FLAGS_MAPPING_MISMATCH", name, "CLR [Flags] enum is not a Swift OptionSet"))
+        if (
+            expected_type.verify_raw_type and expected_type.raw_type and
+            actual_type.raw_type != expected_type.raw_type
+        ):
+            category = "FLAGS_MAPPING_MISMATCH" if expected_type.flags else "TYPE_KIND_MISMATCH"
+            result.append(diagnostic(
+                category, name,
+                f"expected raw type {expected_type.raw_type}, found {actual_type.raw_type}",
+            ))
         if expected_type.generic_count != actual_type.generic_count:
             result.append(diagnostic("GENERIC_MAPPING_MISMATCH", name, f"expected {expected_type.generic_count} generic parameters, found {actual_type.generic_count}"))
         elif expected_type.generic_parameters != actual_type.generic_parameters:
@@ -884,6 +949,15 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
                     result.append(diagnostic("PARAMETER_MAPPING_MISMATCH", subject, f"expected labels/types {list(zip(expected_member_model.labels, expected_member_model.parameters))}, found {list(zip(candidate.labels, candidate.parameters))}"))
                 if expected_member_model.directions != candidate.directions:
                     result.append(diagnostic("REF_OUT_MAPPING_MISMATCH", subject, f"expected {expected_member_model.directions}, found {candidate.directions}"))
+                if (
+                    expected_member_model.verify_parameter_order and
+                    expected_member_model.parameter_names != candidate.parameter_names
+                ):
+                    result.append(diagnostic(
+                        "PARAMETER_MAPPING_MISMATCH", subject,
+                        f"expected internal parameter order {expected_member_model.parameter_names}, "
+                        f"found {candidate.parameter_names}",
+                    ))
             if expected_member_model.kind in ("method", "property", "field") and expected_member_model.return_type != candidate.return_type:
                 category = "RETURN_MAPPING_MISMATCH" if expected_member_model.kind == "method" else ("FIELD_MAPPING_MISMATCH" if expected_member_model.kind == "field" else "PROPERTY_MAPPING_MISMATCH")
                 result.append(diagnostic(category, subject, f"expected {expected_member_model.return_type}, found {candidate.return_type}"))
@@ -1343,11 +1417,138 @@ def self_test() -> None:
     }:
         failures.append("missing ICollection<T> projection not detected")
 
+    gamepad_type_names = {
+        "Microsoft.Xna.Framework.Input.ButtonState",
+        "Microsoft.Xna.Framework.Input.Buttons",
+        "Microsoft.Xna.Framework.Input.GamePad",
+        "Microsoft.Xna.Framework.Input.GamePadButtons",
+        "Microsoft.Xna.Framework.Input.GamePadCapabilities",
+        "Microsoft.Xna.Framework.Input.GamePadDPad",
+        "Microsoft.Xna.Framework.Input.GamePadDeadZone",
+        "Microsoft.Xna.Framework.Input.GamePadState",
+        "Microsoft.Xna.Framework.Input.GamePadThumbSticks",
+        "Microsoft.Xna.Framework.Input.GamePadTriggers",
+        "Microsoft.Xna.Framework.Input.GamePadType",
+    }
+    all_expected = build_expected(contract, rules)
+    gamepad_expected = {
+        name: copy.deepcopy(model) for name, model in all_expected.items()
+        if name in gamepad_type_names
+    }
+    gamepad_good = copy.deepcopy(gamepad_expected)
+    buttons_name = "Microsoft.Xna.Framework.Input.Buttons"
+    gamepad_name = "Microsoft.Xna.Framework.Input.GamePad"
+    gamepad_buttons_name = "Microsoft.Xna.Framework.Input.GamePadButtons"
+    capabilities_name = "Microsoft.Xna.Framework.Input.GamePadCapabilities"
+    dpad_name = "Microsoft.Xna.Framework.Input.GamePadDPad"
+    state_name = "Microsoft.Xna.Framework.Input.GamePadState"
+    sticks_name = "Microsoft.Xna.Framework.Input.GamePadThumbSticks"
+    triggers_name = "Microsoft.Xna.Framework.Input.GamePadTriggers"
+
+    for model in gamepad_good.values():
+        model.identifier = model.name
+        for index, member in enumerate(model.members):
+            member.identifier = f"{model.name}:{index}"
+
+    def gamepad_member(
+        models: dict[str, TypeModel], owner: str, name: str,
+        arity: int | None = None,
+    ) -> Member:
+        return next(
+            member for member in models[owner].members
+            if member.name == name and (arity is None or len(member.parameters) == arity)
+        )
+
+    def gamepad_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(gamepad_expected, models)}
+
+    gamepad_mutations: list[tuple[str, str, Any]] = [
+        ("Buttons normal enum", "FLAGS_MAPPING_MISMATCH",
+         lambda m: (setattr(m[buttons_name], "kind", "enum"), setattr(m[buttons_name], "flags", False))),
+        ("Buttons wrong raw type", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[buttons_name], "raw_type", "UInt32")),
+        ("Buttons wrong A constant", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(gamepad_member(m, buttons_name, "A"), "raw_value", 4097)),
+        ("Buttons missing BigButton", "MISSING_MEMBER",
+         lambda m: m[buttons_name].members.remove(gamepad_member(m, buttons_name, "BigButton"))),
+        ("Buttons wrong high-bit constant", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(gamepad_member(m, buttons_name, "LeftThumbstickRight"), "raw_value", 1)),
+        ("Buttons flags metadata absent", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[buttons_name], "flags", False)),
+        ("GamePadButtons invented virtual property", "UNEXPECTED_MEMBER",
+         lambda m: m[gamepad_buttons_name].members.append(Member(
+             gamepad_buttons_name, "property", "LeftTrigger", False,
+             return_type="ButtonState", mutable=False, identifier="invented-virtual",
+         ))),
+        ("GamePadDPad constructor order", "PARAMETER_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, dpad_name, ".ctor"), "parameter_names",
+                           ("upValue", "downValue", "rightValue", "leftValue"))),
+        ("GamePadTriggers writable property", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, triggers_name, "Left"), "mutable", True)),
+        ("GamePadThumbSticks wrong Vector2", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, sticks_name, "Left"), "return_type", "Vector3")),
+        ("GamePadCapabilities public constructor", "UNEXPECTED_MEMBER",
+         lambda m: m[capabilities_name].members.append(Member(
+             capabilities_name, "constructor", ".ctor", False,
+             identifier="public-capabilities-constructor",
+         ))),
+        ("GamePadCapabilities missing property", "MISSING_MEMBER",
+         lambda m: m[capabilities_name].members.remove(
+             gamepad_member(m, capabilities_name, "HasVoiceSupport")
+         )),
+        ("GamePadState missing second constructor", "MISSING_MEMBER",
+         lambda m: m[state_name].members.remove(gamepad_member(m, state_name, ".ctor", 5))),
+        ("GamePadState Buttons array projected scalar", "PARAMETER_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, state_name, ".ctor", 5), "parameters",
+                           ("Microsoft.Xna.Framework.Vector2", "Microsoft.Xna.Framework.Vector2",
+                            "Float", "Float", buttons_name))),
+        ("GamePadState invented typed Equals", "UNEXPECTED_MEMBER",
+         lambda m: m[state_name].members.append(Member(
+             state_name, "method", "Equals", False, (state_name,), ("_",), ("",),
+             "Bool", identifier="typed-state-equals",
+         ))),
+        ("GamePadState wrong PacketNumber type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, state_name, "PacketNumber"), "return_type", "UInt32")),
+        ("GamePad constructible", "UNEXPECTED_MEMBER",
+         lambda m: m[gamepad_name].members.append(Member(
+             gamepad_name, "constructor", ".ctor", False, identifier="gamepad-constructor",
+         ))),
+        ("GamePad GetState not static", "METHOD_SIGNATURE_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, gamepad_name, "GetState", 1), "static", False)),
+        ("GamePad missing GetState overload", "MISSING_MEMBER",
+         lambda m: m[gamepad_name].members.remove(gamepad_member(m, gamepad_name, "GetState", 2))),
+        ("GamePad wrong dead-zone argument", "PARAMETER_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, gamepad_name, "GetState", 2), "parameters",
+                           ("Microsoft.Xna.Framework.PlayerIndex", "Int32"))),
+        ("GamePad GetCapabilities wrong return", "RETURN_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, gamepad_name, "GetCapabilities"), "return_type", state_name)),
+        ("GamePad SetVibration wrong return", "RETURN_MAPPING_MISMATCH",
+         lambda m: setattr(gamepad_member(m, gamepad_name, "SetVibration"), "return_type", "Void")),
+        ("GamePad public native handle", "RAW_HANDLE_LEAK",
+         lambda m: m[gamepad_name].members.append(Member(
+             gamepad_name, "property", "nativeHandle", True,
+             return_type="UInt64", mutable=False,
+             declaration="static let nativeHandle: UInt64", identifier="native-handle",
+         ))),
+        ("GamePad raw native state return", "PUBLIC_NATIVE_FFI_LEAK",
+         lambda m: (
+             setattr(gamepad_member(m, gamepad_name, "GetState", 1),
+                     "return_type", "CNASwift_GamePadState"),
+             setattr(gamepad_member(m, gamepad_name, "GetState", 1),
+                     "declaration", "func GetState(_ playerIndex: PlayerIndex) -> CNASwift_GamePadState")
+         )),
+    ]
+    for label, wanted, mutate in gamepad_mutations:
+        models = copy.deepcopy(gamepad_good)
+        mutate(models)
+        if wanted not in gamepad_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations)}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

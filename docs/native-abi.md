@@ -19,12 +19,17 @@ handle or function pointer.
 2. compares every Swift function position with the manifest;
 3. compiles size/alignment/offset assertions between canonical structures and
    `CNAShim`;
-4. compiles callback and all `Keys`/selected flag constants;
+4. compiles callback and all selected `Keys`/GamePad constants;
 5. audits ELF exports and calls `cna_get_abi_version` on the explicit library.
 
-Qualified result: 25 functions, 72 prototype positions, 72 C/Swift
-measurements, 15 layouts, 2 callbacks, 168 constants, zero missing header
+Qualified result: 29 functions, 91 prototype positions, 91 C/Swift
+measurements, 18 layouts, 2 callbacks, 214 constants, zero missing header
 symbols, zero missing library symbols, and zero mismatches.
+
+Foundation Milestone 6 added only the four required existing GamePad functions,
+three exact copied-POD layouts, and 46 player/dead-zone/threshold/button/type
+constants. Every new field offset and function position is compiler-measured;
+no adjacent CNA controller extension route is bound.
 
 The external evidence library is not shipped:
 

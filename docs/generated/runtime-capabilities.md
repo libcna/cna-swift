@@ -14,6 +14,20 @@ Qualified boundary: Swift 6.0.3, `x86_64-pc-linux-gnu`, canonical CNA C ABI
 | Texture2D stream load | VERIFIED_NATIVE | CNA decodes PNG bytes and reports dimensions. |
 | SpriteBatch Begin/Draw/End | VERIFIED_NATIVE | Native scaled-command route passes template and stress. |
 | Keyboard | VERIFIED_NATIVE | CNA query passes; HEADLESS observed no pressed keys. |
+| ButtonState | VERIFIED_MANAGED | Exact non-flags Int32 enum values. |
+| Buttons | VERIFIED_MANAGED | Exact 25-identity Int32 OptionSet, combinations, undefined bits, and flags verifier coverage. |
+| GamePadButtons | VERIFIED_MANAGED | Eleven physical properties plus exact value equality/hash/string/copy behavior. |
+| GamePadDPad | VERIFIED_MANAGED | Asymmetric constructor/property order plus exact value behavior. |
+| GamePadDeadZone / GamePadType | VERIFIED_MANAGED | Exact non-flags Int32 enum values, including BigButtonPad=768. |
+| GamePadTriggers / GamePadThumbSticks | VERIFIED_MANAGED | Exact clamp order, special binary32 behavior, equality/hash/string/copies. |
+| GamePadState | VERIFIED_MANAGED | Both constructors, packet/connection defaults, every physical/virtual/combined button query, equality/hash/string/copies. |
+| GamePadCapabilities value | VERIFIED_MANAGED | Exactly 26 read-only properties and no public initializer. |
+| GamePad.GetState default | VERIFIED_NATIVE_ROUTE | Canonical CNA IndependentAxes route returned a real disconnected snapshot; positive hardware path pending. |
+| GamePad.GetState None | VERIFIED_NATIVE_ROUTE | Canonical explicit route returned a real disconnected snapshot; physical boundary path pending. |
+| GamePad.GetState IndependentAxes | VERIFIED_NATIVE_ROUTE | Canonical explicit route returned a real disconnected snapshot; physical boundary path pending. |
+| GamePad.GetState Circular | VERIFIED_NATIVE_ROUTE | Canonical explicit route returned a real disconnected snapshot; physical boundary path pending. |
+| GamePad.GetCapabilities | VERIFIED_NATIVE_ROUTE | Canonical per-control route returned real all-false/Unknown disconnected capabilities; positive diversity pending. |
+| GamePad.SetVibration | VERIFIED_NATIVE_ROUTE | Canonical route returned device-accepted=false for disconnected slot; physical rumble pending. |
 | Visible renderer output | BACKEND_BLOCKED | HEADLESS has no window; no visual claim is made. |
 | Canonical CNA HEAD C API build | UPSTREAM_CNA_BLOCKED | Missing GameUpdateRequiredException header at unmodified HEAD. |
 | Content/XNB | UNIMPLEMENTED_CNA_SWIFT | Deferred; fake ContentManager removed. |

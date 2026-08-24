@@ -5,6 +5,10 @@
   "TEXTURE2D_CYCLES": 20,
   "SPRITEBATCH_CYCLES": 20,
   "CALLBACK_ERROR_CYCLES": 20,
+  "GAMEPAD_GET_STATE_CYCLES": 50,
+  "GAMEPAD_GET_STATE_CALLS": 200,
+  "GAMEPAD_CAPABILITIES_CYCLES": 20,
+  "GAMEPAD_VIBRATION_STRESS": "NOT_RUN_WITHOUT_HARDWARE",
   "NATIVE_CRASHES": 0,
   "OBSERVED_UAF": 0,
   "OBSERVED_DOUBLE_FREE": 0,
@@ -30,6 +34,21 @@
     {
       "mode": "wrong_thread",
       "test": "NativeLifecycleTests.testWrongThreadDisposeKeepsHandleForOwnerRetry",
+      "exitCode": 0
+    },
+    {
+      "mode": "gamepad_routes",
+      "test": "NativeLifecycleTests.testGamePadNativeRoutesAndDisconnectedOrHardwareSnapshot",
+      "exitCode": 0
+    },
+    {
+      "mode": "gamepad_generation",
+      "test": "NativeLifecycleTests.testGamePadQueriesFollowCurrentGeneration",
+      "exitCode": 0
+    },
+    {
+      "mode": "gamepad_wrong_thread",
+      "test": "NativeLifecycleTests.testGamePadWrongThreadQueryRejectsBeforeNativeEntry",
       "exitCode": 0
     }
   ]

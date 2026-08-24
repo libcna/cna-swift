@@ -23,6 +23,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/ShortPackedTests.swift",
     ROOT / "Tests/CNATests/PackedValueSemanticsTests.swift",
     ROOT / "Tests/CNATests/CurveTests.swift",
+    ROOT / "Tests/CNATests/GamePadTests.swift",
 ]
 
 
@@ -72,6 +73,15 @@ def main() -> int:
                 "CURVE_TANGENTS": "CurveDefaultsCloneTangents",
                 "CURVE_EVALUATE": "CurveEvaluate",
                 "CURVE_LOOPS": "CurveLoops",
+                "BUTTON_STATE": "GamePadEnums",
+                "BUTTONS": "GamePadEnums",
+                "GAMEPAD_BUTTONS": "GamePadButtons",
+                "GAMEPAD_DPAD": "GamePadDPad",
+                "GAMEPAD_TRIGGERS": "GamePadTriggers",
+                "GAMEPAD_THUMBSTICKS": "GamePadThumbSticks",
+                "GAMEPAD_STATE": "GamePadState",
+                "GAMEPAD_ENUMS": "GamePadEnums",
+                "GAMEPAD_CAPABILITIES": "GamePadCapabilities",
             }.items()
         },
         "colorPaletteGoldenEntries": len(re.findall(

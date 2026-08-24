@@ -150,6 +150,66 @@ typedef struct CNASwift_KeyboardState {
     uint64_t pressed_key_words[4];
 } CNASwift_KeyboardState;
 
+typedef struct CNASwift_GamePadAnalogState {
+    CNASwift_Vector2 left_thumb_stick;
+    CNASwift_Vector2 right_thumb_stick;
+    float left_trigger;
+    float right_trigger;
+} CNASwift_GamePadAnalogState;
+
+typedef struct CNASwift_GamePadState {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Bool is_connected;
+    uint8_t reserved0[3];
+    int32_t packet_number;
+    uint32_t pressed_buttons;
+    uint32_t reserved1;
+    CNASwift_GamePadAnalogState analog;
+} CNASwift_GamePadState;
+
+typedef struct CNASwift_GamePadCapabilities {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t gamepad_type;
+    CNASwift_Bool is_connected;
+    CNASwift_Bool has_a_button;
+    CNASwift_Bool has_b_button;
+    CNASwift_Bool has_x_button;
+    CNASwift_Bool has_y_button;
+    CNASwift_Bool has_back_button;
+    CNASwift_Bool has_start_button;
+    CNASwift_Bool has_big_button;
+    CNASwift_Bool has_dpad_up_button;
+    CNASwift_Bool has_dpad_down_button;
+    CNASwift_Bool has_dpad_left_button;
+    CNASwift_Bool has_dpad_right_button;
+    CNASwift_Bool has_left_shoulder_button;
+    CNASwift_Bool has_right_shoulder_button;
+    CNASwift_Bool has_left_stick_button;
+    CNASwift_Bool has_right_stick_button;
+    CNASwift_Bool has_left_x_thumb_stick;
+    CNASwift_Bool has_left_y_thumb_stick;
+    CNASwift_Bool has_right_x_thumb_stick;
+    CNASwift_Bool has_right_y_thumb_stick;
+    CNASwift_Bool has_left_trigger;
+    CNASwift_Bool has_right_trigger;
+    CNASwift_Bool has_left_vibration_motor;
+    CNASwift_Bool has_right_vibration_motor;
+    CNASwift_Bool has_voice_support;
+    CNASwift_Bool has_light_bar_ext;
+    CNASwift_Bool has_trigger_vibration_motors_ext;
+    CNASwift_Bool has_misc1_ext;
+    CNASwift_Bool has_paddle1_ext;
+    CNASwift_Bool has_paddle2_ext;
+    CNASwift_Bool has_paddle3_ext;
+    CNASwift_Bool has_paddle4_ext;
+    CNASwift_Bool has_touchpad_ext;
+    CNASwift_Bool has_gyro_ext;
+    CNASwift_Bool has_accelerometer_ext;
+    uint8_t reserved[1];
+} CNASwift_GamePadCapabilities;
+
 #ifdef __cplusplus
 }
 #endif

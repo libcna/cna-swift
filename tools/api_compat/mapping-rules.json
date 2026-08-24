@@ -43,6 +43,12 @@
     "methods": "first external label is _; later labels preserve CLR metadata names",
     "operators": "all external labels are _"
   },
+  "internalParameterOrderChecks": [
+    "Microsoft.Xna.Framework.Input.GamePadDPad.ctor"
+  ],
+  "rawTypeChecks": [
+    "Microsoft.Xna.Framework.Input.Buttons"
+  ],
   "typeMappings": {
     "System.Void": "Void",
     "System.Boolean": "Bool",

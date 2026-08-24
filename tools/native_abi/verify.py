@@ -46,6 +46,7 @@ def canonical_type(value: str) -> str:
     aliases = {
         "CNA_Result": "uint32_t", "CNA_Bool": "uint8_t", "CNA_Handle": "uint64_t",
         "CNA_GraphicsDeviceManagerHandle": "uint64_t", "CNA_PlayerIndex": "uint32_t",
+        "CNA_GamePadDeadZone": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)
@@ -71,6 +72,8 @@ def swift_type(value: str) -> str:
         "CNASwift_SpriteBatchBeginInfo": "CNA_SpriteBatchBeginInfo",
         "CNASwift_SpriteScaledCommand": "CNA_SpriteScaledCommand",
         "CNASwift_KeyboardState": "CNA_KeyboardState",
+        "CNASwift_GamePadState": "CNA_GamePadState",
+        "CNASwift_GamePadCapabilities": "CNA_GamePadCapabilities",
     }
     return mapping.get(text, text)
 
@@ -212,6 +215,7 @@ def main() -> int:
     if load_error:
         mismatches.append(f"library load: {load_error}")
 
+    probe_values = dict(line.split("=", 1) for line in probe_output.splitlines() if "=" in line)
     report = {
         "schemaVersion": 1,
         "CNA_ABI_VERSION": "0.7.0",
@@ -220,15 +224,15 @@ def main() -> int:
         "BOUND_FUNCTIONS": len(entries),
         "PROTOTYPE_TYPE_POSITIONS": sum(1 + len(entry["parameters"]) for entry in entries),
         "C_SWIFT_MEASUREMENTS": measured_positions,
-        "LAYOUTS": 15,
-        "CALLBACKS": 2,
-        "CONSTANTS": 8 + len(keys),
+        "LAYOUTS": int(probe_values["LAYOUTS"]),
+        "CALLBACKS": int(probe_values["CALLBACKS"]),
+        "CONSTANTS": int(probe_values["CONSTANTS"]) + len(keys),
         "MISSING_HEADER_SYMBOLS": 0,
         "MISSING_LIBRARY_SYMBOLS": len(missing_library),
         "ABI_MISMATCHES": len(mismatches),
         "missingLibrarySymbols": missing_library,
         "mismatches": mismatches,
-        "probeOutput": dict(line.split("=", 1) for line in probe_output.splitlines() if "=" in line),
+        "probeOutput": probe_values,
         "library": {
             "filename": args.library.name,
             "sha256": hashlib.sha256(args.library.read_bytes()).hexdigest(),
