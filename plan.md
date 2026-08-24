@@ -1,63 +1,63 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 8 — complete exactly the standalone
-`Microsoft.Xna.Framework.Graphics.BufferUsage` managed flags type over the
-completed Foundation 1–7 baseline.
+**Milestone:** Foundation 9 — complete exactly the standalone
+`Microsoft.Xna.Framework.Graphics.FillMode` managed non-flags enum over the
+completed Foundation 1–8 baseline.
 
 ## Normative rules
 
 1. Pinned Microsoft XNA 4.0 Windows runtime metadata and reference IL are the
    public shape and managed behavior authorities.
 2. Native runtime work follows Swift XNA facade → internal CNA-Swift runtime →
-   canonical CNA C ABI 0.7.0 → CNA. BufferUsage is managed-only and introduces
-   no native route, constant, or graphics resource operation.
-3. A type declaration does not imply runtime capability. Vertex/Index buffers,
-   dynamic buffers, vertex declarations, SetData/GetData, and GraphicsDevice
-   buffer/draw operations remain absent.
+   canonical CNA C ABI 0.7.0 → CNA. FillMode is managed-only and introduces no
+   native route, constant, rasterizer state, or renderer operation.
+3. A type declaration does not imply runtime capability. RasterizerState,
+   GraphicsDevice.RasterizerState, drawing, wireframe rendering, and backend
+   polygon-mode support remain absent.
 4. Public strict names use `Microsoft.Xna.Framework...` and XNA PascalCase.
    Formal Swift projections are measured; manual diagnostic allowlisting is
    forbidden.
-5. CLR `[Flags]` enums map through the established Swift `OptionSet` policy and
-   retain arbitrary fixed-width raw bits. BufferUsage uses exact `Int32`.
+5. Ordinary CLR enums map through the established Swift raw-enum policy.
+   FillMode is not `[Flags]`, uses exact `Int32`, and unknown Swift raw values
+   return `nil`.
 6. Exact CNA ABI 0.7.0 only. Native selection is an absolute environment
    override or installed soname, never a developer-tree fallback.
-7. Runtime and hardware claims require execution evidence. A managed
-   BufferUsage value is not evidence of GPU buffer support.
+7. Runtime and hardware claims require execution evidence. A managed FillMode
+   value is not evidence of RasterizerState or wireframe rendering support.
 
 ## Qualified selected surface
 
-Foundation Milestone 8 adds exactly
-`Microsoft.Xna.Framework.Graphics.BufferUsage`: one CLR type with three CLR
+Foundation Milestone 9 adds exactly
+`Microsoft.Xna.Framework.Graphics.FillMode`: one CLR type with three CLR
 identities and two mapped Swift XNA identities. The synthetic `value__` storage
 field remains the existing formal enum-storage language exclusion.
 
-The CLR `[Flags]` enum maps to a Swift `OptionSet` with exact `Int32` storage.
-Its only XNA literals are `None=0` and `WriteOnly=1`. Raw construction, union,
-intersection, arbitrary positive/negative raw bits, and value copying are
-qualified as Swift projection behavior without creating XNA member identities.
-No custom string or helper surface is added.
+The ordinary CLR enum maps to a Swift `enum` with exact `Int32` storage. Its
+only XNA literals are `Solid=0` and `WireFrame=1`. Raw initialization for 0/1,
+unknown positive/negative rejection, and value copying are qualified as Swift
+projection behavior without creating XNA member identities. No OptionSet,
+custom string, or helper surface is added.
 
-No VertexBuffer, DynamicVertexBuffer, IndexBuffer, DynamicIndexBuffer,
-VertexBufferBinding, VertexDeclaration, IVertexType, built-in vertex struct,
-GraphicsDevice member, GraphicsDeviceManager member, CNAShim declaration,
-native manifest row, native function, C layout, callback, or constant was
-added. Game, GraphicsDeviceManager, GraphicsDevice, Texture2D, and SpriteBatch
-remain the same honest runtime partials.
+No RasterizerState, GraphicsDevice member, drawing operation, wireframe
+behavior, polygon mode, CNAShim declaration, native manifest row, native
+function, C layout, callback, or constant was added. Game,
+GraphicsDeviceManager, GraphicsDevice, Texture2D, and SpriteBatch remain the
+same honest runtime partials.
 
 ## Measurement status
 
 - Pinned contract: 257 types / 2,964 members; contract SHA-256
   `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`.
 - Formal projection: 257 Swift types / 2,887 Swift members.
-- Compiler target: 68 types / 1,381 members; 63 complete, five partial, 189
-  missing. Total diagnostics are 340. Normal strict remains red only for the
+- Compiler target: 69 types / 1,383 members; 64 complete, five partial, 188
+  missing. Total diagnostics are 339. Normal strict remains red only for the
   deferred profile; leak-only is green.
-- Verifier: 114 mutation/self-tests pass. BufferUsage is locally 2/2 with zero
+- Verifier: 126 mutation/self-tests pass. FillMode is locally 2/2 with zero
   diagnostics. Manual/applied allowlists and unmeasured structural categories
   are zero. Every formal projection counter remains unchanged.
-- Pure behavior: 1,245 XNA-derived observations/assertions with zero failures.
-  The `BUFFER_USAGE` record contains the pinned contract literals and keeps
-  Swift OptionSet conveniences in a separate mapping qualification.
+- Pure behavior: 1,247 XNA-derived observations/assertions with zero failures.
+  The `FILL_MODE` record contains the pinned contract literals and keeps Swift
+  raw-initializer/copy semantics in a separate mapping qualification.
 - Native ABI: 29 functions, 91 prototype positions, 91 C/Swift measurements,
   18 layouts, 2 callbacks, and 214 constants; header, library, and ABI mismatch
   counters are zero.
@@ -81,5 +81,6 @@ Completion requires debug/release builds and tests, warnings-as-errors, Symbol
 Graph, verifier self-tests/strict/leak-only, pure behavior, unchanged full ABI,
 GamePad and Keyboard regression, native stress, Swift ASan, unchanged template
 60/600, a clean exact source archive, isolated consumer, `git diff --check`,
-commit/push synchronization, and no CNA/template source change. Work stops
-after selecting—but not starting—one regenerated next closure.
+the local milestone commit and explicit publication boundary, and no
+CNA/template source change. Work stops after selecting—but not starting—one
+regenerated next closure.

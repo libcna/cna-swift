@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=68
-TARGET_MEMBERS=1381
-TOTAL_DIAGNOSTICS=340
-COMPLETE_TYPES=63
+TARGET_TYPES=69
+TARGET_MEMBERS=1383
+TOTAL_DIAGNOSTICS=339
+COMPLETE_TYPES=64
 PARTIAL_TYPES=5
-MISSING_TYPES=189
-MISSING_TYPE=189
+MISSING_TYPES=188
+MISSING_TYPE=188
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -70,6 +70,7 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 - `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.BufferUsage`
+- `Microsoft.Xna.Framework.Graphics.FillMode`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444`
@@ -385,7 +386,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.EffectTechnique`
 - `Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection`
 - `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
-- `Microsoft.Xna.Framework.Graphics.FillMode`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
 - `Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus`
 - `Microsoft.Xna.Framework.Graphics.GraphicsProfile`

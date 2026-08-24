@@ -1,13 +1,13 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestone 8 final status:** COMPLETE.
+**Foundation Milestone 9 final status:** COMPLETE.
 
 The milestone closes exactly
-`Microsoft.Xna.Framework.Graphics.BufferUsage`: one XNA public type, three CLR
-identities, and two mapped Swift identities. It is an exact managed `Int32`
-OptionSet with `None=0` and `WriteOnly=1`. CNA source, the canonical ABI, every
-buffer class and GraphicsDevice/GraphicsDeviceManager member, the five
-runtime-partial types, and maintained template source are unchanged.
+`Microsoft.Xna.Framework.Graphics.FillMode`: one XNA public type, three CLR
+identities, and two mapped Swift identities. It is an exact managed non-flags
+`Int32` enum with `Solid=0` and `WireFrame=1`. CNA source, the canonical ABI,
+RasterizerState, every GraphicsDevice member, the five runtime-partial types,
+and maintained template source are unchanged.
 
 ## Qualified environment and gates
 
@@ -17,15 +17,15 @@ SWIFT_TARGET=x86_64-pc-linux-gnu
 SWIFT_TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS
 RELEASE_BUILD=PASS
-DEBUG_TESTS=81 PASS
-RELEASE_TESTS=81 PASS
-MANAGED_TESTS=71 PASS_WITHOUT_CNA_NATIVE_LIBRARY
+DEBUG_TESTS=83 PASS
+RELEASE_TESTS=83 PASS
+MANAGED_TESTS=73 PASS_WITHOUT_CNA_NATIVE_LIBRARY
 WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE
 SYMBOL_GRAPH=PASS
-API_SELF_TESTS=114 PASS
+API_SELF_TESTS=126 PASS
 NORMAL_STRICT=EXPECTED_RED_DEFERRED_PROFILE_ONLY
 LEAK_ONLY=PASS
-PURE_XNA_DERIVED=1245/1245/0
+PURE_XNA_DERIVED=1247/1247/0
 GAMEPAD_NATIVE_FAILURES=0
 SWIFT_ASAN=PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED
 NATIVE_CNA_SANITIZER=NOT_INSTRUMENTED
@@ -39,14 +39,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=68
-TARGET_MEMBERS=1381
-TOTAL_DIAGNOSTICS=340
-MISSING_TYPE=189
+TARGET_TYPES=69
+TARGET_MEMBERS=1383
+TOTAL_DIAGNOSTICS=339
+MISSING_TYPE=188
 MISSING_MEMBER=131
-COMPLETE_TYPES=63
+COMPLETE_TYPES=64
 PARTIAL_TYPES=5
-MISSING_TYPES=189
+MISSING_TYPES=188
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -90,22 +90,21 @@ overload mismatches remain owned exclusively by Game, GraphicsDeviceManager,
 GraphicsDevice, Texture2D, and SpriteBatch. Every GamePad-family mismatch
 category is zero.
 
-## BufferUsage type matrix
+## FillMode type matrix
 
 | Type | CLR / expected / target | Kind | Raw type | Values | Diagnostics |
 |---|---:|---|---|---|---:|
-| `BufferUsage` | 3 / 2 / 2 | CLR flags enum → Swift `OptionSet` | `Int32` | None=0, WriteOnly=1 | 0 |
+| `FillMode` | 3 / 2 / 2 | CLR enum → Swift `enum` | `Int32` | Solid=0, WireFrame=1 | 0 |
 
 The synthetic CLR `value__` identity is the existing enum-storage language
-mapping. Swift `rawValue`, `init(rawValue:)`, and inherited OptionSet operations
-are compiler language surface and produce no unexpected XNA member. Union,
-intersection, arbitrary raw bits including `1 << 20` and -1, and value-copy
-behavior are qualified separately from the two pinned XNA-derived literal
-observations. See `docs/buffer-usage-evidence.md`.
+mapping. Swift `rawValue`, `init?(rawValue:)`, equality, and value copying are
+compiler language surface and produce no unexpected XNA member. Raw values 0
+and 1 construct the exact cases, while representative unknown positive and
+negative values return `nil`. See `docs/fill-mode-evidence.md`.
 
-No runtime buffer capability is claimed. Vertex/Index buffers, dynamic buffers,
-VertexDeclaration, IVertexType, SetData/GetData, binding, upload/download, and
-every GraphicsDevice buffer/draw operation remain deferred.
+No rasterizer or rendering capability is claimed. RasterizerState,
+GraphicsDevice.RasterizerState, drawing, wireframe rendering, polygon mode, and
+every backend operation remain deferred.
 
 ## Retained GamePad type matrix
 
@@ -195,22 +194,23 @@ self-referential source content.
 
 ## Exactly one next dependency-complete milestone
 
-The regenerated public-signature dependency graph contains multiple independent
-closures. Foundation Milestone 9 selects exactly the standalone managed
-`Microsoft.Xna.Framework.Graphics.FillMode` enum: one CLR type with three CLR
-identities and two mapped Swift identities (`value__` excluded), no missing XNA
-dependency, `System.Int32` storage, `flags=false`, and literal values `Solid=0`
-and `WireFrame=1`.
+The regenerated public-signature dependency graph contains 67 missing types
+whose XNA dependencies are already complete. Foundation Milestone 10 selects
+exactly the standalone managed `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
+enum. It has no missing public-signature dependency and 20 mapped Swift
+identities (`value__` excluded).
 
-This choice is based on the regenerated zero-unresolved-dependency graph and
-keeps the next closure minimal. Among the regenerated candidates it is a
-smallest two-identity leaf in an already mapped namespace, selected
-independently of BufferUsage consumers. It does not infer RasterizerState,
-GraphicsDevice drawing, wireframe rendering capability, buffer support,
-GameWindow, Mouse, Touch, Content, or runtime graphics support.
+The ranking uses reverse dependency reach rather than merely choosing another
+tiny enum. SurfaceFormat is referenced directly by nine missing runtime
+Graphics types and lies upstream of 56 missing types; completing it would make
+DisplayMode dependency-complete. Design-time converter candidates were not
+ranked as runtime closures because their external System.ComponentModel mapping
+is not established. This selection does not infer textures, render targets,
+GraphicsDevice operations, GPU format support, or any native capability.
 
-This is selection only. `FillMode` has not been started and must not be combined
-with RasterizerState, another enum, runtime-partial cleanup, or CNA ABI work.
+This is selection only. `SurfaceFormat` has not been started and must not be
+combined with a texture/render-target type, runtime-partial cleanup, or CNA ABI
+work.
 
 ```text
 SELECTED_ONLY=true

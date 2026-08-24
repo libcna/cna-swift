@@ -856,6 +856,8 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
             result.append(diagnostic("TYPE_KIND_MISMATCH", name, f"expected {expected_type.kind}, found {actual_type.kind}"))
         if expected_type.flags and not actual_type.flags:
             result.append(diagnostic("FLAGS_MAPPING_MISMATCH", name, "CLR [Flags] enum is not a Swift OptionSet"))
+        if expected_type.kind == "enum" and not expected_type.flags and actual_type.flags:
+            result.append(diagnostic("FLAGS_MAPPING_MISMATCH", name, "ordinary CLR enum unexpectedly maps as a Swift OptionSet"))
         if (
             expected_type.verify_raw_type and expected_type.raw_type and
             actual_type.raw_type != expected_type.raw_type
@@ -1683,11 +1685,83 @@ def self_test() -> None:
     }:
         failures.append("BufferUsage value__ treated as required did not fail")
 
+    fill_name = "Microsoft.Xna.Framework.Graphics.FillMode"
+    fill_expected = {
+        fill_name: copy.deepcopy(all_expected[fill_name]),
+    }
+    fill_good = copy.deepcopy(fill_expected)
+    fill_good[fill_name].identifier = fill_name
+    for index, member in enumerate(fill_good[fill_name].members):
+        member.identifier = f"{fill_name}:{index}"
+
+    def fill_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(member for member in models[fill_name].members if member.name == name)
+
+    def fill_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(fill_expected, models)}
+
+    fill_mutations: list[tuple[str, str, Any]] = [
+        ("FillMode missing type", "MISSING_TYPE",
+         lambda m: m.pop(fill_name)),
+        ("FillMode wrong namespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.FillMode",
+             m.pop(fill_name),
+         )),
+        ("FillMode struct instead of enum", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[fill_name], "kind", "struct")),
+        ("FillMode OptionSet instead of ordinary enum", "FLAGS_MAPPING_MISMATCH",
+         lambda m: (setattr(m[fill_name], "kind", "struct"),
+                    setattr(m[fill_name], "flags", True))),
+        ("FillMode wrong raw type", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[fill_name], "raw_type", "UInt32")),
+        ("FillMode flags metadata present", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[fill_name], "flags", True)),
+        ("FillMode wrong Solid", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(fill_member(m, "Solid"), "raw_value", 1)),
+        ("FillMode wrong WireFrame", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(fill_member(m, "WireFrame"), "raw_value", 2)),
+        ("FillMode missing WireFrame", "MISSING_MEMBER",
+         lambda m: m[fill_name].members.remove(fill_member(m, "WireFrame"))),
+        ("FillMode unexpected third enum case", "UNEXPECTED_MEMBER",
+         lambda m: m[fill_name].members.append(Member(
+             fill_name, "field", "Point", True,
+             return_type=fill_name, mutable=False, raw_value=2,
+             identifier="invented-fill-mode-case",
+         ))),
+        ("FillMode public description helper", "UNEXPECTED_MEMBER",
+         lambda m: m[fill_name].members.append(Member(
+             fill_name, "property", "description", False,
+             return_type="String", mutable=False,
+             identifier="invented-fill-mode-description",
+         ))),
+    ]
+    for label, wanted, mutate in fill_mutations:
+        models = copy.deepcopy(fill_good)
+        mutate(models)
+        if wanted not in fill_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    if any(member.name == "value__" for member in fill_expected[fill_name].members):
+        failures.append("FillMode value__ was not excluded from the Swift contract")
+    fill_value_storage_expected = copy.deepcopy(fill_expected)
+    fill_value_storage_expected[fill_name].members.append(Member(
+        fill_name, "field", "value__", False,
+        return_type="Int32", mutable=True,
+        identifier="incorrectly-required-fill-mode-storage",
+    ))
+    if "MISSING_MEMBER" not in {
+        item["category"] for item in compare(
+            fill_value_storage_expected, fill_good,
+        )
+    }:
+        failures.append("FillMode value__ treated as required did not fail")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

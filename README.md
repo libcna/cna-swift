@@ -15,8 +15,9 @@ GamePad family through real canonical CNA state, capability, packet, dead-zone,
 and vibration routes. It also includes the standalone managed
 `DisplayOrientation` flags type without claiming platform rotation or window
 orientation functionality, plus the standalone managed `BufferUsage` flags
-type without claiming buffer or GPU resource support. The old flat API and
-known fake behaviors are absent.
+type without claiming buffer or GPU resource support, plus the standalone
+managed non-flags `FillMode` enum without claiming rasterizer or wireframe
+rendering support. The old flat API and known fake behaviors are absent.
 
 ## Measured surface
 
@@ -25,12 +26,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=68
-TARGET_MEMBERS=1381
-TOTAL_DIAGNOSTICS=340
-COMPLETE_TYPES=63
+TARGET_TYPES=69
+TARGET_MEMBERS=1383
+TOTAL_DIAGNOSTICS=339
+COMPLETE_TYPES=64
 PARTIAL_TYPES=5
-MISSING_TYPES=189
+MISSING_TYPES=188
 MISSING_MEMBER=131
 ```
 
@@ -46,9 +47,22 @@ GameTime, PlayerIndex, Vector2/3/4, Quaternion, Matrix, Viewport, Plane, Ray,
 BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
-CurveTangent, all eleven GamePad-family types, DisplayOrientation, and
-BufferUsage. Every implemented member has qualified behavior; missing members
+CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
+and FillMode. Every implemented member has qualified behavior; missing members
 remain absent.
+
+## Managed FillMode
+
+`Microsoft.Xna.Framework.Graphics.FillMode` is the exact managed non-flags
+`Int32` enum with `Solid=0` and `WireFrame=1`. The CLR `value__` storage
+identity is the existing enum-storage language mapping. Swift raw-value
+initialization accepts 0 and 1, rejects representative unknown values with
+`nil`, and preserves ordinary value-copy behavior without adding XNA members.
+
+This is only a managed enum. `RasterizerState`,
+`GraphicsDevice.RasterizerState`, drawing, wireframe rendering, polygon-mode
+switching, and native renderer support remain deferred. See
+`docs/fill-mode-evidence.md`.
 
 ## Managed BufferUsage
 

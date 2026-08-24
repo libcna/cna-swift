@@ -26,6 +26,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/GamePadTests.swift",
     ROOT / "Tests/CNATests/DisplayOrientationContractTests.swift",
     ROOT / "Tests/CNATests/BufferUsageContractTests.swift",
+    ROOT / "Tests/CNATests/FillModeContractTests.swift",
 ]
 
 
@@ -86,6 +87,7 @@ def main() -> int:
                 "GAMEPAD_CAPABILITIES": "GamePadCapabilities",
                 "DISPLAY_ORIENTATION": "DisplayOrientationXnaContract",
                 "BUFFER_USAGE": "BufferUsageXnaContract",
+                "FILL_MODE": "FillModeXnaContract",
             }.items()
         },
         "displayOrientationContract": {
@@ -105,6 +107,16 @@ def main() -> int:
             "values": {
                 "None": 0,
                 "WriteOnly": 1,
+            },
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "fillModeContract": {
+            "kind": "enum",
+            "flags": False,
+            "underlyingType": "System.Int32",
+            "values": {
+                "Solid": 0,
+                "WireFrame": 1,
             },
             "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },
