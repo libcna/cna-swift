@@ -12,3 +12,8 @@ physical and virtual button query, combinations, connection/packet equality,
 all 26 managed capability properties, and XNA vibration input quantization.
 Canonical controller observations are intentionally emitted by the separate
 `tools/gamepad_native` runner and never counted as pure XNA-derived behavior.
+
+The `DISPLAY_ORIENTATION` group records only the pinned XNA flags, Int32
+underlying type, and four literal values. Swift `OptionSet` union,
+intersection, arbitrary-bit, and copy qualification lives in a separate test
+case and is not counted as XNA runtime behavior.

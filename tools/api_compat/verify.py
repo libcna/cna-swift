@@ -1544,11 +1544,78 @@ def self_test() -> None:
         if wanted not in gamepad_categories(models):
             failures.append(f"{label}: did not produce {wanted}")
 
+    display_name = "Microsoft.Xna.Framework.DisplayOrientation"
+    display_expected = {
+        display_name: copy.deepcopy(all_expected[display_name]),
+    }
+    display_good = copy.deepcopy(display_expected)
+    display_good[display_name].identifier = display_name
+    for index, member in enumerate(display_good[display_name].members):
+        member.identifier = f"{display_name}:{index}"
+
+    def display_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(member for member in models[display_name].members if member.name == name)
+
+    def display_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(display_expected, models)}
+
+    display_mutations: list[tuple[str, str, Any]] = [
+        ("DisplayOrientation missing type", "MISSING_TYPE",
+         lambda m: m.pop(display_name)),
+        ("DisplayOrientation normal enum", "FLAGS_MAPPING_MISMATCH",
+         lambda m: (setattr(m[display_name], "kind", "enum"),
+                    setattr(m[display_name], "flags", False))),
+        ("DisplayOrientation wrong raw type", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[display_name], "raw_type", "UInt32")),
+        ("DisplayOrientation wrong Default", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(display_member(m, "Default"), "raw_value", 1)),
+        ("DisplayOrientation wrong LandscapeLeft", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(display_member(m, "LandscapeLeft"), "raw_value", 2)),
+        ("DisplayOrientation wrong LandscapeRight", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(display_member(m, "LandscapeRight"), "raw_value", 4)),
+        ("DisplayOrientation wrong Portrait", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(display_member(m, "Portrait"), "raw_value", 8)),
+        ("DisplayOrientation missing Portrait", "MISSING_MEMBER",
+         lambda m: m[display_name].members.remove(display_member(m, "Portrait"))),
+        ("DisplayOrientation wrong namespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.Graphics.DisplayOrientation",
+             m.pop(display_name),
+         )),
+        ("DisplayOrientation flags metadata absent", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[display_name], "flags", False)),
+        ("DisplayOrientation unexpected declared member", "UNEXPECTED_MEMBER",
+         lambda m: m[display_name].members.append(Member(
+             display_name, "method", "IsLandscape", False,
+             identifier="invented-display-orientation-member",
+         ))),
+    ]
+    for label, wanted, mutate in display_mutations:
+        models = copy.deepcopy(display_good)
+        mutate(models)
+        if wanted not in display_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    if any(member.name == "value__" for member in display_expected[display_name].members):
+        failures.append("DisplayOrientation value__ was not excluded from the Swift contract")
+    display_value_storage_expected = copy.deepcopy(display_expected)
+    display_value_storage_expected[display_name].members.append(Member(
+        display_name, "field", "value__", False,
+        return_type="Int32", mutable=True,
+        identifier="incorrectly-required-enum-storage",
+    ))
+    if "MISSING_MEMBER" not in {
+        item["category"] for item in compare(
+            display_value_storage_expected, display_good,
+        )
+    }:
+        failures.append("DisplayOrientation value__ treated as required did not fail")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations)}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

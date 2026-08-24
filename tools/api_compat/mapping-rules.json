@@ -47,6 +47,7 @@
     "Microsoft.Xna.Framework.Input.GamePadDPad.ctor"
   ],
   "rawTypeChecks": [
+    "Microsoft.Xna.Framework.DisplayOrientation",
     "Microsoft.Xna.Framework.Input.Buttons"
   ],
   "typeMappings": {

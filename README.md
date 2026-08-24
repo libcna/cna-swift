@@ -12,7 +12,10 @@ surface includes exact binary32 linear algebra and intersection types, Color,
 both packed-vector protocols, all 17 concrete PackedVector formats, and the
 complete six-type Curve family. It also includes the exact eleven-type XNA
 GamePad family through real canonical CNA state, capability, packet, dead-zone,
-and vibration routes. The old flat API and known fake behaviors are absent.
+and vibration routes. It also includes the standalone managed
+`DisplayOrientation` flags type without claiming platform rotation or window
+orientation functionality. The old flat API and known fake behaviors are
+absent.
 
 ## Measured surface
 
@@ -21,12 +24,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=66
-TARGET_MEMBERS=1375
-TOTAL_DIAGNOSTICS=342
-COMPLETE_TYPES=61
+TARGET_TYPES=67
+TARGET_MEMBERS=1379
+TOTAL_DIAGNOSTICS=341
+COMPLETE_TYPES=62
 PARTIAL_TYPES=5
-MISSING_TYPES=191
+MISSING_TYPES=190
 MISSING_MEMBER=131
 ```
 
@@ -42,8 +45,20 @@ GameTime, PlayerIndex, Vector2/3/4, Quaternion, Matrix, Viewport, Plane, Ray,
 BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
-CurveTangent, and all eleven GamePad-family types. Every implemented member has
-qualified behavior; missing members remain absent.
+CurveTangent, all eleven GamePad-family types, and DisplayOrientation. Every
+implemented member has qualified behavior; missing members remain absent.
+
+## Managed DisplayOrientation
+
+`Microsoft.Xna.Framework.DisplayOrientation` is the exact root-framework
+`Int32` OptionSet with `Default=0`, `LandscapeLeft=1`, `LandscapeRight=2`, and
+`Portrait=4`. The CLR `value__` storage field and the Swift raw-value/OptionSet
+surface remain formal language projections, so the type has exactly four XNA
+identities and zero local diagnostics. Arbitrary raw bits are preserved.
+
+This is only a managed flags value. GraphicsDeviceManager orientation members,
+GameWindow, display detection, and platform rotation remain deferred. See
+`docs/display-orientation-evidence.md`.
 
 ## Managed Curve family
 

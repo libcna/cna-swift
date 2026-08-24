@@ -24,6 +24,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/PackedValueSemanticsTests.swift",
     ROOT / "Tests/CNATests/CurveTests.swift",
     ROOT / "Tests/CNATests/GamePadTests.swift",
+    ROOT / "Tests/CNATests/DisplayOrientationContractTests.swift",
 ]
 
 
@@ -82,7 +83,19 @@ def main() -> int:
                 "GAMEPAD_STATE": "GamePadState",
                 "GAMEPAD_ENUMS": "GamePadEnums",
                 "GAMEPAD_CAPABILITIES": "GamePadCapabilities",
+                "DISPLAY_ORIENTATION": "DisplayOrientationXnaContract",
             }.items()
+        },
+        "displayOrientationContract": {
+            "flags": True,
+            "underlyingType": "System.Int32",
+            "values": {
+                "Default": 0,
+                "LandscapeLeft": 1,
+                "LandscapeRight": 2,
+                "Portrait": 4,
+            },
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },
         "colorPaletteGoldenEntries": len(re.findall(
             r'\("[A-Za-z]+",\s*\.[A-Za-z]+,\s*0x[0-9A-Fa-f_]+\)', source,

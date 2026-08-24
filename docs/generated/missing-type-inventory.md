@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=66
-TARGET_MEMBERS=1375
-TOTAL_DIAGNOSTICS=342
-COMPLETE_TYPES=61
+TARGET_TYPES=67
+TARGET_MEMBERS=1379
+TOTAL_DIAGNOSTICS=341
+COMPLETE_TYPES=62
 PARTIAL_TYPES=5
-MISSING_TYPES=191
-MISSING_TYPE=191
+MISSING_TYPES=190
+MISSING_TYPE=190
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -67,6 +67,7 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 - `Microsoft.Xna.Framework.CurveKeyCollection`
 - `Microsoft.Xna.Framework.CurveLoopType`
 - `Microsoft.Xna.Framework.CurveTangent`
+- `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
@@ -342,7 +343,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Design.Vector2Converter`
 - `Microsoft.Xna.Framework.Design.Vector3Converter`
 - `Microsoft.Xna.Framework.Design.Vector4Converter`
-- `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.DrawableGameComponent`
 - `Microsoft.Xna.Framework.FrameworkDispatcher`
 - `Microsoft.Xna.Framework.GameComponent`

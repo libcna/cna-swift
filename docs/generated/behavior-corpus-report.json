@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1239,
-  "ASSERTIONS": 1239,
+  "OBSERVATIONS": 1243,
+  "ASSERTIONS": 1243,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -71,7 +71,8 @@
     "testGamePadStateVirtualButtonQueriesAndBinary32Boundaries",
     "testGamePadStateEqualityHashStringAndNativeSnapshotFieldSet",
     "testGamePadCapabilitiesAllPropertiesAndValueCopy",
-    "testGamePadVibrationInputUsesPinnedUncheckedInt16Words"
+    "testGamePadVibrationInputUsesPinnedUncheckedInt16Words",
+    "testDisplayOrientationXnaContract"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -112,7 +113,19 @@
     "GAMEPAD_THUMBSTICKS": 1,
     "GAMEPAD_STATE": 4,
     "GAMEPAD_ENUMS": 1,
-    "GAMEPAD_CAPABILITIES": 1
+    "GAMEPAD_CAPABILITIES": 1,
+    "DISPLAY_ORIENTATION": 1
+  },
+  "displayOrientationContract": {
+    "flags": true,
+    "underlyingType": "System.Int32",
+    "values": {
+      "Default": 0,
+      "LandscapeLeft": 1,
+      "LandscapeRight": 2,
+      "Portrait": 4
+    },
+    "swiftProjectionQualificationCountedAsXnaBehavior": false
   },
   "colorPaletteGoldenEntries": 141,
   "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
