@@ -10,7 +10,7 @@
   },
   "capabilities": [
     {"operation":"XNA namespace projection","status":"VERIFIED_MANAGED","evidence":"Swift Symbol Graph emits the strict Microsoft.Xna.Framework path; marker symbols are measured exclusions"},
-    {"operation":"Pure math/value foundation","status":"VERIFIED_MANAGED","evidence":"MathHelper, Point, Rectangle and GameTime are strict-complete; selected Vector2 and Color behavior is real but structurally partial"},
+    {"operation":"Pure math/value foundation","status":"VERIFIED_MANAGED","evidence":"MathHelper, Point, Rectangle, GameTime, the binary32/geometry closure, Color, and both packed-vector protocols are strict-complete managed Swift"},
     {"operation":"Game lifecycle","status":"VERIFIED_NATIVE","evidence":"Initialize/LoadContent/BeginRun/Update/Draw/EndRun/UnloadContent/Exiting execute through CNA callbacks; 60/600 runs pass"},
     {"operation":"Game callback error containment","status":"VERIFIED_NATIVE","evidence":"Initialize, LoadContent, Update, Draw and UnloadContent errors are caught in C trampolines and rethrown at controlled Swift boundaries"},
     {"operation":"Game recreation","status":"VERIFIED_NATIVE","evidence":"20 create/run/exit/destroy cycles pass; stale generations reject use"},

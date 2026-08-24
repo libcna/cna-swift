@@ -9,8 +9,9 @@ foundation has a
 compiler-Symbol-Graph scoreboard, exact ABI-0.7 admission, a reviewed typed
 function table, owner-thread/generation/ownership enforcement, callback error
 containment, a native Game/2D/input canary, and a complete managed binary32
-linear-algebra plus public-signature geometry dependency closure. The old flat
-one-file API and every known fake behavior were removed.
+linear-algebra plus public-signature geometry dependency closure. The managed
+Color and its two forced packed-vector protocols are also complete. The old
+flat one-file API and every known fake behavior were removed.
 
 ## Measured surface
 
@@ -19,11 +20,11 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=30
-TARGET_MEMBERS=883
-COMPLETE_TYPES=24
-PARTIAL_TYPES=6
-MISSING_TYPES=227
+TARGET_TYPES=32
+TARGET_MEMBERS=1030
+COMPLETE_TYPES=27
+PARTIAL_TYPES=5
+MISSING_TYPES=225
 ```
 
 Normal strict verification remains red because future XNA types and members
@@ -36,9 +37,10 @@ Strict-complete types are MathHelper, Point, Rectangle, GameTime, PlayerIndex,
 Vector2, Vector3, Vector4, Quaternion, Matrix, Viewport, Plane,
 PlaneIntersectionType, Ray, BoundingBox, BoundingSphere, BoundingFrustum,
 ContainmentType, SpriteSortMode, SpriteEffects, Keys, KeyState, KeyboardState,
-and Keyboard. Color, Game, GraphicsDeviceManager, GraphicsDevice, Texture2D,
-and SpriteBatch are explicitly measured partial types. Every implemented
-member is real; missing members are absent.
+Keyboard, Color, Graphics.PackedVector.IPackedVector, and
+Graphics.PackedVector.IPackedVectorOfT. Game, GraphicsDeviceManager,
+GraphicsDevice, Texture2D, and SpriteBatch are explicitly measured partial
+types. Every implemented member is real; missing members are absent.
 
 The geometry types are not a separate follow-on milestone: pinned Matrix
 signatures require Plane, whose own public signatures recursively require the
@@ -48,6 +50,14 @@ surface was added. BasicEffect, ContentManager, GraphicsCapability, and the old 
 `docs/linear-algebra-evidence.md` and
 `docs/geometry-intersection-evidence.md` for the binary32, convention, and
 dependency evidence.
+
+Color exposes the complete 165-member pinned surface, including exact UInt32
+packing, Vector3/Vector4 conversion, premultiplication, fixed-point
+interpolation, and all 141 predefined colors. Its authoritative direct
+interface forces only `IPackedVector` and the mapped generic
+`IPackedVectorOfT<TPacked>` protocol. No concrete PackedVector format was
+started. See `docs/color-packed-protocol-evidence.md` for the dependency,
+compiler, and behavior evidence.
 
 ## Qualified runtime
 

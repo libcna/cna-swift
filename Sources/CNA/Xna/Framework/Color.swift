@@ -3,9 +3,10 @@
 import CNAShim
 
 extension Microsoft.Xna.Framework {
-    /// XNA's packed little-endian RGBA value. Named colors not needed by the
-    /// Foundation-1 canary remain structurally absent and reported.
-    public struct Color {
+    /// XNA's packed little-endian RGBA color value.
+    public struct Color: Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT {
+        public typealias TPacked = UInt32
+
         private var packedValue: UInt32
 
         public var R: UInt8 {
@@ -49,15 +50,84 @@ extension Microsoft.Xna.Framework {
             packedValue = Self.packFloats(r, g, b, a)
         }
 
+        public init(_ vector: Vector3) {
+            packedValue = Self.packFloats(vector.X, vector.Y, vector.Z, 1)
+        }
+
+        public init(_ vector: Vector4) {
+            packedValue = Self.packFloats(vector.X, vector.Y, vector.Z, vector.W)
+        }
+
         internal init(packedValue: UInt32) { self.packedValue = packedValue }
 
-        public static var Transparent: Color { Color(packedValue: 0x0000_0000) }
-        public static var Black: Color { Color(packedValue: 0xFF00_0000) }
-        public static var White: Color { Color(packedValue: 0xFFFF_FFFF) }
-        public static var CornflowerBlue: Color { Color(packedValue: 0xFFED_9564) }
+        public mutating func PackFromVector4(_ vector: Vector4) {
+            packedValue = Self.packFloats(vector.X, vector.Y, vector.Z, vector.W)
+        }
+
+        public static func FromNonPremultiplied(_ vector: Vector4) -> Color {
+            Color(
+                packedValue: packFloats(
+                    vector.X * vector.W,
+                    vector.Y * vector.W,
+                    vector.Z * vector.W,
+                    vector.W
+                )
+            )
+        }
+
+        public static func FromNonPremultiplied(
+            _ r: Int32,
+            g: Int32,
+            b: Int32,
+            a: Int32
+        ) -> Color {
+            let alpha = Int64(a)
+            let red = clampToByte(Int64(r) * alpha / 255)
+            let green = clampToByte(Int64(g) * alpha / 255)
+            let blue = clampToByte(Int64(b) * alpha / 255)
+            let packedAlpha = clampToByte(alpha)
+            return Color(
+                packedValue: red | (green << 8) | (blue << 16) | (packedAlpha << 24)
+            )
+        }
+
+        public func ToVector3() -> Vector3 {
+            Vector3(
+                Float(R) / Float(255),
+                Float(G) / Float(255),
+                Float(B) / Float(255)
+            )
+        }
+
+        public func ToVector4() -> Vector4 {
+            Vector4(
+                Float(R) / Float(255),
+                Float(G) / Float(255),
+                Float(B) / Float(255),
+                Float(A) / Float(255)
+            )
+        }
+
+        public static func Lerp(_ value1: Color, value2: Color, amount: Float) -> Color {
+            let factor = Int32(packUNorm(Float(65_536), amount))
+
+            func interpolate(_ first: UInt8, _ second: UInt8) -> UInt32 {
+                let start = Int32(first)
+                let delta = Int32(second) - start
+                return UInt32(start + ((delta * factor) >> 16))
+            }
+
+            let red = interpolate(value1.R, value2.R)
+            let green = interpolate(value1.G, value2.G)
+            let blue = interpolate(value1.B, value2.B)
+            let alpha = interpolate(value1.A, value2.A)
+            return Color(
+                packedValue: red | (green << 8) | (blue << 16) | (alpha << 24)
+            )
+        }
 
         public static func Multiply(_ value: Color, scale: Float) -> Color {
-            let scaled = scale * 65_536
+            let scaled = scale * Float(65_536)
             let factor: UInt32
             if scaled.isNaN || scaled < 0 {
                 factor = 0
@@ -90,18 +160,31 @@ extension Microsoft.Xna.Framework {
         internal var native: CNASwift_Color { CNASwift_Color(r: R, g: G, b: B, a: A) }
 
         private static func packIntegers(_ r: Int32, _ g: Int32, _ b: Int32, _ a: Int32) -> UInt32 {
-            func clamp(_ value: Int32) -> UInt32 { UInt32(Swift.max(0, Swift.min(255, value))) }
-            return clamp(r) | (clamp(g) << 8) | (clamp(b) << 16) | (clamp(a) << 24)
+            let red = clampToByte(Int64(r))
+            let green = clampToByte(Int64(g))
+            let blue = clampToByte(Int64(b))
+            let alpha = clampToByte(Int64(a))
+            return red | (green << 8) | (blue << 16) | (alpha << 24)
         }
 
         private static func packFloats(_ r: Float, _ g: Float, _ b: Float, _ a: Float) -> UInt32 {
-            func pack(_ value: Float) -> UInt32 {
-                let scaled = value * 255
-                if scaled.isNaN || scaled <= 0 { return 0 }
-                if scaled >= 255 { return 255 }
-                return UInt32(scaled.rounded(.toNearestOrEven))
-            }
-            return pack(r) | (pack(g) << 8) | (pack(b) << 16) | (pack(a) << 24)
+            packUNorm(Float(255), r) |
+                (packUNorm(Float(255), g) << 8) |
+                (packUNorm(Float(255), b) << 16) |
+                (packUNorm(Float(255), a) << 24)
+        }
+
+        private static func packUNorm(_ bitmask: Float, _ value: Float) -> UInt32 {
+            let scaled = value * bitmask
+            if scaled.isNaN || scaled <= 0 { return 0 }
+            if scaled >= bitmask { return UInt32(bitmask) }
+            return UInt32(scaled.rounded(.toNearestOrEven))
+        }
+
+        private static func clampToByte(_ value: Int64) -> UInt32 {
+            if value < 0 { return 0 }
+            if value > 255 { return 255 }
+            return UInt32(value)
         }
     }
 }

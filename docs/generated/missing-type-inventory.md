@@ -8,25 +8,25 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=30
-TARGET_MEMBERS=883
-TOTAL_DIAGNOSTICS=525
-COMPLETE_TYPES=24
-PARTIAL_TYPES=6
-MISSING_TYPES=227
-MISSING_TYPE=227
-MISSING_MEMBER=275
+TARGET_TYPES=32
+TARGET_MEMBERS=1030
+TOTAL_DIAGNOSTICS=376
+COMPLETE_TYPES=27
+PARTIAL_TYPES=5
+MISSING_TYPES=225
+MISSING_TYPE=225
+MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
 BASE_MAPPING_MISMATCH=2
-INTERFACE_MAPPING_MISMATCH=2
+INTERFACE_MAPPING_MISMATCH=1
 FIELD_MAPPING_MISMATCH=0
 PROPERTY_MAPPING_MISMATCH=1
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=18
+OVERLOAD_MAPPING_MISMATCH=16
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -40,11 +40,12 @@ PUBLIC_NATIVE_FFI_LEAK=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=86
+LANGUAGE_PROJECTION_EXCLUSIONS=88
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
-NAMESPACE_MARKERS=6
+NAMESPACE_MARKERS=7
 INHERITED_MEMBER_PROJECTIONS=3
+PROTOCOL_WITNESS_MEMBER_PROJECTIONS=1
 ARRAY_MUTATION_MAPPINGS=18
 ```
 
@@ -53,8 +54,11 @@ ARRAY_MUTATION_MAPPINGS=18
 - `Microsoft.Xna.Framework.BoundingBox`
 - `Microsoft.Xna.Framework.BoundingFrustum`
 - `Microsoft.Xna.Framework.BoundingSphere`
+- `Microsoft.Xna.Framework.Color`
 - `Microsoft.Xna.Framework.ContainmentType`
 - `Microsoft.Xna.Framework.GameTime`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
@@ -76,158 +80,6 @@ ARRAY_MUTATION_MAPPINGS=18
 - `Microsoft.Xna.Framework.Vector4`
 
 ## Partial types and exact diagnostics
-
-### `Microsoft.Xna.Framework.Color`
-
-Expected members: 165; emitted members: 21.
-
-- `INTERFACE_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Color`: missing protocols ['Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT<UInt32>']
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color..ctor(_:Microsoft.Xna.Framework.Vector3)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Color..ctor(_:Microsoft.Xna.Framework.Vector3)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color..ctor(_:Microsoft.Xna.Framework.Vector4)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Color..ctor(_:Microsoft.Xna.Framework.Vector4)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.FromNonPremultiplied(_:Microsoft.Xna.Framework.Vector4)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.FromNonPremultiplied(_:Int32,g:Int32,b:Int32,a:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.ToVector3()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.ToVector4()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Lerp(_:Microsoft.Xna.Framework.Color,value2:Microsoft.Xna.Framework.Color,amount:Float)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.AliceBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.AntiqueWhite()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Aqua()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Aquamarine()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Azure()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Beige()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Bisque()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.BlanchedAlmond()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Blue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.BlueViolet()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Brown()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.BurlyWood()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.CadetBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Chartreuse()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Chocolate()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Coral()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Cornsilk()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Crimson()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Cyan()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkCyan()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkGoldenrod()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkGray()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkKhaki()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkMagenta()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkOliveGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkOrange()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkOrchid()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkRed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkSalmon()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkSeaGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkSlateBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkSlateGray()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkTurquoise()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DarkViolet()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DeepPink()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DeepSkyBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DimGray()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.DodgerBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Firebrick()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.FloralWhite()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.ForestGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Fuchsia()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Gainsboro()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.GhostWhite()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Gold()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Goldenrod()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Gray()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Green()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.GreenYellow()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Honeydew()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.HotPink()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.IndianRed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Indigo()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Ivory()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Khaki()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Lavender()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LavenderBlush()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LawnGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LemonChiffon()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightCoral()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightCyan()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightGoldenrodYellow()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightGray()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightPink()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightSalmon()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightSeaGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightSkyBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightSlateGray()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightSteelBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LightYellow()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Lime()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.LimeGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Linen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Magenta()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Maroon()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumAquamarine()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumOrchid()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumPurple()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumSeaGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumSlateBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumSpringGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumTurquoise()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MediumVioletRed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MidnightBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MintCream()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.MistyRose()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Moccasin()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.NavajoWhite()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Navy()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.OldLace()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Olive()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.OliveDrab()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Orange()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.OrangeRed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Orchid()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.PaleGoldenrod()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.PaleGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.PaleTurquoise()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.PaleVioletRed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.PapayaWhip()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.PeachPuff()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Peru()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Pink()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Plum()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.PowderBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Purple()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Red()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.RosyBrown()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.RoyalBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SaddleBrown()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Salmon()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SandyBrown()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SeaGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SeaShell()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Sienna()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Silver()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SkyBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SlateBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SlateGray()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Snow()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SpringGreen()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.SteelBlue()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Tan()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Teal()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Thistle()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Tomato()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Turquoise()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Violet()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Wheat()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.WhiteSmoke()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.Yellow()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Color.YellowGreen()`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.Game`
 
@@ -534,8 +386,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2`

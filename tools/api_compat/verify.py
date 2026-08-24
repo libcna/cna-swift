@@ -53,6 +53,7 @@ class Member:
     directions: tuple[str, ...] = ()
     return_type: str = "Void"
     mutable: bool | None = None
+    self_mutating: bool | None = None
     raw_value: int | None = None
     declaration: str = ""
     identifier: str = ""
@@ -74,6 +75,7 @@ class TypeModel:
     base: str | None = None
     interfaces: tuple[str, ...] = ()
     generic_count: int = 0
+    generic_parameters: tuple[str, ...] = ()
     declaration: str = ""
     identifier: str = ""
     members: list[Member] = dataclasses.field(default_factory=list)
@@ -107,25 +109,35 @@ def split_generic_arguments(text: str) -> list[str]:
     return [item.strip() for item in result if item.strip()]
 
 
-def map_clr_type(clr: str | None, rules: dict[str, Any]) -> str:
+def map_clr_type(
+    clr: str | None,
+    rules: dict[str, Any],
+    generic_parameters: tuple[str, ...] = (),
+) -> str:
     if clr is None:
         return "Void"
     text = clr.rstrip("&")
+    placeholder = re.fullmatch(r"!(\d+)", text)
+    if placeholder and int(placeholder.group(1)) < len(generic_parameters):
+        return generic_parameters[int(placeholder.group(1))]
     if text.endswith("[]"):
-        return f"[{map_clr_type(text[:-2], rules)}]"
+        return f"[{map_clr_type(text[:-2], rules, generic_parameters)}]"
     direct = rules["typeMappings"].get(text)
     if direct:
         return direct
     nullable = re.fullmatch(r"System\.Nullable`1\[(.+)]", text)
     if nullable:
-        return f"{map_clr_type(nullable.group(1), rules)}?"
+        return f"{map_clr_type(nullable.group(1), rules, generic_parameters)}?"
     enumerable = re.fullmatch(r"System\.Collections\.Generic\.IEnumerable`1\[(.+)]", text)
     if enumerable:
-        return f"[{map_clr_type(enumerable.group(1), rules)}]"
+        return f"[{map_clr_type(enumerable.group(1), rules, generic_parameters)}]"
     generic = re.fullmatch(r"(.+)`(\d+)\[(.*)]", text)
     if generic:
         base = map_type_name(f"{generic.group(1)}`{generic.group(2)}", rules)
-        args = ", ".join(map_clr_type(item, rules) for item in split_generic_arguments(generic.group(3)))
+        args = ", ".join(
+            map_clr_type(item, rules, generic_parameters)
+            for item in split_generic_arguments(generic.group(3))
+        )
         return f"{base}<{args}>"
     return map_type_name(text, rules)
 
@@ -134,7 +146,13 @@ def member_is_omitted(member: dict[str, Any]) -> bool:
     return (member["kind"] == "field" and member["name"] == "value__") or member["name"] == "Finalize"
 
 
-def expected_member(owner: str, source: dict[str, Any], rules: dict[str, Any], owner_kind: str) -> Member:
+def expected_member(
+    owner: str,
+    source: dict[str, Any],
+    rules: dict[str, Any],
+    owner_kind: str,
+    owner_generic_parameters: tuple[str, ...] = (),
+) -> Member:
     kind = source["kind"]
     name = source["name"]
     if kind == "constructor":
@@ -161,7 +179,7 @@ def expected_member(owner: str, source: dict[str, Any], rules: dict[str, Any], o
             )
         ) else ""
         directions.append(direction)
-        types.append(map_clr_type(parameter["type"], rules))
+        types.append(map_clr_type(parameter["type"], rules, owner_generic_parameters))
 
     mutable: bool | None = None
     if kind == "property":
@@ -187,8 +205,15 @@ def expected_member(owner: str, source: dict[str, Any], rules: dict[str, Any], o
         parameters=tuple(types),
         labels=tuple(labels),
         directions=tuple(directions),
-        return_type=map_clr_type(source.get("returnType") or source.get("type"), rules),
+        return_type=map_clr_type(
+            source.get("returnType") or source.get("type"), rules,
+            owner_generic_parameters,
+        ),
         mutable=mutable,
+        self_mutating=(
+            f"{owner}.{mapped_name}" in rules.get("mutatingProtocolRequirements", [])
+            if kind == "method" and owner_kind == "interface" else None
+        ),
         raw_value=raw,
     )
 
@@ -200,17 +225,22 @@ def build_expected(contract: dict[str, Any], rules: dict[str, Any]) -> dict[str,
         kind = source_type["kind"]
         flags = bool(source_type.get("flags"))
         swift_kind = "struct" if kind == "enum" and flags else rules["typeKinds"][kind]
-        generic_count = len(source_type.get("genericParameters", []))
+        generic_parameters = tuple(
+            item["name"] for item in source_type.get("genericParameters", [])
+        )
         model = TypeModel(
             name=name,
             kind=swift_kind,
             flags=flags,
             base=map_clr_type(source_type.get("baseType"), rules) if source_type.get("baseType") else None,
             interfaces=tuple(map_clr_type(value, rules) for value in source_type.get("directInterfaces", [])),
-            generic_count=generic_count,
+            generic_count=len(generic_parameters),
+            generic_parameters=generic_parameters,
         )
         model.members = [
-            expected_member(name, member, rules, source_type["kind"])
+            expected_member(
+                name, member, rules, source_type["kind"], generic_parameters,
+            )
             for member in source_type["members"] if not member_is_omitted(member)
         ]
         models[name] = model
@@ -224,6 +254,7 @@ def declaration(symbol: dict[str, Any]) -> str:
 def normalize_swift_type(text: str) -> str:
     value = re.sub(r"\s+", " ", text.strip())
     value = value.replace("Swift.", "").replace("CNA.", "")
+    value = value.replace("Self.", "")
     if value == "InputStream":
         value = "Foundation.InputStream"
     value = value.replace("()", "Void") if value == "()" else value
@@ -308,6 +339,7 @@ def actual_member(owner: str, symbol: dict[str, Any], raw_values: dict[tuple[str
         directions=tuple(directions),
         return_type=returns,
         mutable=mutable,
+        self_mutating=("mutating func " in decl if kind == "method" else None),
         raw_value=raw_values.get((owner.rsplit(".", 1)[-1], name)),
         declaration=decl,
         identifier=symbol["identifier"]["precise"],
@@ -372,9 +404,14 @@ def is_synthesized_language_member(owner: TypeModel, member: Member) -> bool:
     return False
 
 
-def parse_symbol_graph(path: Path, markers: set[str], source_root: Path) -> tuple[dict[str, TypeModel], list[dict[str, Any]], int]:
+def parse_symbol_graph(
+    path: Path,
+    rules: dict[str, Any],
+    source_root: Path,
+) -> tuple[dict[str, TypeModel], list[dict[str, Any]], int]:
     graph = load_json(path)
     symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
+    markers = set(rules["namespaceMarkers"])
     raw_values = source_constant_values(source_root)
     types: dict[str, TypeModel] = {}
     strict_symbols = 0
@@ -387,22 +424,45 @@ def parse_symbol_graph(path: Path, markers: set[str], source_root: Path) -> tupl
         swift_kind = symbol["kind"]["identifier"]
         if swift_kind not in TYPE_KINDS or not path_name.startswith("Microsoft.Xna.Framework") or path_name in markers:
             continue
-        generic_count = declaration(symbol).count("<")
+        decl = declaration(symbol)
+        generic_match = re.search(
+            r"\b(?:class|struct|enum|protocol)\s+\w+\s*<([^>]+)>", decl,
+        )
+        generic_parameters = tuple(
+            item.split(":", 1)[0].strip()
+            for item in split_generic_arguments(generic_match.group(1))
+        ) if generic_match else ()
         types[path_name] = TypeModel(
             name=path_name,
             kind=TYPE_KINDS[swift_kind],
             flags="OptionSet" in declaration(symbol),
-            generic_count=generic_count,
-            declaration=declaration(symbol),
+            generic_count=len(generic_parameters),
+            generic_parameters=generic_parameters,
+            declaration=decl,
             identifier=symbol["identifier"]["precise"],
         )
 
     member_relationships: dict[str, str] = {}
+    source_origins: dict[str, dict[str, str]] = {}
+    associated_type_witnesses: dict[str, dict[str, str]] = collections.defaultdict(dict)
+    for relation in graph.get("relationships", []):
+        if relation["kind"] != "memberOf" or relation.get("target") not in symbols:
+            continue
+        source = symbols.get(relation.get("source", ""))
+        if not source or source["kind"]["identifier"] != "swift.typealias":
+            continue
+        parent = ".".join(symbols[relation["target"]]["pathComponents"])
+        match = re.fullmatch(r"typealias\s+(\w+)\s*=\s*(.+)", declaration(source))
+        if match:
+            associated_type_witnesses[parent][match.group(1)] = normalize_swift_type(match.group(2))
+
     diagnostics_context: list[dict[str, Any]] = []
     for relation in graph.get("relationships", []):
-        if relation["kind"] == "memberOf" and relation.get("target") in symbols:
+        if relation["kind"] in ("memberOf", "requirementOf") and relation.get("target") in symbols:
             parent = ".".join(symbols[relation["target"]]["pathComponents"])
             member_relationships[relation["source"]] = parent
+            if relation.get("sourceOrigin"):
+                source_origins[relation["source"]] = relation["sourceOrigin"]
         elif relation["kind"] in ("inheritsFrom", "conformsTo") and relation.get("source") in symbols:
             source_name = ".".join(symbols[relation["source"]]["pathComponents"])
             if source_name in types:
@@ -410,6 +470,17 @@ def parse_symbol_graph(path: Path, markers: set[str], source_root: Path) -> tupl
                 if relation["kind"] == "inheritsFrom":
                     types[source_name].base = target_name
                 elif target_name:
+                    target_model = types.get(target_name)
+                    witnesses = associated_type_witnesses.get(source_name, {})
+                    if (
+                        target_model and target_model.generic_parameters and
+                        all(parameter in witnesses for parameter in target_model.generic_parameters)
+                    ):
+                        arguments = ", ".join(
+                            witnesses[parameter]
+                            for parameter in target_model.generic_parameters
+                        )
+                        target_name = f"{target_name}<{arguments}>"
                     types[source_name].interfaces += (target_name,)
                     if target_name in ("OptionSet", "Swift.OptionSet"):
                         types[source_name].flags = True
@@ -420,7 +491,18 @@ def parse_symbol_graph(path: Path, markers: set[str], source_root: Path) -> tupl
         symbol = symbols[precise]
         if symbol.get("accessLevel") not in ("public", "open"):
             continue
+        if symbol["kind"]["identifier"] not in {
+            "swift.init", "swift.subscript", "swift.enum.case", "swift.func.op",
+            "swift.method", "swift.type.method", "swift.property", "swift.type.property",
+        }:
+            continue
         member = actual_member(parent, symbol, raw_values)
+        witness_identity = f"{parent}.{member.name}"
+        if (
+            precise in source_origins and
+            witness_identity in rules.get("protocolWitnessMemberProjections", [])
+        ):
+            continue
         if not is_synthesized_language_member(types[parent], member):
             types[parent].members.append(member)
 
@@ -510,6 +592,12 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
             result.append(diagnostic("FLAGS_MAPPING_MISMATCH", name, "CLR [Flags] enum is not a Swift OptionSet"))
         if expected_type.generic_count != actual_type.generic_count:
             result.append(diagnostic("GENERIC_MAPPING_MISMATCH", name, f"expected {expected_type.generic_count} generic parameters, found {actual_type.generic_count}"))
+        elif expected_type.generic_parameters != actual_type.generic_parameters:
+            result.append(diagnostic(
+                "GENERIC_MAPPING_MISMATCH", name,
+                f"expected generic parameters {expected_type.generic_parameters}, "
+                f"found {actual_type.generic_parameters}",
+            ))
 
         expected_base = expected_type.base
         if expected_base and expected_base.startswith("Microsoft.Xna.Framework") and actual_type.base != expected_base:
@@ -592,6 +680,16 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
             if expected_member_model.mutable is not None and candidate.mutable is not None and expected_member_model.mutable != candidate.mutable:
                 category = "FIELD_MAPPING_MISMATCH" if expected_member_model.kind == "field" else "PROPERTY_MAPPING_MISMATCH"
                 result.append(diagnostic(category, subject, f"expected mutable={expected_member_model.mutable}, found mutable={candidate.mutable}"))
+            if (
+                expected_member_model.self_mutating is not None and
+                candidate.self_mutating is not None and
+                expected_member_model.self_mutating != candidate.self_mutating
+            ):
+                result.append(diagnostic(
+                    "METHOD_SIGNATURE_MAPPING_MISMATCH", subject,
+                    f"expected mutating={expected_member_model.self_mutating}, "
+                    f"found mutating={candidate.self_mutating}",
+                ))
             if expected_member_model.raw_value is not None:
                 if candidate.raw_value is None:
                     result.append(diagnostic("UNMEASURED_STRUCTURAL_CATEGORY", subject, "constant/enum raw value unavailable from source supplement"))
@@ -751,9 +849,64 @@ def self_test() -> None:
     if "MISSING_MEMBER" not in geometry_categories:
         failures.append("geometry member hidden by language projection")
 
+    packed = "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector"
+    packed_generic = "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT"
+    color = "Microsoft.Xna.Framework.Color"
+    vector4 = "Microsoft.Xna.Framework.Vector4"
+    packed_members = [
+        Member(
+            packed, "method", "ToVector4", False, return_type=vector4,
+            self_mutating=False, identifier="to-vector4",
+        ),
+        Member(
+            packed, "method", "PackFromVector4", False,
+            (vector4,), ("_",), ("",), "Void", self_mutating=True,
+            identifier="pack-from-vector4",
+        ),
+    ]
+    packed_value = Member(
+        packed_generic, "property", "PackedValue", False,
+        return_type="TPacked", mutable=True, identifier="packed-value",
+    )
+    protocol_expected = {
+        packed: TypeModel(packed, "protocol", members=copy.deepcopy(packed_members)),
+        packed_generic: TypeModel(
+            packed_generic, "protocol", interfaces=(packed,), generic_count=1,
+            generic_parameters=("TPacked",), members=[copy.deepcopy(packed_value)],
+        ),
+        color: TypeModel(
+            color, "struct", interfaces=(f"{packed_generic}<UInt32>",),
+        ),
+        vector4: TypeModel(vector4, "struct"),
+    }
+    protocol_good = copy.deepcopy(protocol_expected)
+
+    def protocol_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(protocol_expected, models)}
+
+    protocol_mutations: list[tuple[str, str, Any]] = [
+        ("missing IPackedVector", "MISSING_TYPE", lambda m: m.pop(packed)),
+        ("missing IPackedVectorOfT", "MISSING_TYPE", lambda m: m.pop(packed_generic)),
+        ("wrong packed protocol kind", "TYPE_KIND_MISMATCH", lambda m: setattr(m[packed], "kind", "struct")),
+        ("missing packed protocol inheritance", "INTERFACE_MAPPING_MISMATCH", lambda m: setattr(m[packed_generic], "interfaces", ())),
+        ("wrong packed generic parameter", "GENERIC_MAPPING_MISMATCH", lambda m: setattr(m[packed_generic], "generic_parameters", ("TValue",))),
+        ("wrong PackedValue type", "PROPERTY_MAPPING_MISMATCH", lambda m: setattr(m[packed_generic].members[0], "return_type", "UInt32")),
+        ("read-only PackedValue", "PROPERTY_MAPPING_MISMATCH", lambda m: setattr(m[packed_generic].members[0], "mutable", False)),
+        ("wrong PackFromVector4 argument", "PARAMETER_MAPPING_MISMATCH", lambda m: setattr(m[packed].members[1], "parameters", ("Float",))),
+        ("nonmutating PackFromVector4", "METHOD_SIGNATURE_MAPPING_MISMATCH", lambda m: setattr(m[packed].members[1], "self_mutating", False)),
+        ("wrong ToVector4 return", "RETURN_MAPPING_MISMATCH", lambda m: setattr(m[packed].members[0], "return_type", "Microsoft.Xna.Framework.Vector3")),
+        ("Color missing packed conformance", "INTERFACE_MAPPING_MISMATCH", lambda m: setattr(m[color], "interfaces", ())),
+        ("Color wrong packed type", "INTERFACE_MAPPING_MISMATCH", lambda m: setattr(m[color], "interfaces", (f"{packed_generic}<UInt16>",))),
+    ]
+    for label, wanted, mutate in protocol_mutations:
+        models = copy.deepcopy(protocol_good)
+        mutate(models)
+        if wanted not in protocol_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
-    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 11}")
+    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 11 + len(protocol_mutations)}")
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
 
@@ -798,6 +951,7 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
         for item in contract["types"] for member in item["members"]
     )
     namespace_markers = len(rules["namespaceMarkers"])
+    protocol_witness_projections = len(rules.get("protocolWitnessMemberProjections", []))
     array_mutation_mappings = sum(
         parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
         and parameter.get("type", "").endswith("[]")
@@ -807,12 +961,14 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
     summary["ALLOWLIST_ENTRIES"] = len(rules.get("manualDiagnosticSuppressions", []))
     summary["APPLIED_ALLOWLIST_ENTRIES"] = applied_suppressions
     summary["LANGUAGE_PROJECTION_EXCLUSIONS"] = (
-        enum_storage_exclusions + finalizer_mappings + namespace_markers + inherited_projections
+        enum_storage_exclusions + finalizer_mappings + namespace_markers +
+        inherited_projections + protocol_witness_projections
     )
     summary["ENUM_STORAGE_FIELD_EXCLUSIONS"] = enum_storage_exclusions
     summary["FINALIZER_LANGUAGE_MAPPINGS"] = finalizer_mappings
     summary["NAMESPACE_MARKERS"] = namespace_markers
     summary["INHERITED_MEMBER_PROJECTIONS"] = inherited_projections
+    summary["PROTOCOL_WITNESS_MEMBER_PROJECTIONS"] = protocol_witness_projections
     summary["ARRAY_MUTATION_MAPPINGS"] = array_mutation_mappings
     return {
         "schemaVersion": 1,
@@ -889,7 +1045,7 @@ def main() -> int:
     contract = load_json(REFERENCE)
     rules = load_json(RULES)
     expected = build_expected(contract, rules)
-    actual, _, _ = parse_symbol_graph(args.symbol_graph, set(rules["namespaceMarkers"]), ROOT / "Sources/CNA")
+    actual, _, _ = parse_symbol_graph(args.symbol_graph, rules, ROOT / "Sources/CNA")
     diagnostics, applied_suppressions = apply_manual_suppressions(
         compare(expected, actual), rules.get("manualDiagnosticSuppressions", []),
     )

@@ -14,8 +14,9 @@ the retained snapshot hash before projecting it.
 ## Names and kinds
 
 - Namespace marker enums produce `Microsoft.Xna.Framework`, `.Graphics`,
-  `.Input`, and `.Content`. Markers are mapping infrastructure, not XNA types,
-  and the verifier excludes the six marker symbols.
+  `.Graphics.PackedVector`, `.Input`, and `.Content`. Markers are mapping
+  infrastructure, not XNA types, and the verifier excludes the seven marker
+  symbols.
 - CLR class -> Swift class; an externally subclassable CLR class -> `open`
   Swift class where required.
 - CLR struct -> Swift struct.
@@ -74,6 +75,21 @@ represented value type. Thus XNA geometry intersection distances return
 Swift collection projection, without introducing a synthetic Microsoft
 collection type.
 
+`IPackedVectorOfT<TPacked>` uses Swift's primary-associated-type protocol
+syntax and explicitly declares `associatedtype TPacked`. The compiler Symbol
+Graph must expose that exact name and the verifier measures it, not merely the
+number of generic parameters. A concrete conformance supplies a same-named
+typealias; Color's compiler-emitted witness is `UInt32`, producing the exact
+mapped interface `IPackedVectorOfT<UInt32>`.
+
+Interface mutation maps to a `mutating` Swift protocol requirement when the CLR
+operation changes packed struct storage. Thus `IPackedVector.PackFromVector4`
+is mutating, while `ToVector4` is not. XNA's explicit interface implementation
+does not count among Color's 165 public CLR members, but Swift requires a public
+conformance witness. The compiler's `sourceOrigin` relationship measures that
+witness, and the verifier records it as one deterministic protocol-witness
+language projection rather than an allowlist entry.
+
 ## Errors
 
 Swift `throws` is the language projection for runtime/XNA failure paths because
@@ -100,7 +116,7 @@ are language mappings. No missing functional API is hidden by those omissions.
 The report reserves `ALLOWLIST_ENTRIES` for genuine manual diagnostic
 suppressions; it is currently zero. Deterministic projection transformations
 are reported separately as `LANGUAGE_PROJECTION_EXCLUSIONS` (49 enum storage
-fields, 28 finalizer mappings, six namespace markers, and three inherited
-member projections). A verifier self-test proves that a real suppression counts
+fields, 28 finalizer mappings, seven namespace markers, three inherited member
+projections, and one explicit-interface protocol witness). A verifier self-test proves that a real suppression counts
 as an allowlist entry and that a missing geometry member cannot be reclassified
 as a projection rule.

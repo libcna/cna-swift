@@ -6,7 +6,7 @@ Qualified boundary: Swift 6.0.3, `x86_64-pc-linux-gnu`, canonical CNA C ABI
 | Operation | Status | Evidence |
 |---|---|---|
 | XNA namespace projection | VERIFIED_MANAGED | Compiler Symbol Graph emits `Microsoft.Xna.Framework`; namespace markers are measured exclusions. |
-| Pure math/value foundation | VERIFIED_MANAGED | MathHelper, Point, Rectangle, and GameTime are complete; selected Vector2 and Color members are real but measured partial. |
+| Pure math/value foundation | VERIFIED_MANAGED | MathHelper, Point, Rectangle, GameTime, the binary32/geometry closure, Color, and both packed-vector protocols are strict-complete managed Swift. |
 | Game lifecycle | VERIFIED_NATIVE | CNA drives Initialize through shutdown; 60/600 frames pass. |
 | Game callback error containment | VERIFIED_NATIVE | Errors in Initialize, LoadContent, Update, Draw, and UnloadContent return normally through C and rethrow at Swift boundaries. |
 | Game recreation | VERIFIED_NATIVE | 20 cycles pass with generation invalidation. |

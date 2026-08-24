@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 360,
-  "ASSERTIONS": 360,
+  "OBSERVATIONS": 415,
+  "ASSERTIONS": 415,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -24,7 +24,19 @@
     "testRayXnaDerivedNullableIntersections",
     "testBoundingBoxXnaCornersFactoriesContainmentAndInout",
     "testBoundingSphereXnaFactoriesMergeTransformAndContainment",
-    "testBoundingFrustumXnaPlanesCornersMutationAndRelations"
+    "testBoundingFrustumXnaPlanesCornersMutationAndRelations",
+    "testColorPackedProtocolsMutateValueTypes",
+    "testColorPackedValueLayoutAndChannelMutation",
+    "testColorIntegerConstructorsClampWithoutTraps",
+    "testColorFloatConstructorsUseXnaUNormRounding",
+    "testColorVectorConstructorsAndPackFromVector4",
+    "testColorVectorConversionsUseExactBinary32Division",
+    "testColorFromNonPremultipliedVectorOperationOrder",
+    "testColorFromNonPremultipliedIntegerOperationOrder",
+    "testColorLerpUsesXnaFixedPointAsymmetry",
+    "testColorMultiplyAndOperatorUseXnaSaturation",
+    "testColorEqualityHashStringAndValueSemantics",
+    "testColorFullXnaGoldenPalette"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -38,8 +50,10 @@
     "BoundingBox": 1,
     "BoundingSphere": 1,
     "BoundingFrustum": 1,
-    "GeometryEnums": 1
+    "GeometryEnums": 1,
+    "Color": 13
   },
+  "colorPaletteGoldenEntries": 141,
   "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
   "nativeLibraryRequired": false
 }

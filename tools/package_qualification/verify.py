@@ -106,6 +106,7 @@ def main() -> int:
 
     forbidden: list[str] = []
     native_libraries: list[str] = []
+    microsoft_reference_binaries: list[str] = []
     path_leaks: list[str] = []
     path_patterns = {
         str(Path.home()).encode(),
@@ -119,6 +120,11 @@ def main() -> int:
                 forbidden.append(name)
             if name.endswith((".so", ".dylib", ".dll", ".a")):
                 native_libraries.append(name)
+            if (
+                Path(name).name.lower().startswith("microsoft.xna.framework") and
+                name.lower().endswith((".dll", ".exe"))
+            ):
+                microsoft_reference_binaries.append(name)
             if not name.endswith("/"):
                 data = archive.read(name)
                 if any(pattern and pattern in data for pattern in path_patterns):
@@ -168,6 +174,7 @@ def main() -> int:
         "SOURCE_ARCHIVE_ENTRIES": len(entries),
         "FORBIDDEN_ENTRIES": forbidden,
         "NATIVE_LIBRARIES": native_libraries,
+        "MICROSOFT_REFERENCE_BINARIES": microsoft_reference_binaries,
         "DEVELOPER_PATH_LEAKS": path_leaks,
         "DEBUG_BUILD": "PASS",
         "RELEASE_BUILD": "PASS",
@@ -184,7 +191,7 @@ def main() -> int:
         "SOURCE_ARCHIVE_FILENAME", "SOURCE_ARCHIVE_SHA256", "SOURCE_ARCHIVE_ENTRIES",
         "DEBUG_BUILD", "RELEASE_BUILD", "RUN_60", "RUN_600"
     )))
-    return 1 if forbidden or native_libraries or path_leaks else 0
+    return 1 if forbidden or native_libraries or path_leaks or microsoft_reference_binaries else 0
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@
     "Microsoft.Xna",
     "Microsoft.Xna.Framework",
     "Microsoft.Xna.Framework.Graphics",
+    "Microsoft.Xna.Framework.Graphics.PackedVector",
     "Microsoft.Xna.Framework.Input",
     "Microsoft.Xna.Framework.Content"
   ],
@@ -63,6 +64,14 @@
     "System.IntPtr": "Int"
   },
   "refOutMapping": "inout",
+  "mutatingProtocolRequirements": [
+    "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4"
+  ],
+  "primaryAssociatedTypeMapping": "CLR interface generic parameters map to same-named Swift primary associated types",
+  "protocolWitnessMemberProjections": [
+    "Microsoft.Xna.Framework.Color.PackFromVector4"
+  ],
+  "protocolWitnessMapping": "A public Swift conformance witness forced by a CLR explicit interface implementation is compiler-measured through sourceOrigin and excluded from the concrete type member count",
   "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners map to Swift inout Array; source arrays remain value snapshots",
   "arrayMutationParameterNames": ["destinationArray", "corners"],
   "enumerableMapping": "System.Collections.Generic.IEnumerable<T> parameters map to Swift Array<T>",

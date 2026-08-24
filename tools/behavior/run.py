@@ -14,6 +14,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/PureValueTests.swift",
     ROOT / "Tests/CNATests/LinearAlgebraTests.swift",
     ROOT / "Tests/CNATests/GeometryIntersectionTests.swift",
+    ROOT / "Tests/CNATests/ColorPackedProtocolTests.swift",
 ]
 
 
@@ -46,8 +47,12 @@ def main() -> int:
             for group in (
                 "Vector2", "Vector3", "Vector4", "Quaternion", "Matrix", "Viewport",
                 "Plane", "Ray", "BoundingBox", "BoundingSphere", "BoundingFrustum", "GeometryEnums",
+                "Color",
             )
         },
+        "colorPaletteGoldenEntries": len(re.findall(
+            r'\("[A-Za-z]+",\s*\.[A-Za-z]+,\s*0x[0-9A-Fa-f_]+\)', source,
+        )),
         "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
         "nativeLibraryRequired": False,
     }
