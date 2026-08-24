@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 32,
-    "TARGET_MEMBERS": 1030,
-    "TOTAL_DIAGNOSTICS": 376,
-    "COMPLETE_TYPES": 27,
+    "TARGET_TYPES": 49,
+    "TARGET_MEMBERS": 1198,
+    "TOTAL_DIAGNOSTICS": 359,
+    "COMPLETE_TYPES": 44,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 225,
-    "MISSING_TYPE": 225,
+    "MISSING_TYPES": 208,
+    "MISSING_TYPE": 208,
     "MISSING_MEMBER": 131,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -43,12 +43,12 @@
     "UNMEASURED_STRUCTURAL_CATEGORY": 0,
     "ALLOWLIST_ENTRIES": 0,
     "APPLIED_ALLOWLIST_ENTRIES": 0,
-    "LANGUAGE_PROJECTION_EXCLUSIONS": 88,
+    "LANGUAGE_PROJECTION_EXCLUSIONS": 113,
     "ENUM_STORAGE_FIELD_EXCLUSIONS": 49,
     "FINALIZER_LANGUAGE_MAPPINGS": 28,
     "NAMESPACE_MARKERS": 7,
     "INHERITED_MEMBER_PROJECTIONS": 3,
-    "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 1,
+    "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 26,
     "ARRAY_MUTATION_MAPPINGS": 18
   },
   "completeTypes": [
@@ -58,8 +58,25 @@
     "Microsoft.Xna.Framework.Color",
     "Microsoft.Xna.Framework.ContainmentType",
     "Microsoft.Xna.Framework.GameTime",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Byte4",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4",
     "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector",
     "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Rg32",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.Short4",
     "Microsoft.Xna.Framework.Graphics.SpriteEffects",
     "Microsoft.Xna.Framework.Graphics.SpriteSortMode",
     "Microsoft.Xna.Framework.Graphics.Viewport",
@@ -207,23 +224,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Byte4",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Rg32",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
-    "Microsoft.Xna.Framework.Graphics.PackedVector.Short4",
     "Microsoft.Xna.Framework.Graphics.PresentInterval",
     "Microsoft.Xna.Framework.Graphics.PresentationParameters",
     "Microsoft.Xna.Framework.Graphics.PrimitiveType",
@@ -1307,91 +1307,6 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Byte4",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Rg32",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Short4",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.PresentInterval",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
@@ -2194,6 +2109,242 @@
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.TitleContainer",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+    }
+  ],
+  "protocolWitnessProjections": [
+    {
+      "ownerType": "Microsoft.Xna.Framework.Color",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.Byte]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.Byte]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Byte4",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt64]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt16]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt64]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Rg32",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Rg32",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt64]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
+      "swiftMember": "ToVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt32]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.ToVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.PackedVector.Short4",
+      "swiftMember": "PackFromVector4",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt64]",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
     }
   ],
   "typeScoreboard": [
@@ -4199,107 +4350,59 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Byte4",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Byte4",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector",
@@ -4317,120 +4420,66 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Rg32",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Rg32",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PackedVector.Short4",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PackedVector.Short4",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PresentInterval",

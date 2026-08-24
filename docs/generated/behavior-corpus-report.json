@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 415,
-  "ASSERTIONS": 415,
+  "OBSERVATIONS": 762,
+  "ASSERTIONS": 762,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -36,7 +36,24 @@
     "testColorLerpUsesXnaFixedPointAsymmetry",
     "testColorMultiplyAndOperatorUseXnaSaturation",
     "testColorEqualityHashStringAndValueSemantics",
-    "testColorFullXnaGoldenPalette"
+    "testColorFullXnaGoldenPalette",
+    "testPackedProtocolExactGenericWitnessesAndValueSemantics",
+    "testPackedProtocolPublicConvertersMatchWitnessExpansion",
+    "testPackedAlphaXnaBitsRoundingNonFiniteAndAllPatterns",
+    "testPacked565_4444_5551IndependentGoldensAndMidpoints",
+    "testPacked565_4444_5551ExhaustiveDecodeSweeps",
+    "testPackedByteRawDomainBankersRoundingAndNonFiniteValues",
+    "testPackedRgRgbaIndependentBitLayoutsRoundingAndDecode",
+    "testPackedRgRgbaThresholdNeighborsAndDirectAssignment",
+    "testPackedHalfSingleSpecialValuesTiesAndCanonicalization",
+    "testPackedHalfExhaustive65536DecodeAndRepackIdentity",
+    "testPackedHalfVectorLaneOrderMixedSpecialValuesAndStrings",
+    "testPackedNormalizedByteExactEndpointsTiesAndSignExtension",
+    "testPackedNormalizedShortExactEndpointsTiesAndSignExtension",
+    "testPackedShortRawDomainClampBankersRoundingAndTwosComplement",
+    "testPackedShortDirectAssignmentPreservesEveryBit",
+    "testPackedEqualityOperatorsUseExactPackedBitsForAllFormats",
+    "testPackedHashAndStringAreExactForAllStorageWidths"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -51,9 +68,28 @@
     "BoundingSphere": 1,
     "BoundingFrustum": 1,
     "GeometryEnums": 1,
-    "Color": 13
+    "Color": 13,
+    "PACKED_ALPHA": 1,
+    "PACKED_565_4444_5551": 2,
+    "PACKED_BYTE": 1,
+    "PACKED_HALF": 3,
+    "PACKED_NORMALIZED_BYTE": 1,
+    "PACKED_NORMALIZED_SHORT": 1,
+    "PACKED_RG_RGBA": 2,
+    "PACKED_SHORT": 2,
+    "PACKED_PROTOCOL": 2,
+    "PACKED_EQUALITY": 1,
+    "PACKED_HASH_STRING": 1
   },
   "colorPaletteGoldenEntries": 141,
   "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
-  "nativeLibraryRequired": false
+  "nativeLibraryRequired": false,
+  "exhaustiveSweeps": {
+    "Alpha8": 256,
+    "Bgr565": 65536,
+    "Bgra4444": 65536,
+    "Bgra5551": 65536,
+    "HalfSingle": 65536,
+    "failures": 0
+  }
 }

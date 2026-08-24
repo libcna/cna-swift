@@ -404,11 +404,44 @@ def is_synthesized_language_member(owner: TypeModel, member: Member) -> bool:
     return False
 
 
+def protocol_witness_shape_diagnostic(
+    witness: Member,
+    requirement: Member,
+) -> dict[str, str] | None:
+    subject = witness.display
+    if witness.kind != requirement.kind or witness.static != requirement.static:
+        return diagnostic(
+            "METHOD_SIGNATURE_MAPPING_MISMATCH", subject,
+            "projected protocol witness does not match the interface requirement kind/static identity",
+        )
+    if witness.parameters != requirement.parameters or witness.labels != requirement.labels:
+        return diagnostic(
+            "PARAMETER_MAPPING_MISMATCH", subject,
+            "projected protocol witness parameters do not match the interface requirement",
+        )
+    if witness.directions != requirement.directions:
+        return diagnostic(
+            "REF_OUT_MAPPING_MISMATCH", subject,
+            "projected protocol witness parameter direction does not match the interface requirement",
+        )
+    if witness.return_type != requirement.return_type:
+        return diagnostic(
+            "RETURN_MAPPING_MISMATCH", subject,
+            f"projected protocol witness returns {witness.return_type}, expected {requirement.return_type}",
+        )
+    if witness.self_mutating != requirement.self_mutating:
+        return diagnostic(
+            "METHOD_SIGNATURE_MAPPING_MISMATCH", subject,
+            "projected protocol witness mutating identity does not match the interface requirement",
+        )
+    return None
+
+
 def parse_symbol_graph(
     path: Path,
     rules: dict[str, Any],
     source_root: Path,
-) -> tuple[dict[str, TypeModel], list[dict[str, Any]], int]:
+) -> tuple[dict[str, TypeModel], list[dict[str, Any]], int, list[dict[str, str]]]:
     graph = load_json(path)
     symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
     markers = set(rules["namespaceMarkers"])
@@ -485,6 +518,7 @@ def parse_symbol_graph(
                     if target_name in ("OptionSet", "Swift.OptionSet"):
                         types[source_name].flags = True
 
+    witness_candidates: list[tuple[str, Member, dict[str, str]]] = []
     for precise, parent in member_relationships.items():
         if parent not in types or precise not in symbols:
             continue
@@ -502,11 +536,40 @@ def parse_symbol_graph(
             precise in source_origins and
             witness_identity in rules.get("protocolWitnessMemberProjections", [])
         ):
+            witness_candidates.append((parent, member, source_origins[precise]))
             continue
         if not is_synthesized_language_member(types[parent], member):
             types[parent].members.append(member)
 
-    return types, diagnostics_context, strict_symbols
+    observed_projections: list[dict[str, str]] = []
+    for parent, witness, origin in witness_candidates:
+        display_name = origin.get("displayName", "")
+        requirement_owner = display_name.rsplit(".", 1)[0] if "." in display_name else ""
+        requirement = next(
+            (
+                item for item in types.get(requirement_owner, TypeModel("", "")).members
+                if item.name == witness.name
+            ),
+            None,
+        )
+        identity = f"{parent}.{witness.name}"
+        if requirement is None:
+            diagnostics_context.append(diagnostic(
+                "UNMEASURED_STRUCTURAL_CATEGORY", identity,
+                f"protocol witness sourceOrigin does not resolve to a compiler-emitted requirement: {display_name}",
+            ))
+            continue
+        mismatch = protocol_witness_shape_diagnostic(witness, requirement)
+        if mismatch:
+            diagnostics_context.append(mismatch)
+            continue
+        observed_projections.append({
+            "ownerType": parent,
+            "swiftMember": witness.name,
+            "sourceOrigin": display_name,
+        })
+
+    return types, diagnostics_context, strict_symbols, observed_projections
 
 
 def comparable_kind(expected: Member, actual: Member) -> bool:
@@ -904,13 +967,130 @@ def self_test() -> None:
         if wanted not in protocol_categories(models):
             failures.append(f"{label}: did not produce {wanted}")
 
+    witness_requirement = Member(
+        packed, "method", "PackFromVector4", False,
+        (vector4,), ("_",), ("",), "Void", self_mutating=True,
+        identifier="packed-requirement",
+    )
+    witness = dataclasses.replace(
+        witness_requirement,
+        owner="Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
+        identifier="alpha-witness",
+    )
+    if protocol_witness_shape_diagnostic(witness, witness_requirement) is not None:
+        failures.append("valid concrete packed witness rejected")
+    wrong_witness_return = dataclasses.replace(witness, return_type=vector4)
+    wrong_return = protocol_witness_shape_diagnostic(
+        wrong_witness_return, witness_requirement,
+    )
+    if wrong_return is None or wrong_return["category"] != "RETURN_MAPPING_MISMATCH":
+        failures.append("wrong projected witness return not detected")
+    nonmutating_witness = dataclasses.replace(witness, self_mutating=False)
+    wrong_mutation = protocol_witness_shape_diagnostic(
+        nonmutating_witness, witness_requirement,
+    )
+    if wrong_mutation is None or wrong_mutation["category"] != "METHOD_SIGNATURE_MAPPING_MISMATCH":
+        failures.append("nonmutating projected witness not detected")
+
+    contract = load_json(REFERENCE)
+    configured_witnesses = [
+        {
+            "ownerType": identity.rsplit(".", 1)[0],
+            "swiftMember": identity.rsplit(".", 1)[1],
+        }
+        for identity in rules["protocolWitnessMemberProjections"]
+    ]
+    _, complete_witness_diagnostics = protocol_witness_projection_evidence(
+        contract, rules, configured_witnesses,
+    )
+    if complete_witness_diagnostics:
+        failures.append("configured protocol-witness evidence is not contract-complete")
+    _, missing_witness_diagnostics = protocol_witness_projection_evidence(
+        contract, rules, configured_witnesses[1:],
+    )
+    if "LANGUAGE_MAPPING_MISMATCH" not in {
+        item["category"] for item in missing_witness_diagnostics
+    }:
+        failures.append("removed required witness not detected")
+
+    packed_extra_expected = {
+        "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8": TypeModel(
+            "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8", "struct",
+        ),
+    }
+    packed_extra_actual = copy.deepcopy(packed_extra_expected)
+    packed_extra_actual[next(iter(packed_extra_actual))].members.append(Member(
+        next(iter(packed_extra_actual)), "method", "Unrelated", False,
+        identifier="unrelated-packed-member",
+    ))
+    if "UNEXPECTED_MEMBER" not in {
+        item["category"] for item in compare(packed_extra_expected, packed_extra_actual)
+    }:
+        failures.append("unrelated packed member hidden by witness projection")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
-    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 11 + len(protocol_mutations)}")
+    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 17 + len(protocol_mutations)}")
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
 
-def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[str, TypeModel], actual: dict[str, TypeModel], diagnostics: list[dict[str, str]], graph_path: Path, applied_suppressions: int) -> dict[str, Any]:
+def protocol_witness_projection_evidence(
+    contract: dict[str, Any],
+    rules: dict[str, Any],
+    observed: list[dict[str, str]],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    source_types = {
+        map_type_name(item["name"], rules): item for item in contract["types"]
+    }
+    interface_name = "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector"
+    interface = source_types[interface_name]
+    observed_identities = {
+        f"{item['ownerType']}.{item['swiftMember']}" for item in observed
+    }
+    records: list[dict[str, Any]] = []
+    failures: list[dict[str, str]] = []
+    for identity in rules.get("protocolWitnessMemberProjections", []):
+        owner_name, member_name = identity.rsplit(".", 1)
+        owner = source_types.get(owner_name)
+        requirement = next(
+            (item for item in interface["members"] if item["name"] == member_name),
+            None,
+        )
+        forcing_interfaces = [] if owner is None else [
+            item for item in owner.get("directInterfaces", [])
+            if item.startswith(
+                "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1["
+            )
+        ]
+        declared = [] if owner is None else [
+            item for item in owner["members"] if item["name"] == member_name
+        ]
+        if owner is None or requirement is None or len(forcing_interfaces) != 1 or declared:
+            failures.append(diagnostic(
+                "UNMEASURED_STRUCTURAL_CATEGORY", identity,
+                "protocol-witness rule lacks a unique concrete owner/direct generic CLR interface, "
+                "a matching IPackedVector requirement, or absence from public declared CLR members",
+            ))
+            continue
+        compiler_observed = identity in observed_identities
+        if not compiler_observed:
+            failures.append(diagnostic(
+                "LANGUAGE_MAPPING_MISMATCH", identity,
+                "configured protocol-witness projection has no matching compiler sourceOrigin witness",
+            ))
+        records.append({
+            "ownerType": owner_name,
+            "swiftMember": member_name,
+            "forcingClrInterface": forcing_interfaces[0],
+            "interfaceRequirement": f"{interface_name}.{member_name}",
+            "absentFromPublicDeclaredClrMembers": True,
+            "compilerSourceOriginObserved": compiler_observed,
+            "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation",
+        })
+    return records, failures
+
+
+def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[str, TypeModel], actual: dict[str, TypeModel], diagnostics: list[dict[str, str]], graph_path: Path, applied_suppressions: int, witness_evidence: list[dict[str, Any]]) -> dict[str, Any]:
     counts = collections.Counter(item["category"] for item in diagnostics)
     type_diagnostics: dict[str, list[dict[str, str]]] = collections.defaultdict(list)
     for item in diagnostics:
@@ -951,7 +1131,9 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
         for item in contract["types"] for member in item["members"]
     )
     namespace_markers = len(rules["namespaceMarkers"])
-    protocol_witness_projections = len(rules.get("protocolWitnessMemberProjections", []))
+    protocol_witness_projections = sum(
+        item["compilerSourceOriginObserved"] for item in witness_evidence
+    )
     array_mutation_mappings = sum(
         parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
         and parameter.get("type", "").endswith("[]")
@@ -983,6 +1165,7 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
         "partialTypes": partial_types,
         "missingTypes": missing_types,
         "diagnostics": diagnostics,
+        "protocolWitnessProjections": witness_evidence,
         "typeScoreboard": [
             {
                 "type": name,
@@ -1045,12 +1228,19 @@ def main() -> int:
     contract = load_json(REFERENCE)
     rules = load_json(RULES)
     expected = build_expected(contract, rules)
-    actual, _, _ = parse_symbol_graph(args.symbol_graph, rules, ROOT / "Sources/CNA")
+    actual, parser_diagnostics, _, observed_witnesses = parse_symbol_graph(
+        args.symbol_graph, rules, ROOT / "Sources/CNA",
+    )
+    witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(
+        contract, rules, observed_witnesses,
+    )
     diagnostics, applied_suppressions = apply_manual_suppressions(
-        compare(expected, actual), rules.get("manualDiagnosticSuppressions", []),
+        compare(expected, actual) + parser_diagnostics + witness_diagnostics,
+        rules.get("manualDiagnosticSuppressions", []),
     )
     report = make_report(
-        contract, rules, expected, actual, diagnostics, args.symbol_graph, applied_suppressions,
+        contract, rules, expected, actual, diagnostics, args.symbol_graph,
+        applied_suppressions, witness_evidence,
     )
     text = json.dumps(report, indent=2, sort_keys=False) + "\n"
     if args.output:

@@ -1,8 +1,8 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 3 — compiler-measured managed Color and exactly the
-two packed-vector protocols forced by Color's pinned direct interface, over the
-completed Foundation-2 geometry closure.
+**Milestone:** Foundation 4 — exact managed packed-bit behavior and
+compiler-measured closure for all 17 concrete XNA PackedVector structs, over
+the completed Foundation-3 Color/protocol closure.
 
 ## Normative rules
 
@@ -54,13 +54,20 @@ Foundation Milestone 3 adds exactly:
 - the deterministic Swift collision mapping
   `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT<TPacked>`.
 
-Pinned public signatures and direct interfaces prove this closure. Vector3 and
-Vector4 were already complete; no concrete packed-vector format is referenced.
-All three Milestone-3 types are complete and locally strict-clean. Their new
-behavior is managed Swift with no CNA calls or C ABI expansion. Game,
-GraphicsDeviceManager, GraphicsDevice, Texture2D, and SpriteBatch remain honest
-runtime partials. Curve, Content, Effects/Model, Audio, Media, Storage, Touch,
-Design, and all concrete PackedVector formats are not started.
+Pinned public signatures and direct interfaces prove this closure. All three
+Milestone-3 types remain complete and locally strict-clean.
+
+Foundation Milestone 4 adds exactly Alpha8, Bgr565, Bgra4444, Bgra5551, Byte4,
+HalfSingle, HalfVector2, HalfVector4, NormalizedByte2, NormalizedByte4,
+NormalizedShort2, NormalizedShort4, Rg32, Rgba1010102, Rgba64, Short2, and
+Short4. Their 168 mapped public members and 25 Swift-required explicit-interface
+witnesses are complete and locally strict-clean. Exact XNA packing, unpacking,
+rounding, non-finite behavior, half conversion, equality, integer hashes, and
+strings are managed Swift with no CNA calls or C ABI expansion.
+
+Game, GraphicsDeviceManager, GraphicsDevice, Texture2D, and SpriteBatch remain
+the same honest runtime partials. Curve, Content, Effects/Model, Audio, Media,
+Storage, Touch, Design, and broader runtime work remain not started.
 
 ## Measurement status
 
@@ -68,20 +75,21 @@ Design, and all concrete PackedVector formats are not started.
   `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`.
 - Formal projection: 257 Swift types / 2,887 Swift members after 49 raw enum
   backing fields and 28 finalizers map to language storage/lifetime syntax.
-- Compiler target: 32 types / 1,030 emitted members; 27 complete, 5 partial,
-  225 missing. Normal strict is red by design; leak-only is green.
+- Compiler target: 49 types / 1,198 emitted mapped members; 44 complete, 5
+  partial, 208 missing. Normal strict is red by design; leak-only is green.
 - Verifier: every requested structural category has executable comparison code;
-  41 mutation/self-tests pass. Manual diagnostic suppressions are zero. The 88
+  47 mutation/self-tests pass. Manual diagnostic suppressions are zero. The 113
   deterministic language projections are measured separately, including
-  enum-storage, finalizer, namespace-marker, inherited-member, and the one
-  compiler-required explicit-protocol-witness rule. The 18 caller-owned array
+  enum-storage, finalizer, namespace-marker, inherited-member, and 26
+  compiler-observed explicit-protocol-witness rules. The 18 caller-owned array
   mutation projections are separately measured.
 - Native ABI: 25 functions, 72 type positions, 15 layouts, 2 callbacks, 168
   constants; zero header/library/mismatch failures.
-- Pure behavior: 415 observations/assertions, zero failures, including exact
+- Pure behavior: 762 observations/assertions, zero failures, including exact
   binary32 vector, quaternion, matrix, viewport, plane, ray, bounds, and frustum
-  observations plus the dedicated Color group and independent 141-entry
-  predefined palette.
+  observations, the dedicated Color group and independent 141-entry predefined
+  palette, and all concrete packed families. Alpha8, Bgr565, Bgra4444,
+  Bgra5551, and HalfSingle have declared zero-failure exhaustive decode sweeps.
 - Native lifecycle: real 60/600 frame loops, real exit, callback containment,
   20 recreations, resources, and callback-error cycles.
 - Graphics/input: native viewport 800x480, clear, PNG decode, SpriteBatch scaled
@@ -96,12 +104,12 @@ that could be mistaken for runtime evidence.
 
 ## Completion policy
 
-The Milestone-3 closure is complete only when both protocols have their exact
-kind, inheritance, generic identity, mutating method, and mutable property;
-Color is 165/165 with its exact UInt32 conformance; all 141 named values have
-independent golden evidence; and all compiler, behavior, ABI, native, template,
-archive, and isolated-consumer gates pass. The full 257-type strict verifier
-remains red by design; zero fake behavior, zero unmeasured structural
-categories, zero manual suppression, zero ABI mismatch, and real selected
-native routes remain mandatory. Work stops after these three types: no concrete
-packed-vector format belongs to this milestone.
+The Milestone-4 closure is complete only when all 17 formats are 168/168 with
+exact fixed-width mutable packed storage and generic protocol identities; all
+packing, half, normalized/raw signed, witness, equality/hash/string, exhaustive,
+compiler, behavior, ABI, native, template, archive, and isolated-consumer gates
+pass. The full 257-type strict verifier remains red by design; zero fake
+behavior, zero unmeasured structural categories, zero manual suppression, zero
+ABI mismatch, and real selected native routes remain mandatory. Work stops
+after the concrete PackedVector family; Curve and runtime-partial cleanup do
+not belong to this milestone.

@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=32
-TARGET_MEMBERS=1030
-TOTAL_DIAGNOSTICS=376
-COMPLETE_TYPES=27
+TARGET_TYPES=49
+TARGET_MEMBERS=1198
+TOTAL_DIAGNOSTICS=359
+COMPLETE_TYPES=44
 PARTIAL_TYPES=5
-MISSING_TYPES=225
-MISSING_TYPE=225
+MISSING_TYPES=208
+MISSING_TYPE=208
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -40,12 +40,12 @@ PUBLIC_NATIVE_FFI_LEAK=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=88
+LANGUAGE_PROJECTION_EXCLUSIONS=113
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=7
 INHERITED_MEMBER_PROJECTIONS=3
-PROTOCOL_WITNESS_MEMBER_PROJECTIONS=1
+PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
 ARRAY_MUTATION_MAPPINGS=18
 ```
 
@@ -57,8 +57,25 @@ ARRAY_MUTATION_MAPPINGS=18
 - `Microsoft.Xna.Framework.Color`
 - `Microsoft.Xna.Framework.ContainmentType`
 - `Microsoft.Xna.Framework.GameTime`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Byte4`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Rg32`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Short2`
+- `Microsoft.Xna.Framework.Graphics.PackedVector.Short4`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
@@ -378,23 +395,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra5551`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Byte4`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.HalfSingle`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector2`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.HalfVector4`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte2`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedByte4`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort2`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.NormalizedShort4`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Rg32`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Rgba1010102`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Short2`
-- `Microsoft.Xna.Framework.Graphics.PackedVector.Short4`
 - `Microsoft.Xna.Framework.Graphics.PresentInterval`
 - `Microsoft.Xna.Framework.Graphics.PresentationParameters`
 - `Microsoft.Xna.Framework.Graphics.PrimitiveType`

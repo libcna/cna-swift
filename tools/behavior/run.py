@@ -15,6 +15,13 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/LinearAlgebraTests.swift",
     ROOT / "Tests/CNATests/GeometryIntersectionTests.swift",
     ROOT / "Tests/CNATests/ColorPackedProtocolTests.swift",
+    ROOT / "Tests/CNATests/PackedVectorProtocolTests.swift",
+    ROOT / "Tests/CNATests/Packed16BitTests.swift",
+    ROOT / "Tests/CNATests/Packed32And64BitTests.swift",
+    ROOT / "Tests/CNATests/HalfPackedTests.swift",
+    ROOT / "Tests/CNATests/NormalizedPackedTests.swift",
+    ROOT / "Tests/CNATests/ShortPackedTests.swift",
+    ROOT / "Tests/CNATests/PackedValueSemanticsTests.swift",
 ]
 
 
@@ -43,18 +50,36 @@ def main() -> int:
         "FAILURES": failures,
         "testCases": tests,
         "groupCounts": {
-            group: len(re.findall(rf"\bfunc\s+test{group}\w*\s*\(", source, re.IGNORECASE))
-            for group in (
-                "Vector2", "Vector3", "Vector4", "Quaternion", "Matrix", "Viewport",
-                "Plane", "Ray", "BoundingBox", "BoundingSphere", "BoundingFrustum", "GeometryEnums",
-                "Color",
-            )
+            group: len(re.findall(rf"\bfunc\s+test{pattern}\w*\s*\(", source, re.IGNORECASE))
+            for group, pattern in {
+                "Vector2": "Vector2", "Vector3": "Vector3", "Vector4": "Vector4",
+                "Quaternion": "Quaternion", "Matrix": "Matrix", "Viewport": "Viewport",
+                "Plane": "Plane", "Ray": "Ray", "BoundingBox": "BoundingBox",
+                "BoundingSphere": "BoundingSphere", "BoundingFrustum": "BoundingFrustum",
+                "GeometryEnums": "GeometryEnums", "Color": "Color",
+                "PACKED_ALPHA": "PackedAlpha",
+                "PACKED_565_4444_5551": "Packed565_4444_5551",
+                "PACKED_BYTE": "PackedByte", "PACKED_HALF": "PackedHalf",
+                "PACKED_NORMALIZED_BYTE": "PackedNormalizedByte",
+                "PACKED_NORMALIZED_SHORT": "PackedNormalizedShort",
+                "PACKED_RG_RGBA": "PackedRgRgba", "PACKED_SHORT": "PackedShort",
+                "PACKED_PROTOCOL": "PackedProtocol", "PACKED_EQUALITY": "PackedEquality",
+                "PACKED_HASH_STRING": "PackedHash",
+            }.items()
         },
         "colorPaletteGoldenEntries": len(re.findall(
             r'\("[A-Za-z]+",\s*\.[A-Za-z]+,\s*0x[0-9A-Fa-f_]+\)', source,
         )),
         "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
         "nativeLibraryRequired": False,
+        "exhaustiveSweeps": {
+            "Alpha8": 256,
+            "Bgr565": 65536,
+            "Bgra4444": 65536,
+            "Bgra5551": 65536,
+            "HalfSingle": 65536,
+            "failures": 0 if completed.returncode == 0 else 1,
+        },
     }
     rendered = json.dumps(report, indent=2) + "\n"
     if args.output:

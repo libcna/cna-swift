@@ -79,16 +79,21 @@ collection type.
 syntax and explicitly declares `associatedtype TPacked`. The compiler Symbol
 Graph must expose that exact name and the verifier measures it, not merely the
 number of generic parameters. A concrete conformance supplies a same-named
-typealias; Color's compiler-emitted witness is `UInt32`, producing the exact
-mapped interface `IPackedVectorOfT<UInt32>`.
+typealias; Color and all 17 concrete PackedVector structs expose the exact
+fixed-width compiler witness, producing the corresponding mapped
+`IPackedVectorOfT<TPacked>` interface.
 
 Interface mutation maps to a `mutating` Swift protocol requirement when the CLR
 operation changes packed struct storage. Thus `IPackedVector.PackFromVector4`
-is mutating, while `ToVector4` is not. XNA's explicit interface implementation
-does not count among Color's 165 public CLR members, but Swift requires a public
-conformance witness. The compiler's `sourceOrigin` relationship measures that
-witness, and the verifier records it as one deterministic protocol-witness
-language projection rather than an allowlist entry.
+is mutating, while `ToVector4` is not. XNA's private explicit-interface methods
+do not count among a concrete struct's public declared CLR members, but Swift
+requires public conformance witnesses. The verifier excludes a witness only
+when the concrete CLR type has the direct generic packed interface, the
+non-generic interface declares the requirement, the concrete public contract
+lacks it, the compiler emits a matching `sourceOrigin`, and the full witness
+signature/mutating identity matches. It records all such deterministic
+language projections separately rather than using a diagnostic allowlist.
+Unrelated public members and malformed witnesses remain errors.
 
 ## Errors
 
