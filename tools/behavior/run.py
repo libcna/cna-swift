@@ -27,6 +27,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/DisplayOrientationContractTests.swift",
     ROOT / "Tests/CNATests/BufferUsageContractTests.swift",
     ROOT / "Tests/CNATests/FillModeContractTests.swift",
+    ROOT / "Tests/CNATests/SurfaceFormatContractTests.swift",
 ]
 
 
@@ -88,6 +89,7 @@ def main() -> int:
                 "DISPLAY_ORIENTATION": "DisplayOrientationXnaContract",
                 "BUFFER_USAGE": "BufferUsageXnaContract",
                 "FILL_MODE": "FillModeXnaContract",
+                "SURFACE_FORMAT": "SurfaceFormatXnaContract",
             }.items()
         },
         "displayOrientationContract": {
@@ -117,6 +119,34 @@ def main() -> int:
             "values": {
                 "Solid": 0,
                 "WireFrame": 1,
+            },
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "surfaceFormatContract": {
+            "kind": "enum",
+            "flags": False,
+            "underlyingType": "System.Int32",
+            "values": {
+                "Color": 0,
+                "Bgr565": 1,
+                "Bgra5551": 2,
+                "Bgra4444": 3,
+                "Dxt1": 4,
+                "Dxt3": 5,
+                "Dxt5": 6,
+                "NormalizedByte2": 7,
+                "NormalizedByte4": 8,
+                "Rgba1010102": 9,
+                "Rg32": 10,
+                "Rgba64": 11,
+                "Alpha8": 12,
+                "Single": 13,
+                "Vector2": 14,
+                "Vector4": 15,
+                "HalfSingle": 16,
+                "HalfVector2": 17,
+                "HalfVector4": 18,
+                "HdrBlendable": 19,
             },
             "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },

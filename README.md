@@ -17,7 +17,9 @@ and vibration routes. It also includes the standalone managed
 orientation functionality, plus the standalone managed `BufferUsage` flags
 type without claiming buffer or GPU resource support, plus the standalone
 managed non-flags `FillMode` enum without claiming rasterizer or wireframe
-rendering support. The old flat API and known fake behaviors are absent.
+rendering support, plus the standalone managed non-flags `SurfaceFormat` enum
+without claiming texture, render-target, display, DXT, HDR, or GPU format
+support. The old flat API and known fake behaviors are absent.
 
 ## Measured surface
 
@@ -26,12 +28,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=69
-TARGET_MEMBERS=1383
-TOTAL_DIAGNOSTICS=339
-COMPLETE_TYPES=64
+TARGET_TYPES=70
+TARGET_MEMBERS=1403
+TOTAL_DIAGNOSTICS=338
+COMPLETE_TYPES=65
 PARTIAL_TYPES=5
-MISSING_TYPES=188
+MISSING_TYPES=187
 MISSING_MEMBER=131
 ```
 
@@ -48,8 +50,25 @@ BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
-and FillMode. Every implemented member has qualified behavior; missing members
-remain absent.
+FillMode, and SurfaceFormat. Every implemented member has qualified behavior;
+missing members remain absent.
+
+## Managed SurfaceFormat
+
+`Microsoft.Xna.Framework.Graphics.SurfaceFormat` is the exact managed
+non-flags `Int32` enum with all twenty pinned literals from `Color=0` through
+`HdrBlendable=19`. The CLR `value__` storage identity is the existing
+enum-storage language mapping. Swift raw-value initialization accepts the
+complete 0...19 table, rejects representative unknown positive and negative
+values with `nil`, and preserves ordinary value-copy behavior without adding
+XNA members.
+
+This is managed metadata only. DisplayMode, DisplayModeCollection,
+GraphicsAdapter, PresentationParameters, texture and render-target APIs,
+GraphicsDeviceManager format properties, GraphicsDevice format operations,
+pixel/DXT conversion, HDR capability, GPU format negotiation, and native
+SurfaceFormat mapping remain deferred. See
+`docs/surface-format-evidence.md`.
 
 ## Managed FillMode
 

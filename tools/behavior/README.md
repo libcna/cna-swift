@@ -17,3 +17,8 @@ The `DISPLAY_ORIENTATION` group records only the pinned XNA flags, Int32
 underlying type, and four literal values. Swift `OptionSet` union,
 intersection, arbitrary-bit, and copy qualification lives in a separate test
 case and is not counted as XNA runtime behavior.
+
+The `SURFACE_FORMAT` group likewise records only the pinned non-flags enum,
+Int32 underlying type, and complete twenty-value literal table. Swift raw-value
+initialization, unknown-value rejection, and copy qualification remain in a
+separate projection test and are not counted as XNA runtime behavior.

@@ -50,6 +50,7 @@
     "Microsoft.Xna.Framework.DisplayOrientation",
     "Microsoft.Xna.Framework.Graphics.BufferUsage",
     "Microsoft.Xna.Framework.Graphics.FillMode",
+    "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
     "Microsoft.Xna.Framework.Input.Buttons"
   ],
   "typeMappings": {

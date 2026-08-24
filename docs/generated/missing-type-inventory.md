@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=69
-TARGET_MEMBERS=1383
-TOTAL_DIAGNOSTICS=339
-COMPLETE_TYPES=64
+TARGET_TYPES=70
+TARGET_MEMBERS=1403
+TOTAL_DIAGNOSTICS=338
+COMPLETE_TYPES=65
 PARTIAL_TYPES=5
-MISSING_TYPES=188
-MISSING_TYPE=188
+MISSING_TYPES=187
+MISSING_TYPE=187
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -92,6 +92,7 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Short4`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
+- `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
 - `Microsoft.Xna.Framework.Input.ButtonState`
 - `Microsoft.Xna.Framework.Input.Buttons`
@@ -427,7 +428,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`
 - `Microsoft.Xna.Framework.Graphics.StencilOperation`
-- `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
 - `Microsoft.Xna.Framework.Graphics.Texture`
 - `Microsoft.Xna.Framework.Graphics.Texture3D`
 - `Microsoft.Xna.Framework.Graphics.TextureAddressMode`

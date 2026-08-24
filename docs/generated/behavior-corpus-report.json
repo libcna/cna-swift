@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1247,
-  "ASSERTIONS": 1247,
+  "OBSERVATIONS": 1249,
+  "ASSERTIONS": 1249,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -74,7 +74,8 @@
     "testGamePadVibrationInputUsesPinnedUncheckedInt16Words",
     "testDisplayOrientationXnaContract",
     "testBufferUsageXnaContract",
-    "testFillModeXnaContract"
+    "testFillModeXnaContract",
+    "testSurfaceFormatXnaContract"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -118,7 +119,8 @@
     "GAMEPAD_CAPABILITIES": 1,
     "DISPLAY_ORIENTATION": 1,
     "BUFFER_USAGE": 1,
-    "FILL_MODE": 1
+    "FILL_MODE": 1,
+    "SURFACE_FORMAT": 1
   },
   "displayOrientationContract": {
     "flags": true,
@@ -147,6 +149,34 @@
     "values": {
       "Solid": 0,
       "WireFrame": 1
+    },
+    "swiftProjectionQualificationCountedAsXnaBehavior": false
+  },
+  "surfaceFormatContract": {
+    "kind": "enum",
+    "flags": false,
+    "underlyingType": "System.Int32",
+    "values": {
+      "Color": 0,
+      "Bgr565": 1,
+      "Bgra5551": 2,
+      "Bgra4444": 3,
+      "Dxt1": 4,
+      "Dxt3": 5,
+      "Dxt5": 6,
+      "NormalizedByte2": 7,
+      "NormalizedByte4": 8,
+      "Rgba1010102": 9,
+      "Rg32": 10,
+      "Rgba64": 11,
+      "Alpha8": 12,
+      "Single": 13,
+      "Vector2": 14,
+      "Vector4": 15,
+      "HalfSingle": 16,
+      "HalfVector2": 17,
+      "HalfVector4": 18,
+      "HdrBlendable": 19
     },
     "swiftProjectionQualificationCountedAsXnaBehavior": false
   },

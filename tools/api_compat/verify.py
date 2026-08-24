@@ -1757,11 +1757,105 @@ def self_test() -> None:
     }:
         failures.append("FillMode value__ treated as required did not fail")
 
+    surface_name = "Microsoft.Xna.Framework.Graphics.SurfaceFormat"
+    surface_expected = {
+        surface_name: copy.deepcopy(all_expected[surface_name]),
+    }
+    surface_good = copy.deepcopy(surface_expected)
+    surface_good[surface_name].identifier = surface_name
+    for index, member in enumerate(surface_good[surface_name].members):
+        member.identifier = f"{surface_name}:{index}"
+
+    def surface_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(
+            member for member in models[surface_name].members
+            if member.name == name
+        )
+
+    def surface_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {
+            item["category"] for item in compare(surface_expected, models)
+        }
+
+    surface_mutations: list[tuple[str, str, Any]] = [
+        ("SurfaceFormat missing type", "MISSING_TYPE",
+         lambda m: m.pop(surface_name)),
+        ("SurfaceFormat wrong namespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.SurfaceFormat",
+             m.pop(surface_name),
+         )),
+        ("SurfaceFormat struct instead of enum", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[surface_name], "kind", "struct")),
+        ("SurfaceFormat OptionSet instead of ordinary enum", "FLAGS_MAPPING_MISMATCH",
+         lambda m: (setattr(m[surface_name], "kind", "struct"),
+                    setattr(m[surface_name], "flags", True))),
+        ("SurfaceFormat wrong raw type", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[surface_name], "raw_type", "UInt32")),
+        ("SurfaceFormat flags metadata present", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[surface_name], "flags", True)),
+        ("SurfaceFormat wrong Color", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "Color"), "raw_value", 1)),
+        ("SurfaceFormat wrong Bgr565", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "Bgr565"), "raw_value", 2)),
+        ("SurfaceFormat wrong Dxt1", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "Dxt1"), "raw_value", 5)),
+        ("SurfaceFormat wrong NormalizedByte4", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "NormalizedByte4"), "raw_value", 9)),
+        ("SurfaceFormat wrong Rgba1010102", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "Rgba1010102"), "raw_value", 10)),
+        ("SurfaceFormat wrong Alpha8", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "Alpha8"), "raw_value", 13)),
+        ("SurfaceFormat wrong HalfVector4", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "HalfVector4"), "raw_value", 19)),
+        ("SurfaceFormat wrong HdrBlendable", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(surface_member(m, "HdrBlendable"), "raw_value", 20)),
+        ("SurfaceFormat missing middle case", "MISSING_MEMBER",
+         lambda m: m[surface_name].members.remove(surface_member(m, "Rg32"))),
+        ("SurfaceFormat missing HdrBlendable", "MISSING_MEMBER",
+         lambda m: m[surface_name].members.remove(surface_member(m, "HdrBlendable"))),
+        ("SurfaceFormat unexpected extra enum case", "UNEXPECTED_MEMBER",
+         lambda m: m[surface_name].members.append(Member(
+             surface_name, "field", "Unknown", True,
+             return_type=surface_name, mutable=False, raw_value=20,
+             identifier="invented-surface-format-case",
+         ))),
+        ("SurfaceFormat public description helper", "UNEXPECTED_MEMBER",
+         lambda m: m[surface_name].members.append(Member(
+             surface_name, "property", "description", False,
+             return_type="String", mutable=False,
+             identifier="invented-surface-format-description",
+         ))),
+    ]
+    for label, wanted, mutate in surface_mutations:
+        models = copy.deepcopy(surface_good)
+        mutate(models)
+        if wanted not in surface_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    if any(
+        member.name == "value__"
+        for member in surface_expected[surface_name].members
+    ):
+        failures.append("SurfaceFormat value__ was not excluded from the Swift contract")
+    surface_value_storage_expected = copy.deepcopy(surface_expected)
+    surface_value_storage_expected[surface_name].members.append(Member(
+        surface_name, "field", "value__", False,
+        return_type="Int32", mutable=True,
+        identifier="incorrectly-required-surface-format-storage",
+    ))
+    if "MISSING_MEMBER" not in {
+        item["category"] for item in compare(
+            surface_value_storage_expected, surface_good,
+        )
+    }:
+        failures.append("SurfaceFormat value__ treated as required did not fail")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

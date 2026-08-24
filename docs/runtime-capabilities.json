@@ -14,6 +14,7 @@
     {"operation":"DisplayOrientation","status":"VERIFIED_MANAGED","evidence":"exact root-framework Int32 OptionSet with Default=0, LandscapeLeft=1, LandscapeRight=2, and Portrait=4; no runtime orientation claim"},
     {"operation":"BufferUsage","status":"VERIFIED_MANAGED","evidence":"exact Graphics Int32 OptionSet with None=0 and WriteOnly=1; no buffer or GPU resource capability is claimed"},
     {"operation":"FillMode","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with Solid=0 and WireFrame=1; no RasterizerState, polygon mode, or wireframe rendering capability is claimed"},
+    {"operation":"SurfaceFormat","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with all twenty pinned literals; no texture, render-target, display, GPU-format, DXT, HDR, or native capability is claimed"},
     {"operation":"Game lifecycle","status":"VERIFIED_NATIVE","evidence":"Initialize/LoadContent/BeginRun/Update/Draw/EndRun/UnloadContent/Exiting execute through CNA callbacks; 60/600 runs pass"},
     {"operation":"Game callback error containment","status":"VERIFIED_NATIVE","evidence":"Initialize, LoadContent, Update, Draw and UnloadContent errors are caught in C trampolines and rethrown at controlled Swift boundaries"},
     {"operation":"Game recreation","status":"VERIFIED_NATIVE","evidence":"20 create/run/exit/destroy cycles pass; stale generations reject use"},

@@ -1,13 +1,14 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestone 9 final status:** COMPLETE.
+**Foundation Milestone 10 final status:** COMPLETE.
 
 The milestone closes exactly
-`Microsoft.Xna.Framework.Graphics.FillMode`: one XNA public type, three CLR
-identities, and two mapped Swift identities. It is an exact managed non-flags
-`Int32` enum with `Solid=0` and `WireFrame=1`. CNA source, the canonical ABI,
-RasterizerState, every GraphicsDevice member, the five runtime-partial types,
-and maintained template source are unchanged.
+`Microsoft.Xna.Framework.Graphics.SurfaceFormat`: one XNA public type, 21 CLR
+identities, and 20 mapped Swift identities. It is an exact managed non-flags
+`Int32` enum with the complete pinned 0...19 literal table. CNA source, the
+canonical ABI, display/adapter/presentation APIs, texture and render-target
+APIs, every GraphicsDevice/GraphicsDeviceManager member, the five runtime-
+partial types, and maintained template source are unchanged.
 
 ## Qualified environment and gates
 
@@ -17,15 +18,15 @@ SWIFT_TARGET=x86_64-pc-linux-gnu
 SWIFT_TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS
 RELEASE_BUILD=PASS
-DEBUG_TESTS=83 PASS
-RELEASE_TESTS=83 PASS
-MANAGED_TESTS=73 PASS_WITHOUT_CNA_NATIVE_LIBRARY
+DEBUG_TESTS=85 PASS
+RELEASE_TESTS=85 PASS
+MANAGED_TESTS=75 PASS_WITHOUT_CNA_NATIVE_LIBRARY
 WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE
 SYMBOL_GRAPH=PASS
-API_SELF_TESTS=126 PASS
+API_SELF_TESTS=145 PASS
 NORMAL_STRICT=EXPECTED_RED_DEFERRED_PROFILE_ONLY
 LEAK_ONLY=PASS
-PURE_XNA_DERIVED=1247/1247/0
+PURE_XNA_DERIVED=1249/1249/0
 GAMEPAD_NATIVE_FAILURES=0
 SWIFT_ASAN=PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED
 NATIVE_CNA_SANITIZER=NOT_INSTRUMENTED
@@ -39,14 +40,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=69
-TARGET_MEMBERS=1383
-TOTAL_DIAGNOSTICS=339
-MISSING_TYPE=188
+TARGET_TYPES=70
+TARGET_MEMBERS=1403
+TOTAL_DIAGNOSTICS=338
+MISSING_TYPE=187
 MISSING_MEMBER=131
-COMPLETE_TYPES=64
+COMPLETE_TYPES=65
 PARTIAL_TYPES=5
-MISSING_TYPES=188
+MISSING_TYPES=187
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -87,55 +88,58 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 
 The two base mismatches, one interface mismatch, one property mismatch, and 16
 overload mismatches remain owned exclusively by Game, GraphicsDeviceManager,
-GraphicsDevice, Texture2D, and SpriteBatch. Every GamePad-family mismatch
-category is zero.
+GraphicsDevice, Texture2D, and SpriteBatch. Every other mismatch,
+unexpected-surface, leak, allowlist, and unmeasured category is zero.
 
-## FillMode type matrix
+## SurfaceFormat type matrix
 
-| Type | CLR / expected / target | Kind | Raw type | Values | Diagnostics |
+| Type | CLR / expected / target | Kind | Raw type | Flags | Diagnostics |
 |---|---:|---|---|---|---:|
-| `FillMode` | 3 / 2 / 2 | CLR enum → Swift `enum` | `Int32` | Solid=0, WireFrame=1 | 0 |
+| `SurfaceFormat` | 21 / 20 / 20 | CLR enum → Swift `enum` | `Int32` | false | 0 |
+
+| Case | Raw | Case | Raw |
+|---|---:|---|---:|
+| Color | 0 | Rg32 | 10 |
+| Bgr565 | 1 | Rgba64 | 11 |
+| Bgra5551 | 2 | Alpha8 | 12 |
+| Bgra4444 | 3 | Single | 13 |
+| Dxt1 | 4 | Vector2 | 14 |
+| Dxt3 | 5 | Vector4 | 15 |
+| Dxt5 | 6 | HalfSingle | 16 |
+| NormalizedByte2 | 7 | HalfVector2 | 17 |
+| NormalizedByte4 | 8 | HalfVector4 | 18 |
+| Rgba1010102 | 9 | HdrBlendable | 19 |
 
 The synthetic CLR `value__` identity is the existing enum-storage language
 mapping. Swift `rawValue`, `init?(rawValue:)`, equality, and value copying are
-compiler language surface and produce no unexpected XNA member. Raw values 0
-and 1 construct the exact cases, while representative unknown positive and
-negative values return `nil`. See `docs/fill-mode-evidence.md`.
+compiler language surface and produce no unexpected XNA member. All raw values
+0...19 construct the exact cases; 20, -1, and `Int32.max` return `nil`.
 
-No rasterizer or rendering capability is claimed. RasterizerState,
-GraphicsDevice.RasterizerState, drawing, wireframe rendering, polygon mode, and
-every backend operation remain deferred.
+SurfaceFormat is not an OptionSet and has no custom string/helper surface or
+PackedVector dependency. See `docs/surface-format-evidence.md` for the exact
+contract, strict-zero matrix, mutation coverage, and dependency evidence.
 
-## Retained GamePad type matrix
+## Dependency effect and deferred boundary
 
-| Type | CLR / expected / target | Kind | Behavior | Native | Diagnostics |
-|---|---:|---|---|---|---:|
-| ButtonState | 3 / 2 / 2 | Int32 enum | verified | N/A | 0 |
-| Buttons | 26 / 25 / 25 | Int32 OptionSet | verified | explicit bits | 0 |
-| GamePad | 4 / 4 / 4 | final class/private init | verified | route verified | 0 |
-| GamePadButtons | 17 / 17 / 17 | struct | verified | copied value | 0 |
-| GamePadCapabilities | 26 / 26 / 26 | struct/no public init | verified | route verified | 0 |
-| GamePadDPad | 10 / 10 / 10 | struct | verified | copied value | 0 |
-| GamePadDeadZone | 4 / 3 / 3 | Int32 enum | verified | explicit modes | 0 |
-| GamePadState | 15 / 15 / 15 | struct | verified | route verified | 0 |
-| GamePadThumbSticks | 8 / 8 / 8 | struct | verified | copied value | 0 |
-| GamePadTriggers | 8 / 8 / 8 | struct | verified | copied value | 0 |
-| GamePadType | 11 / 10 / 10 | Int32 enum | verified | explicit mapping | 0 |
+The regenerated public-signature graph retains nine still-missing direct
+reverse dependents: DisplayMode, DisplayModeCollection, GraphicsAdapter,
+PresentationParameters, RenderTarget2D, RenderTargetCube, Texture, Texture3D,
+and TextureCube. Texture2D and GraphicsDeviceManager are two additional direct
+partial consumers and remain unchanged. The transitive reverse closure is 56
+missing types plus the same five partial types.
 
-Buttons has all 25 explicit raw values and retains arbitrary combinations.
-The state implements all physical/DPad/stick-click/BigButton identities, eight
-virtual stick directions, both virtual triggers, all-bit combinations, zero,
-and unknown-bit behavior. Public constructors set connected=true and packet=0;
-native construction alone copies real connection and PacketNumber. Equality and
-hash include connection and packet as well as all four public nested values;
-the exact string reports only connection.
+DisplayMode now has only complete public-signature XNA dependencies
+(SurfaceFormat and Rectangle), but neither DisplayMode nor any other dependent
+was implemented or started. There is no DisplayModeCollection, GraphicsAdapter,
+PresentationParameters, Texture constructor, Texture/RenderTarget family,
+GraphicsDeviceManager format property, GraphicsDevice format operation, pixel
+conversion, DXT implementation, HDR support, GPU negotiation, or CNA-native
+SurfaceFormat mapping.
 
-Triggers use the XNA Min-then-Max clamp and preserve NaN; thumbsticks use the
-XNA square Vector2 Min-then-Max clamp. Their special values, signed zero,
-equality, hashes, strings, and value copies are qualified. Capabilities expose
-all 26 real copied fields and no public initializer.
+Capability is limited to `SurfaceFormat: VERIFIED_MANAGED`. Enum completeness
+is not evidence of actual renderer/GPU support for any format.
 
-## Retained native GamePad evidence
+## Retained native evidence
 
 ```text
 CNA_SOURCE_REVISION=a09196a6477f69a7a57c8364f990658d31531a5b
@@ -163,20 +167,11 @@ OBSERVED_UAF=0
 OBSERVED_DOUBLE_FREE=0
 ```
 
-The only added native routes are canonical `cna_gamepad_get_state`,
-`cna_gamepad_get_state_with_dead_zone`, `cna_gamepad_get_capabilities`, and
-`cna_gamepad_set_vibration`. Default state is IndependentAxes. None,
-IndependentAxes, and Circular route directly to CNA without double processing.
-Player slots, all selected button bits, controller type, and fields map
-explicitly. Each operation resolves the current Game generation and validates
-the owner thread before native entry.
-
-This HEADLESS/NULL host has no connected controller. Real successful
-disconnected state and capability snapshots and `SetVibration=false` are
-verified. Positive controller state/capabilities/type/voice/motors and physical
-rumble remain `HARDWARE_PENDING`; repeated rumble stress was intentionally not
-run. No result is fabricated. See `docs/gamepad-evidence.md`,
-`docs/gamepad-native-inventory.md`, and generated GamePad native evidence.
+The retained GamePad default/None/IndependentAxes/Circular state routes,
+capabilities, disconnected SetVibration, generation, wrong-thread, and stress
+qualification all pass. This HEADLESS/NULL host has no attached controller, so
+positive controller observations and physical rumble remain
+`HARDWARE_PENDING`; no result is fabricated.
 
 The unchanged maintained template remains at commit
 `86687f62c3a13ee2b59798f338fc083f7399f447` and passes debug 60 / release 600
@@ -194,23 +189,23 @@ self-referential source content.
 
 ## Exactly one next dependency-complete milestone
 
-The regenerated public-signature dependency graph contains 67 missing types
-whose XNA dependencies are already complete. Foundation Milestone 10 selects
-exactly the standalone managed `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
-enum. It has no missing public-signature dependency and 20 mapped Swift
-identities (`value__` excluded).
+The regenerated graph contains 67 missing types whose XNA public-signature
+dependencies are complete. Foundation Milestone 11 selects exactly the
+standalone managed `Microsoft.Xna.Framework.Graphics.DepthFormat` enum. It has
+no XNA dependency and four mapped Swift literals (`value__` excluded).
 
-The ranking uses reverse dependency reach rather than merely choosing another
-tiny enum. SurfaceFormat is referenced directly by nine missing runtime
-Graphics types and lies upstream of 56 missing types; completing it would make
-DisplayMode dependency-complete. Design-time converter candidates were not
-ranked as runtime closures because their external System.ComponentModel mapping
-is not established. This selection does not infer textures, render targets,
-GraphicsDevice operations, GPU format support, or any native capability.
+DepthFormat and DisplayMode each lead to 54 still-missing types by transitive
+reverse reach. The consistent tie-break selects DepthFormat because it has four
+direct missing reverse dependents versus DisplayMode's two, while remaining a
+bounded dependency-free managed enum. DisplayMode was evaluated after becoming
+dependency-complete; it was not selected automatically merely because
+SurfaceFormat unlocked it. Design-time converter closures remain outside this
+runtime ranking because their external System.ComponentModel projection is not
+established.
 
-This is selection only. `SurfaceFormat` has not been started and must not be
-combined with a texture/render-target type, runtime-partial cleanup, or CNA ABI
-work.
+This is selection only. `DepthFormat` has not been started and must not be
+combined with PresentationParameters, render targets, depth-stencil state,
+format negotiation, or CNA ABI work.
 
 ```text
 SELECTED_ONLY=true
