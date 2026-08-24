@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=19
-TARGET_MEMBERS=365
-TOTAL_DIAGNOSTICS=575
-COMPLETE_TYPES=11
-PARTIAL_TYPES=8
-MISSING_TYPES=238
-MISSING_TYPE=238
-MISSING_MEMBER=307
+TARGET_TYPES=30
+TARGET_MEMBERS=883
+TOTAL_DIAGNOSTICS=525
+COMPLETE_TYPES=24
+PARTIAL_TYPES=6
+MISSING_TYPES=227
+MISSING_TYPE=227
+MISSING_MEMBER=275
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=1
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=25
+OVERLOAD_MAPPING_MISMATCH=18
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -38,22 +38,42 @@ INTERNAL_TYPE_LEAK=0
 RAW_HANDLE_LEAK=0
 PUBLIC_NATIVE_FFI_LEAK=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
-ALLOWLIST_ENTRIES=86
+ALLOWLIST_ENTRIES=0
+APPLIED_ALLOWLIST_ENTRIES=0
+LANGUAGE_PROJECTION_EXCLUSIONS=86
+ENUM_STORAGE_FIELD_EXCLUSIONS=49
+FINALIZER_LANGUAGE_MAPPINGS=28
+NAMESPACE_MARKERS=6
+INHERITED_MEMBER_PROJECTIONS=3
+ARRAY_MUTATION_MAPPINGS=18
 ```
 
 ## Complete types
 
+- `Microsoft.Xna.Framework.BoundingBox`
+- `Microsoft.Xna.Framework.BoundingFrustum`
+- `Microsoft.Xna.Framework.BoundingSphere`
+- `Microsoft.Xna.Framework.ContainmentType`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
+- `Microsoft.Xna.Framework.Graphics.Viewport`
 - `Microsoft.Xna.Framework.Input.KeyState`
 - `Microsoft.Xna.Framework.Input.Keyboard`
 - `Microsoft.Xna.Framework.Input.KeyboardState`
 - `Microsoft.Xna.Framework.Input.Keys`
 - `Microsoft.Xna.Framework.MathHelper`
+- `Microsoft.Xna.Framework.Matrix`
+- `Microsoft.Xna.Framework.Plane`
+- `Microsoft.Xna.Framework.PlaneIntersectionType`
 - `Microsoft.Xna.Framework.PlayerIndex`
 - `Microsoft.Xna.Framework.Point`
+- `Microsoft.Xna.Framework.Quaternion`
+- `Microsoft.Xna.Framework.Ray`
 - `Microsoft.Xna.Framework.Rectangle`
+- `Microsoft.Xna.Framework.Vector2`
+- `Microsoft.Xna.Framework.Vector3`
+- `Microsoft.Xna.Framework.Vector4`
 
 ## Partial types and exact diagnostics
 
@@ -351,14 +371,6 @@ Expected members: 16; emitted members: 4.
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.Bounds()`: mapped member is absent
 
-### `Microsoft.Xna.Framework.Graphics.Viewport`
-
-Expected members: 14; emitted members: 11.
-
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Viewport.ToString()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Viewport.Project(_:Microsoft.Xna.Framework.Vector3,projection:Microsoft.Xna.Framework.Matrix,view:Microsoft.Xna.Framework.Matrix,world:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Viewport.Unproject(_:Microsoft.Xna.Framework.Vector3,projection:Microsoft.Xna.Framework.Matrix,view:Microsoft.Xna.Framework.Matrix,world:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
-
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 
 Expected members: 30; emitted members: 4.
@@ -393,47 +405,6 @@ Expected members: 30; emitted members: 4.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DefaultBackBufferWidth()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DefaultBackBufferHeight()`: mapped member is absent
 
-### `Microsoft.Xna.Framework.Vector2`
-
-Expected members: 77; emitted members: 48.
-
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Reflect(_:Microsoft.Xna.Framework.Vector2,normal:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Reflect(inout _:Microsoft.Xna.Framework.Vector2,inout normal:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Barycentric(_:Microsoft.Xna.Framework.Vector2,value2:Microsoft.Xna.Framework.Vector2,value3:Microsoft.Xna.Framework.Vector2,amount1:Float,amount2:Float)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Barycentric(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout value3:Microsoft.Xna.Framework.Vector2,amount1:Float,amount2:Float,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.SmoothStep(_:Microsoft.Xna.Framework.Vector2,value2:Microsoft.Xna.Framework.Vector2,amount:Float)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.SmoothStep(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,amount:Float,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.CatmullRom(_:Microsoft.Xna.Framework.Vector2,value2:Microsoft.Xna.Framework.Vector2,value3:Microsoft.Xna.Framework.Vector2,value4:Microsoft.Xna.Framework.Vector2,amount:Float)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.CatmullRom(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout value3:Microsoft.Xna.Framework.Vector2,inout value4:Microsoft.Xna.Framework.Vector2,amount:Float,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Hermite(_:Microsoft.Xna.Framework.Vector2,tangent1:Microsoft.Xna.Framework.Vector2,value2:Microsoft.Xna.Framework.Vector2,tangent2:Microsoft.Xna.Framework.Vector2,amount:Float)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Hermite(inout _:Microsoft.Xna.Framework.Vector2,inout tangent1:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout tangent2:Microsoft.Xna.Framework.Vector2,amount:Float,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(_:Microsoft.Xna.Framework.Vector2,matrix:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(inout _:Microsoft.Xna.Framework.Vector2,inout matrix:Microsoft.Xna.Framework.Matrix,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.TransformNormal(_:Microsoft.Xna.Framework.Vector2,matrix:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.TransformNormal(inout _:Microsoft.Xna.Framework.Vector2,inout matrix:Microsoft.Xna.Framework.Matrix,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(_:Microsoft.Xna.Framework.Vector2,rotation:Microsoft.Xna.Framework.Quaternion)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(inout _:Microsoft.Xna.Framework.Vector2,inout rotation:Microsoft.Xna.Framework.Quaternion,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(_:[Microsoft.Xna.Framework.Vector2],inout matrix:Microsoft.Xna.Framework.Matrix,destinationArray:[Microsoft.Xna.Framework.Vector2])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(_:[Microsoft.Xna.Framework.Vector2],sourceIndex:Int32,inout matrix:Microsoft.Xna.Framework.Matrix,destinationArray:[Microsoft.Xna.Framework.Vector2],destinationIndex:Int32,length:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.TransformNormal(_:[Microsoft.Xna.Framework.Vector2],inout matrix:Microsoft.Xna.Framework.Matrix,destinationArray:[Microsoft.Xna.Framework.Vector2])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.TransformNormal(_:[Microsoft.Xna.Framework.Vector2],sourceIndex:Int32,inout matrix:Microsoft.Xna.Framework.Matrix,destinationArray:[Microsoft.Xna.Framework.Vector2],destinationIndex:Int32,length:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(_:[Microsoft.Xna.Framework.Vector2],inout rotation:Microsoft.Xna.Framework.Quaternion,destinationArray:[Microsoft.Xna.Framework.Vector2])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Transform(_:[Microsoft.Xna.Framework.Vector2],sourceIndex:Int32,inout rotation:Microsoft.Xna.Framework.Quaternion,destinationArray:[Microsoft.Xna.Framework.Vector2],destinationIndex:Int32,length:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Negate(inout _:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Vector2.Negate(inout _:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Add(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Vector2.Add(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Subtract(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Vector2.Subtract(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Multiply(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Vector2.Multiply(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Multiply(inout _:Microsoft.Xna.Framework.Vector2,scaleFactor:Float,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Vector2.Multiply(inout _:Microsoft.Xna.Framework.Vector2,scaleFactor:Float,inout result:Microsoft.Xna.Framework.Vector2)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Divide(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Vector2.Divide(inout _:Microsoft.Xna.Framework.Vector2,inout value2:Microsoft.Xna.Framework.Vector2,inout result:Microsoft.Xna.Framework.Vector2)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Vector2.Divide(inout _:Microsoft.Xna.Framework.Vector2,divider:Float,inout result:Microsoft.Xna.Framework.Vector2)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Vector2.Divide(inout _:Microsoft.Xna.Framework.Vector2,divider:Float,inout result:Microsoft.Xna.Framework.Vector2)`: required overload is absent
-
 ## Missing types
 
 - `Microsoft.Xna.Framework.Audio.AudioCategory`
@@ -455,10 +426,6 @@ Expected members: 77; emitted members: 48.
 - `Microsoft.Xna.Framework.Audio.SoundEffectInstance`
 - `Microsoft.Xna.Framework.Audio.SoundState`
 - `Microsoft.Xna.Framework.Audio.WaveBank`
-- `Microsoft.Xna.Framework.BoundingBox`
-- `Microsoft.Xna.Framework.BoundingFrustum`
-- `Microsoft.Xna.Framework.BoundingSphere`
-- `Microsoft.Xna.Framework.ContainmentType`
 - `Microsoft.Xna.Framework.Content.ContentLoadException`
 - `Microsoft.Xna.Framework.Content.ContentManager`
 - `Microsoft.Xna.Framework.Content.ContentReader`
@@ -638,7 +605,6 @@ Expected members: 77; emitted members: 48.
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities`
 - `Microsoft.Xna.Framework.LaunchParameters`
-- `Microsoft.Xna.Framework.Matrix`
 - `Microsoft.Xna.Framework.Media.Album`
 - `Microsoft.Xna.Framework.Media.AlbumCollection`
 - `Microsoft.Xna.Framework.Media.Artist`
@@ -663,14 +629,8 @@ Expected members: 77; emitted members: 48.
 - `Microsoft.Xna.Framework.Media.VideoPlayer`
 - `Microsoft.Xna.Framework.Media.VideoSoundtrackType`
 - `Microsoft.Xna.Framework.Media.VisualizationData`
-- `Microsoft.Xna.Framework.Plane`
-- `Microsoft.Xna.Framework.PlaneIntersectionType`
 - `Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs`
-- `Microsoft.Xna.Framework.Quaternion`
-- `Microsoft.Xna.Framework.Ray`
 - `Microsoft.Xna.Framework.Storage.StorageContainer`
 - `Microsoft.Xna.Framework.Storage.StorageDevice`
 - `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
 - `Microsoft.Xna.Framework.TitleContainer`
-- `Microsoft.Xna.Framework.Vector3`
-- `Microsoft.Xna.Framework.Vector4`

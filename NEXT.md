@@ -1,32 +1,35 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestone 1 status:** complete for the applicable Linux x86-64
-HEADLESS boundary. The full XNA profile is intentionally incomplete; preserve
-the strict red scoreboard.
+**Foundation Milestone 2 final status:** COMPLETE. This is the final status of
+Milestone 2, not Foundation Milestone 3.
 
-## Repository and toolchain evidence
+Pinned XNA metadata proved that complete Matrix requires Plane and that
+complete Plane recursively requires the geometry/intersection types. The
+corrected milestone therefore closes exactly the following two parts:
+
+- binary32 linear algebra: Vector2, Vector3, Vector4, Quaternion, Matrix,
+  Graphics.Viewport;
+- Matrix's forced public-signature closure: Plane, PlaneIntersectionType, Ray,
+  BoundingBox, BoundingSphere, BoundingFrustum, ContainmentType.
+
+Every one of these 13 types is complete and locally zero-diagnostic. No other
+geometry, Color, Content, Effects, renderer, or CNA ABI work was included.
+
+## Qualified environment
 
 ```text
-CNA_SWIFT_INITIAL_HEAD=db329d8358e21420952bf4dd7318302a3cd3c81c
-CNA_SWIFT_TEMPLATE_INITIAL_HEAD=ae8c8d38d3dee4a4a47b3515ef65989b7f36812a
 SWIFT_VERSION=6.0.3
 SWIFT_TARGET=x86_64-pc-linux-gnu
 SWIFT_TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS
 RELEASE_BUILD=PASS
-TESTS=15
-TEST_FAILURES=0
+DEBUG_TESTS=27 PASS
+RELEASE_TESTS=27 PASS
 WARNINGS_AS_ERRORS=PASS
 SYMBOL_GRAPH=PASS
-SWIFT_ASAN=PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED_PTRACE
+SWIFT_ASAN=PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED
 NATIVE_CNA_SANITIZER=NOT_INSTRUMENTED
 ```
-
-The environment had no Swift on PATH. Qualification used the locally extracted
-Debian swiftlang 6.0.3 toolchain without adding a package dependency. The first
-ASan launch hit LeakSanitizer's ptrace limitation; rerunning with leak detection
-disabled passed the pure suite. This is Swift-side memory-misuse evidence, not
-native CNA sanitizer or leak-freedom evidence.
 
 ## Structural scoreboard
 
@@ -35,14 +38,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=19
-TARGET_MEMBERS=365
-TOTAL_DIAGNOSTICS=575
-MISSING_TYPE=238
-MISSING_MEMBER=307
-COMPLETE_TYPES=11
-PARTIAL_TYPES=8
-MISSING_TYPES=238
+TARGET_TYPES=30
+TARGET_MEMBERS=883
+TOTAL_DIAGNOSTICS=525
+MISSING_TYPE=227
+MISSING_MEMBER=275
+COMPLETE_TYPES=24
+PARTIAL_TYPES=6
+MISSING_TYPES=227
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -53,7 +56,7 @@ PROPERTY_MAPPING_MISMATCH=1
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=25
+OVERLOAD_MAPPING_MISMATCH=18
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -65,37 +68,56 @@ INTERNAL_TYPE_LEAK=0
 RAW_HANDLE_LEAK=0
 PUBLIC_NATIVE_FFI_LEAK=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
-ALLOWLIST_ENTRIES=86
+ALLOWLIST_ENTRIES=0
+APPLIED_ALLOWLIST_ENTRIES=0
+LANGUAGE_PROJECTION_EXCLUSIONS=86
+ENUM_STORAGE_FIELD_EXCLUSIONS=49
+FINALIZER_LANGUAGE_MAPPINGS=28
+NAMESPACE_MARKERS=6
+INHERITED_MEMBER_PROJECTIONS=3
+ARRAY_MUTATION_MAPPINGS=18
 ```
 
-The 86 formal mapping entries are 49 `value__` backing fields, 28 finalizers,
-six namespace markers, and three inherited/System.IDisposable `Dispose()`
-projections. They are explicit language mappings, not unmeasured API.
-Twenty-two verifier mutation/self-tests pass. Normal strict exits red; leak-only exits
-green.
+Twenty-nine verifier mutation/self-tests pass. Normal strict exits red only
+because 227 future types and 275 members of deferred partial runtime/value types
+are genuinely absent; leak-only is green. The remaining global mismatch owners
+are unchanged: SpriteBatch/Texture2D bases, Color/GraphicsDeviceManager
+interfaces, GraphicsDevice.Viewport mutability, and overloads on Color, Game,
+GraphicsDevice, SpriteBatch, Texture2D, and GraphicsDeviceManager.
 
-Complete types:
+## Complete Milestone-2 matrix
 
-- Microsoft.Xna.Framework.MathHelper
-- Microsoft.Xna.Framework.Point
-- Microsoft.Xna.Framework.Rectangle
-- Microsoft.Xna.Framework.GameTime
-- Microsoft.Xna.Framework.PlayerIndex
-- Microsoft.Xna.Framework.Graphics.SpriteSortMode
-- Microsoft.Xna.Framework.Graphics.SpriteEffects
-- Microsoft.Xna.Framework.Input.Keys
-- Microsoft.Xna.Framework.Input.KeyState
-- Microsoft.Xna.Framework.Input.KeyboardState
-- Microsoft.Xna.Framework.Input.Keyboard
+| Type | Expected | Target | Local diagnostics | Kind | Behavior |
+|---|---:|---:|---:|---|---|
+| Vector2 | 77 | 77 | 0 | struct | PASS |
+| Vector3 | 88 | 88 | 0 | struct | PASS |
+| Vector4 | 85 | 85 | 0 | struct | PASS |
+| Quaternion | 55 | 55 | 0 | struct | PASS |
+| Matrix | 107 | 107 | 0 | struct | PASS |
+| Graphics.Viewport | 14 | 14 | 0 | struct | PASS |
+| Plane | 30 | 30 | 0 | struct | PASS |
+| PlaneIntersectionType | 3 | 3 | 0 | enum | PASS |
+| Ray | 16 | 16 | 0 | struct | PASS |
+| BoundingBox | 33 | 33 | 0 | struct | PASS |
+| BoundingSphere | 33 | 33 | 0 | struct | PASS |
+| BoundingFrustum | 33 | 33 | 0 | class | PASS |
+| ContainmentType | 3 | 3 | 0 | enum | PASS |
 
-Partial types are Color, Vector2, Game, GraphicsDeviceManager, GraphicsDevice,
-Viewport, Texture2D, and SpriteBatch. Their exact missing identities are in
-`docs/generated/missing-type-inventory.md`; do not replace those diagnostics
-with catch-alls or no-ops.
+`Nullable<Single>` and nullable out results are formally measured as `Float?`
+and `inout Float?`. Plane dot, Matrix/Quaternion transforms, and all
+intersections are present. Box corner order and caller-owned destination
+mutation are exact. Sphere point construction, merge, and largest-basis-scale
+Matrix transform are qualified. BoundingFrustum preserves class semantics,
+recomputes planes/corners on Matrix mutation, uses exact XNA plane/corner
+ordering, and contains only a private scalar GJK helper.
 
-## Native evidence
+## Behavior and native evidence
 
 ```text
+AUTHORITY=PURE_XNA_DERIVED
+PURE_OBSERVATIONS=360
+PURE_ASSERTIONS=360
+PURE_FAILURES=0
 CNA_SOURCE_REVISION=a09196a6477f69a7a57c8364f990658d31531a5b
 CNA_ABI_VERSION=0.7.0
 NATIVE_LIBRARY_SHA256=42e099146bf3b470f82fd963a516f8bdd7ff0406da8c37dd53747699117db086
@@ -111,19 +133,6 @@ CONSTANTS=168
 MISSING_HEADER_SYMBOLS=0
 MISSING_LIBRARY_SYMBOLS=0
 ABI_MISMATCHES=0
-```
-
-Current CNA HEAD `1bb2145d99ed572dd4eb15009c34e2e5f410fcf0`
-remains read-only and its clean out-of-tree C API build is blocked on the
-missing `GameUpdateRequiredException.hpp`. Do not patch CNA from this binding.
-The retained compatible artifact was independently reverified here.
-
-## Behavior, lifecycle, and stress
-
-```text
-PURE_OBSERVATIONS=47
-PURE_ASSERTIONS=47
-PURE_FAILURES=0
 GAME_CYCLES=20
 GAME_RECREATION_CYCLES=20
 TEXTURE2D_CYCLES=20
@@ -134,35 +143,32 @@ OBSERVED_UAF=0
 OBSERVED_DOUBLE_FREE=0
 ```
 
-Real callback containment covers Initialize, LoadContent, Update, Draw, and
-UnloadContent. Wrong-thread Game and Texture destruction refuse without
-clearing the handle; owner-thread retry succeeds. Parent-before-child,
-child-before-parent, double dispose, failed PNG create, retained borrowed
-device, and generation invalidation are covered.
-
-The maintained template completed 60 and 600 exact native Update/Draw callback
-counts, decoded its project-owned logo as 128x128, and read the HEADLESS native
-viewport as 800x480. It uses real Clear, SpriteBatch, rotation, scale,
-movement, and Keyboard. Visible output remains BACKEND_BLOCKED by HEADLESS.
+The implementation and conventions are documented in
+`docs/linear-algebra-evidence.md` and
+`docs/geometry-intersection-evidence.md`. All new closure behavior is managed
+Swift; no native symbol, handle, library, or public helper identity was added.
+The template source is unchanged and its maintained debug-60 and release-600
+canaries pass with exact Update/Draw counts, viewport 800x480, and texture
+128x128.
 
 ## Deferred boundaries
 
-Content/XNB is DEFERRED and fake ContentManager is absent. Effects/3D is
-DEFERRED and fake BasicEffect, cube, `GraphicsCapability`, and capability guess
-are absent. Audio, Media, Storage, Touch, Design, PackedVector, and all remaining
-families are unimplemented. macOS, iOS, tvOS, visionOS, Windows, and Web/Wasm
-are unqualified.
+Color remains deliberately unchanged at 21/165 with 144 missing identities.
+The six runtime partials are otherwise unchanged. Content/XNB, Effects,
+rendering, Audio, Media, Storage, Touch, GamerServices, Design, and concrete
+PackedVector formats remain deferred. Do not modify CNA.
 
-## One next dependency-complete milestone
+## Exactly one next dependency-complete milestone
 
-Implement the strict binary32 linear-algebra closure as one milestone:
-Vector2, Vector3, Vector4, Quaternion, and Matrix, including every constructor,
-operator, value/ref overload, transform array overload, field/property, equality,
-hash, and string mapping required by the pinned contract. Extend the
-PURE_XNA_DERIVED corpus with exact Float edge observations and complete Matrix
-creation/multiplication semantics. Then finish the newly unblocked Viewport
-Project/Unproject and Color vector-dependent members only if that closes those
-whole types.
+The next milestone should be the managed Color/protocol closure:
 
-Do not start Content, Effects/Model, Audio, or another broad family during that
-milestone.
+`Color`, `Graphics.PackedVector.IPackedVector`, and
+`Graphics.PackedVector.IPackedVector<TPacked>` plus only language mapping needed
+for those exact interfaces. Pinned Color signatures and direct interfaces force
+only those two PackedVector protocols; they do not force the concrete packed
+format structs. Complete all three locally before considering a broader
+PackedVector family.
+
+Do not combine that milestone with runtime partials, Content, Effects,
+rendering, or concrete PackedVector formats unless a regenerated public
+signature graph proves an additional dependency.

@@ -1,7 +1,8 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 1 — compiler-measured Swift -> canonical CNA C ABI
-foundation.
+**Milestone:** Foundation 2 — compiler-measured binary32 linear algebra and
+its exact public-signature dependency closure over the Foundation-1 Swift ->
+canonical CNA C ABI foundation.
 
 ## Normative rules
 
@@ -26,17 +27,29 @@ foundation.
 8. Runtime support claims require execution evidence. Package platform metadata
    is not a support claim.
 
-## Foundation-1 selected surface
+## Qualified selected surface
 
 The first strict-complete pure/value closure is MathHelper, Point, Rectangle,
 GameTime, and PlayerIndex. The coherent input value closure Keys, KeyState,
 KeyboardState, and Keyboard is also complete. SpriteSortMode and SpriteEffects
 are complete exact dependencies of the canary.
 
-Vector2 and Color are honest canary dependencies but remain partial. Game,
-GraphicsDeviceManager, GraphicsDevice, Viewport, Texture2D, and SpriteBatch are
-honest runtime partials. Broad Content, Effects/Model, Audio, Media, Storage,
-Touch, Design, and PackedVector families are not started.
+Foundation Milestone 2 has two inseparable parts:
+
+- A: the complete binary32 linear-algebra closure: Vector2, Vector3, Vector4,
+  Quaternion, Matrix, and Viewport.
+- B: only the public-signature dependency closure forced by Matrix through
+  Plane: Plane, PlaneIntersectionType, Ray, BoundingBox, BoundingSphere,
+  BoundingFrustum, and ContainmentType.
+
+Pinned metadata proved B unavoidable because complete Matrix exposes Plane and
+complete Plane recursively exposes the other six types. This is the corrected
+Foundation-2 closure, not Foundation Milestone 3 and not discretionary geometry
+scope. All 13 types are complete and locally strict-clean. Their math and
+geometry are managed Swift with no CNA calls. Color is unchanged partial. Game,
+GraphicsDeviceManager, GraphicsDevice, Texture2D, and SpriteBatch remain honest
+runtime partials. Broad Content, Effects/Model, Audio, Media, Storage, Touch,
+Design, and PackedVector families are not started.
 
 ## Measurement status
 
@@ -44,14 +57,18 @@ Touch, Design, and PackedVector families are not started.
   `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`.
 - Formal projection: 257 Swift types / 2,887 Swift members after 49 raw enum
   backing fields and 28 finalizers map to language storage/lifetime syntax.
-- Compiler target: 19 types / 365 emitted members; 11 complete, 8 partial,
-  238 missing. Normal strict is red by design; leak-only is green.
+- Compiler target: 30 types / 883 emitted members; 24 complete, 6 partial,
+  227 missing. Normal strict is red by design; leak-only is green.
 - Verifier: every requested structural category has executable comparison code;
-  22 mutation/self-tests pass, including native-handle, internal-helper, and
-  unmeasured-category mutations.
+  29 mutation/self-tests pass. Manual diagnostic suppressions are zero. The 86
+  deterministic language projections are measured separately, including
+  enum-storage, finalizer, namespace-marker, and inherited-member rules. The 18
+  caller-owned array mutation projections are separately measured.
 - Native ABI: 25 functions, 72 type positions, 15 layouts, 2 callbacks, 168
   constants; zero header/library/mismatch failures.
-- Pure behavior: 47 observations/assertions, zero failures.
+- Pure behavior: 360 observations/assertions, zero failures, including exact
+  binary32 vector, quaternion, matrix, viewport, plane, ray, bounds, and frustum
+  observations.
 - Native lifecycle: real 60/600 frame loops, real exit, callback containment,
   20 recreations, resources, and callback-error cycles.
 - Graphics/input: native viewport 800x480, clear, PNG decode, SpriteBatch scaled
@@ -66,8 +83,10 @@ that could be mistaken for runtime evidence.
 
 ## Completion policy
 
-Foundation 1 is complete when the exact final source archive and isolated
-consumer gates recorded in `NEXT.md` remain green. The full 257-type strict
-verifier is not a Foundation-1 completion condition; zero fake behavior, zero
-unmeasured structural categories, zero ABI mismatch, and real selected native
-routes are.
+The 13 corrected Milestone-2 closure types are complete only when each is
+compiler-emitted with zero local diagnostics and its behavior corpus passes.
+Plane and every recursively forced public dependency are now complete; no new
+partial dependency exists. Therefore the final Foundation Milestone 2 gate is
+true. The full 257-type strict verifier remains red by design; zero fake
+behavior, zero unmeasured structural categories, zero manual suppression, zero
+ABI mismatch, and real selected native routes remain mandatory.

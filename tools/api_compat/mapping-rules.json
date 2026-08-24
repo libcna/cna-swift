@@ -63,10 +63,14 @@
     "System.IntPtr": "Int"
   },
   "refOutMapping": "inout",
-  "nullableMapping": "Optional",
+  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners map to Swift inout Array; source arrays remain value snapshots",
+  "arrayMutationParameterNames": ["destinationArray", "corners"],
+  "enumerableMapping": "System.Collections.Generic.IEnumerable<T> parameters map to Swift Array<T>",
+  "nullableMapping": "System.Nullable<T> maps to Swift T?; ref/out direction remains independently mapped to inout",
   "throwsMapping": "Swift throws is LANGUAGE_MAPPING and does not add an XNA member",
   "protectedVirtualMapping": "open",
   "inheritedPublicMemberProjection": "A selected public inherited member may be declared on a partial Swift subtype until its XNA base exists; the verifier requires an exact ancestor identity. System.IDisposable maps to a public Dispose() member.",
+  "manualDiagnosticSuppressions": [],
   "nestedTypeMapping": "replace CLR + nesting separator with Swift . nesting",
   "systemInterfaceMappings": {
     "System.IEquatable`1": "Equals/operator members; no Swift Equatable conformance required",

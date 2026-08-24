@@ -10,7 +10,11 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-TEST_SOURCE = ROOT / "Tests/CNATests/PureValueTests.swift"
+TEST_SOURCES = [
+    ROOT / "Tests/CNATests/PureValueTests.swift",
+    ROOT / "Tests/CNATests/LinearAlgebraTests.swift",
+    ROOT / "Tests/CNATests/GeometryIntersectionTests.swift",
+]
 
 
 def main() -> int:
@@ -26,8 +30,8 @@ def main() -> int:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
-    source = TEST_SOURCE.read_text(encoding="utf-8")
-    assertions = len(re.findall(r"\bXCTAssert(?:Equal|True|False|GreaterThan|GreaterThanOrEqual)?\s*\(", source))
+    source = "\n".join(path.read_text(encoding="utf-8") for path in TEST_SOURCES)
+    assertions = len(re.findall(r"\bXCTAssert\w*\s*\(", source))
     tests = re.findall(r"\bfunc\s+(test\w+)\s*\(", source)
     failures = 0 if completed.returncode == 0 else 1
     report = {
@@ -37,6 +41,13 @@ def main() -> int:
         "ASSERTIONS": assertions,
         "FAILURES": failures,
         "testCases": tests,
+        "groupCounts": {
+            group: len(re.findall(rf"\bfunc\s+test{group}\w*\s*\(", source, re.IGNORECASE))
+            for group in (
+                "Vector2", "Vector3", "Vector4", "Quaternion", "Matrix", "Viewport",
+                "Plane", "Ray", "BoundingBox", "BoundingSphere", "BoundingFrustum", "GeometryEnums",
+            )
+        },
         "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
         "nativeLibraryRequired": False,
     }

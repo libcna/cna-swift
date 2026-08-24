@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 47,
-  "ASSERTIONS": 47,
+  "OBSERVATIONS": 360,
+  "ASSERTIONS": 360,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -12,8 +12,34 @@
     "testVector2ImplementedMembersAreRealBinary32Math",
     "testColorPackingAndCanaryValues",
     "testGameTimeDurationMappingIsExactAtHundredNanoseconds",
-    "testKeyboardStateAndPinnedKeys"
+    "testKeyboardStateAndPinnedKeys",
+    "testVector2CompleteBinary32Behavior",
+    "testVector3HandednessTransformsAndArrays",
+    "testVector4ConstructorsTransformsAndInout",
+    "testQuaternionXnaDerivedBranchesAndOrdering",
+    "testMatrixXnaDerivedArithmeticAndConventions",
+    "testViewportXnaDerivedProjectUnproject",
+    "testGeometryEnumsXnaRawValues",
+    "testPlaneXnaDerivedTransformsDotsAndClassification",
+    "testRayXnaDerivedNullableIntersections",
+    "testBoundingBoxXnaCornersFactoriesContainmentAndInout",
+    "testBoundingSphereXnaFactoriesMergeTransformAndContainment",
+    "testBoundingFrustumXnaPlanesCornersMutationAndRelations"
   ],
+  "groupCounts": {
+    "Vector2": 2,
+    "Vector3": 1,
+    "Vector4": 1,
+    "Quaternion": 1,
+    "Matrix": 1,
+    "Viewport": 1,
+    "Plane": 1,
+    "Ray": 1,
+    "BoundingBox": 1,
+    "BoundingSphere": 1,
+    "BoundingFrustum": 1,
+    "GeometryEnums": 1
+  },
   "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",
   "nativeLibraryRequired": false
 }

@@ -41,6 +41,11 @@ the retained snapshot hash before projecting it.
   overload separately.
 - CLR `ref`/`out` -> Swift `inout`; direction, type, label, and mutability are
   measured.
+- A CLR caller-owned destination array named `destinationArray` or `corners`
+  maps to Swift `inout Array`. Source arrays remain value snapshots. This
+  preserves writes through Swift value semantics and gives overlapping
+  source/destination calls an explicit copy-on-write snapshot rule. The verifier
+  measures every selected destination-array mapping independently.
 - CLR protected virtual lifecycle members -> `open` methods. Their additional
   Swift visibility is `LANGUAGE_MAPPING`, not an unexpected XNA member.
 - A selected inherited public member may temporarily be declared on a partial
@@ -60,6 +65,14 @@ No aliases collapse the identities. Reference nullability maps to Swift
 Optional only where the selected XNA signature permits null. Native create
 failure is an Error, not an Optional result. Value types remain non-optional
 unless the signature itself is nullable.
+
+`System.Nullable<T>` maps independently to Swift `T?` when `T` is a faithfully
+represented value type. Thus XNA geometry intersection distances return
+`Float?`, and `out Nullable<Single>` maps to `inout Float?`; `nil` means XNA
+`HasValue=false` and is not an error or sentinel value. Selected
+`IEnumerable<Vector3>` point inputs map to `[Vector3]`, the established finite
+Swift collection projection, without introducing a synthetic Microsoft
+collection type.
 
 ## Errors
 
@@ -83,3 +96,11 @@ The verifier derives `EXPECTED_SWIFT_TYPES=257`. It derives
 `EXPECTED_SWIFT_MEMBERS=2887` by excluding exactly 49 enum backing fields named
 `value__` and 28 CLR finalizers. Swift raw-value storage and non-public `deinit`
 are language mappings. No missing functional API is hidden by those omissions.
+
+The report reserves `ALLOWLIST_ENTRIES` for genuine manual diagnostic
+suppressions; it is currently zero. Deterministic projection transformations
+are reported separately as `LANGUAGE_PROJECTION_EXCLUSIONS` (49 enum storage
+fields, 28 finalizer mappings, six namespace markers, and three inherited
+member projections). A verifier self-test proves that a real suppression counts
+as an allowlist entry and that a missing geometry member cannot be reclassified
+as a projection rule.

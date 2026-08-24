@@ -23,6 +23,9 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
     case staleRuntimeGeneration(expected: UInt64, actual: UInt64?)
     case callbackOutsideGameLifecycle
     case streamFailure(String)
+    case argument(String)
+    case argumentOutOfRange(String)
+    case indexOutOfRange(String)
 
     public var description: String {
         switch self {
@@ -48,6 +51,12 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
             return "The native operation requires an active Game lifecycle callback"
         case .streamFailure(let message):
             return "InputStream failed: \(message)"
+        case .argument(let message):
+            return message
+        case .argumentOutOfRange(let parameter):
+            return "Argument is outside the XNA range: \(parameter)"
+        case .indexOutOfRange(let parameter):
+            return "Index is outside the XNA array range: \(parameter)"
         }
     }
 }

@@ -119,6 +119,9 @@ def map_clr_type(clr: str | None, rules: dict[str, Any]) -> str:
     nullable = re.fullmatch(r"System\.Nullable`1\[(.+)]", text)
     if nullable:
         return f"{map_clr_type(nullable.group(1), rules)}?"
+    enumerable = re.fullmatch(r"System\.Collections\.Generic\.IEnumerable`1\[(.+)]", text)
+    if enumerable:
+        return f"[{map_clr_type(enumerable.group(1), rules)}]"
     generic = re.fullmatch(r"(.+)`(\d+)\[(.*)]", text)
     if generic:
         base = map_type_name(f"{generic.group(1)}`{generic.group(2)}", rules)
@@ -150,7 +153,13 @@ def expected_member(owner: str, source: dict[str, Any], rules: dict[str, Any], o
             labels.append(parameter["name"] if owner_kind == "class" else "_")
         else:
             labels.append("_" if index == 0 or name.startswith("op_") else parameter["name"])
-        direction = "inout" if parameter.get("ref") or parameter.get("out") else ""
+        direction = "inout" if (
+            parameter.get("ref") or parameter.get("out") or
+            (
+                parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
+                and parameter.get("type", "").endswith("[]")
+            )
+        ) else ""
         directions.append(direction)
         types.append(map_clr_type(parameter["type"], rules))
 
@@ -305,37 +314,44 @@ def actual_member(owner: str, symbol: dict[str, Any], raw_values: dict[tuple[str
     )
 
 
-def enum_raw_values(source_root: Path) -> dict[tuple[str, str], int]:
+def source_constant_values(source_root: Path) -> dict[tuple[str, str], int]:
     values: dict[tuple[str, str], int] = {}
-    enum_name: str | None = None
+    container_name: str | None = None
+    container_kind: str | None = None
     brace_depth = 0
     for path in source_root.rglob("*.swift"):
-        enum_name = None
+        container_name = None
+        container_kind = None
         brace_depth = 0
         for line in path.read_text(encoding="utf-8").splitlines():
-            match = re.search(r"public enum\s+(\w+)\s*:\s*(?:U?Int\d+)", line)
-            option_set = re.search(r"public struct\s+(\w+)\s*:\s*OptionSet", line)
-            if option_set:
-                enum_name = option_set.group(1)
+            declaration_match = re.search(
+                r"(?:public|open)\s+(?:final\s+)?(enum|struct|class)\s+(\w+)(?:\s*:\s*([^\{]+))?", line)
+            if declaration_match:
+                container_kind = declaration_match.group(1)
+                container_name = declaration_match.group(2)
                 brace_depth = line.count("{") - line.count("}")
                 continue
-            if match:
-                enum_name = match.group(1)
-                brace_depth = line.count("{") - line.count("}")
-                continue
-            if enum_name:
+            if container_name:
                 brace_depth += line.count("{") - line.count("}")
-                case = re.search(r"\bcase\s+(\w+)\s*=\s*(-?(?:0x[0-9A-Fa-f_]+|\d[\d_]*))", line)
-                if case:
-                    values[(enum_name, case.group(1))] = int(case.group(2).replace("_", ""), 0)
+                if container_kind == "enum":
+                    case = re.search(r"\bcase\s+(\w+)\s*=\s*(-?(?:0x[0-9A-Fa-f_]+|\d[\d_]*))", line)
+                    if case:
+                        values[(container_name, case.group(1))] = int(case.group(2).replace("_", ""), 0)
                 option = re.search(r"static let\s+(\w+)\s*=\s*\w+\(rawValue:\s*(-?(?:0x[0-9A-Fa-f_]+|\d[\d_]*))\)", line)
                 if option:
-                    values[(enum_name, option.group(1))] = int(option.group(2).replace("_", ""), 0)
+                    values[(container_name, option.group(1))] = int(option.group(2).replace("_", ""), 0)
                 empty_option = re.search(r"static let\s+(\w+)\s*=\s*\w+\(\[\]\)", line)
                 if empty_option:
-                    values[(enum_name, empty_option.group(1))] = 0
+                    values[(container_name, empty_option.group(1))] = 0
+                integer_constant = re.search(
+                    r"public\s+static\s+let\s+(\w+)\s*:\s*U?Int\d+\s*=\s*"
+                    r"(-?(?:0x[0-9A-Fa-f_]+|\d[\d_]*))", line)
+                if integer_constant:
+                    values[(container_name, integer_constant.group(1))] = int(
+                        integer_constant.group(2).replace("_", ""), 0)
                 if brace_depth <= 0:
-                    enum_name = None
+                    container_name = None
+                    container_kind = None
     return values
 
 
@@ -359,7 +375,7 @@ def is_synthesized_language_member(owner: TypeModel, member: Member) -> bool:
 def parse_symbol_graph(path: Path, markers: set[str], source_root: Path) -> tuple[dict[str, TypeModel], list[dict[str, Any]], int]:
     graph = load_json(path)
     symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
-    raw_values = enum_raw_values(source_root)
+    raw_values = source_constant_values(source_root)
     types: dict[str, TypeModel] = {}
     strict_symbols = 0
     for symbol in graph["symbols"]:
@@ -427,6 +443,23 @@ def system_interface_is_language_mapped(name: str) -> bool:
 
 def diagnostic(category: str, subject: str, detail: str) -> dict[str, str]:
     return {"category": category, "subject": subject, "detail": detail}
+
+
+def apply_manual_suppressions(
+    diagnostics: list[dict[str, str]],
+    suppressions: list[dict[str, str]],
+) -> tuple[list[dict[str, str]], int]:
+    remaining = list(diagnostics)
+    applied = 0
+    for suppression in suppressions:
+        category = suppression.get("category")
+        subject = suppression.get("subject")
+        for index, item in enumerate(remaining):
+            if item["category"] == category and item["subject"] == subject:
+                remaining.pop(index)
+                applied += 1
+                break
+    return remaining, applied
 
 
 def same_callable_identity(expected: Member, actual: Member) -> bool:
@@ -561,7 +594,7 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
                 result.append(diagnostic(category, subject, f"expected mutable={expected_member_model.mutable}, found mutable={candidate.mutable}"))
             if expected_member_model.raw_value is not None:
                 if candidate.raw_value is None:
-                    result.append(diagnostic("UNMEASURED_STRUCTURAL_CATEGORY", subject, "enum raw value unavailable from Symbol Graph supplement"))
+                    result.append(diagnostic("UNMEASURED_STRUCTURAL_CATEGORY", subject, "constant/enum raw value unavailable from source supplement"))
                 elif expected_member_model.raw_value != candidate.raw_value:
                     result.append(diagnostic("ENUM_VALUE_MISMATCH", subject, f"expected {expected_member_model.raw_value}, found {candidate.raw_value}"))
             if expected_member_model.name.startswith("op_") and candidate.kind != "method":
@@ -660,13 +693,71 @@ def self_test() -> None:
     if "UNMEASURED_STRUCTURAL_CATEGORY" not in {item["category"] for item in compare(enum_expected, unmeasured_actual)}:
         failures.append("unmeasured category mutation")
 
+    rules = load_json(RULES)
+    array_source = {
+        "kind": "method", "name": "Transform", "static": True,
+        "returnType": "System.Void", "parameters": [
+            {"name": "sourceArray", "type": "Microsoft.Xna.Framework.Vector3[]"},
+            {"name": "destinationArray", "type": "Microsoft.Xna.Framework.Vector3[]"},
+        ],
+    }
+    array_member = expected_member("Microsoft.Xna.Framework.Vector3", array_source, rules, "struct")
+    if array_member.directions != ("", "inout"):
+        failures.append("array mutation language projection")
+
+    corners_source = {
+        "kind": "method", "name": "GetCorners", "static": False,
+        "returnType": "System.Void", "parameters": [
+            {"name": "corners", "type": "Microsoft.Xna.Framework.Vector3[]"},
+        ],
+    }
+    corners_member = expected_member("Microsoft.Xna.Framework.BoundingBox", corners_source, rules, "struct")
+    if corners_member.directions != ("inout",):
+        failures.append("caller-owned corners array mutation projection")
+
+    if map_clr_type("System.Nullable`1[System.Single]", rules) != "Float?":
+        failures.append("nullable value projection")
+    nullable_out_source = {
+        "kind": "method", "name": "Intersects", "static": False,
+        "returnType": "System.Void", "parameters": [
+            {"name": "result", "type": "System.Nullable`1[System.Single]&", "out": True},
+        ],
+    }
+    nullable_out_member = expected_member("Microsoft.Xna.Framework.Ray", nullable_out_source, rules, "struct")
+    if nullable_out_member.parameters != ("Float?",) or nullable_out_member.directions != ("inout",):
+        failures.append("nullable out projection")
+
+    enumerable_type = "System.Collections.Generic.IEnumerable`1[Microsoft.Xna.Framework.Vector3]"
+    if map_clr_type(enumerable_type, rules) != "[Microsoft.Xna.Framework.Vector3]":
+        failures.append("generic enumerable array projection")
+
+    suppressible = [diagnostic("MISSING_MEMBER", "Microsoft.Xna.Framework.Foo.Bar()", "mapped member is absent")]
+    filtered, applied = apply_manual_suppressions(suppressible, [{
+        "category": "MISSING_MEMBER", "subject": "Microsoft.Xna.Framework.Foo.Bar()",
+    }])
+    if filtered or applied != 1:
+        failures.append("manual diagnostic suppression accounting")
+
+    geometry_expected = {
+        "Microsoft.Xna.Framework.Plane": TypeModel(
+            "Microsoft.Xna.Framework.Plane", "struct",
+            members=[Member("Microsoft.Xna.Framework.Plane", "method", "Intersects", False,
+                            ("Microsoft.Xna.Framework.BoundingBox",), ("_",), ("",),
+                            "Microsoft.Xna.Framework.PlaneIntersectionType")],
+        ),
+    }
+    geometry_actual = {"Microsoft.Xna.Framework.Plane": TypeModel("Microsoft.Xna.Framework.Plane", "struct")}
+    geometry_categories = {item["category"] for item in compare(geometry_expected, geometry_actual)}
+    if "MISSING_MEMBER" not in geometry_categories:
+        failures.append("geometry member hidden by language projection")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
-    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 4}")
+    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 11}")
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
 
-def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[str, TypeModel], actual: dict[str, TypeModel], diagnostics: list[dict[str, str]], graph_path: Path) -> dict[str, Any]:
+def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[str, TypeModel], actual: dict[str, TypeModel], diagnostics: list[dict[str, str]], graph_path: Path, applied_suppressions: int) -> dict[str, Any]:
     counts = collections.Counter(item["category"] for item in diagnostics)
     type_diagnostics: dict[str, list[dict[str, str]]] = collections.defaultdict(list)
     for item in diagnostics:
@@ -698,7 +789,31 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
         for name, model in actual.items() if name in expected
         for member in model.members
     )
-    summary["ALLOWLIST_ENTRIES"] = 28 + 49 + len(rules["namespaceMarkers"]) + inherited_projections
+    enum_storage_exclusions = sum(
+        member["kind"] == "field" and member["name"] == "value__"
+        for item in contract["types"] for member in item["members"]
+    )
+    finalizer_mappings = sum(
+        member["name"] == "Finalize"
+        for item in contract["types"] for member in item["members"]
+    )
+    namespace_markers = len(rules["namespaceMarkers"])
+    array_mutation_mappings = sum(
+        parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
+        and parameter.get("type", "").endswith("[]")
+        for item in contract["types"] for member in item["members"]
+        for parameter in member.get("parameters", [])
+    )
+    summary["ALLOWLIST_ENTRIES"] = len(rules.get("manualDiagnosticSuppressions", []))
+    summary["APPLIED_ALLOWLIST_ENTRIES"] = applied_suppressions
+    summary["LANGUAGE_PROJECTION_EXCLUSIONS"] = (
+        enum_storage_exclusions + finalizer_mappings + namespace_markers + inherited_projections
+    )
+    summary["ENUM_STORAGE_FIELD_EXCLUSIONS"] = enum_storage_exclusions
+    summary["FINALIZER_LANGUAGE_MAPPINGS"] = finalizer_mappings
+    summary["NAMESPACE_MARKERS"] = namespace_markers
+    summary["INHERITED_MEMBER_PROJECTIONS"] = inherited_projections
+    summary["ARRAY_MUTATION_MAPPINGS"] = array_mutation_mappings
     return {
         "schemaVersion": 1,
         "profile": contract["profile"],
@@ -725,10 +840,44 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
     }
 
 
+def render_missing_inventory(report: dict[str, Any]) -> str:
+    lines = [
+        "# XNA to Swift missing-type inventory",
+        "",
+        "Generated from the compiler Symbol Graph and the pinned XNA 4.0 Windows runtime contract.",
+        "Normal strict status is intentionally red.",
+        "",
+        "```text",
+    ]
+    lines.extend(
+        f"{key}={value}" for key, value in report["summary"].items()
+        if isinstance(value, int)
+    )
+    lines.extend(["```", "", "## Complete types", ""])
+    lines.extend(f"- `{name}`" for name in report["completeTypes"])
+    lines.extend(["", "## Partial types and exact diagnostics", ""])
+    scoreboard = {item["type"]: item for item in report["typeScoreboard"]}
+    for name in report["partialTypes"]:
+        item = scoreboard[name]
+        lines.extend([
+            f"### `{name}`", "",
+            f"Expected members: {item['expectedMembers']}; emitted members: {item['targetMembers']}.", "",
+        ])
+        lines.extend(
+            f"- `{diagnostic_item['category']}` — `{diagnostic_item['subject']}`: {diagnostic_item['detail']}"
+            for diagnostic_item in item["diagnostics"]
+        )
+        lines.append("")
+    lines.extend(["## Missing types", ""])
+    lines.extend(f"- `{name}`" for name in report["missingTypes"])
+    return "\n".join(lines) + "\n"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--symbol-graph", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--inventory-output", type=Path)
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--leak-only", action="store_true")
     args = parser.parse_args()
@@ -741,14 +890,21 @@ def main() -> int:
     rules = load_json(RULES)
     expected = build_expected(contract, rules)
     actual, _, _ = parse_symbol_graph(args.symbol_graph, set(rules["namespaceMarkers"]), ROOT / "Sources/CNA")
-    diagnostics = compare(expected, actual)
-    report = make_report(contract, rules, expected, actual, diagnostics, args.symbol_graph)
+    diagnostics, applied_suppressions = apply_manual_suppressions(
+        compare(expected, actual), rules.get("manualDiagnosticSuppressions", []),
+    )
+    report = make_report(
+        contract, rules, expected, actual, diagnostics, args.symbol_graph, applied_suppressions,
+    )
     text = json.dumps(report, indent=2, sort_keys=False) + "\n"
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(text, encoding="utf-8")
     else:
         print(text, end="")
+    if args.inventory_output:
+        args.inventory_output.parent.mkdir(parents=True, exist_ok=True)
+        args.inventory_output.write_text(render_missing_inventory(report), encoding="utf-8")
     summary = report["summary"]
     print(" ".join(f"{key}={value}" for key, value in summary.items() if isinstance(value, int)), file=sys.stderr)
     if args.leak_only:
