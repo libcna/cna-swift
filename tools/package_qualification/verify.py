@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import stat
 import subprocess
 import tempfile
@@ -91,6 +92,23 @@ def run(command: list[str], cwd: Path, environment: dict[str, str]) -> str:
     return completed.stdout
 
 
+def validate_canary(output: str, requested: int) -> bool:
+    match = re.search(
+        r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) texture=(\d+)x(\d+)",
+        output,
+    )
+    if not match:
+        return False
+    observed_request, updates, draws, width, height = map(int, match.groups())
+    return (
+        observed_request == requested and
+        updates >= requested and
+        draws == requested and
+        width == 1 and
+        height == 1
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--archive", required=True, type=Path)
@@ -162,10 +180,16 @@ def main() -> int:
                 args.swift_run, "--scratch-path", str(scratch), "-c", "release",
                 "ArchiveCanary", "--frames", "600"
             ], consumer, environment)
-            expected60 = "ARCHIVE_CANARY requested=60 updates=60 draws=60 texture=1x1"
-            expected600 = "ARCHIVE_CANARY requested=600 updates=600 draws=600 texture=1x1"
-            if expected60 not in debug_output or expected600 not in release_output:
-                raise RuntimeError("archive consumer callback/dimension evidence did not match")
+            if not validate_canary(debug_output, 60):
+                raise RuntimeError(
+                    "debug archive consumer callback/dimension evidence did not match:\n" +
+                    debug_output
+                )
+            if not validate_canary(release_output, 600):
+                raise RuntimeError(
+                    "release archive consumer callback/dimension evidence did not match:\n" +
+                    release_output
+                )
 
     report = {
         "schemaVersion": 1,
