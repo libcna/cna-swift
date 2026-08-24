@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1243,
-  "ASSERTIONS": 1243,
+  "OBSERVATIONS": 1245,
+  "ASSERTIONS": 1245,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -72,7 +72,8 @@
     "testGamePadStateEqualityHashStringAndNativeSnapshotFieldSet",
     "testGamePadCapabilitiesAllPropertiesAndValueCopy",
     "testGamePadVibrationInputUsesPinnedUncheckedInt16Words",
-    "testDisplayOrientationXnaContract"
+    "testDisplayOrientationXnaContract",
+    "testBufferUsageXnaContract"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -114,7 +115,8 @@
     "GAMEPAD_STATE": 4,
     "GAMEPAD_ENUMS": 1,
     "GAMEPAD_CAPABILITIES": 1,
-    "DISPLAY_ORIENTATION": 1
+    "DISPLAY_ORIENTATION": 1,
+    "BUFFER_USAGE": 1
   },
   "displayOrientationContract": {
     "flags": true,
@@ -124,6 +126,15 @@
       "LandscapeLeft": 1,
       "LandscapeRight": 2,
       "Portrait": 4
+    },
+    "swiftProjectionQualificationCountedAsXnaBehavior": false
+  },
+  "bufferUsageContract": {
+    "flags": true,
+    "underlyingType": "System.Int32",
+    "values": {
+      "None": 0,
+      "WriteOnly": 1
     },
     "swiftProjectionQualificationCountedAsXnaBehavior": false
   },

@@ -1611,11 +1611,83 @@ def self_test() -> None:
     }:
         failures.append("DisplayOrientation value__ treated as required did not fail")
 
+    buffer_name = "Microsoft.Xna.Framework.Graphics.BufferUsage"
+    buffer_expected = {
+        buffer_name: copy.deepcopy(all_expected[buffer_name]),
+    }
+    buffer_good = copy.deepcopy(buffer_expected)
+    buffer_good[buffer_name].identifier = buffer_name
+    for index, member in enumerate(buffer_good[buffer_name].members):
+        member.identifier = f"{buffer_name}:{index}"
+
+    def buffer_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(member for member in models[buffer_name].members if member.name == name)
+
+    def buffer_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(buffer_expected, models)}
+
+    buffer_mutations: list[tuple[str, str, Any]] = [
+        ("BufferUsage missing type", "MISSING_TYPE",
+         lambda m: m.pop(buffer_name)),
+        ("BufferUsage wrong namespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.BufferUsage",
+             m.pop(buffer_name),
+         )),
+        ("BufferUsage normal enum", "TYPE_KIND_MISMATCH",
+         lambda m: (setattr(m[buffer_name], "kind", "enum"),
+                    setattr(m[buffer_name], "flags", False))),
+        ("BufferUsage wrong raw type", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[buffer_name], "raw_type", "UInt32")),
+        ("BufferUsage flags metadata absent", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[buffer_name], "flags", False)),
+        ("BufferUsage wrong None", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(buffer_member(m, "None"), "raw_value", 1)),
+        ("BufferUsage wrong WriteOnly", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(buffer_member(m, "WriteOnly"), "raw_value", 2)),
+        ("BufferUsage missing WriteOnly", "MISSING_MEMBER",
+         lambda m: m[buffer_name].members.remove(buffer_member(m, "WriteOnly"))),
+        ("BufferUsage unexpected declared field", "UNEXPECTED_MEMBER",
+         lambda m: m[buffer_name].members.append(Member(
+             buffer_name, "field", "ReadOnly", True,
+             return_type=buffer_name, mutable=False, raw_value=2,
+             identifier="invented-buffer-usage-field",
+         ))),
+        ("BufferUsage public description helper", "UNEXPECTED_MEMBER",
+         lambda m: m[buffer_name].members.append(Member(
+             buffer_name, "property", "description", False,
+             return_type="String", mutable=False,
+             identifier="invented-buffer-usage-description",
+         ))),
+        ("BufferUsage malformed OptionSet conformance", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[buffer_name], "flags", False)),
+    ]
+    for label, wanted, mutate in buffer_mutations:
+        models = copy.deepcopy(buffer_good)
+        mutate(models)
+        if wanted not in buffer_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    if any(member.name == "value__" for member in buffer_expected[buffer_name].members):
+        failures.append("BufferUsage value__ was not excluded from the Swift contract")
+    buffer_value_storage_expected = copy.deepcopy(buffer_expected)
+    buffer_value_storage_expected[buffer_name].members.append(Member(
+        buffer_name, "field", "value__", False,
+        return_type="Int32", mutable=True,
+        identifier="incorrectly-required-buffer-usage-storage",
+    ))
+    if "MISSING_MEMBER" not in {
+        item["category"] for item in compare(
+            buffer_value_storage_expected, buffer_good,
+        )
+    }:
+        failures.append("BufferUsage value__ treated as required did not fail")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

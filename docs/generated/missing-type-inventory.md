@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=67
-TARGET_MEMBERS=1379
-TOTAL_DIAGNOSTICS=341
-COMPLETE_TYPES=62
+TARGET_TYPES=68
+TARGET_MEMBERS=1381
+TOTAL_DIAGNOSTICS=340
+COMPLETE_TYPES=63
 PARTIAL_TYPES=5
-MISSING_TYPES=190
-MISSING_TYPE=190
+MISSING_TYPES=189
+MISSING_TYPE=189
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -69,6 +69,7 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 - `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.GameTime`
+- `Microsoft.Xna.Framework.Graphics.BufferUsage`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444`
@@ -356,7 +357,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.Blend`
 - `Microsoft.Xna.Framework.Graphics.BlendFunction`
 - `Microsoft.Xna.Framework.Graphics.BlendState`
-- `Microsoft.Xna.Framework.Graphics.BufferUsage`
 - `Microsoft.Xna.Framework.Graphics.ClearOptions`
 - `Microsoft.Xna.Framework.Graphics.ColorWriteChannels`
 - `Microsoft.Xna.Framework.Graphics.CompareFunction`

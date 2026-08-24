@@ -48,6 +48,7 @@
   ],
   "rawTypeChecks": [
     "Microsoft.Xna.Framework.DisplayOrientation",
+    "Microsoft.Xna.Framework.Graphics.BufferUsage",
     "Microsoft.Xna.Framework.Input.Buttons"
   ],
   "typeMappings": {

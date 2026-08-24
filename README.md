@@ -14,8 +14,9 @@ complete six-type Curve family. It also includes the exact eleven-type XNA
 GamePad family through real canonical CNA state, capability, packet, dead-zone,
 and vibration routes. It also includes the standalone managed
 `DisplayOrientation` flags type without claiming platform rotation or window
-orientation functionality. The old flat API and known fake behaviors are
-absent.
+orientation functionality, plus the standalone managed `BufferUsage` flags
+type without claiming buffer or GPU resource support. The old flat API and
+known fake behaviors are absent.
 
 ## Measured surface
 
@@ -24,12 +25,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=67
-TARGET_MEMBERS=1379
-TOTAL_DIAGNOSTICS=341
-COMPLETE_TYPES=62
+TARGET_TYPES=68
+TARGET_MEMBERS=1381
+TOTAL_DIAGNOSTICS=340
+COMPLETE_TYPES=63
 PARTIAL_TYPES=5
-MISSING_TYPES=190
+MISSING_TYPES=189
 MISSING_MEMBER=131
 ```
 
@@ -45,8 +46,22 @@ GameTime, PlayerIndex, Vector2/3/4, Quaternion, Matrix, Viewport, Plane, Ray,
 BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
-CurveTangent, all eleven GamePad-family types, and DisplayOrientation. Every
-implemented member has qualified behavior; missing members remain absent.
+CurveTangent, all eleven GamePad-family types, DisplayOrientation, and
+BufferUsage. Every implemented member has qualified behavior; missing members
+remain absent.
+
+## Managed BufferUsage
+
+`Microsoft.Xna.Framework.Graphics.BufferUsage` is the exact managed `Int32`
+OptionSet with `None=0` and `WriteOnly=1`. The CLR `value__` storage identity
+is the existing enum-storage language mapping; Swift raw-value and OptionSet
+surface adds no XNA identity. Unknown positive and negative raw patterns,
+ordinary union/intersection, and value-copy semantics are qualified separately
+from the two pinned literal observations.
+
+This is only a managed flags value. VertexBuffer, IndexBuffer, dynamic buffers,
+VertexDeclaration, IVertexType, SetData/GetData, and all GraphicsDevice buffer
+and draw operations remain deferred. See `docs/buffer-usage-evidence.md`.
 
 ## Managed DisplayOrientation
 
