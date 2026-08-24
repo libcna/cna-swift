@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 49,
-    "TARGET_MEMBERS": 1198,
-    "TOTAL_DIAGNOSTICS": 359,
-    "COMPLETE_TYPES": 44,
+    "TARGET_TYPES": 55,
+    "TARGET_MEMBERS": 1247,
+    "TOTAL_DIAGNOSTICS": 353,
+    "COMPLETE_TYPES": 50,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 208,
-    "MISSING_TYPE": 208,
+    "MISSING_TYPES": 202,
+    "MISSING_TYPE": 202,
     "MISSING_MEMBER": 131,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -49,7 +49,12 @@
     "NAMESPACE_MARKERS": 7,
     "INHERITED_MEMBER_PROJECTIONS": 3,
     "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 26,
-    "ARRAY_MUTATION_MAPPINGS": 18
+    "ARRAY_MUTATION_MAPPINGS": 19,
+    "COMPARABLE_INTERFACE_PROJECTIONS": 1,
+    "COLLECTION_INTERFACE_PROJECTIONS": 1,
+    "ENUMERATOR_SUPPORT_PROJECTIONS": 9,
+    "INDEXED_PROPERTY_ACCESSOR_PROJECTIONS": 4,
+    "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.BoundingBox",
@@ -57,6 +62,12 @@
     "Microsoft.Xna.Framework.BoundingSphere",
     "Microsoft.Xna.Framework.Color",
     "Microsoft.Xna.Framework.ContainmentType",
+    "Microsoft.Xna.Framework.Curve",
+    "Microsoft.Xna.Framework.CurveContinuity",
+    "Microsoft.Xna.Framework.CurveKey",
+    "Microsoft.Xna.Framework.CurveKeyCollection",
+    "Microsoft.Xna.Framework.CurveLoopType",
+    "Microsoft.Xna.Framework.CurveTangent",
     "Microsoft.Xna.Framework.GameTime",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
@@ -136,12 +147,6 @@
     "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
     "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
     "Microsoft.Xna.Framework.Content.ResourceContentManager",
-    "Microsoft.Xna.Framework.Curve",
-    "Microsoft.Xna.Framework.CurveContinuity",
-    "Microsoft.Xna.Framework.CurveKey",
-    "Microsoft.Xna.Framework.CurveKeyCollection",
-    "Microsoft.Xna.Framework.CurveLoopType",
-    "Microsoft.Xna.Framework.CurveTangent",
     "Microsoft.Xna.Framework.Design.BoundingBoxConverter",
     "Microsoft.Xna.Framework.Design.BoundingSphereConverter",
     "Microsoft.Xna.Framework.Design.ColorConverter",
@@ -468,36 +473,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Content.ResourceContentManager",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Curve",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.CurveContinuity",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.CurveKey",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.CurveKeyCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.CurveLoopType",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.CurveTangent",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2347,6 +2322,41 @@
       "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
     }
   ],
+  "systemInterfaceProjections": [
+    {
+      "ownerType": "Microsoft.Xna.Framework.CurveKey",
+      "clrInterface": "System.IComparable`1[Microsoft.Xna.Framework.CurveKey]",
+      "swiftProjection": "CompareTo(T) member; no Swift Comparable conformance or language-added ordering operators",
+      "requiredConcreteMembers": [
+        "CompareTo"
+      ]
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.CurveKeyCollection",
+      "clrInterface": "System.Collections.Generic.ICollection`1[Microsoft.Xna.Framework.CurveKey]",
+      "swiftProjection": "the concrete XNA Add/Clear/Contains/CopyTo/Remove/Count/IsReadOnly members represent the direct interface; no automatic Swift Collection conformance",
+      "requiredConcreteMembers": [
+        "Add",
+        "Clear",
+        "Contains",
+        "CopyTo",
+        "Count",
+        "IsReadOnly",
+        "Remove"
+      ]
+    }
+  ],
+  "indexedPropertyAccessorProjections": [
+    {
+      "ownerType": "Microsoft.Xna.Framework.CurveKeyCollection",
+      "sourceProperty": "Item",
+      "getterSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.Item(_:Int32)",
+      "setterSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.CurveKey)",
+      "getterObserved": true,
+      "setterObserved": true,
+      "reason": "Swift throwing accessors require a compiler-measured Item/SetItem expansion"
+    }
+  ],
   "typeScoreboard": [
     {
       "type": "Microsoft.Xna.Framework.Audio.AudioCategory",
@@ -2788,81 +2798,45 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Curve",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 11,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Curve",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 11,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.CurveContinuity",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.CurveContinuity",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.CurveKey",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 15,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.CurveKey",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 15,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.CurveKeyCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 13,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.CurveKeyCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 13,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.CurveLoopType",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.CurveLoopType",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.CurveTangent",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.CurveTangent",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Design.BoundingBoxConverter",

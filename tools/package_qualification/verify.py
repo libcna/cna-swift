@@ -30,6 +30,37 @@ let package = Package(
 SOURCE = r'''import CNA
 import Foundation
 
+func qualifyManagedCurve() throws {
+    typealias F = Microsoft.Xna.Framework
+    let curve = F.Curve()
+    let first = F.CurveKey(position: 2, value: 10, tangentIn: 3, tangentOut: 0)
+    let last = F.CurveKey(position: 5, value: 22, tangentIn: 0, tangentOut: -4)
+    curve.Keys.Add(last)
+    curve.Keys.Add(first)
+    guard curve.Keys.Count == 2, try curve.Keys.Item(0) === first else {
+        throw CNAError.argument("isolated Curve collection qualification failed")
+    }
+    curve.ComputeTangents(.Smooth)
+    curve.PreLoop = .CycleOffset
+    curve.PostLoop = .Oscillate
+    guard curve.Evaluate(1) == curve.Evaluate(4) - 12,
+          curve.Evaluate(6).bitPattern == curve.Evaluate(4).bitPattern else {
+        throw CNAError.argument("isolated Curve loop qualification failed")
+    }
+    let nan = F.CurveKey(position: .nan, value: 0)
+    guard try nan.CompareTo(first) == 1, try first.CompareTo(nan) == 1 else {
+        throw CNAError.argument("isolated Curve CompareTo qualification failed")
+    }
+    let enumerator = curve.Keys.GetEnumerator()
+    curve.Keys.Add(F.CurveKey(position: 8, value: 30))
+    do {
+        _ = try enumerator.Next()
+        throw CNAError.argument("isolated Curve enumerator did not invalidate")
+    } catch CNAError.collectionModified {
+        // Exact expected mutation failure.
+    }
+}
+
 final class ArchiveGame: Microsoft.Xna.Framework.Game {
     let requested: Int
     var manager: Microsoft.Xna.Framework.GraphicsDeviceManager?
@@ -69,11 +100,12 @@ final class ArchiveGame: Microsoft.Xna.Framework.Game {
 }
 
 do {
+    try qualifyManagedCurve()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0)")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -94,18 +126,19 @@ def run(command: list[str], cwd: Path, environment: dict[str, str]) -> str:
 
 def validate_canary(output: str, requested: int) -> bool:
     match = re.search(
-        r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) texture=(\d+)x(\d+)",
+        r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) texture=(\d+)x(\d+) curve=(PASS)",
         output,
     )
     if not match:
         return False
-    observed_request, updates, draws, width, height = map(int, match.groups())
+    observed_request, updates, draws, width, height = map(int, match.groups()[:5])
     return (
         observed_request == requested and
         updates >= requested and
         draws == requested and
         width == 1 and
-        height == 1
+        height == 1 and
+        match.group(6) == "PASS"
     )
 
 

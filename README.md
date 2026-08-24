@@ -1,18 +1,17 @@
 # CNA-Swift
 
-CNA-Swift is now a real, deliberately partial Swift projection of Microsoft
-XNA Framework 4.0 over the canonical CNA C ABI. It is not a 257-type binding
-yet, and it does not claim that it is.
+CNA-Swift is a real, deliberately partial Swift projection of Microsoft XNA
+Framework 4.0 over the canonical CNA C ABI. It does not claim completion of the
+full 257-type profile.
 
 The strict public identity is `Microsoft.Xna.Framework...`. The qualified
-foundation has a
-compiler-Symbol-Graph scoreboard, exact ABI-0.7 admission, a reviewed typed
-function table, owner-thread/generation/ownership enforcement, callback error
-containment, a native Game/2D/input canary, and a complete managed binary32
-linear-algebra plus public-signature geometry dependency closure. The managed
-Color, its two forced packed-vector protocols, and the full 17-format concrete
-PackedVector family are also complete. The old flat one-file API and every
-known fake behavior were removed.
+foundation has a compiler Symbol Graph scoreboard, exact ABI-0.7 admission, a
+reviewed typed function table, owner-thread/generation/ownership enforcement,
+callback error containment, and a native Game/2D/input canary. Its managed
+surface includes exact binary32 linear algebra and intersection types, Color,
+both packed-vector protocols, all 17 concrete PackedVector formats, and the
+complete six-type Curve family. The old flat API and known fake behaviors are
+absent.
 
 ## Measured surface
 
@@ -21,49 +20,49 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=49
-TARGET_MEMBERS=1198
-COMPLETE_TYPES=44
+TARGET_TYPES=55
+TARGET_MEMBERS=1247
+TOTAL_DIAGNOSTICS=353
+COMPLETE_TYPES=50
 PARTIAL_TYPES=5
-MISSING_TYPES=208
+MISSING_TYPES=202
+MISSING_MEMBER=131
 ```
 
-Normal strict verification remains red because future XNA types and members
-are genuinely absent. Leak-only verification is green: no internal type, raw
-pointer, native handle, or public FFI declaration leaks into the XNA surface.
-See `docs/generated/api-compat-report.json` and
-`docs/generated/missing-type-inventory.md` for the current exact diagnostics.
+Normal strict verification remains red because deferred XNA types are genuinely
+absent. Leak-only is green: no internal type, pointer, native handle, or public
+FFI declaration leaks into the XNA surface. All remaining member diagnostics
+belong to Game, GraphicsDeviceManager, GraphicsDevice, Texture2D, and
+SpriteBatch. See `docs/generated/api-compat-report.json` and
+`docs/generated/missing-type-inventory.md` for the exact inventory.
 
-Strict-complete types are MathHelper, Point, Rectangle, GameTime, PlayerIndex,
-Vector2, Vector3, Vector4, Quaternion, Matrix, Viewport, Plane,
-PlaneIntersectionType, Ray, BoundingBox, BoundingSphere, BoundingFrustum,
-ContainmentType, SpriteSortMode, SpriteEffects, Keys, KeyState, KeyboardState,
-Keyboard, Color, Graphics.PackedVector.IPackedVector,
-Graphics.PackedVector.IPackedVectorOfT, and all 17 concrete PackedVector
-formats from Alpha8 through Short4. Game, GraphicsDeviceManager,
-GraphicsDevice, Texture2D, and SpriteBatch are explicitly measured partial
-types. Every implemented member is real; missing members are absent.
+The strict-complete managed foundation includes MathHelper, Point, Rectangle,
+GameTime, PlayerIndex, Vector2/3/4, Quaternion, Matrix, Viewport, Plane, Ray,
+BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
+SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
+and Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType, and
+CurveTangent. Every implemented member has qualified behavior; missing members
+remain absent.
 
-The geometry types are not a separate follow-on milestone: pinned Matrix
-signatures require Plane, whose own public signatures recursively require the
-exact intersection closure above. No broader geometry, rendering, or native ABI
-surface was added. BasicEffect, ContentManager, GraphicsCapability, and the old top-level
-`Run(game:)` do not exist. Content/XNB and Effects/3D are deferred. See
-`docs/linear-algebra-evidence.md` and
-`docs/geometry-intersection-evidence.md` for the binary32, convention, and
-dependency evidence.
+## Managed Curve family
 
-Color exposes the complete 165-member pinned surface, including exact UInt32
-packing, Vector3/Vector4 conversion, premultiplication, fixed-point
-interpolation, and all 141 predefined colors. Its authoritative direct
-interface forces `IPackedVector` and the mapped generic
-`IPackedVectorOfT<TPacked>` protocol. The complete managed concrete family adds
-exact fixed-width packed storage, XNA bit layouts and rounding, signed
-normalization, XNA half conversion, explicit-interface protocol witnesses,
-and packed-value equality/hash behavior without adding any CNA ABI entry.
-See `docs/color-packed-protocol-evidence.md` and
-`docs/packed-vector-evidence.md` for the dependency, compiler, and behavior
-evidence.
+Curve, CurveKey, and CurveKeyCollection are open reference classes, matching
+the non-sealed CLR types. CurveKey has exact field equality/hash and the XNA
+direct-branch CompareTo behavior, including `NaN/finite=+1`,
+`finite/NaN=+1`, and `NaN/NaN=+1`.
+
+CurveKeyCollection preserves XNA sorted insertion and reference identity. Its
+CLR collection interfaces map without fake Microsoft collection types or
+automatic Swift Collection conformance. `GetEnumerator` returns the root
+support type `CNAEnumerator<CurveKey>` so mutation invalidation throws; the
+read/write CLR indexer maps to throwing Item/SetItem accessors so invalid
+indices cannot become Swift Array traps. Tangents, Hermite evaluation, Double
+position widening, Step continuity, and Constant/Cycle/CycleOffset/Oscillate/
+Linear loops reproduce the pinned XNA IL, including negative cycles.
+
+See `docs/curve-evidence.md` for exact formulas, clone depth, collection
+versioning, null policy, projection rules, and authority provenance. Earlier
+managed families are documented in the other evidence files under `docs/`.
 
 ## Qualified runtime
 
@@ -77,33 +76,33 @@ swift test
 ```
 
 `CNA_NATIVE_LIBRARY` must be absolute. Without it Linux tries only an installed
-`libcna_c_api.so`; there is no developer-tree fallback. ABI 0.8 is rejected.
-No native binary ships in the source package.
+`libcna_c_api.so`; there is no developer-tree fallback. ABI 0.8 is rejected,
+and no native binary ships in the source package. Managed Curve tests require
+no native library.
 
-The HEADLESS renderer executes real viewport, clear, PNG decode, SpriteBatch,
-and keyboard routes, but has no visible window. Visible output is therefore
-backend-blocked, not claimed. macOS, iOS, tvOS, visionOS, Windows, and Web/Wasm
-are future/unqualified.
+HEADLESS executes real viewport, clear, PNG decode, SpriteBatch, and keyboard
+routes but has no visible window. Visible output is backend-blocked, not
+claimed. macOS, iOS, tvOS, visionOS, Windows, and Web/Wasm are unqualified.
 
 ## Verification
-
-The core commands are:
 
 ```bash
 swift build
 swift build -c release
 swift test
+swift test -c release
 swift package dump-symbol-graph
 python3 tools/api_compat/verify.py --self-test
 python3 tools/api_compat/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
-  --output docs/generated/api-compat-report.json
+  --output docs/generated/api-compat-report.json \
+  --inventory-output docs/generated/missing-type-inventory.md
 python3 tools/native_abi/verify.py \
   --cna-include /path/to/cna/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY"
 ```
 
-The normal API verifier exits nonzero until the selected XNA profile is
-complete; use `--leak-only` for the green encapsulation gate.
-Architecture, mapping, ABI provenance, scaffold audit, capabilities, and exact
-handoff evidence are retained under `docs/`, `plan.md`, and `NEXT.md`.
+The normal API verifier exits nonzero until the full selected profile is
+complete; use `--leak-only` for the green encapsulation gate. Architecture,
+mapping, ABI provenance, capabilities, evidence, and the exact continuation
+handoff are retained under `docs/`, `plan.md`, and `NEXT.md`.

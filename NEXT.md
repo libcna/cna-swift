@@ -1,13 +1,12 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestone 4 final status:** COMPLETE.
+**Foundation Milestone 5 final status:** COMPLETE.
 
-The milestone closes exactly the 17 public concrete XNA PackedVector structs:
-Alpha8, Bgr565, Bgra4444, Bgra5551, Byte4, HalfSingle, HalfVector2,
-HalfVector4, NormalizedByte2, NormalizedByte4, NormalizedShort2,
-NormalizedShort4, Rg32, Rgba1010102, Rgba64, Short2, and Short4. All behavior
-is managed Swift. CNA source, the CNA C ABI, the five runtime-partial types,
-and maintained template source are unchanged.
+The milestone closes exactly `Curve`, `CurveKey`, `CurveKeyCollection`,
+`CurveContinuity`, `CurveLoopType`, and `CurveTangent`: six XNA public types
+and 49 mapped member identities. All behavior is managed Swift. CNA source,
+the CNA C ABI, the five runtime-partial types, and maintained template source
+are unchanged.
 
 ## Qualified environment and gates
 
@@ -17,11 +16,12 @@ SWIFT_TARGET=x86_64-pc-linux-gnu
 SWIFT_TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS
 RELEASE_BUILD=PASS
-DEBUG_TESTS=56 PASS
-RELEASE_TESTS=56 PASS
+DEBUG_TESTS=63 PASS
+RELEASE_TESTS=63 PASS
+MANAGED_TESTS=56 PASS_WITHOUT_CNA_NATIVE_LIBRARY
 WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE
 SYMBOL_GRAPH=PASS
-API_SELF_TESTS=47 PASS
+API_SELF_TESTS=66 PASS
 NORMAL_STRICT=EXPECTED_RED_DEFERRED_PROFILE_ONLY
 LEAK_ONLY=PASS
 SWIFT_ASAN=PASS_PURE_CORPUS_DETECT_LEAKS_DISABLED
@@ -35,14 +35,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=49
-TARGET_MEMBERS=1198
-TOTAL_DIAGNOSTICS=359
-MISSING_TYPE=208
+TARGET_TYPES=55
+TARGET_MEMBERS=1247
+TOTAL_DIAGNOSTICS=353
+MISSING_TYPE=202
 MISSING_MEMBER=131
-COMPLETE_TYPES=44
+COMPLETE_TYPES=50
 PARTIAL_TYPES=5
-MISSING_TYPES=208
+MISSING_TYPES=202
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -73,78 +73,84 @@ FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=7
 INHERITED_MEMBER_PROJECTIONS=3
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
-ARRAY_MUTATION_MAPPINGS=18
+ARRAY_MUTATION_MAPPINGS=19
+COMPARABLE_INTERFACE_PROJECTIONS=1
+COLLECTION_INTERFACE_PROJECTIONS=1
+ENUMERATOR_SUPPORT_PROJECTIONS=9
+INDEXED_PROPERTY_ACCESSOR_PROJECTIONS=4
+GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 ```
 
-The remaining base mismatches belong to SpriteBatch and Texture2D; the
-interface mismatch belongs to GraphicsDeviceManager; the property mismatch
-belongs to GraphicsDevice.Viewport; and the 16 overload mismatches belong to
-the same deferred runtime partials. No PackedVector type owns a diagnostic.
+The two base mismatches, one interface mismatch, one property mismatch, and 16
+overload mismatches still belong exclusively to Game, GraphicsDeviceManager,
+GraphicsDevice, Texture2D, and SpriteBatch. No Curve type owns a diagnostic.
 
-## Concrete PackedVector matrix
+## Curve type matrix
 
-| Type | Expected/target | TPacked | Public converter | Projected witnesses | Local diagnostics |
-|---|---:|---|---|---|---:|
-| `Alpha8` | 9/9 | `UInt8` | `ToAlpha` | pack + vector4 | 0 |
-| `Bgr565` | 10/10 | `UInt16` | `ToVector3` | pack + vector4 | 0 |
-| `Bgra4444` | 10/10 | `UInt16` | `ToVector4` | pack | 0 |
-| `Bgra5551` | 10/10 | `UInt16` | `ToVector4` | pack | 0 |
-| `Byte4` | 10/10 | `UInt32` | `ToVector4` | pack | 0 |
-| `HalfSingle` | 9/9 | `UInt16` | `ToSingle` | pack + vector4 | 0 |
-| `HalfVector2` | 10/10 | `UInt32` | `ToVector2` | pack + vector4 | 0 |
-| `HalfVector4` | 10/10 | `UInt64` | `ToVector4` | pack | 0 |
-| `NormalizedByte2` | 10/10 | `UInt16` | `ToVector2` | pack + vector4 | 0 |
-| `NormalizedByte4` | 10/10 | `UInt32` | `ToVector4` | pack | 0 |
-| `NormalizedShort2` | 10/10 | `UInt32` | `ToVector2` | pack + vector4 | 0 |
-| `NormalizedShort4` | 10/10 | `UInt64` | `ToVector4` | pack | 0 |
-| `Rg32` | 10/10 | `UInt32` | `ToVector2` | pack + vector4 | 0 |
-| `Rgba1010102` | 10/10 | `UInt32` | `ToVector4` | pack | 0 |
-| `Rgba64` | 10/10 | `UInt64` | `ToVector4` | pack | 0 |
-| `Short2` | 10/10 | `UInt32` | `ToVector2` | pack + vector4 | 0 |
-| `Short4` | 10/10 | `UInt64` | `ToVector4` | pack | 0 |
+| Type | Expected/target | Kind | Behavior | Local diagnostics |
+|---|---:|---|---|---:|
+| `Curve` | 11/11 | open class | XNA-qualified | 0 |
+| `CurveKey` | 15/15 | open class | XNA-qualified | 0 |
+| `CurveKeyCollection` | 13/13 | open class | XNA-qualified | 0 |
+| `CurveContinuity` | 2/2 | Int32 enum | XNA-qualified | 0 |
+| `CurveLoopType` | 5/5 | Int32 enum | XNA-qualified | 0 |
+| `CurveTangent` | 3/3 | Int32 enum | XNA-qualified | 0 |
 
-Every row is a Swift struct with one private fixed-width packed value and an
-exact get/set `PackedValue`. Equality and operators compare packed bits.
-UInt8/UInt16 hashes widen, UInt32 hashes reinterpret, and UInt64 hashes XOR-fold
-its 32-bit halves. Strings match the pinned XNA IL paths.
+The classes are non-sealed in pinned metadata and preserve reference identity.
+CurveKey constructors, immutable Position, mutable value/tangents/continuity,
+distinct clone, field equality, null-aware operators, deterministic CLR-style
+hash, and null-reference failure are exact.
 
-The verifier measures 17 new `PackFromVector4` and eight new reduced-format
-`ToVector4` compiler witnesses. With Color, the formal whole-profile count is
-26. Its 47 self-tests retain errors for missing/wrong witnesses, a wrong
-`TPacked`, and unrelated public members; no general protocol-member suppression
-exists.
+The authoritative XNA IL for `CurveKey.CompareTo` compares Position with direct
+`==`, then `<`, then returns +1. Consequently finite order and signed zero are
+ordinary; `NaN/finite=+1`, `finite/NaN=+1`, and `NaN/NaN=+1`. This independently
+resolves the sibling discrepancy; no sibling repository was modified.
 
-## Packed-bit behavior
+## Collection, tangents, and evaluation
 
-All normalized formats scale in Float, clamp safely for NaN/infinity, widen at
-the pinned IL point, and use `System.Math.Round` midpoint-to-even semantics.
-SNorm -1 packs to -127/-32767 (`0x81`/`0x8001`); directly assigned minimum
-two's-complement codes also decode to -1. Byte4 and Short2/Short4 are raw,
-unscaled integer-domain formats.
+`ICollection<CurveKey>` maps to the concrete seven-member interface contract;
+no fake BCL or Swift Collection conformance exists. Transitive enumeration maps
+to root `CNAEnumerator<CurveKey>` with throwing `Next`, a fresh live cursor,
+source order/reference preservation, and exact version invalidation. Successful
+Add/Remove/RemoveAt/Clear and item replacement invalidate; Clear invalidates an
+empty collection; failed Remove and CopyTo do not. Indexing is one CLR property
+projected as throwing `Item(Int32)` and `SetItem(Int32, CurveKey)` symbols.
 
-The half implementation is a bit-level port of XNA `HalfUtils`, not Swift
-Float16. It preserves signed zero, subnormals, finite normals, and ties. XNA
-canonicalizes positive infinity/NaN to `0x7FFF` and negative infinity/NaN to
-`0xFFFF`; these packed exponent-31 patterns decode to finite extended values.
-All 65,536 UInt16 patterns decode and repack identically.
+Add uses the XNA List binary-search path and inserts normal equal positions
+after their run; same references may repeat. Replacement stays in place only
+when positions compare equal, otherwise it removes/reinserts. Contains,
+IndexOf, and Remove use field equality and first match. CopyTo mutates `inout`
+destination storage without cloning keys. Collection and Curve clones own new
+collection shape but share contained CurveKey references.
 
-Declared zero-failure exhaustive sweeps are Alpha8 256, Bgr565 65,536,
-Bgra4444 65,536, Bgra5551 65,536, and HalfSingle 65,536. Exact layouts, fills,
-rounding thresholds, non-finite inputs, direct assignment, equality/hash/string,
-and independent goldens are documented in `docs/packed-vector-evidence.md`.
+Curve defaults both loops to Constant, preserves one Keys identity, and defines
+IsConstant as Count <= 1. Flat tangents are zero; Linear uses raw value
+differences; Smooth uses the XNA position-scaled formula and Single epsilon.
+Mixed modes are independent, whole-curve computation is forward and stable,
+and invalid indices throw.
 
-## Behavior and native evidence
+Evaluate covers empty/single curves, duplicate positions, Step at exactly one,
+exact Float Hermite grouping, and the reference Double-widened interpolation
+fraction. Constant, Linear, Cycle, CycleOffset, and Oscillate match reference
+IL, including exact negative cycle boundaries, negative parity, large values,
+and unchecked CLR-like float-to-Int32 behavior.
+
+## Behavior, ABI, native, and template evidence
 
 ```text
 AUTHORITY=PURE_XNA_DERIVED
-PURE_OBSERVATIONS=762
-PURE_ASSERTIONS=762
+PURE_OBSERVATIONS=986
+PURE_ASSERTIONS=986
 PURE_FAILURES=0
+CURVE_ENUMS=1
+CURVE_KEY=1
+CURVE_COLLECTION=2
+CURVE_TANGENTS=1
+CURVE_EVALUATE=1
+CURVE_LOOPS=1
+CNA_SOURCE_REVISION=a09196a6477f69a7a57c8364f990658d31531a5b
 CNA_ABI_VERSION=0.7.0
 NATIVE_LIBRARY_SHA256=42e099146bf3b470f82fd963a516f8bdd7ff0406da8c37dd53747699117db086
-PLATFORM=Linux x86-64
-RENDERER=HEADLESS
-AUDIO_BACKEND=NULL
 BOUND_FUNCTIONS=25
 PROTOTYPE_TYPE_POSITIONS=72
 C_SWIFT_MEASUREMENTS=72
@@ -164,15 +170,14 @@ OBSERVED_UAF=0
 OBSERVED_DOUBLE_FREE=0
 ```
 
-The maintained template remains at unchanged commit
-`86687f62c3a13ee2b59798f338fc083f7399f447`; its debug 60-frame and release
-600-frame runs both match the requested callback counts, viewport 800x480, and
-texture 128x128. Exact final-archive identity and isolated-consumer results are
-release handoff artifacts rather than self-referential source content.
+The maintained template remains clean at commit
+`86687f62c3a13ee2b59798f338fc083f7399f447`, source tree
+`70e6bab6a86db65324a60b04c4cde8aa4bce662e`, and passes maintained 60/600
+runs with exact update/draw counts, viewport 800x480, and texture 128x128.
+Final source-archive identity and isolated-consumer results are release handoff
+artifacts rather than self-referential source content.
 
 ## Unchanged partial types
-
-Exactly these five remain partial with their pre-milestone diagnostics:
 
 - `Microsoft.Xna.Framework.Game`
 - `Microsoft.Xna.Framework.GraphicsDeviceManager`
@@ -182,13 +187,14 @@ Exactly these five remain partial with their pre-milestone diagnostics:
 
 ## Exactly one next dependency-complete milestone
 
-The regenerated scoreboard selects the managed Curve family as the next single
-dependency-complete milestone: `Curve`, `CurveKey`, `CurveKeyCollection`,
-`CurveContinuity`, `CurveLoopType`, and `CurveTangent`. Their current mapped
-member counts are 11, 15, 13, 2, 5, and 3 respectively (49 total); their public
-signatures close within that six-type family and Swift/System primitives.
+The regenerated scoreboard selects the XNA GamePad family as the next single
+dependency-complete milestone: `ButtonState`, `Buttons`, `GamePad`,
+`GamePadButtons`, `GamePadCapabilities`, `GamePadDPad`, `GamePadDeadZone`,
+`GamePadState`, `GamePadThumbSticks`, `GamePadTriggers`, and `GamePadType`.
+These 11 missing types contain 128 mapped identities and close publicly over
+the already-complete PlayerIndex and Vector2 plus Swift/System primitives.
 
-This is a selection only. The Curve family is **not started** here. Do not
-combine it with runtime-partial cleanup, Design, Content/XNB, LZX,
-Effects/Model, Audio/XACT, Media/Video, Storage, Touch, GamerServices, or CNA
-ABI work.
+This is selection only. The GamePad family is not started here. Its future run
+must independently audit exact native-input requirements and the pinned 0.7
+function table; it must not be combined with runtime-partial cleanup, Touch,
+Design, Content, Effects/Model, Audio, Media, Storage, or GamerServices.

@@ -1,115 +1,98 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 4 — exact managed packed-bit behavior and
-compiler-measured closure for all 17 concrete XNA PackedVector structs, over
-the completed Foundation-3 Color/protocol closure.
+**Milestone:** Foundation 5 — complete managed Microsoft XNA Framework 4.0
+Curve family, over the completed Foundation 1–4 baseline.
 
 ## Normative rules
 
 1. Microsoft XNA 4.0 Windows runtime metadata and reference behavior are the
-   public shape/behavior authorities. CNA is an implementation, not the XNA
-   reference.
-2. The only runtime path is strict Swift XNA facade -> internal CNA-Swift
-   runtime -> canonical CNA C ABI 0.7.0 -> CNA. C++ and sibling bindings are
-   forbidden runtime dependencies.
+   public shape and behavior authorities. CNA and sibling bindings are not XNA
+   behavioral authorities.
+2. Native runtime work uses strict Swift XNA facade -> internal CNA-Swift
+   runtime -> canonical CNA C ABI 0.7.0 -> CNA. The Curve family is wholly
+   managed Swift and has no CNA call.
 3. Public strict names use `Microsoft.Xna.Framework...` and XNA PascalCase.
-   Namespace markers are excluded mapping infrastructure.
+   Namespace markers and root support projections are measured infrastructure,
+   not additional XNA types.
 4. A missing member is preferable to a fake member. Partial types are allowed
-   only when the compiler scoreboard lists every missing identity and every
-   implemented member has real behavior.
-5. Native handles/functions remain private. Owned destruction is explicit,
-   transactional, generation-checked, and owner-thread checked. Deinit is only
-   safe best effort.
-6. No Swift error crosses C. Callback trampolines store failure and return CNA
-   callback status; controlled Swift boundaries rethrow.
-7. Exact ABI 0.7.0 only. Native selection is an absolute environment override
-   or an installed soname, never a developer path.
-8. Runtime support claims require execution evidence. Package platform metadata
+   only when the compiler scoreboard identifies every missing identity and
+   every implemented member has real behavior.
+5. Native handles and functions remain private. No Swift error crosses C.
+6. Exact CNA ABI 0.7.0 only. Native selection is an absolute environment
+   override or installed soname, never a developer path.
+7. Runtime support claims require execution evidence. Package platform metadata
    is not a support claim.
 
 ## Qualified selected surface
 
-The first strict-complete pure/value closure is MathHelper, Point, Rectangle,
-GameTime, and PlayerIndex. The coherent input value closure Keys, KeyState,
-KeyboardState, and Keyboard is also complete. SpriteSortMode and SpriteEffects
-are complete exact dependencies of the canary.
+Foundation Milestones 1–4 completed the initial managed/runtime canary, the
+binary32 linear-algebra and forced intersection closure, Color and its packed
+protocols, and all 17 concrete PackedVector formats.
 
-Foundation Milestone 2 completed two inseparable parts:
+Foundation Milestone 5 adds exactly:
 
-- A: the complete binary32 linear-algebra closure: Vector2, Vector3, Vector4,
-  Quaternion, Matrix, and Viewport.
-- B: only the public-signature dependency closure forced by Matrix through
-  Plane: Plane, PlaneIntersectionType, Ray, BoundingBox, BoundingSphere,
-  BoundingFrustum, and ContainmentType.
+- `Microsoft.Xna.Framework.Curve`
+- `Microsoft.Xna.Framework.CurveKey`
+- `Microsoft.Xna.Framework.CurveKeyCollection`
+- `Microsoft.Xna.Framework.CurveContinuity`
+- `Microsoft.Xna.Framework.CurveLoopType`
+- `Microsoft.Xna.Framework.CurveTangent`
 
-Pinned metadata proved B unavoidable because complete Matrix exposes Plane and
-complete Plane recursively exposes the other six types. This is the corrected
-Foundation-2 closure, not Foundation Milestone 3 and not discretionary geometry
-scope. All 13 types remain complete and locally strict-clean.
+These six public types and 49 mapped identities are complete and locally
+strict-clean. The three CLR classes are open Swift reference classes. Exact
+reference IL governs construction, cloning, equality/hash/ordering, sorted key
+storage, mutation-sensitive live enumeration, tangents, Hermite evaluation,
+and all five loop modes. `CurveKey.CompareTo` deliberately uses the direct XNA
+branch sequence: both `NaN/finite` and `finite/NaN` return +1, and `NaN/NaN`
+also returns +1.
 
-Foundation Milestone 3 adds exactly:
-
-- `Microsoft.Xna.Framework.Color`;
-- `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`;
-- the deterministic Swift collision mapping
-  `Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT<TPacked>`.
-
-Pinned public signatures and direct interfaces prove this closure. All three
-Milestone-3 types remain complete and locally strict-clean.
-
-Foundation Milestone 4 adds exactly Alpha8, Bgr565, Bgra4444, Bgra5551, Byte4,
-HalfSingle, HalfVector2, HalfVector4, NormalizedByte2, NormalizedByte4,
-NormalizedShort2, NormalizedShort4, Rg32, Rgba1010102, Rgba64, Short2, and
-Short4. Their 168 mapped public members and 25 Swift-required explicit-interface
-witnesses are complete and locally strict-clean. Exact XNA packing, unpacking,
-rounding, non-finite behavior, half conversion, equality, integer hashes, and
-strings are managed Swift with no CNA calls or C ABI expansion.
+The collection mapping adds no fake BCL namespace and no automatic Swift
+Collection conformance. `ICollection<T>` maps to the concrete member contract;
+`IEnumerator<CurveKey>` returns root support type `CNAEnumerator<CurveKey>`;
+and read/write CLR `Item[Int32]` maps to throwing `Item`/`SetItem` accessors so
+bad indices never trap. `CopyTo` mutates caller-owned `inout` array storage.
 
 Game, GraphicsDeviceManager, GraphicsDevice, Texture2D, and SpriteBatch remain
-the same honest runtime partials. Curve, Content, Effects/Model, Audio, Media,
-Storage, Touch, Design, and broader runtime work remain not started.
+the same honest runtime partials. No deferred Design, Content/XNB, LZX,
+Effects/Model/3D, Audio/XACT, Media/Video, Storage, Touch, GamerServices, or
+runtime-partial surface was started.
 
 ## Measurement status
 
 - Pinned contract: 257 types / 2,964 members; retained SHA-256
   `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`.
-- Formal projection: 257 Swift types / 2,887 Swift members after 49 raw enum
-  backing fields and 28 finalizers map to language storage/lifetime syntax.
-- Compiler target: 49 types / 1,198 emitted mapped members; 44 complete, 5
-  partial, 208 missing. Normal strict is red by design; leak-only is green.
-- Verifier: every requested structural category has executable comparison code;
-  47 mutation/self-tests pass. Manual diagnostic suppressions are zero. The 113
-  deterministic language projections are measured separately, including
-  enum-storage, finalizer, namespace-marker, inherited-member, and 26
-  compiler-observed explicit-protocol-witness rules. The 18 caller-owned array
-  mutation projections are separately measured.
-- Native ABI: 25 functions, 72 type positions, 15 layouts, 2 callbacks, 168
-  constants; zero header/library/mismatch failures.
-- Pure behavior: 762 observations/assertions, zero failures, including exact
-  binary32 vector, quaternion, matrix, viewport, plane, ray, bounds, and frustum
-  observations, the dedicated Color group and independent 141-entry predefined
-  palette, and all concrete packed families. Alpha8, Bgr565, Bgra4444,
-  Bgra5551, and HalfSingle have declared zero-failure exhaustive decode sweeps.
-- Native lifecycle: real 60/600 frame loops, real exit, callback containment,
-  20 recreations, resources, and callback-error cycles.
-- Graphics/input: native viewport 800x480, clear, PNG decode, SpriteBatch scaled
-  submission, and keyboard query on HEADLESS.
+- Formal projection: 257 Swift types / 2,887 Swift members after deterministic
+  language storage/lifetime projections.
+- Compiler target: 55 types / 1,247 mapped members; 50 complete, 5 partial,
+  202 missing. Normal strict is red only for deferred work; leak-only is green.
+- Verifier: 66 mutation/self-tests pass. Manual and applied allowlists are zero;
+  unmeasured structural categories are zero. Whole-profile counters include 26
+  protocol witnesses, 19 caller-owned array mutations, 1 comparable-interface,
+  1 collection-interface, 9 enumerator-support, 4 indexed-property-accessor,
+  and 2 optional global-operator projections.
+- Pure behavior: 986 XNA-derived observations/assertions, zero failures. Curve
+  groups cover enums, key semantics, collection/enumerator behavior, tangents,
+  evaluation, and loops without `CNA_NATIVE_LIBRARY`.
+- Native ABI remains exactly 25 functions, 72 prototype positions, 72
+  C/Swift measurements, 15 layouts, 2 callbacks, and 168 constants, with zero
+  header/library/mismatch failures.
+- Debug/release builds and tests, warnings-as-errors, Symbol Graph, native
+  lifecycle stress, Swift ASan pure corpus, unchanged template, exact source
+  archive, and isolated consumer gates are required release evidence.
 
 ## Platform policy
 
-Linux x86-64 is the only qualified runtime. HEADLESS/NULL is the only qualified
-backend combination. The absence of a visible window is BACKEND_BLOCKED. Apple,
-Windows, and Web/Wasm remain PLATFORM_PENDING and have no manifest declarations
-that could be mistaken for runtime evidence.
+Linux x86-64 with Swift 6.0.3 and CNA 0.7.0 HEADLESS/NULL is the only qualified
+runtime. HEADLESS has no visible window, so visible output remains
+BACKEND_BLOCKED. Apple, Windows, and Web/Wasm remain unqualified.
 
 ## Completion policy
 
-The Milestone-4 closure is complete only when all 17 formats are 168/168 with
-exact fixed-width mutable packed storage and generic protocol identities; all
-packing, half, normalized/raw signed, witness, equality/hash/string, exhaustive,
-compiler, behavior, ABI, native, template, archive, and isolated-consumer gates
-pass. The full 257-type strict verifier remains red by design; zero fake
-behavior, zero unmeasured structural categories, zero manual suppression, zero
-ABI mismatch, and real selected native routes remain mandatory. Work stops
-after the concrete PackedVector family; Curve and runtime-partial cleanup do
-not belong to this milestone.
+Foundation Milestone 5 is complete only when all six Curve types are 49/49,
+locally diagnostic-zero, and exact for class identity, collection interfaces,
+throwing indexing, live mutation-invalidated enumeration, sorted insertion,
+cloning, comparison/hash, tangent generation, interpolation precision, and
+negative loop cycles. The full 257-type strict verifier remains red by design;
+zero fake behavior, zero manual suppression, zero unmeasured category, zero ABI
+mismatch, clean archive/consumer qualification, and unchanged CNA/template
+source remain mandatory. Work stops after the Curve family.

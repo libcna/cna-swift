@@ -97,10 +97,28 @@
     "Microsoft.Xna.Framework.Graphics.PackedVector.Short4.PackFromVector4"
   ],
   "protocolWitnessMapping": "A public Swift conformance witness forced by a CLR explicit interface implementation is compiler-measured through sourceOrigin and excluded from the concrete type member count",
-  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners map to Swift inout Array; source arrays remain value snapshots",
+  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots",
   "arrayMutationParameterNames": ["destinationArray", "corners"],
+  "collectionCopyToArrayMutationMapping": "A CopyTo array parameter on a type whose direct CLR interface is ICollection<T> is caller-owned mutable destination storage",
   "enumerableMapping": "System.Collections.Generic.IEnumerable<T> parameters map to Swift Array<T>",
+  "enumeratorReturnMapping": "System.Collections.Generic.IEnumerator<T> returns map to CNAEnumerator<T>, whose throwing Next preserves live order and mutation invalidation without a fake Microsoft collection type",
   "nullableMapping": "System.Nullable<T> maps to Swift T?; ref/out direction remains independently mapped to inout",
+  "optionalReferenceParameters": [
+    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "Equals", "parameter": "other"},
+    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "CompareTo", "parameter": "other"},
+    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Equality", "parameter": "a"},
+    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Equality", "parameter": "b"},
+    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Inequality", "parameter": "a"},
+    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Inequality", "parameter": "b"},
+    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "IndexOf", "parameter": "item"},
+    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "Contains", "parameter": "item"},
+    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "Remove", "parameter": "item"}
+  ],
+  "globalOperatorProjections": [
+    "Microsoft.Xna.Framework.CurveKey.op_Equality",
+    "Microsoft.Xna.Framework.CurveKey.op_Inequality"
+  ],
+  "indexedPropertyAccessorMapping": "A read/write CLR indexed property maps to a throwing Item getter plus throwing SetItem method; the verifier combines both compiler symbols into one source property identity",
   "throwsMapping": "Swift throws is LANGUAGE_MAPPING and does not add an XNA member",
   "protectedVirtualMapping": "open",
   "inheritedPublicMemberProjection": "A selected public inherited member may be declared on a partial Swift subtype until its XNA base exists; the verifier requires an exact ancestor identity. System.IDisposable maps to a public Dispose() member.",
@@ -108,8 +126,15 @@
   "nestedTypeMapping": "replace CLR + nesting separator with Swift . nesting",
   "systemInterfaceMappings": {
     "System.IEquatable`1": "Equals/operator members; no Swift Equatable conformance required",
+    "System.IComparable`1": "CompareTo(T) member; no Swift Comparable conformance or language-added ordering operators",
     "System.IDisposable": "Dispose member; no public helper protocol",
-    "System.Collections.IEnumerable": "sequence members; no automatic conformance"
+    "System.Collections.Generic.ICollection`1": "the concrete XNA Add/Clear/Contains/CopyTo/Remove/Count/IsReadOnly members represent the direct interface; no automatic Swift Collection conformance",
+    "System.Collections.Generic.IEnumerable`1": "GetEnumerator maps to CNAEnumerator<T>; no automatic Swift Sequence conformance",
+    "System.Collections.IEnumerable": "GetEnumerator mapping only; no automatic Swift Sequence conformance"
   },
+  "requiredSystemInterfaceProjections": [
+    "System.IComparable`1",
+    "System.Collections.Generic.ICollection`1"
+  ],
   "referenceContractSha256": "7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc"
 }

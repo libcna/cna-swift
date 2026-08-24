@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 762,
-  "ASSERTIONS": 762,
+  "OBSERVATIONS": 986,
+  "ASSERTIONS": 986,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -53,7 +53,14 @@
     "testPackedShortRawDomainClampBankersRoundingAndTwosComplement",
     "testPackedShortDirectAssignmentPreservesEveryBit",
     "testPackedEqualityOperatorsUseExactPackedBitsForAllFormats",
-    "testPackedHashAndStringAreExactForAllStorageWidths"
+    "testPackedHashAndStringAreExactForAllStorageWidths",
+    "testCurveEnumsAndClassReferenceSemantics",
+    "testCurveKeyConstructorsCloneEqualityHashAndCompare",
+    "testCurveCollectionOrderingIndexerCopyCloneAndSearch",
+    "testCurveCollectionEnumeratorLiveOrderFreshnessAndInvalidation",
+    "testCurveDefaultsCloneTangentsAndInvalidIndexes",
+    "testCurveEvaluateSegmentsStepHermitePrecisionAndLoops",
+    "testCurveLoopsConstantLinearCycleOffsetOscillateAndBoundaries"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -79,7 +86,13 @@
     "PACKED_SHORT": 2,
     "PACKED_PROTOCOL": 2,
     "PACKED_EQUALITY": 1,
-    "PACKED_HASH_STRING": 1
+    "PACKED_HASH_STRING": 1,
+    "CURVE_ENUMS": 1,
+    "CURVE_KEY": 1,
+    "CURVE_COLLECTION": 2,
+    "CURVE_TANGENTS": 1,
+    "CURVE_EVALUATE": 1,
+    "CURVE_LOOPS": 1
   },
   "colorPaletteGoldenEntries": 141,
   "floatPolicy": "System.Single maps to Swift Float; asserted results use Float bitPattern where exact bits are selected observations",

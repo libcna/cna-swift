@@ -131,6 +131,9 @@ def map_clr_type(
     enumerable = re.fullmatch(r"System\.Collections\.Generic\.IEnumerable`1\[(.+)]", text)
     if enumerable:
         return f"[{map_clr_type(enumerable.group(1), rules, generic_parameters)}]"
+    enumerator = re.fullmatch(r"System\.Collections\.Generic\.IEnumerator`1\[(.+)]", text)
+    if enumerator:
+        return f"CNAEnumerator<{map_clr_type(enumerator.group(1), rules, generic_parameters)}>"
     generic = re.fullmatch(r"(.+)`(\d+)\[(.*)]", text)
     if generic:
         base = map_type_name(f"{generic.group(1)}`{generic.group(2)}", rules)
@@ -152,6 +155,7 @@ def expected_member(
     rules: dict[str, Any],
     owner_kind: str,
     owner_generic_parameters: tuple[str, ...] = (),
+    owner_direct_interfaces: tuple[str, ...] = (),
 ) -> Member:
     kind = source["kind"]
     name = source["name"]
@@ -171,15 +175,34 @@ def expected_member(
             labels.append(parameter["name"] if owner_kind == "class" else "_")
         else:
             labels.append("_" if index == 0 or name.startswith("op_") else parameter["name"])
+        collection_copy_destination = (
+            name == "CopyTo" and parameter.get("name") == "array" and
+            parameter.get("type", "").endswith("[]") and
+            any(
+                item.startswith("System.Collections.Generic.ICollection`1[")
+                for item in owner_direct_interfaces
+            )
+        )
         direction = "inout" if (
             parameter.get("ref") or parameter.get("out") or
             (
                 parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
                 and parameter.get("type", "").endswith("[]")
-            )
+            ) or collection_copy_destination
         ) else ""
         directions.append(direction)
-        types.append(map_clr_type(parameter["type"], rules, owner_generic_parameters))
+        mapped_parameter_type = map_clr_type(
+            parameter["type"], rules, owner_generic_parameters,
+        )
+        optional_reference = any(
+            item.get("owner") == owner and
+            item.get("member") == mapped_name and
+            item.get("parameter") == parameter.get("name")
+            for item in rules.get("optionalReferenceParameters", [])
+        )
+        if optional_reference and not mapped_parameter_type.endswith("?"):
+            mapped_parameter_type += "?"
+        types.append(mapped_parameter_type)
 
     mutable: bool | None = None
     if kind == "property":
@@ -240,6 +263,7 @@ def build_expected(contract: dict[str, Any], rules: dict[str, Any]) -> dict[str,
         model.members = [
             expected_member(
                 name, member, rules, source_type["kind"], generic_parameters,
+                tuple(source_type.get("directInterfaces", [])),
             )
             for member in source_type["members"] if not member_is_omitted(member)
         ]
@@ -437,11 +461,50 @@ def protocol_witness_shape_diagnostic(
     return None
 
 
+def indexed_setter_shape_diagnostics(
+    owner_name: str,
+    setter: Member,
+    expected_property: Member,
+) -> list[dict[str, str]]:
+    result: list[dict[str, str]] = []
+    expected_parameters = expected_property.parameters + (
+        expected_property.return_type,
+    )
+    expected_labels = expected_property.labels + ("_",)
+    expected_directions = expected_property.directions + ("",)
+    subject = f"{owner_name}.SetItem"
+    if setter.static != expected_property.static or setter.kind != "method":
+        result.append(diagnostic(
+            "METHOD_SIGNATURE_MAPPING_MISMATCH", subject,
+            "indexed-property setter kind/static identity differs",
+        ))
+    if setter.parameters != expected_parameters or setter.labels != expected_labels:
+        result.append(diagnostic(
+            "PARAMETER_MAPPING_MISMATCH", subject,
+            "indexed-property setter index or element type differs",
+        ))
+    if setter.directions != expected_directions:
+        result.append(diagnostic(
+            "REF_OUT_MAPPING_MISMATCH", subject,
+            "indexed-property setter parameter direction differs",
+        ))
+    if setter.return_type != "Void":
+        result.append(diagnostic(
+            "RETURN_MAPPING_MISMATCH", subject,
+            f"indexed-property setter returns {setter.return_type}, expected Void",
+        ))
+    return result
+
+
 def parse_symbol_graph(
     path: Path,
     rules: dict[str, Any],
     source_root: Path,
-) -> tuple[dict[str, TypeModel], list[dict[str, Any]], int, list[dict[str, str]]]:
+    expected: dict[str, TypeModel],
+) -> tuple[
+    dict[str, TypeModel], list[dict[str, Any]], int,
+    list[dict[str, str]], list[dict[str, Any]],
+]:
     graph = load_json(path)
     symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
     markers = set(rules["namespaceMarkers"])
@@ -518,6 +581,13 @@ def parse_symbol_graph(
                     if target_name in ("OptionSet", "Swift.OptionSet"):
                         types[source_name].flags = True
 
+    read_write_indexers = {
+        (owner_name, member.name): member
+        for owner_name, model in expected.items()
+        for member in model.members
+        if member.kind == "property" and member.parameters and member.mutable
+    }
+    indexed_candidates: dict[tuple[str, str], Member] = {}
     witness_candidates: list[tuple[str, Member, dict[str, str]]] = []
     for precise, parent in member_relationships.items():
         if parent not in types or precise not in symbols:
@@ -531,6 +601,15 @@ def parse_symbol_graph(
         }:
             continue
         member = actual_member(parent, symbol, raw_values)
+        if (parent, member.name) in read_write_indexers:
+            indexed_candidates[(parent, "getter")] = member
+            continue
+        if (
+            member.name == "SetItem" and
+            any(owner_name == parent for owner_name, _ in read_write_indexers)
+        ):
+            indexed_candidates[(parent, "setter")] = member
+            continue
         witness_identity = f"{parent}.{member.name}"
         if (
             precise in source_origins and
@@ -540,6 +619,71 @@ def parse_symbol_graph(
             continue
         if not is_synthesized_language_member(types[parent], member):
             types[parent].members.append(member)
+
+    # Swift cannot express a throwing setter. A read/write CLR indexer is
+    # therefore emitted as throwing Item/SetItem methods, but remains one
+    # source property identity in the strict scoreboard.
+    indexed_evidence: list[dict[str, Any]] = []
+    for (owner_name, property_name), expected_property in read_write_indexers.items():
+        if owner_name not in types:
+            continue
+        getter = indexed_candidates.get((owner_name, "getter"))
+        setter = indexed_candidates.get((owner_name, "setter"))
+        valid_getter = bool(
+            getter is not None and
+            getter.static == expected_property.static and
+            getter.parameters == expected_property.parameters and
+            getter.labels == expected_property.labels and
+            getter.directions == expected_property.directions and
+            getter.return_type == expected_property.return_type
+        )
+        valid_setter = setter is not None
+        if getter is not None:
+            types[owner_name].members.append(dataclasses.replace(
+                getter,
+                kind="property",
+                name=property_name,
+                mutable=setter is not None,
+            ))
+        if setter is not None:
+            setter_diagnostics = indexed_setter_shape_diagnostics(
+                owner_name, setter, expected_property,
+            )
+            valid_setter = not setter_diagnostics
+            diagnostics_context.extend(setter_diagnostics)
+        indexed_evidence.append({
+            "ownerType": owner_name,
+            "sourceProperty": property_name,
+            "getterSymbol": getter.display if getter else None,
+            "setterSymbol": setter.display if setter else None,
+            "getterObserved": valid_getter,
+            "setterObserved": valid_setter,
+            "reason": "Swift throwing accessors require a compiler-measured Item/SetItem expansion",
+        })
+
+    # Optional-reference operators cannot be declared as type members in
+    # Swift because neither operand has the non-Optional owner type. Assign
+    # only the explicitly configured global symbols back to their XNA owner.
+    owned_precise = set(member_relationships)
+    for identity in rules.get("globalOperatorProjections", []):
+        owner_name, member_name = identity.rsplit(".", 1)
+        for symbol in graph["symbols"]:
+            if (
+                symbol["identifier"]["precise"] in owned_precise or
+                symbol.get("accessLevel") not in ("public", "open") or
+                symbol["kind"]["identifier"] != "swift.func.op"
+            ):
+                continue
+            member = actual_member(owner_name, symbol, raw_values)
+            if member.name != member_name:
+                continue
+            if not all(
+                parameter.rstrip("?") == owner_name
+                for parameter in member.parameters
+            ):
+                continue
+            types[owner_name].members.append(member)
+            break
 
     observed_projections: list[dict[str, str]] = []
     for parent, witness, origin in witness_candidates:
@@ -569,7 +713,10 @@ def parse_symbol_graph(
             "sourceOrigin": display_name,
         })
 
-    return types, diagnostics_context, strict_symbols, observed_projections
+    return (
+        types, diagnostics_context, strict_symbols, observed_projections,
+        indexed_evidence,
+    )
 
 
 def comparable_kind(expected: Member, actual: Member) -> bool:
@@ -1028,9 +1175,180 @@ def self_test() -> None:
     }:
         failures.append("unrelated packed member hidden by witness projection")
 
+    curve_key_name = "Microsoft.Xna.Framework.CurveKey"
+    curve_collection_name = "Microsoft.Xna.Framework.CurveKeyCollection"
+    curve_loop_name = "Microsoft.Xna.Framework.CurveLoopType"
+    curve_key_compare = Member(
+        curve_key_name, "method", "CompareTo", False,
+        (f"{curve_key_name}?",), ("_",), ("",), "Int32",
+        identifier="curve-compare",
+    )
+    curve_item = Member(
+        curve_collection_name, "property", "Item", False,
+        ("Int32",), ("_",), ("",), curve_key_name, mutable=True,
+        identifier="curve-item",
+    )
+    curve_copy = Member(
+        curve_collection_name, "method", "CopyTo", False,
+        (f"[{curve_key_name}]", "Int32"), ("_", "arrayIndex"),
+        ("inout", ""), "Void", identifier="curve-copy",
+    )
+    curve_enumerator = Member(
+        curve_collection_name, "method", "GetEnumerator", False,
+        return_type=f"CNAEnumerator<{curve_key_name}>",
+        identifier="curve-enumerator",
+    )
+    curve_count = Member(
+        curve_collection_name, "property", "Count", False,
+        return_type="Int32", mutable=False, identifier="curve-count",
+    )
+    curve_read_only = Member(
+        curve_collection_name, "property", "IsReadOnly", False,
+        return_type="Bool", mutable=False, identifier="curve-read-only",
+    )
+    curve_expected = {
+        curve_key_name: TypeModel(
+            curve_key_name, "class", members=[copy.deepcopy(curve_key_compare)],
+        ),
+        curve_collection_name: TypeModel(
+            curve_collection_name, "class", members=[
+                copy.deepcopy(curve_item), copy.deepcopy(curve_copy),
+                copy.deepcopy(curve_enumerator), copy.deepcopy(curve_count),
+                copy.deepcopy(curve_read_only),
+            ],
+        ),
+        curve_loop_name: TypeModel(
+            curve_loop_name, "enum", members=[Member(
+                curve_loop_name, "field", "CycleOffset", True,
+                return_type=curve_loop_name, mutable=False, raw_value=2,
+                identifier="curve-loop-cycle-offset",
+            )],
+        ),
+    }
+    curve_good = copy.deepcopy(curve_expected)
+
+    def curve_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(curve_expected, models)}
+
+    curve_mutations: list[tuple[str, str, Any]] = [
+        ("CurveKeyCollection wrong kind", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[curve_collection_name], "kind", "struct")),
+        ("missing collection member", "MISSING_MEMBER",
+         lambda m: m[curve_collection_name].members.pop()),
+        ("unwanted Swift Collection witness", "UNEXPECTED_MEMBER",
+         lambda m: m[curve_collection_name].members.append(Member(
+             curve_collection_name, "property", "startIndex", False,
+             return_type="Int", mutable=False, identifier="start-index",
+         ))),
+        ("wrong enumerator element", "RETURN_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_collection_name].members[2], "return_type",
+                           "CNAEnumerator<Float>")),
+        ("missing Item getter", "MISSING_MEMBER",
+         lambda m: m[curve_collection_name].members.pop(0)),
+        ("missing Item setter", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_collection_name].members[0], "mutable", False)),
+        ("Item wrong index type", "PARAMETER_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_collection_name].members[0], "parameters", ("Int",))),
+        ("Item wrong element type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_collection_name].members[0], "return_type", "Float")),
+        ("CopyTo wrong mutation direction", "REF_OUT_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_collection_name].members[1], "directions", ("", ""))),
+        ("Count wrong type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_collection_name].members[3], "return_type", "Int")),
+        ("IsReadOnly writable", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_collection_name].members[4], "mutable", True)),
+        ("CompareTo wrong parameter", "PARAMETER_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_key_name].members[0], "parameters", ("Float",))),
+        ("CompareTo wrong return", "RETURN_MAPPING_MISMATCH",
+         lambda m: setattr(m[curve_key_name].members[0], "return_type", "Bool")),
+        ("CurveLoopType wrong raw value", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(m[curve_loop_name].members[0], "raw_value", 3)),
+    ]
+    for label, wanted, mutate in curve_mutations:
+        models = copy.deepcopy(curve_good)
+        mutate(models)
+        if wanted not in curve_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    setter_good = Member(
+        curve_collection_name, "method", "SetItem", False,
+        ("Int32", curve_key_name), ("_", "_"), ("", ""), "Void",
+        identifier="curve-set-item",
+    )
+    if indexed_setter_shape_diagnostics(
+        curve_collection_name, setter_good, curve_item,
+    ):
+        failures.append("valid indexed-property setter rejected")
+    setter_wrong_index = dataclasses.replace(
+        setter_good, parameters=("Int", curve_key_name),
+    )
+    if "PARAMETER_MAPPING_MISMATCH" not in {
+        item["category"] for item in indexed_setter_shape_diagnostics(
+            curve_collection_name, setter_wrong_index, curve_item,
+        )
+    }:
+        failures.append("wrong indexed-property setter index not detected")
+    setter_wrong_element = dataclasses.replace(
+        setter_good, parameters=("Int32", "Float"),
+    )
+    if "PARAMETER_MAPPING_MISMATCH" not in {
+        item["category"] for item in indexed_setter_shape_diagnostics(
+            curve_collection_name, setter_wrong_element, curve_item,
+        )
+    }:
+        failures.append("wrong indexed-property setter element not detected")
+
+    comparable_contract = {"types": [{
+        "name": curve_key_name,
+        "directInterfaces": [f"System.IComparable`1[{curve_key_name}]"],
+        "members": [{"name": "CompareTo"}],
+    }]}
+    missing_comparable_rules = copy.deepcopy(rules)
+    missing_comparable_rules["requiredSystemInterfaceProjections"] = [
+        "System.IComparable`1",
+    ]
+    missing_comparable_rules["systemInterfaceMappings"].pop("System.IComparable`1")
+    _, missing_comparable_diagnostics = system_interface_projection_evidence(
+        comparable_contract, missing_comparable_rules,
+    )
+    if "LANGUAGE_MAPPING_MISMATCH" not in {
+        item["category"] for item in missing_comparable_diagnostics
+    }:
+        failures.append("missing IComparable<T> projection not detected")
+
+    collection_contract = {"types": [{
+        "name": curve_collection_name,
+        "directInterfaces": [
+            f"System.Collections.Generic.ICollection`1[{curve_key_name}]",
+        ],
+        "members": [
+            {"name": name} for name in (
+                "Add", "Clear", "Contains", "CopyTo", "Remove", "Count",
+                "IsReadOnly",
+            )
+        ],
+    }]}
+    missing_collection_rules = copy.deepcopy(rules)
+    missing_collection_rules["requiredSystemInterfaceProjections"] = [
+        "System.Collections.Generic.ICollection`1",
+    ]
+    missing_collection_rules["systemInterfaceMappings"].pop(
+        "System.Collections.Generic.ICollection`1",
+    )
+    _, missing_collection_diagnostics = system_interface_projection_evidence(
+        collection_contract, missing_collection_rules,
+    )
+    if "LANGUAGE_MAPPING_MISMATCH" not in {
+        item["category"] for item in missing_collection_diagnostics
+    }:
+        failures.append("missing ICollection<T> projection not detected")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
-    print(f"API_COMPAT_SELF_TESTS={len(mutations) + 17 + len(protocol_mutations)}")
+    print(
+        "API_COMPAT_SELF_TESTS="
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5}"
+    )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
 
@@ -1090,7 +1408,74 @@ def protocol_witness_projection_evidence(
     return records, failures
 
 
-def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[str, TypeModel], actual: dict[str, TypeModel], diagnostics: list[dict[str, str]], graph_path: Path, applied_suppressions: int, witness_evidence: list[dict[str, Any]]) -> dict[str, Any]:
+def system_interface_projection_evidence(
+    contract: dict[str, Any],
+    rules: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    records: list[dict[str, Any]] = []
+    failures: list[dict[str, str]] = []
+    mappings = rules.get("systemInterfaceMappings", {})
+    for interface_prefix in rules.get("requiredSystemInterfaceProjections", []):
+        if interface_prefix not in mappings:
+            failures.append(diagnostic(
+                "LANGUAGE_MAPPING_MISMATCH", interface_prefix,
+                "required CLR system-interface projection is not configured",
+            ))
+            continue
+        owners = [
+            item for item in contract["types"]
+            if any(
+                direct == interface_prefix or direct.startswith(interface_prefix + "[")
+                for direct in item.get("directInterfaces", [])
+            )
+        ]
+        if not owners:
+            failures.append(diagnostic(
+                "UNMEASURED_STRUCTURAL_CATEGORY", interface_prefix,
+                "configured system-interface projection has no pinned direct-interface owner",
+            ))
+            continue
+        for owner in owners:
+            if interface_prefix == "System.IComparable`1":
+                required_members = {"CompareTo"}
+            elif interface_prefix == "System.Collections.Generic.ICollection`1":
+                required_members = {
+                    "Add", "Clear", "Contains", "CopyTo", "Remove",
+                    "Count", "IsReadOnly",
+                }
+            else:
+                required_members = set()
+            declared_members = {member["name"] for member in owner["members"]}
+            missing = sorted(required_members - declared_members)
+            if missing:
+                failures.append(diagnostic(
+                    "UNMEASURED_STRUCTURAL_CATEGORY", owner["name"],
+                    f"direct {interface_prefix} owner lacks mapped contract members {missing}",
+                ))
+            records.append({
+                "ownerType": owner["name"],
+                "clrInterface": next(
+                    direct for direct in owner["directInterfaces"]
+                    if direct == interface_prefix or direct.startswith(interface_prefix + "[")
+                ),
+                "swiftProjection": mappings[interface_prefix],
+                "requiredConcreteMembers": sorted(required_members),
+            })
+    return records, failures
+
+
+def make_report(
+    contract: dict[str, Any],
+    rules: dict[str, Any],
+    expected: dict[str, TypeModel],
+    actual: dict[str, TypeModel],
+    diagnostics: list[dict[str, str]],
+    graph_path: Path,
+    applied_suppressions: int,
+    witness_evidence: list[dict[str, Any]],
+    indexed_evidence: list[dict[str, Any]],
+    system_interface_evidence: list[dict[str, Any]],
+) -> dict[str, Any]:
     counts = collections.Counter(item["category"] for item in diagnostics)
     type_diagnostics: dict[str, list[dict[str, str]]] = collections.defaultdict(list)
     for item in diagnostics:
@@ -1134,11 +1519,37 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
     protocol_witness_projections = sum(
         item["compilerSourceOriginObserved"] for item in witness_evidence
     )
-    array_mutation_mappings = sum(
-        parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
-        and parameter.get("type", "").endswith("[]")
+    array_mutation_mappings = 0
+    for item in contract["types"]:
+        direct_collection = any(
+            interface.startswith("System.Collections.Generic.ICollection`1[")
+            for interface in item.get("directInterfaces", [])
+        )
+        for member in item["members"]:
+            for parameter in member.get("parameters", []):
+                named_destination = (
+                    parameter.get("name") in rules.get(
+                        "arrayMutationParameterNames", ["destinationArray"],
+                    ) and parameter.get("type", "").endswith("[]")
+                )
+                collection_copy_destination = (
+                    direct_collection and member["name"] == "CopyTo" and
+                    parameter.get("name") == "array" and
+                    parameter.get("type", "").endswith("[]")
+                )
+                array_mutation_mappings += bool(
+                    named_destination or collection_copy_destination
+                )
+    enumerator_support_projections = sum(
+        (member.get("returnType") or "").startswith(
+            "System.Collections.Generic.IEnumerator`1["
+        )
         for item in contract["types"] for member in item["members"]
-        for parameter in member.get("parameters", [])
+    )
+    indexed_property_accessor_projections = sum(
+        member["kind"] == "property" and bool(member.get("parameters")) and
+        bool(member.get("get")) and bool(member.get("set"))
+        for item in contract["types"] for member in item["members"]
     )
     summary["ALLOWLIST_ENTRIES"] = len(rules.get("manualDiagnosticSuppressions", []))
     summary["APPLIED_ALLOWLIST_ENTRIES"] = applied_suppressions
@@ -1152,6 +1563,23 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
     summary["INHERITED_MEMBER_PROJECTIONS"] = inherited_projections
     summary["PROTOCOL_WITNESS_MEMBER_PROJECTIONS"] = protocol_witness_projections
     summary["ARRAY_MUTATION_MAPPINGS"] = array_mutation_mappings
+    summary["COMPARABLE_INTERFACE_PROJECTIONS"] = sum(
+        item["clrInterface"].startswith("System.IComparable`1[")
+        for item in system_interface_evidence
+    )
+    summary["COLLECTION_INTERFACE_PROJECTIONS"] = sum(
+        item["clrInterface"].startswith(
+            "System.Collections.Generic.ICollection`1["
+        )
+        for item in system_interface_evidence
+    )
+    summary["ENUMERATOR_SUPPORT_PROJECTIONS"] = enumerator_support_projections
+    summary["INDEXED_PROPERTY_ACCESSOR_PROJECTIONS"] = (
+        indexed_property_accessor_projections
+    )
+    summary["GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS"] = len(
+        rules.get("globalOperatorProjections", [])
+    )
     return {
         "schemaVersion": 1,
         "profile": contract["profile"],
@@ -1166,6 +1594,8 @@ def make_report(contract: dict[str, Any], rules: dict[str, Any], expected: dict[
         "missingTypes": missing_types,
         "diagnostics": diagnostics,
         "protocolWitnessProjections": witness_evidence,
+        "systemInterfaceProjections": system_interface_evidence,
+        "indexedPropertyAccessorProjections": indexed_evidence,
         "typeScoreboard": [
             {
                 "type": name,
@@ -1228,19 +1658,24 @@ def main() -> int:
     contract = load_json(REFERENCE)
     rules = load_json(RULES)
     expected = build_expected(contract, rules)
-    actual, parser_diagnostics, _, observed_witnesses = parse_symbol_graph(
-        args.symbol_graph, rules, ROOT / "Sources/CNA",
+    actual, parser_diagnostics, _, observed_witnesses, indexed_evidence = parse_symbol_graph(
+        args.symbol_graph, rules, ROOT / "Sources/CNA", expected,
     )
     witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(
         contract, rules, observed_witnesses,
     )
+    system_interface_evidence, system_interface_diagnostics = (
+        system_interface_projection_evidence(contract, rules)
+    )
     diagnostics, applied_suppressions = apply_manual_suppressions(
-        compare(expected, actual) + parser_diagnostics + witness_diagnostics,
+        compare(expected, actual) + parser_diagnostics + witness_diagnostics +
+        system_interface_diagnostics,
         rules.get("manualDiagnosticSuppressions", []),
     )
     report = make_report(
         contract, rules, expected, actual, diagnostics, args.symbol_graph,
-        applied_suppressions, witness_evidence,
+        applied_suppressions, witness_evidence, indexed_evidence,
+        system_interface_evidence,
     )
     text = json.dumps(report, indent=2, sort_keys=False) + "\n"
     if args.output:

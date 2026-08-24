@@ -26,6 +26,8 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
     case argument(String)
     case argumentOutOfRange(String)
     case indexOutOfRange(String)
+    case nullReference(String)
+    case collectionModified
 
     public var description: String {
         switch self {
@@ -57,6 +59,35 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
             return "Argument is outside the XNA range: \(parameter)"
         case .indexOutOfRange(let parameter):
             return "Index is outside the XNA array range: \(parameter)"
+        case .nullReference(let operation):
+            return "XNA null reference in \(operation)"
+        case .collectionModified:
+            return "Collection was modified after the enumerator was created"
         }
+    }
+}
+
+/// Throwing support projection for CLR `IEnumerator<T>` return values.
+///
+/// This type deliberately does not conform to Swift `IteratorProtocol`: XNA
+/// collection enumeration can fail when the source mutates, while
+/// `IteratorProtocol.next()` cannot throw.
+public final class CNAEnumerator<Element> {
+    private let nextElement: (Int, UInt64) throws -> Element?
+    private let expectedVersion: UInt64
+    private var index = 0
+
+    internal init(
+        expectedVersion: UInt64,
+        nextElement: @escaping (Int, UInt64) throws -> Element?
+    ) {
+        self.expectedVersion = expectedVersion
+        self.nextElement = nextElement
+    }
+
+    public func Next() throws -> Element? {
+        let value = try nextElement(index, expectedVersion)
+        if value != nil { index += 1 }
+        return value
     }
 }

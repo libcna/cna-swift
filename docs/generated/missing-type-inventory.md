@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=49
-TARGET_MEMBERS=1198
-TOTAL_DIAGNOSTICS=359
-COMPLETE_TYPES=44
+TARGET_TYPES=55
+TARGET_MEMBERS=1247
+TOTAL_DIAGNOSTICS=353
+COMPLETE_TYPES=50
 PARTIAL_TYPES=5
-MISSING_TYPES=208
-MISSING_TYPE=208
+MISSING_TYPES=202
+MISSING_TYPE=202
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -46,7 +46,12 @@ FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=7
 INHERITED_MEMBER_PROJECTIONS=3
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
-ARRAY_MUTATION_MAPPINGS=18
+ARRAY_MUTATION_MAPPINGS=19
+COMPARABLE_INTERFACE_PROJECTIONS=1
+COLLECTION_INTERFACE_PROJECTIONS=1
+ENUMERATOR_SUPPORT_PROJECTIONS=9
+INDEXED_PROPERTY_ACCESSOR_PROJECTIONS=4
+GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 ```
 
 ## Complete types
@@ -56,6 +61,12 @@ ARRAY_MUTATION_MAPPINGS=18
 - `Microsoft.Xna.Framework.BoundingSphere`
 - `Microsoft.Xna.Framework.Color`
 - `Microsoft.Xna.Framework.ContainmentType`
+- `Microsoft.Xna.Framework.Curve`
+- `Microsoft.Xna.Framework.CurveContinuity`
+- `Microsoft.Xna.Framework.CurveKey`
+- `Microsoft.Xna.Framework.CurveKeyCollection`
+- `Microsoft.Xna.Framework.CurveLoopType`
+- `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
@@ -307,12 +318,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Content.ContentTypeReaderManager`
 - `Microsoft.Xna.Framework.Content.ContentTypeReaderOfT`
 - `Microsoft.Xna.Framework.Content.ResourceContentManager`
-- `Microsoft.Xna.Framework.Curve`
-- `Microsoft.Xna.Framework.CurveContinuity`
-- `Microsoft.Xna.Framework.CurveKey`
-- `Microsoft.Xna.Framework.CurveKeyCollection`
-- `Microsoft.Xna.Framework.CurveLoopType`
-- `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.Design.BoundingBoxConverter`
 - `Microsoft.Xna.Framework.Design.BoundingSphereConverter`
 - `Microsoft.Xna.Framework.Design.ColorConverter`

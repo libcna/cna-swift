@@ -22,6 +22,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/NormalizedPackedTests.swift",
     ROOT / "Tests/CNATests/ShortPackedTests.swift",
     ROOT / "Tests/CNATests/PackedValueSemanticsTests.swift",
+    ROOT / "Tests/CNATests/CurveTests.swift",
 ]
 
 
@@ -65,6 +66,12 @@ def main() -> int:
                 "PACKED_RG_RGBA": "PackedRgRgba", "PACKED_SHORT": "PackedShort",
                 "PACKED_PROTOCOL": "PackedProtocol", "PACKED_EQUALITY": "PackedEquality",
                 "PACKED_HASH_STRING": "PackedHash",
+                "CURVE_ENUMS": "CurveEnums",
+                "CURVE_KEY": "CurveKeyConstructors",
+                "CURVE_COLLECTION": "CurveCollection",
+                "CURVE_TANGENTS": "CurveDefaultsCloneTangents",
+                "CURVE_EVALUATE": "CurveEvaluate",
+                "CURVE_LOOPS": "CurveLoops",
             }.items()
         },
         "colorPaletteGoldenEntries": len(re.findall(

@@ -40,6 +40,10 @@ the retained snapshot hash before projecting it.
   mutability. XNA static value properties remain Swift static properties.
 - CLR operators map to Swift operator functions. The verifier measures each
   overload separately.
+- A reference-typed operator whose null behavior must remain observable may
+  require Optional operands. Swift cannot declare an operator as a type member
+  when both operands are Optional, so the configured global compiler symbol is
+  assigned back to its XNA owner and measured as that same operator identity.
 - CLR `ref`/`out` -> Swift `inout`; direction, type, label, and mutability are
   measured.
 - A CLR caller-owned destination array named `destinationArray` or `corners`
@@ -47,6 +51,10 @@ the retained snapshot hash before projecting it.
   preserves writes through Swift value semantics and gives overlapping
   source/destination calls an explicit copy-on-write snapshot rule. The verifier
   measures every selected destination-array mapping independently.
+- The `array` parameter of `ICollection<T>.CopyTo` is identified from the
+  pinned direct interface plus member semantics and likewise maps to `inout
+  Array`. This is a general caller-owned mutation rule, not a diagnostic
+  allowlist.
 - CLR protected virtual lifecycle members -> `open` methods. Their additional
   Swift visibility is `LANGUAGE_MAPPING`, not an unexpected XNA member.
 - A selected inherited public member may temporarily be declared on a partial
@@ -74,6 +82,14 @@ represented value type. Thus XNA geometry intersection distances return
 `IEnumerable<Vector3>` point inputs map to `[Vector3]`, the established finite
 Swift collection projection, without introducing a synthetic Microsoft
 collection type.
+
+Reference parameters become Optional only where null is an observable selected
+operation rather than merely an immediate invalid argument. CurveKey therefore
+maps typed `Equals`, `CompareTo`, and both operator operands to Optional;
+CurveKeyCollection maps `IndexOf`, `Contains`, and `Remove` items to Optional.
+`CompareTo(nil)` throws the mapped null-reference error. `Add(nil)` and an
+indexed setter value of nil are immediate XNA argument failures, so those
+strict parameters remain non-Optional.
 
 `IPackedVectorOfT<TPacked>` uses Swift's primary-associated-type protocol
 syntax and explicitly declares `associatedtype TPacked`. The compiler Symbol
@@ -103,6 +119,33 @@ is ignored only as a measured `LANGUAGE_MAPPING` signature detail. Ordinary
 failures never use `fatalError`, process exit, silent defaults, or no-ops.
 `CNAError` is support API outside the strict XNA namespace.
 
+## Comparison and collection interfaces
+
+`System.IComparable<T>` maps to the exact concrete `CompareTo(T)` member. It
+does not imply Swift `Comparable` conformance or synthesize ordering operators.
+The pre-existing `System.IEquatable<T>` mapping remains the XNA `Equals(T)` and
+operator members without Swift `Equatable` conformance.
+
+`System.Collections.Generic.ICollection<T>` maps to the concrete XNA public
+members that implement it: `Add`, `Clear`, `Contains`, `CopyTo`, `Remove`,
+`Count`, and `IsReadOnly`. The verifier records the pinned direct-interface
+identity and requires those compiler symbols, but there is no fake Microsoft
+protocol and no automatic Swift `Collection`, `MutableCollection`, `Sequence`,
+or `RandomAccessCollection` conformance.
+
+`System.Collections.Generic.IEnumerator<T>` return values map to the public
+support type `CNAEnumerator<T>` outside the XNA namespace. Its throwing
+`Next() -> T?` preserves a live cursor and mutation invalidation. It does not
+conform to nonthrowing `IteratorProtocol`. The related generic and non-generic
+`IEnumerable` identities add no automatic Swift conformance.
+
+A read/write CLR indexed property maps to a throwing getter named `Item` and a
+throwing setter named `SetItem`. Swift has no throwing setter accessor. The
+verifier validates both compiler symbols and recombines them into one source
+property identity; missing/wrong getters, setters, index types, element types,
+and mutability remain diagnostics. Read-only indexed properties may continue
+to use a normal Swift subscript where their selected error contract permits.
+
 ## BCL mappings started in Foundation 1
 
 | CLR type | Swift projection | Rule |
@@ -112,6 +155,7 @@ failures never use `fatalError`, process exit, silent defaults, or no-ops.
 | `System.IntPtr` | `Int` | Pointer-width signed integer; the native ABI verifier validates the host width where a selected route first uses it. |
 | `System.Object` | `Any?` | Optional preserves CLR null. |
 | `System.EventArgs` | `CNAEventArgs` | Empty public support value outside the XNA namespace. |
+| `System.Collections.Generic.IEnumerator<T>` | `CNAEnumerator<T>` | Throwing live enumeration preserves CLR mutation invalidation without a fake Microsoft type. |
 
 The verifier derives `EXPECTED_SWIFT_TYPES=257`. It derives
 `EXPECTED_SWIFT_MEMBERS=2887` by excluding exactly 49 enum backing fields named
@@ -122,6 +166,9 @@ The report reserves `ALLOWLIST_ENTRIES` for genuine manual diagnostic
 suppressions; it is currently zero. Deterministic projection transformations
 are reported separately as `LANGUAGE_PROJECTION_EXCLUSIONS` (49 enum storage
 fields, 28 finalizer mappings, seven namespace markers, three inherited member
-projections, and one explicit-interface protocol witness). A verifier self-test proves that a real suppression counts
+projections, and 26 explicit-interface protocol witnesses). Comparison,
+collection, enumerator, indexed-property, optional-operator-placement, and
+caller-owned-array mappings have their own precise counters. A verifier
+self-test proves that a real suppression counts
 as an allowlist entry and that a missing geometry member cannot be reclassified
 as a projection rule.
