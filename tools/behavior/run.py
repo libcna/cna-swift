@@ -82,6 +82,15 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation22ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation23ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation24ContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation28ContractTests.swift",
+]
+
+# Observations whose authority is the admitted Microsoft .NET Framework 4.0
+# `mscorlib`, NOT an XNA assembly. They run in the same suite and are held to
+# the same standard, but they are counted separately: folding BCL behaviour
+# into `OBSERVATIONS` would relabel it as XNA-derived, which it is not.
+BCL_TEST_SOURCES = [
+    ROOT / "Tests/CNATests/Foundation27ContractTests.swift",
 ]
 
 
@@ -101,6 +110,10 @@ def main() -> int:
     source = "\n".join(path.read_text(encoding="utf-8") for path in TEST_SOURCES)
     assertions = len(re.findall(r"\bXCTAssert\w*\s*\(", source))
     tests = re.findall(r"\bfunc\s+(test\w+)\s*\(", source)
+    bcl_source = "\n".join(
+        path.read_text(encoding="utf-8") for path in BCL_TEST_SOURCES)
+    bcl_assertions = len(re.findall(r"\bXCTAssert\w*\s*\(", bcl_source))
+    bcl_tests = re.findall(r"\bfunc\s+(test\w+)\s*\(", bcl_source)
     failures = 0 if completed.returncode == 0 else 1
     contract = json.loads(REFERENCE.read_text(encoding="utf-8"))
     pinned = {item["name"]: item for item in contract["types"]}
@@ -130,6 +143,13 @@ def main() -> int:
         "ASSERTIONS": assertions,
         "FAILURES": failures,
         "testCases": tests,
+        # The BCL half, on its own axis. Its authority is the admitted
+        # Microsoft mscorlib recorded in tools/api_compat/bcl-authorities.json,
+        # never an XNA assembly, and it is counted in no XNA total.
+        "BCL_AUTHORITY": "PURE_BCL_DERIVED",
+        "BCL_OBSERVATIONS": bcl_assertions,
+        "BCL_ASSERTIONS": bcl_assertions,
+        "bclTestCases": bcl_tests,
         "groupCounts": {
             group: len(re.findall(rf"\bfunc\s+test{pattern}\w*\s*\(", source, re.IGNORECASE))
             for group, pattern in {
@@ -504,6 +524,7 @@ def main() -> int:
     else:
         print(rendered, end="")
     print(f"OBSERVATIONS={assertions} ASSERTIONS={assertions} FAILURES={failures}")
+    print(f"BCL_OBSERVATIONS={bcl_assertions} BCL_ASSERTIONS={bcl_assertions}")
     return completed.returncode
 
 

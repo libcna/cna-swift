@@ -151,9 +151,44 @@
   "eventAccessorPrefixes": ["add_", "remove_", "raise_"],
   "existentialSpelling": "Swift emits a CLR interface-typed member as the existential `any P`, which is the same type as `P`, so the spelling normalizes away. The opaque `some P` is a different type and is not normalized.",
   "measuredSupportBaseProjections": {
-    "System.EventArgs": "CNAEventArgs"
+    "System.EventArgs": "CNAEventArgs",
+    "System.Collections.ObjectModel.Collection`1": "CNACollection",
+    "System.Collections.ObjectModel.ReadOnlyCollection`1": "CNAReadOnlyCollection"
   },
-  "measuredSupportBaseMapping": "A non-XNA CLR base listed in measuredSupportBaseProjections is a MEASURED base, exactly as an XNA base is: the Swift type must be a class whose compiler-emitted superclass is the mapped support type. A missing base, AnyObject or Object in its place, a struct where the CLR declares a class, a different support base, or any other base projection is a BASE_MAPPING_MISMATCH. It is never silently dropped and never allowlisted.",
+  "measuredSupportBaseMapping": "A non-XNA CLR base listed in measuredSupportBaseProjections is a MEASURED base, exactly as an XNA base is: the Swift type must be a class whose compiler-emitted superclass is the mapped support type. A missing base, AnyObject or Object in its place, a struct where the CLR declares a class, a different support base, composition in place of inheritance, or any other base projection is a BASE_MAPPING_MISMATCH. It is never silently dropped and never allowlisted. A GENERIC support base additionally requires its CLR generic argument to be preserved in the Swift specialization -- Collection<IGameComponent> projects to CNACollection<any IGameComponent>, never to CNACollection<Any> -- and that argument is measured by bclSupportBaseSpecializationMapping.",
+  "bclSupportTypeProjections": {
+    "System.Collections.ObjectModel.Collection`1": "CNACollection",
+    "System.Collections.ObjectModel.ReadOnlyCollection`1": "CNAReadOnlyCollection",
+    "System.Collections.Generic.List`1": "CNAList"
+  },
+  "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
+  "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
+  "bclSupportContract": {
+    "CNACollection": {
+      "kind": "class", "inheritance": "open", "generics": ["Element"], "base": null,
+      "clrFamily": "System.Collections.ObjectModel.Collection`1",
+      "requiredMembers": ["Count", "Items", "Item", "SetItem", "Add", "Clear", "Contains", "CopyTo", "GetEnumerator", "IndexOf", "Insert", "Remove", "RemoveAt", "ClearItems", "InsertItem", "RemoveItem"],
+      "openMembers": ["ClearItems", "InsertItem", "RemoveItem", "SetItem"],
+      "forbiddenMembers": ["Sort", "Reverse", "AddRange", "RemoveRange"]
+    },
+    "CNAReadOnlyCollection": {
+      "kind": "class", "inheritance": "open", "generics": ["Element"], "base": null,
+      "clrFamily": "System.Collections.ObjectModel.ReadOnlyCollection`1",
+      "requiredMembers": ["Count", "Items", "Item", "Contains", "CopyTo", "GetEnumerator", "IndexOf"],
+      "openMembers": [],
+      "forbiddenMembers": ["Add", "Clear", "Insert", "Remove", "RemoveAt", "SetItem", "ClearItems", "InsertItem", "RemoveItem"]
+    },
+    "CNAList": {
+      "kind": "class", "inheritance": "final", "generics": ["Element"], "base": null,
+      "clrFamily": "System.Collections.Generic.List`1",
+      "requiredMembers": ["Count", "IsReadOnly", "Item", "SetItem", "Add", "Clear", "Contains", "CopyTo", "GetEnumerator", "IndexOf", "Insert", "RemoveAt"],
+      "openMembers": [],
+      "forbiddenMembers": ["Sort", "Reverse", "AddRange", "ConvertAll"]
+    }
+  },
+  "bclSupportMapping": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",
+  "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
+  "bclSelectedShapeSha256": "ef5f2428a546b677d797b5def4c07c44e04419844418b13de9a20f61aa323f0e",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class", "inheritance": "open", "generics": [], "base": null,

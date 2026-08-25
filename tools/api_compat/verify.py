@@ -115,6 +115,10 @@ class Member:
     return_fallible: bool | None = None
     clr_return_type: str | None = None
     clr_return_is_reference: bool | None = None
+    # The compiler-emitted access level. `declarationFragments` omit the
+    # access keyword, so `open` is only visible here -- and a protected virtual
+    # BCL hook that is not `open` is not an override point at all.
+    access: str = ""
 
     @property
     def display(self) -> str:
@@ -140,6 +144,10 @@ class TypeModel:
     raw_type: str | None = None
     verify_raw_type: bool = False
     access: str = ""
+    # The superclass exactly as the compiled source declares it, generic
+    # arguments included. `None` means no source evidence was found, which is
+    # reported rather than treated as an absent base.
+    base_specialization: str | None = None
 
 
 def load_json(path: Path) -> Any:
@@ -150,6 +158,12 @@ def map_type_name(name: str, rules: dict[str, Any]) -> str:
     collision = rules["genericCollisionTypeNames"].get(name)
     if collision:
         return collision
+    # A selected BCL family admitted through `bcl-authorities.json` projects to
+    # its Swift support class wherever it occurs -- as a base, as a member type
+    # or as a generic argument. See `bclSupportTypeMapping`.
+    support = rules.get("bclSupportTypeProjections", {}).get(name)
+    if support:
+        return support
     name = name.replace("+", ".")
     return re.sub(r"`\d+", "", name)
 
@@ -591,6 +605,7 @@ def actual_member(owner: str, symbol: dict[str, Any], raw_values: dict[tuple[str
         ),
         getter_throws=getter_throws,
         writer_kind=writer_kind,
+        access=symbol.get("accessLevel", ""),
     )
 
 
@@ -668,6 +683,41 @@ def source_raw_types(source_root: Path) -> dict[str, str]:
                     container_name = None
                     option_set = False
     return values
+
+
+# A Swift superclass clause, as written in the compiled source. The Symbol
+# Graph's `inheritsFrom` relationship names only the generic symbol, so this is
+# the one place the generic ARGUMENT can be read -- the same supplementation
+# the enum raw types already use, and reported as unmeasured when unavailable.
+SUPERCLASS_DECLARATION = re.compile(
+    r"(?:public|open|internal)?\s*(?:final\s+)?class\s+(\w+)\s*"
+    r"(?:<[^>]*>)?\s*:\s*([^{]+)")
+
+
+def source_superclass_specializations(source_root: Path) -> dict[str, str]:
+    """Each Swift class's declared superclass, generic arguments included.
+
+    Keyed by simple name, as `source_raw_types` is. Only the first entry of an
+    inheritance clause can be a superclass in Swift, so a protocol list behind
+    it is ignored; an entry naming no class at all is simply absent, which the
+    caller reports rather than assumes.
+    """
+    found: dict[str, str] = {}
+    for path in sorted(source_root.rglob("*.swift")):
+        text = path.read_text(encoding="utf-8")
+        # A declaration may wrap, so the clause is matched over the joined
+        # source with runs of whitespace collapsed.
+        joined = re.sub(r"\s+", " ", text)
+        for match in SUPERCLASS_DECLARATION.finditer(joined):
+            name = match.group(1)
+            first = split_generic_arguments(match.group(2).strip())
+            if not first:
+                continue
+            candidate = normalize_swift_type(first[0])
+            if not candidate or not candidate[0].isupper():
+                continue
+            found.setdefault(name, candidate)
+    return found
 
 
 def relationship_name(relationship: dict[str, Any], symbols: dict[str, dict[str, Any]]) -> str | None:
@@ -918,9 +968,13 @@ def parse_symbol_graph(
     graph = load_json(path) if graph is None else graph
     symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
     markers = set(rules["namespaceMarkers"])
-    support_names = set(rules.get("eventSupportContract", {}))
+    support_names = (
+        set(rules.get("eventSupportContract", {})) |
+        set(rules.get("bclSupportContract", {}))
+    )
     raw_values = source_constant_values(source_root)
     raw_types = source_raw_types(source_root)
+    superclasses = source_superclass_specializations(source_root)
     types: dict[str, TypeModel] = {}
     strict_symbols = 0
     for symbol in graph["symbols"]:
@@ -954,6 +1008,7 @@ def parse_symbol_graph(
             identifier=symbol["identifier"]["precise"],
             raw_type=raw_types.get(path_name.rsplit(".", 1)[-1]),
             access=symbol.get("accessLevel", ""),
+            base_specialization=superclasses.get(path_name.rsplit(".", 1)[-1]),
         )
 
     member_relationships: dict[str, str] = {}
@@ -1183,10 +1238,20 @@ def comparable_kind(expected: Member, actual: Member) -> bool:
 
 # An XNA base has always been measured. A non-XNA CLR base is measured exactly
 # when the project has decided its support projection: `System.EventArgs` maps
-# to `CNAEventArgs` and is checked, while `System.Object`, `System.ValueType`
-# and the still-undecided BCL bases stay unmeasured rather than silently
-# asserted. Kept in step with `measuredSupportBaseProjections` by a self-test.
-MEASURED_SUPPORT_BASES = ("CNAEventArgs",)
+# to `CNAEventArgs`, and the two BCL collection families admitted through
+# `bcl-authorities.json` map to `CNACollection` and `CNAReadOnlyCollection`.
+# `System.Object`, `System.ValueType` and the still-undecided BCL bases stay
+# unmeasured rather than silently asserted. Kept in step with
+# `measuredSupportBaseProjections` by a self-test.
+MEASURED_SUPPORT_BASES = (
+    "CNAEventArgs", "CNACollection", "CNAReadOnlyCollection",
+)
+
+# The support bases that are GENERIC. For these the Swift superclass identity
+# is only half the fact: `Collection<IGameComponent>` and `Collection<Object>`
+# are different CLR bases and would be different Swift superclasses, so the
+# specialization is measured too. See `bclSupportBaseSpecializationMapping`.
+GENERIC_SUPPORT_BASES = ("CNACollection", "CNAReadOnlyCollection")
 
 # The three CLR roots carry no projected members, so a type sitting directly on
 # one of them has nothing to inherit and needs no base decision. Every other
@@ -1194,12 +1259,23 @@ MEASURED_SUPPORT_BASES = ("CNAEventArgs",)
 CLR_ROOT_BASES = ("Any?", "System.ValueType", "System.Enum")
 
 
+def base_head(mapped_base: str | None) -> str:
+    """A mapped base without its generic argument list.
+
+    `CNACollection<Microsoft.Xna.Framework.IGameComponent>` -> `CNACollection`.
+    The Symbol Graph's `inheritsFrom` relationship names the generic symbol,
+    so the head is what the compiler evidence can be compared against directly
+    and the argument is measured separately.
+    """
+    return (mapped_base or "").split("<", 1)[0]
+
+
 def base_is_measured(mapped_base: str | None) -> bool:
     if not mapped_base:
         return False
     return (
         mapped_base.startswith("Microsoft.Xna.Framework") or
-        mapped_base in MEASURED_SUPPORT_BASES
+        base_head(mapped_base) in MEASURED_SUPPORT_BASES
     )
 
 
@@ -1209,10 +1285,14 @@ def base_is_undecided(mapped_base: str | None) -> bool:
     Implementing such a type would drop its CLR base silently -- exactly the
     failure the `System.EventArgs` decision was made to avoid. Reporting it as
     unmeasured keeps the deferral honest: `System.Exception`,
-    `System.Attribute`, `Collection<T>`, `ReadOnlyCollection<T>` and
-    `Dictionary<K,V>` cannot be quietly projected as base-less Swift classes to
-    improve the scoreboard, and a future decision plugs into the same measured
-    machinery `CNAEventArgs` uses.
+    `System.Attribute`, `System.Runtime.InteropServices.ExternalException`,
+    `System.ComponentModel.ExpandableObjectConverter`, `System.IO.BinaryReader`
+    and `Dictionary<K,V>` cannot be quietly projected as base-less Swift
+    classes to improve the scoreboard. `Collection<T>` and
+    `ReadOnlyCollection<T>` were exactly such bases until their support classes
+    were built and measured, and they moved from here to
+    `MEASURED_SUPPORT_BASES` through the same machinery a future decision will
+    use.
     """
     if not mapped_base or base_is_measured(mapped_base):
         return False
@@ -1311,8 +1391,33 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
             ))
 
         expected_base = expected_type.base
-        if base_is_measured(expected_base) and actual_type.base != expected_base:
-            result.append(diagnostic("BASE_MAPPING_MISMATCH", name, f"expected base {expected_base}, found {actual_type.base}"))
+        if base_is_measured(expected_base):
+            # The Symbol Graph proves the superclass IDENTITY: `inheritsFrom`
+            # names the generic symbol and nothing else, so it is compared
+            # against the head. A struct, a dropped base, `AnyObject`, `Any?`
+            # or composition instead of inheritance all fail here, because
+            # none of them makes the compiler emit this relationship.
+            expected_head = base_head(expected_base)
+            if actual_type.base != expected_head:
+                result.append(diagnostic(
+                    "BASE_MAPPING_MISMATCH", name,
+                    f"expected base {expected_head}, found {actual_type.base}"))
+            elif expected_head in GENERIC_SUPPORT_BASES:
+                # ... and the compiled source declaration proves the generic
+                # ARGUMENT, which the relationship cannot carry. Erasing
+                # `Collection<IGameComponent>` to `CNACollection<Any>` would
+                # otherwise pass the identity check unnoticed.
+                if actual_type.base_specialization is None:
+                    result.append(diagnostic(
+                        "UNMEASURED_STRUCTURAL_CATEGORY", name,
+                        f"the Swift superclass specialization of {expected_base} "
+                        "could not be read from the compiled source, so its CLR "
+                        "generic argument is unmeasured"))
+                elif actual_type.base_specialization != expected_base:
+                    result.append(diagnostic(
+                        "BASE_MAPPING_MISMATCH", name,
+                        f"expected base {expected_base}, found "
+                        f"{actual_type.base_specialization}"))
         elif base_is_undecided(expected_base):
             result.append(diagnostic(
                 "UNMEASURED_STRUCTURAL_CATEGORY", name,
@@ -3638,34 +3743,163 @@ def self_test() -> None:
         "System.ComponentModel.ExpandableObjectConverter",
         "System.IO.BinaryReader",
         "System.Collections.Generic.Dictionary<String, String>",
-        "System.Collections.ObjectModel.Collection<Microsoft.Xna.Framework.IGameComponent>",
-        "System.Collections.ObjectModel.ReadOnlyCollection<Microsoft.Xna.Framework.Graphics.ModelBone>",
     ]
     for undecided in undecided_bases:
         if not base_is_undecided(undecided):
             failures.append(f"undecided BCL base {undecided} was treated as decided")
         event_self_tests += 1
 
-    # GameComponentCollection is the live case: its XNA dependencies are all
-    # complete, so only the base guard stops it being projected as a base-less
-    # Swift class whose entire collection surface would be invented rather than
-    # derived.
+    # ------------------------------------------------------------------
+    # The two BCL collection families are MEASURED bases, and the generic
+    # ARGUMENT is measured beside the superclass identity.
+    # ------------------------------------------------------------------
     collection_name = "Microsoft.Xna.Framework.GameComponentCollection"
-    collection_expected = {collection_name: copy.deepcopy(all_expected[collection_name])}
-    if not base_is_undecided(collection_expected[collection_name].base):
-        failures.append("GameComponentCollection's Collection<T> base is not guarded")
-    event_self_tests += 1
-    collection_actual = {collection_name: TypeModel(
-        collection_name, "class", identifier=collection_name,
-        declaration=f"class {collection_name}",
-    )}
-    if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
-        item["category"] for item in compare(collection_expected, collection_actual)
-    }:
+    collection_expected = {
+        collection_name: copy.deepcopy(all_expected[collection_name])}
+    collection_base = collection_expected[collection_name].base
+    if collection_base != "CNACollection<Microsoft.Xna.Framework.IGameComponent>":
         failures.append(
-            "implementing GameComponentCollection without deciding its base "
-            "was not reported unmeasured")
+            f"GameComponentCollection's expected base is {collection_base}, not "
+            "the CNACollection specialization")
     event_self_tests += 1
+    if not base_is_measured(collection_base):
+        failures.append("the CNACollection base projection is not measured")
+    event_self_tests += 1
+    if base_is_undecided(collection_base):
+        failures.append("a decided CNACollection base was reported undecided")
+    event_self_tests += 1
+    if base_head(collection_base) != "CNACollection":
+        failures.append("base_head does not strip the generic argument list")
+    event_self_tests += 1
+    for generic_base in GENERIC_SUPPORT_BASES:
+        if generic_base not in MEASURED_SUPPORT_BASES:
+            failures.append(
+                f"generic support base {generic_base} is not measured")
+        event_self_tests += 1
+
+    # The reference model: the exact superclass identity the compiler emits,
+    # plus the exact specialization the compiled source declares.
+    collection_good = copy.deepcopy(collection_expected)
+    collection_good[collection_name].identifier = collection_name
+    collection_good[collection_name].declaration = f"class {collection_name}"
+    collection_good[collection_name].base = "CNACollection"
+    collection_good[collection_name].base_specialization = (
+        "CNACollection<Microsoft.Xna.Framework.IGameComponent>")
+    for index, member in enumerate(collection_good[collection_name].members):
+        member.identifier = f"{collection_name}:{index}"
+
+    def collection_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(collection_expected, models)}
+
+    observed = collection_categories(collection_good)
+    if "BASE_MAPPING_MISMATCH" in observed or (
+        "UNMEASURED_STRUCTURAL_CATEGORY" in observed
+    ):
+        failures.append(
+            "the correct GameComponentCollection base model is not accepted")
+    event_self_tests += 1
+
+    # Every way of losing the base must be rejected. No allowlist, no
+    # unmeasured category: each of these is a hard BASE_MAPPING_MISMATCH.
+    collection_mutations: list[tuple[str, Any]] = [
+        ("missing base",
+         lambda m: setattr(m[collection_name], "base", None)),
+        ("Object in place of the base",
+         lambda m: setattr(m[collection_name], "base", "Any?")),
+        ("AnyObject in place of the base",
+         lambda m: setattr(m[collection_name], "base", "AnyObject")),
+        ("wrong BCL support class",
+         lambda m: setattr(m[collection_name], "base", "CNAReadOnlyCollection")),
+        ("the event support class in place of the collection base",
+         lambda m: setattr(m[collection_name], "base", "CNAEventArgs")),
+        ("Array substitution",
+         lambda m: setattr(
+             m[collection_name], "base",
+             "[Microsoft.Xna.Framework.IGameComponent]")),
+        ("the backing store in place of the base",
+         lambda m: setattr(m[collection_name], "base", "CNAList")),
+    ]
+    for label, mutate in collection_mutations:
+        models = copy.deepcopy(collection_good)
+        mutate(models)
+        if "BASE_MAPPING_MISMATCH" not in collection_categories(models):
+            failures.append(f"collection base: {label} did not fail")
+        event_self_tests += 1
+
+    # Composition instead of inheritance emits no `inheritsFrom` relationship
+    # at all, so it presents exactly as a missing base and is rejected as one.
+    models = copy.deepcopy(collection_good)
+    models[collection_name].base = None
+    models[collection_name].base_specialization = None
+    if "BASE_MAPPING_MISMATCH" not in collection_categories(models):
+        failures.append(
+            "collection base: composition in place of inheritance did not fail")
+    event_self_tests += 1
+
+    # A struct cannot carry a CLR class base, so it is caught twice.
+    models = copy.deepcopy(collection_good)
+    models[collection_name].kind = "struct"
+    models[collection_name].base = None
+    models[collection_name].base_specialization = None
+    observed = collection_categories(models)
+    for category in ("TYPE_KIND_MISMATCH", "BASE_MAPPING_MISMATCH"):
+        if category not in observed:
+            failures.append(
+                f"collection base: a value type where the CLR declares a class "
+                f"did not produce {category}")
+        event_self_tests += 1
+
+    # The generic ARGUMENT is the half the Symbol Graph cannot carry. Each of
+    # these keeps the correct superclass identity and must still be rejected.
+    specialization_mutations: list[tuple[str, str]] = [
+        ("Any erasure", "CNACollection<Any>"),
+        ("Object erasure", "CNACollection<Any?>"),
+        ("AnyObject erasure", "CNACollection<AnyObject>"),
+        ("wrong element type",
+         "CNACollection<Microsoft.Xna.Framework.IUpdateable>"),
+        ("the collection's own type as the element",
+         "CNACollection<Microsoft.Xna.Framework.GameComponentCollection>"),
+        ("an unspecialized base", "CNACollection"),
+    ]
+    for label, spelling in specialization_mutations:
+        models = copy.deepcopy(collection_good)
+        models[collection_name].base_specialization = spelling
+        if "BASE_MAPPING_MISMATCH" not in collection_categories(models):
+            failures.append(f"collection specialization: {label} did not fail")
+        event_self_tests += 1
+
+    # Unreadable source evidence is reported, never assumed either way.
+    models = copy.deepcopy(collection_good)
+    models[collection_name].base_specialization = None
+    observed = collection_categories(models)
+    if "UNMEASURED_STRUCTURAL_CATEGORY" not in observed:
+        failures.append(
+            "an unreadable superclass specialization was not reported unmeasured")
+    event_self_tests += 1
+    if "BASE_MAPPING_MISMATCH" in observed:
+        failures.append(
+            "an unreadable superclass specialization was reported as a wrong base")
+    event_self_tests += 1
+
+    # A support class must not be smuggled into the XNA namespace: the strict
+    # surface counts every Microsoft.Xna.Framework symbol, so a support type
+    # declared there would become a phantom XNA identity.
+    for support_name in MEASURED_SUPPORT_BASES:
+        if support_name.startswith("Microsoft.Xna.Framework"):
+            failures.append(
+                f"support base {support_name} is inside the XNA namespace")
+        event_self_tests += 1
+    for clr_name, swift_name in rules.get(
+        "measuredSupportBaseProjections", {},
+    ).items():
+        if swift_name.startswith("Microsoft.Xna.Framework"):
+            failures.append(
+                f"{clr_name} projects into the XNA namespace as {swift_name}")
+        event_self_tests += 1
+        if swift_name.startswith("System.") or "::" in swift_name:
+            failures.append(
+                f"{clr_name} projects into a fabricated System namespace")
+        event_self_tests += 1
 
     args_good = copy.deepcopy(args_expected)
     args_good[args_name].identifier = args_name
@@ -3865,6 +4099,161 @@ def self_test() -> None:
         if "UNMEASURED_STRUCTURAL_CATEGORY" not in support_categories(models):
             failures.append(f"event support omitted: {name} was not reported unmeasured")
         event_self_tests += 1
+
+    # ------------------------------------------------------------------
+    # The BCL collection support classes are measured the same way.
+    # ------------------------------------------------------------------
+    def bcl_models() -> dict[str, TypeModel]:
+        models: dict[str, TypeModel] = {}
+        for name, specification in rules.get("bclSupportContract", {}).items():
+            model = TypeModel(
+                name, specification["kind"], generic_count=1,
+                generic_parameters=tuple(specification.get("generics", [])),
+                declaration=(
+                    f"{'final ' if specification['inheritance'] == 'final' else ''}"
+                    f"class {name}<Element>"),
+                identifier=name, access=specification["inheritance"],
+            )
+            open_members = set(specification.get("openMembers", []))
+            model.members = [
+                Member(
+                    owner=name, kind="method", name=member_name, static=False,
+                    declaration=f"func {member_name}()",
+                    identifier=f"{name}:{member_name}",
+                    access="open" if member_name in open_members else "public",
+                )
+                for member_name in specification.get("requiredMembers", [])
+            ]
+            models[name] = model
+        return models
+
+    def bcl_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in bcl_support_evidence(models, rules)[1]}
+
+    if bcl_categories(bcl_models()):
+        failures.append("the BCL support reference model is not diagnostic-free")
+    event_self_tests += 1
+    if len(bcl_support_evidence(bcl_models(), rules)[0]) != 3:
+        failures.append("the BCL support evidence does not cover three types")
+    event_self_tests += 1
+
+    def bcl_member(owner: str, member_name: str, access: str = "public") -> Member:
+        return Member(
+            owner=owner, kind="method", name=member_name, static=False,
+            declaration=f"func {member_name}()",
+            identifier=f"{owner}:{member_name}", access=access,
+        )
+
+    bcl_mutations: list[tuple[str, Any]] = [
+        # A value type would discard the CLR reference identity and the live
+        # backing-store view that both families are built on.
+        ("CNACollection projected as a struct",
+         lambda m: setattr(m["CNACollection"], "kind", "struct")),
+        ("CNAReadOnlyCollection projected as a struct",
+         lambda m: setattr(m["CNAReadOnlyCollection"], "kind", "struct")),
+        # A sealed base cannot be derived from, so the XNA subclass is
+        # inexpressible.
+        ("CNACollection not open",
+         lambda m: setattr(m["CNACollection"], "access", "public")),
+        # The CLR hierarchy is two siblings, never a chain.
+        ("CNACollection deriving from CNAReadOnlyCollection",
+         lambda m: setattr(m["CNACollection"], "base", "CNAReadOnlyCollection")),
+        ("CNAReadOnlyCollection deriving from CNACollection",
+         lambda m: setattr(m["CNAReadOnlyCollection"], "base", "CNACollection")),
+        # Arity is part of the family's identity.
+        ("CNACollection losing its generic parameter",
+         lambda m: setattr(m["CNACollection"], "generic_parameters", ())),
+        # A hook that cannot be overridden is not a hook.
+        ("a hook that is not open", lambda m: setattr(
+            m["CNACollection"],
+            "members",
+            [bcl_member("CNACollection", item.name)
+             for item in m["CNACollection"].members])),
+        # Mutation through the read-only surface.
+        ("CNAReadOnlyCollection exposing Add", lambda m:
+            m["CNAReadOnlyCollection"].members.append(
+                bcl_member("CNAReadOnlyCollection", "Add"))),
+        ("CNAReadOnlyCollection exposing RemoveAt", lambda m:
+            m["CNAReadOnlyCollection"].members.append(
+                bcl_member("CNAReadOnlyCollection", "RemoveAt"))),
+        ("CNAReadOnlyCollection exposing a mutation hook", lambda m:
+            m["CNAReadOnlyCollection"].members.append(
+                bcl_member("CNAReadOnlyCollection", "InsertItem", "open"))),
+        # Convenience invented beyond the measured BCL surface.
+        ("CNAList exposing Sort", lambda m:
+            m["CNAList"].members.append(bcl_member("CNAList", "Sort"))),
+        # The backing store must stay a fixed contract.
+        ("CNAList not final",
+         lambda m: setattr(m["CNAList"], "declaration", "class CNAList<Element>")),
+    ]
+    for label, mutate in bcl_mutations:
+        models = bcl_models()
+        mutate(models)
+        if "BASE_MAPPING_MISMATCH" not in bcl_categories(models):
+            failures.append(f"BCL support {label}: was not detected")
+        event_self_tests += 1
+
+    # Every required member must actually be required.
+    for support_name, specification in rules.get("bclSupportContract", {}).items():
+        for member_name in specification.get("requiredMembers", []):
+            models = bcl_models()
+            models[support_name].members = [
+                item for item in models[support_name].members
+                if item.name != member_name
+            ]
+            if "BASE_MAPPING_MISMATCH" not in bcl_categories(models):
+                failures.append(
+                    f"BCL support: dropping {support_name}.{member_name} "
+                    "was not detected")
+            event_self_tests += 1
+
+    # Omitting a BCL support type is unmeasured, not silently fine.
+    for name in sorted(rules.get("bclSupportContract", {})):
+        models = bcl_models()
+        models.pop(name, None)
+        if "UNMEASURED_STRUCTURAL_CATEGORY" not in bcl_categories(models):
+            failures.append(
+                f"BCL support omitted: {name} was not reported unmeasured")
+        event_self_tests += 1
+
+    # The BCL support classes and the CLR families they project must stay in
+    # step with the pinned selected-shape manifest and its digest.
+    bcl_manifest_path = ROOT / rules.get("bclSelectedShapeReference", "")
+    if not bcl_manifest_path.is_file():
+        failures.append("the pinned BCL selected-shape manifest is missing")
+        event_self_tests += 1
+    else:
+        digest = hashlib.sha256(bcl_manifest_path.read_bytes()).hexdigest()
+        if digest != rules.get("bclSelectedShapeSha256"):
+            failures.append(
+                f"the BCL selected-shape manifest digest {digest} does not "
+                f"match the pinned {rules.get('bclSelectedShapeSha256')}")
+        event_self_tests += 1
+        manifest = json.loads(bcl_manifest_path.read_text(encoding="utf-8"))
+        admitted = {item["type"] for item in manifest["types"]}
+        for support_name, specification in rules.get(
+            "bclSupportContract", {},
+        ).items():
+            family = specification.get("clrFamily")
+            if family not in admitted:
+                failures.append(
+                    f"{support_name} projects {family}, which is not admitted "
+                    "in the pinned BCL manifest")
+            event_self_tests += 1
+        for family in rules.get("bclSupportTypeProjections", {}):
+            if family not in admitted:
+                failures.append(
+                    f"{family} is projected but is not an admitted BCL family")
+            event_self_tests += 1
+        # Every generic support base must be a projected admitted family, so a
+        # base cannot be declared measured without an authority behind it.
+        projected = set(rules.get("bclSupportTypeProjections", {}).values())
+        for generic_base in GENERIC_SUPPORT_BASES:
+            if generic_base not in projected:
+                failures.append(
+                    f"{generic_base} is a measured generic base with no "
+                    "admitted BCL family behind it")
+            event_self_tests += 1
 
     # ------------------------------------------------------------------
     # IList<T> as a measured direct interface, and its CopyTo destination.
@@ -4471,6 +4860,152 @@ def event_support_evidence(
     return evidence, diagnostics
 
 
+def bcl_support_evidence(
+    support: dict[str, TypeModel],
+    rules: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Measure the BCL collection support classes against their pinned shape.
+
+    These live outside `Microsoft.Xna.Framework` and are counted in no XNA
+    scoreboard, but they carry the entire inherited surface of every XNA type
+    with a BCL collection base, so they are measured rather than assumed. The
+    rules that carry the architecture are checked here and nowhere else:
+
+    - each is a CLASS. A struct would give a CLR reference type value
+      semantics, and the live backing-store relationship both CLR families are
+      built on would be lost with it;
+    - `CNACollection` and `CNAReadOnlyCollection` are `open`, because an XNA
+      subclass must be able to derive from them and override the hooks;
+    - the four protected virtual hooks are `open`. A hook that is not
+      overridable is not a hook, and `GameComponentCollection`'s entire
+      behaviour is four overrides;
+    - neither collection family derives from the other, exactly as `mscorlib`
+      declares them both directly on `System.Object`;
+    - `CNAReadOnlyCollection` exposes no mutator and no hook at all.
+    """
+    contract = rules.get("bclSupportContract", {})
+    evidence: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, str]] = []
+    pointer_pattern = re.compile(
+        r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle|CNASwift_|CNA_Handle"
+    )
+    raw_pattern = re.compile(
+        r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle"
+    )
+
+    for name in sorted(contract):
+        specification = contract[name]
+        model = support.get(name)
+        if model is None:
+            diagnostics.append(diagnostic(
+                "UNMEASURED_STRUCTURAL_CATEGORY", name,
+                "BCL support type is absent from the Swift Symbol Graph, so the "
+                "inherited surface it carries is unmeasured",
+            ))
+            continue
+
+        if model.kind != specification["kind"]:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", name,
+                f"expected support kind {specification['kind']}, found "
+                f"{model.kind}; a CLR reference type cannot be projected as a "
+                "Swift value type without losing the live backing store",
+            ))
+        expected_generics = tuple(specification.get("generics", []))
+        if model.generic_parameters != expected_generics:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", name,
+                f"expected generic parameters {expected_generics}, found "
+                f"{model.generic_parameters}",
+            ))
+        if model.base != specification.get("base"):
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", name,
+                f"expected base {specification.get('base')}, found {model.base}; "
+                "mscorlib declares Collection<T> and ReadOnlyCollection<T> "
+                "directly on System.Object and neither derives from the other",
+            ))
+        inheritance = specification.get("inheritance")
+        if inheritance == "final" and "final class" not in model.declaration:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", name,
+                f"expected a final support class, found {model.declaration!r}",
+            ))
+        if inheritance == "open" and model.access != "open":
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", name,
+                f"expected an open support class, found access {model.access!r}; "
+                "an XNA subclass must be able to derive from it",
+            ))
+        if name.startswith("Microsoft.Xna.Framework"):
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", name,
+                "a BCL support type must live outside the XNA namespace",
+            ))
+
+        observed: dict[str, list[Member]] = collections.defaultdict(list)
+        for member in model.members:
+            observed[member.name].append(member)
+        for member_name in specification.get("requiredMembers", []):
+            if member_name not in observed:
+                diagnostics.append(diagnostic(
+                    "BASE_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    "required BCL support member is absent",
+                ))
+        for member_name in specification.get("openMembers", []):
+            candidates = observed.get(member_name)
+            if not candidates:
+                continue
+            # `SetItem` is deliberately two members: the indexed property's
+            # writer, which the CLR seals, and the protected virtual hook,
+            # which it does not. One of them must be open.
+            if not any(item.access == "open" for item in candidates):
+                found = sorted({item.access or "?" for item in candidates})
+                diagnostics.append(diagnostic(
+                    "BASE_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    "the CLR declares this a protected virtual hook, so it must "
+                    f"be open; found access {found}",
+                ))
+        for member_name in specification.get("forbiddenMembers", []):
+            if member_name in observed:
+                diagnostics.append(diagnostic(
+                    "BASE_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    "BCL support member is forbidden on this type; mscorlib "
+                    "does not declare it here",
+                ))
+
+        for member in model.members:
+            if raw_pattern.search(member.declaration):
+                diagnostics.append(diagnostic(
+                    "RAW_HANDLE_LEAK", member.display, member.declaration,
+                ))
+            if pointer_pattern.search(member.declaration):
+                diagnostics.append(diagnostic(
+                    "PUBLIC_NATIVE_FFI_LEAK", member.display, member.declaration,
+                ))
+
+        evidence.append({
+            "supportType": name,
+            "clrFamily": specification.get("clrFamily"),
+            "kind": model.kind,
+            "inheritance": inheritance,
+            "genericParameters": list(model.generic_parameters),
+            "base": model.base,
+            "publicMembers": sorted(observed),
+            "openHooks": [
+                item for item in specification.get("openMembers", [])
+                if any(entry.access == "open" for entry in observed.get(item, []))
+            ],
+            "forbiddenMembersAbsent": [
+                item for item in specification.get("forbiddenMembers", [])
+                if item not in observed
+            ],
+            "reason": rules.get("bclSupportMapping", ""),
+        })
+
+    return evidence, diagnostics
+
+
 def protocol_witness_projection_evidence(
     contract: dict[str, Any],
     rules: dict[str, Any],
@@ -4606,7 +5141,9 @@ def make_report(
     support_evidence: list[dict[str, Any]],
     accessor_fallibility: dict[tuple[str, str], dict[str, bool]],
     return_nullability: dict[tuple[str, str, str, tuple[str, ...]], dict[str, Any]],
+    bcl_evidence: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    bcl_evidence = bcl_evidence or []
     counts = collections.Counter(item["category"] for item in diagnostics)
     type_diagnostics: dict[str, list[dict[str, str]]] = collections.defaultdict(list)
     for item in diagnostics:
@@ -4808,9 +5345,51 @@ def make_report(
         for item in contract["types"] for member in item["members"]
     )
     summary["EVENT_SUPPORT_TYPE_MEASUREMENTS"] = len(support_evidence)
-    summary["MEASURED_SUPPORT_BASE_PROJECTIONS"] = sum(
-        map_clr_type(item["baseType"], rules) in MEASURED_SUPPORT_BASES
-        for item in contract["types"] if item.get("baseType")
+    summary["BCL_SUPPORT_TYPE_MEASUREMENTS"] = len(bcl_evidence)
+    # Every contract type whose CLR base has a decided Swift support
+    # projection. The head is what is counted, because a generic support base
+    # arrives here specialized -- `CNACollection<...>` -- and is the same
+    # decided projection as its unspecialized head.
+    support_based = [
+        item for item in contract["types"]
+        if item.get("baseType") and
+        base_head(map_clr_type(item["baseType"], rules)) in MEASURED_SUPPORT_BASES
+    ]
+    summary["MEASURED_SUPPORT_BASE_PROJECTIONS"] = len(support_based)
+
+    # The BCL half, measured separately so that no XNA counter absorbs it. A
+    # type is counted as PROJECTED once it is actually implemented; the
+    # remainder are types whose BCL base is now decided but which are still
+    # blocked on something else, and are named rather than silently dropped.
+    bcl_based = [
+        item for item in support_based
+        if base_head(map_clr_type(item["baseType"], rules)) in GENERIC_SUPPORT_BASES
+    ]
+    bcl_projected = [
+        item for item in bcl_based if item["name"] not in missing_types
+    ]
+    summary["BCL_BASE_PROJECTIONS"] = len(bcl_based)
+    summary["PROJECTED_BCL_BASE_TYPES"] = len(bcl_projected)
+    summary["PENDING_BCL_BASE_TYPES"] = len(bcl_based) - len(bcl_projected)
+    # The public members these types inherit from a BCL base rather than
+    # declaring. They are real usable surface and they are NOT XNA identities,
+    # so they are counted here and in no XNA total: REFERENCE_MEMBERS and
+    # EXPECTED_SWIFT_MEMBERS are unaffected by this number.
+    bcl_inherited = {
+        "CNACollection": (
+            "Count", "Items", "Item", "SetItem", "Add", "Clear", "Contains",
+            "CopyTo", "GetEnumerator", "IndexOf", "Insert", "Remove",
+            "RemoveAt", "ClearItems", "InsertItem", "RemoveItem",
+        ),
+        "CNAReadOnlyCollection": (
+            "Count", "Items", "Item", "Contains", "CopyTo", "GetEnumerator",
+            "IndexOf",
+        ),
+    }
+    summary["BCL_INHERITED_MEMBER_PROJECTIONS"] = sum(
+        len(bcl_inherited.get(
+            base_head(map_clr_type(item["baseType"], rules)), ()))
+        for item in bcl_projected
     )
 
     # Every public reference-typed return position, with the Swift shape the
@@ -4902,6 +5481,7 @@ def make_report(
         "pendingAccessorProjections": pending_accessors,
         "nonPublicConstructionProjections": nonpublic_construction_evidence,
         "eventSupportProjections": support_evidence,
+        "bclSupportProjections": bcl_evidence,
         "returnNullabilityProjections": return_projections,
         "unknownReturnNullabilityProjections": [
             f"{item['ownerType']}.{item['member']}"
@@ -4986,6 +5566,7 @@ def main() -> int:
         args.symbol_graph, rules, ROOT / "Sources/CNA", expected,
     )
     support_evidence, support_diagnostics = event_support_evidence(support, rules)
+    bcl_evidence, bcl_diagnostics = bcl_support_evidence(support, rules)
     witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(
         contract, rules, observed_witnesses,
     )
@@ -4994,14 +5575,14 @@ def main() -> int:
     )
     diagnostics, applied_suppressions = apply_manual_suppressions(
         compare(expected, actual) + parser_diagnostics + witness_diagnostics +
-        system_interface_diagnostics + support_diagnostics,
+        system_interface_diagnostics + support_diagnostics + bcl_diagnostics,
         rules.get("manualDiagnosticSuppressions", []),
     )
     report = make_report(
         contract, rules, expected, actual, diagnostics, args.symbol_graph,
         applied_suppressions, witness_evidence, accessor_evidence,
         system_interface_evidence, support_evidence, accessor_fallibility,
-        return_nullability,
+        return_nullability, bcl_evidence,
     )
     text = json.dumps(report, indent=2, sort_keys=False) + "\n"
     if args.output:

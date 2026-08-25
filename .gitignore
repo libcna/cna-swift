@@ -10,3 +10,4 @@
 /build-consumer
 __pycache__/
 *.pyc
+/build-probe

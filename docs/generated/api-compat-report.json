@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 124,
-    "TARGET_MEMBERS": 1696,
-    "TOTAL_DIAGNOSTICS": 286,
-    "COMPLETE_TYPES": 119,
+    "TARGET_TYPES": 125,
+    "TARGET_MEMBERS": 1703,
+    "TOTAL_DIAGNOSTICS": 285,
+    "COMPLETE_TYPES": 120,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 133,
-    "MISSING_TYPE": 133,
+    "MISSING_TYPES": 132,
+    "MISSING_TYPE": 132,
     "MISSING_MEMBER": 130,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -68,7 +68,12 @@
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 8,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
-    "MEASURED_SUPPORT_BASE_PROJECTIONS": 4,
+    "BCL_SUPPORT_TYPE_MEASUREMENTS": 3,
+    "MEASURED_SUPPORT_BASE_PROJECTIONS": 9,
+    "BCL_BASE_PROJECTIONS": 5,
+    "PROJECTED_BCL_BASE_TYPES": 1,
+    "PENDING_BCL_BASE_TYPES": 4,
+    "BCL_INHERITED_MEMBER_PROJECTIONS": 16,
     "REFERENCE_RETURN_PROJECTIONS": 369,
     "OPTIONAL_RETURN_PROJECTIONS": 153,
     "NONOPTIONAL_RETURN_PROJECTIONS": 216,
@@ -102,6 +107,7 @@
     "Microsoft.Xna.Framework.CurveLoopType",
     "Microsoft.Xna.Framework.CurveTangent",
     "Microsoft.Xna.Framework.DisplayOrientation",
+    "Microsoft.Xna.Framework.GameComponentCollection",
     "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
     "Microsoft.Xna.Framework.GameTime",
     "Microsoft.Xna.Framework.Graphics.Blend",
@@ -253,7 +259,6 @@
     "Microsoft.Xna.Framework.DrawableGameComponent",
     "Microsoft.Xna.Framework.FrameworkDispatcher",
     "Microsoft.Xna.Framework.GameComponent",
-    "Microsoft.Xna.Framework.GameComponentCollection",
     "Microsoft.Xna.Framework.GameServiceContainer",
     "Microsoft.Xna.Framework.GameWindow",
     "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
@@ -665,11 +670,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.GameComponent",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.GameComponentCollection",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1514,7 +1514,7 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:System.Collections.Generic.List<Microsoft.Xna.Framework.GraphicsDeviceInformation>)",
+      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>)",
       "detail": "mapped member is absent"
     },
     {
@@ -3394,6 +3394,116 @@
       "reason": "The event support types live outside Microsoft.Xna.Framework and are language-support API, not XNA types or XNA identities, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a base where composition is required, a missing required member, or a forbidden member is an EVENT_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     }
   ],
+  "bclSupportProjections": [
+    {
+      "supportType": "CNACollection",
+      "clrFamily": "System.Collections.ObjectModel.Collection`1",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [
+        "Element"
+      ],
+      "base": null,
+      "publicMembers": [
+        ".ctor",
+        "Add",
+        "Clear",
+        "ClearItems",
+        "Contains",
+        "CopyTo",
+        "Count",
+        "GetEnumerator",
+        "IndexOf",
+        "Insert",
+        "InsertItem",
+        "Item",
+        "Items",
+        "Remove",
+        "RemoveAt",
+        "RemoveItem",
+        "SetItem"
+      ],
+      "openHooks": [
+        "ClearItems",
+        "InsertItem",
+        "RemoveItem",
+        "SetItem"
+      ],
+      "forbiddenMembersAbsent": [
+        "Sort",
+        "Reverse",
+        "AddRange",
+        "RemoveRange"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAList",
+      "clrFamily": "System.Collections.Generic.List`1",
+      "kind": "class",
+      "inheritance": "final",
+      "genericParameters": [
+        "Element"
+      ],
+      "base": null,
+      "publicMembers": [
+        ".ctor",
+        "Add",
+        "Clear",
+        "Contains",
+        "CopyTo",
+        "Count",
+        "GetEnumerator",
+        "IndexOf",
+        "Insert",
+        "IsReadOnly",
+        "Item",
+        "RemoveAt",
+        "SetItem"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "Sort",
+        "Reverse",
+        "AddRange",
+        "ConvertAll"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAReadOnlyCollection",
+      "clrFamily": "System.Collections.ObjectModel.ReadOnlyCollection`1",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [
+        "Element"
+      ],
+      "base": null,
+      "publicMembers": [
+        ".ctor",
+        "Contains",
+        "CopyTo",
+        "Count",
+        "GetEnumerator",
+        "IndexOf",
+        "Item",
+        "Items"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "Add",
+        "Clear",
+        "Insert",
+        "Remove",
+        "RemoveAt",
+        "SetItem",
+        "ClearItems",
+        "InsertItem",
+        "RemoveItem"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    }
+  ],
   "returnNullabilityProjections": [
     {
       "ownerType": "Microsoft.Xna.Framework.Audio.AudioCategory",
@@ -3430,7 +3540,7 @@
       "static": false,
       "typeState": "missing",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[Microsoft.Xna.Framework.Audio.RendererDetail]",
-      "swiftReturnType": "System.Collections.ObjectModel.ReadOnlyCollection<Microsoft.Xna.Framework.Audio.RendererDetail>?",
+      "swiftReturnType": "CNAReadOnlyCollection<Microsoft.Xna.Framework.Audio.RendererDetail>?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
@@ -3458,7 +3568,7 @@
       "static": true,
       "typeState": "missing",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[Microsoft.Xna.Framework.Audio.Microphone]",
-      "swiftReturnType": "System.Collections.ObjectModel.ReadOnlyCollection<Microsoft.Xna.Framework.Audio.Microphone>",
+      "swiftReturnType": "CNAReadOnlyCollection<Microsoft.Xna.Framework.Audio.Microphone>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
@@ -5614,7 +5724,7 @@
       "static": true,
       "typeState": "missing",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[Microsoft.Xna.Framework.Graphics.GraphicsAdapter]",
-      "swiftReturnType": "System.Collections.ObjectModel.ReadOnlyCollection<Microsoft.Xna.Framework.Graphics.GraphicsAdapter>?",
+      "swiftReturnType": "CNAReadOnlyCollection<Microsoft.Xna.Framework.Graphics.GraphicsAdapter>?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
@@ -6776,7 +6886,7 @@
       "static": false,
       "typeState": "missing",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[System.Char]",
-      "swiftReturnType": "System.Collections.ObjectModel.ReadOnlyCollection<System.Char>?",
+      "swiftReturnType": "CNAReadOnlyCollection<System.Char>?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
@@ -8162,7 +8272,7 @@
       "static": false,
       "typeState": "missing",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[System.Single]",
-      "swiftReturnType": "System.Collections.ObjectModel.ReadOnlyCollection<Float>",
+      "swiftReturnType": "CNAReadOnlyCollection<Float>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
@@ -8176,7 +8286,7 @@
       "static": false,
       "typeState": "missing",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[System.Single]",
-      "swiftReturnType": "System.Collections.ObjectModel.ReadOnlyCollection<Float>",
+      "swiftReturnType": "CNAReadOnlyCollection<Float>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
@@ -9475,16 +9585,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.GameComponentCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 7,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.GameComponentCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 7,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
@@ -11268,7 +11372,7 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:System.Collections.Generic.List<Microsoft.Xna.Framework.GraphicsDeviceInformation>)",
+          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>)",
           "detail": "mapped member is absent"
         },
         {
