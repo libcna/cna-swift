@@ -2278,11 +2278,14 @@ def self_test() -> None:
         failures.append(
             "RenderTargetUsage publicly exposed value__ did not fail")
 
-    # Foundation 14 pure managed batch. Every batch enum is driven through the
-    # same structural mutation matrix, built from its own pinned reference model
-    # rather than from a transcribed table, so a batch type cannot be registered
-    # without negative coverage for its exact literals.
+    # Foundation 14 and 16 pure managed batches. Every batch enum is driven
+    # through the same structural mutation matrix, built from its own pinned
+    # reference model rather than from a transcribed table, so a batch type
+    # cannot be registered without negative coverage for its exact literals.
     batch_enum_names = [
+        "Microsoft.Xna.Framework.Audio.MicrophoneState",
+        "Microsoft.Xna.Framework.Media.MediaSourceType",
+        "Microsoft.Xna.Framework.Media.MediaState",
         "Microsoft.Xna.Framework.Graphics.Blend",
         "Microsoft.Xna.Framework.Graphics.BlendFunction",
         "Microsoft.Xna.Framework.Graphics.ClearOptions",
@@ -2465,6 +2468,7 @@ def self_test() -> None:
         "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
         "Microsoft.Xna.Framework.Graphics.VertexElement",
         "Microsoft.Xna.Framework.Graphics.PresentationParameters",
+        "Microsoft.Xna.Framework.Input.MouseState",
     ]
     for managed_name in batch_managed_names:
         managed_expected = {managed_name: copy.deepcopy(all_expected[managed_name])}
@@ -2775,11 +2779,94 @@ def self_test() -> None:
                 f"PresentationParameters invented {invented} did not fail")
         intptr_self_tests += 1
 
+    # ------------------------------------------------------------------
+    # Foundation 16: the MouseState constructor's pinned parameter order.
+    #
+    # The pinned metadata order is
+    # (x, y, scrollWheel, leftButton, middleButton, rightButton,
+    #  xButton1, xButton2)
+    # — middleButton precedes rightButton, which is not the order the property
+    # list suggests. Both parameters have the same mapped type and the same
+    # `_` external label, so a transposition is invisible to the type, label,
+    # and arity checks. It is caught only because the constructor is
+    # registered in `internalParameterOrderChecks` and the internal names are
+    # compared positionally.
+    # ------------------------------------------------------------------
+    order_self_tests = 0
+    mouse_name = "Microsoft.Xna.Framework.Input.MouseState"
+    if f"{mouse_name}.ctor" not in rules.get("internalParameterOrderChecks", []):
+        failures.append("MouseState constructor order is not verified")
+    order_self_tests += 1
+
+    mouse_expected = {mouse_name: copy.deepcopy(all_expected[mouse_name])}
+    mouse_good = copy.deepcopy(mouse_expected)
+    mouse_good[mouse_name].identifier = mouse_name
+    for index, member in enumerate(mouse_good[mouse_name].members):
+        member.identifier = f"{mouse_name}:{index}"
+
+    def mouse_ctor(models: dict[str, TypeModel]) -> Member:
+        return next(
+            member for member in models[mouse_name].members
+            if member.name == ".ctor"
+        )
+
+    def mouse_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(mouse_expected, models)}
+
+    pinned_order = mouse_ctor(mouse_expected).parameter_names
+    if pinned_order != (
+        "x", "y", "scrollWheel", "leftButton", "middleButton", "rightButton",
+        "xButton1", "xButton2",
+    ):
+        failures.append("MouseState pinned constructor order is not the pinned order")
+    order_self_tests += 1
+    if mouse_categories(mouse_good):
+        failures.append("MouseState reference model is not diagnostic-free")
+    order_self_tests += 1
+
+    def swapped(names: tuple[str, ...], first: int, second: int) -> tuple[str, ...]:
+        items = list(names)
+        items[first], items[second] = items[second], items[first]
+        return tuple(items)
+
+    # Every adjacent transposition must be caught, not only the middle/right
+    # pair, so the rule is positional rather than a single hand-picked case.
+    for index in range(len(pinned_order) - 1):
+        models = copy.deepcopy(mouse_good)
+        setattr(
+            mouse_ctor(models), "parameter_names",
+            swapped(pinned_order, index, index + 1),
+        )
+        if "PARAMETER_MAPPING_MISMATCH" not in mouse_categories(models):
+            failures.append(
+                f"MouseState constructor order swap {index}/{index + 1} did not fail")
+        order_self_tests += 1
+
+    # A renamed internal parameter is equally a mismatch.
+    models = copy.deepcopy(mouse_good)
+    setattr(mouse_ctor(models), "parameter_names", ("a",) + pinned_order[1:])
+    if "PARAMETER_MAPPING_MISMATCH" not in mouse_categories(models):
+        failures.append("MouseState renamed constructor parameter did not fail")
+    order_self_tests += 1
+
+    # The eight declared properties are all get-only in the pinned contract.
+    mouse_properties = [
+        member for member in mouse_expected[mouse_name].members
+        if member.kind == "property"
+    ]
+    if len(mouse_properties) != 8:
+        failures.append("MouseState expected property count is not eight")
+    order_self_tests += 1
+    for member in mouse_properties:
+        if member.mutable:
+            failures.append(f"MouseState {member.name} is not get-only")
+        order_self_tests += 1
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + order_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

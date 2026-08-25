@@ -41,6 +41,12 @@ creation, native window handling, presentation, or render targets. Its
 signed value held as pure descriptor state, never dereferenced, resolved, or
 handed to CNA. See `docs/xna-swift-mapping.md` for the general rule.
 
+Foundation 16 adds four more pure-managed types — the `MouseState` value
+struct and the `MediaState`, `MediaSourceType` and `MicrophoneState` enums —
+without claiming any mouse device, cursor, microphone, capture, media player,
+media library, or video support. `MouseState` is a value snapshot with no
+producer: `Input.Mouse` is not implemented.
+
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -50,12 +56,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=99
-TARGET_MEMBERS=1573
-TOTAL_DIAGNOSTICS=309
-COMPLETE_TYPES=94
+TARGET_TYPES=103
+TARGET_MEMBERS=1594
+TOTAL_DIAGNOSTICS=305
+COMPLETE_TYPES=98
 PARTIAL_TYPES=5
-MISSING_TYPES=158
+MISSING_TYPES=154
 MISSING_MEMBER=131
 ```
 
@@ -73,7 +79,8 @@ SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
 DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, the
-25 Foundation-14 pure-managed types listed below, and PresentationParameters. Every implemented member has
+25 Foundation-14 pure-managed types listed below, PresentationParameters,
+MouseState, MediaState, MediaSourceType, and MicrophoneState. Every implemented member has
 qualified behavior; missing members remain absent.
 
 ## Foundation 14 pure managed batch

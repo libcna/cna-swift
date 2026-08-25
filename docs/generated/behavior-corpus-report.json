@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1443,
-  "ASSERTIONS": 1443,
+  "OBSERVATIONS": 1493,
+  "ASSERTIONS": 1493,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -112,7 +112,14 @@
     "testPresentationParametersXnaContractIsFullScreenNormalization",
     "testPresentationParametersXnaContractBounds",
     "testPresentationParametersXnaContractDeviceWindowHandle",
-    "testPresentationParametersXnaContractClone"
+    "testPresentationParametersXnaContractClone",
+    "testMouseStateXnaContractConstructionAndProperties",
+    "testMouseStateXnaContractEquality",
+    "testMouseStateXnaContractGetHashCode",
+    "testMouseStateXnaContractToString",
+    "testMediaStateXnaContract",
+    "testMediaSourceTypeXnaContract",
+    "testMicrophoneStateXnaContract"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -194,7 +201,14 @@
     "PRESENTATION_PARAMETERS_IS_FULL_SCREEN": 1,
     "PRESENTATION_PARAMETERS_BOUNDS": 1,
     "PRESENTATION_PARAMETERS_DEVICE_WINDOW_HANDLE": 1,
-    "PRESENTATION_PARAMETERS_CLONE": 1
+    "PRESENTATION_PARAMETERS_CLONE": 1,
+    "MOUSE_STATE_CONSTRUCTION": 1,
+    "MOUSE_STATE_EQUALITY": 1,
+    "MOUSE_STATE_HASH": 1,
+    "MOUSE_STATE_TO_STRING": 1,
+    "MEDIA_STATE": 1,
+    "MEDIA_SOURCE_TYPE": 1,
+    "MICROPHONE_STATE": 1
   },
   "displayOrientationContract": {
     "flags": true,
@@ -600,6 +614,92 @@
       },
       "swiftProjectionQualificationCountedAsXnaBehavior": false
     }
+  },
+  "foundation16PureManagedBatchContracts": {
+    "Microsoft.Xna.Framework.Audio.MicrophoneState": {
+      "kind": "enum",
+      "flags": false,
+      "underlyingType": "System.Int32",
+      "values": {
+        "Started": 0,
+        "Stopped": 1
+      },
+      "swiftProjectionQualificationCountedAsXnaBehavior": false
+    },
+    "Microsoft.Xna.Framework.Media.MediaSourceType": {
+      "kind": "enum",
+      "flags": false,
+      "underlyingType": "System.Int32",
+      "values": {
+        "LocalDevice": 0,
+        "WindowsMediaConnect": 4
+      },
+      "swiftProjectionQualificationCountedAsXnaBehavior": false
+    },
+    "Microsoft.Xna.Framework.Media.MediaState": {
+      "kind": "enum",
+      "flags": false,
+      "underlyingType": "System.Int32",
+      "values": {
+        "Paused": 2,
+        "Playing": 1,
+        "Stopped": 0
+      },
+      "swiftProjectionQualificationCountedAsXnaBehavior": false
+    }
+  },
+  "mouseStateContract": {
+    "kind": "struct",
+    "sealed": true,
+    "layout": "sequential",
+    "baseType": "System.ValueType",
+    "directInterfaces": [],
+    "storage": [
+      "x",
+      "y",
+      "leftButton",
+      "rightButton",
+      "middleButton",
+      "xb1",
+      "xb2",
+      "wheel"
+    ],
+    "publicMembers": [
+      ".ctor",
+      "GetHashCode",
+      "ToString",
+      "Equals",
+      "op_Equality",
+      "op_Inequality",
+      "X",
+      "Y",
+      "LeftButton",
+      "RightButton",
+      "MiddleButton",
+      "XButton1",
+      "XButton2",
+      "ScrollWheelValue"
+    ],
+    "constructorParameterOrder": [
+      "x",
+      "y",
+      "scrollWheel",
+      "leftButton",
+      "middleButton",
+      "rightButton",
+      "xButton1",
+      "xButton2"
+    ],
+    "toStringButtonOrder": [
+      "Left",
+      "Right",
+      "Middle",
+      "XButton1",
+      "XButton2"
+    ],
+    "toStringFormat": "String.Format(CultureInfo.CurrentCulture, \"{{X:{0} Y:{1} Buttons:{2} Wheel:{3}}}\", x, y, buttons, wheel)",
+    "getHashCode": "plain Int32 XOR over all eight fields; no SmartGetHashCode helper, so a zero result is returned as zero",
+    "swiftProjectionQualificationCountedAsXnaBehavior": false
   },
   "vertexElementContract": {
     "kind": "struct",

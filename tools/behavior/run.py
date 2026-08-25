@@ -15,6 +15,11 @@ REFERENCE = ROOT / "tools/api_compat/reference/xna40-windows-runtime-contract.js
 # Foundation 14 pure managed batch. Each entry is a pinned XNA metadata
 # closure; the table below is read back out of the pinned contract rather
 # than transcribed, so the report cannot drift from the reference.
+FOUNDATION_16_BATCH = [
+    "Microsoft.Xna.Framework.Audio.MicrophoneState",
+    "Microsoft.Xna.Framework.Media.MediaSourceType",
+    "Microsoft.Xna.Framework.Media.MediaState",
+]
 FOUNDATION_14_BATCH = [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
     "Microsoft.Xna.Framework.Audio.SoundState",
@@ -63,6 +68,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation14GraphicsEnumContractTests.swift",
     ROOT / "Tests/CNATests/Foundation14ManagedTypeContractTests.swift",
     ROOT / "Tests/CNATests/PresentationParametersContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation16ContractTests.swift",
 ]
 
 
@@ -85,20 +91,24 @@ def main() -> int:
     failures = 0 if completed.returncode == 0 else 1
     contract = json.loads(REFERENCE.read_text(encoding="utf-8"))
     pinned = {item["name"]: item for item in contract["types"]}
-    batch_contracts = {
-        name: {
-            "kind": "OptionSet" if pinned[name]["flags"] else "enum",
-            "flags": pinned[name]["flags"],
-            "underlyingType": pinned[name]["underlyingType"],
-            "values": {
-                member["name"]: int(member["value"])
-                for member in pinned[name]["members"]
-                if member["kind"] == "field" and member["name"] != "value__"
-            },
-            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+    def enum_contracts(names: list[str]) -> dict[str, dict]:
+        return {
+            name: {
+                "kind": "OptionSet" if pinned[name]["flags"] else "enum",
+                "flags": pinned[name]["flags"],
+                "underlyingType": pinned[name]["underlyingType"],
+                "values": {
+                    member["name"]: int(member["value"])
+                    for member in pinned[name]["members"]
+                    if member["kind"] == "field" and member["name"] != "value__"
+                },
+                "swiftProjectionQualificationCountedAsXnaBehavior": False,
+            }
+            for name in names
         }
-        for name in FOUNDATION_14_BATCH
-    }
+
+    batch_contracts = enum_contracts(FOUNDATION_14_BATCH)
+    foundation16_contracts = enum_contracts(FOUNDATION_16_BATCH)
     report = {
         "schemaVersion": 1,
         "authority": "PURE_XNA_DERIVED",
@@ -185,6 +195,14 @@ def main() -> int:
                     "PresentationParametersXnaContractDeviceWindowHandle",
                 "PRESENTATION_PARAMETERS_CLONE":
                     "PresentationParametersXnaContractClone",
+                "MOUSE_STATE_CONSTRUCTION":
+                    "MouseStateXnaContractConstruction",
+                "MOUSE_STATE_EQUALITY": "MouseStateXnaContractEquality",
+                "MOUSE_STATE_HASH": "MouseStateXnaContractGetHashCode",
+                "MOUSE_STATE_TO_STRING": "MouseStateXnaContractToString",
+                "MEDIA_STATE": "MediaStateXnaContract",
+                "MEDIA_SOURCE_TYPE": "MediaSourceTypeXnaContract",
+                "MICROPHONE_STATE": "MicrophoneStateXnaContract",
             }.items()
         },
         "displayOrientationContract": {
@@ -293,6 +311,37 @@ def main() -> int:
             "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },
         "foundation14PureManagedBatchContracts": batch_contracts,
+        "foundation16PureManagedBatchContracts": foundation16_contracts,
+        "mouseStateContract": {
+            "kind": "struct",
+            "sealed": True,
+            "layout": "sequential",
+            "baseType": "System.ValueType",
+            "directInterfaces": [],
+            "storage": [
+                "x", "y", "leftButton", "rightButton", "middleButton",
+                "xb1", "xb2", "wheel",
+            ],
+            "publicMembers": [
+                ".ctor", "GetHashCode", "ToString", "Equals", "op_Equality",
+                "op_Inequality", "X", "Y", "LeftButton", "RightButton",
+                "MiddleButton", "XButton1", "XButton2", "ScrollWheelValue",
+            ],
+            "constructorParameterOrder": [
+                "x", "y", "scrollWheel", "leftButton", "middleButton",
+                "rightButton", "xButton1", "xButton2",
+            ],
+            "toStringButtonOrder": [
+                "Left", "Right", "Middle", "XButton1", "XButton2",
+            ],
+            "toStringFormat":
+                "String.Format(CultureInfo.CurrentCulture, "
+                "\"{{X:{0} Y:{1} Buttons:{2} Wheel:{3}}}\", x, y, buttons, wheel)",
+            "getHashCode":
+                "plain Int32 XOR over all eight fields; no SmartGetHashCode "
+                "helper, so a zero result is returned as zero",
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
         "vertexElementContract": {
             "kind": "struct",
             "sealed": True,

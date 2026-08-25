@@ -1,9 +1,8 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 15 — `PresentationParameters` and the general
-`System.IntPtr` projection. One entirely missing pure-managed XNA descriptor
-class carrying 13 mapped Swift XNA identities, over the completed
-Foundation 1–14 baseline.
+**Milestone:** Foundation 16 — Pure Managed Batch B. Four entirely missing
+pure-managed XNA types carrying 21 mapped Swift XNA identities, over the
+completed Foundation 1–15 baseline.
 
 ## Normative rules
 
@@ -57,7 +56,31 @@ Foundation 1–14 baseline.
 
 ## Qualified selected surface
 
-Foundation 15 adds exactly one type, previously entirely missing:
+Foundation 16 adds exactly these four types, all previously entirely missing:
+
+- `Microsoft.Xna.Framework.Input.MouseState`, a sealed sequential value struct
+  mapping to a Swift struct with 14 identities: the constructor, eight get-only
+  properties, `GetHashCode`, `ToString`, `Equals(object)`, and the two equality
+  operators. Its pinned constructor order places `middleButton` before
+  `rightButton`; because both share a mapped type and a `_` label, the
+  transposition is caught only by the registered
+  `internalParameterOrderChecks` entry, which the self-test exercises for every
+  adjacent pair. `GetHashCode` is a plain `Int32` XOR with **no**
+  `SmartGetHashCode` zero substitution, and `ToString` emits buttons in the
+  order Left, Right, Middle, XButton1, XButton2. No typed `Equals`, no
+  `Equatable`/`Hashable` conformance, and no mutable property is added.
+- Three ordinary CLR `Int32` enums with no `[Flags]` attribute in the pinned
+  binary: `Media.MediaState`, `Media.MediaSourceType`, and
+  `Audio.MicrophoneState`. `MediaSourceType`'s literals are non-contiguous
+  (0 and 4) and no literal was invented to close the gap;
+  `MicrophoneState.Started` is the zero literal.
+
+`Microsoft.Xna.Framework.Media` gained its namespace marker.
+
+Completing these four types claims no mouse device, cursor, microphone,
+capture, media player, media library, or video capability.
+
+Foundation 15 added exactly one type, previously entirely missing:
 
 - `Microsoft.Xna.Framework.Graphics.PresentationParameters`, a public
   non-sealed CLR class with a public parameterless constructor, mapping to an
@@ -106,14 +129,14 @@ callback, or constant was added, and the five runtime partials are untouched.
   the pinned assembly IL for this milestone, as were all 25 Foundation-14
   entries before it.
 - Formal projection: 257 Swift types / 2,887 Swift members.
-- Compiler target: 99 types / 1,573 members; 94 complete, five partial, 158
-  missing. Total diagnostics are 309. Normal strict remains red only for the
+- Compiler target: 103 types / 1,594 members; 98 complete, five partial, 154
+  missing. Total diagnostics are 305. Normal strict remains red only for the
   deferred profile; leak-only is green.
-- Verifier: 1,396 mutation/self-tests pass, up from 1,259. Every completed type
+- Verifier: 1,606 mutation/self-tests pass, up from 1,396. Every completed type
   is locally complete with zero diagnostics. Manual/applied allowlists and
   unmeasured structural categories are zero.
-- Pure behavior: 1,443 XNA-derived observation/assertion sites with zero
-  failures, up from 1,348. Swift projection qualification stays in separate
+- Pure behavior: 1,493 XNA-derived observation/assertion sites with zero
+  failures, up from 1,443. Swift projection qualification stays in separate
   tests and is not counted as XNA behavior.
 - Dependency graph: node names are now mapped exactly as the strict verifier
   maps them, which removed six false-positive dependency-complete candidates

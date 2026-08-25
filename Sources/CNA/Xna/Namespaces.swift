@@ -20,6 +20,9 @@ public enum Microsoft {
 
             /// Namespace marker only; excluded from XNA type counts.
             public enum Content {}
+
+            /// Namespace marker only; excluded from XNA type counts.
+            public enum Media {}
         }
     }
 }

@@ -10,7 +10,8 @@
     "Microsoft.Xna.Framework.Graphics.PackedVector",
     "Microsoft.Xna.Framework.Input",
     "Microsoft.Xna.Framework.Audio",
-    "Microsoft.Xna.Framework.Content"
+    "Microsoft.Xna.Framework.Content",
+    "Microsoft.Xna.Framework.Media"
   ],
   "typeKinds": {
     "class": "class",
@@ -45,10 +46,12 @@
     "operators": "all external labels are _"
   },
   "internalParameterOrderChecks": [
-    "Microsoft.Xna.Framework.Input.GamePadDPad.ctor"
+    "Microsoft.Xna.Framework.Input.GamePadDPad.ctor",
+    "Microsoft.Xna.Framework.Input.MouseState.ctor"
   ],
   "rawTypeChecks": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
+    "Microsoft.Xna.Framework.Audio.MicrophoneState",
     "Microsoft.Xna.Framework.Audio.SoundState",
     "Microsoft.Xna.Framework.DisplayOrientation",
     "Microsoft.Xna.Framework.Graphics.Blend",
@@ -76,7 +79,9 @@
     "Microsoft.Xna.Framework.Graphics.TextureFilter",
     "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
     "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
-    "Microsoft.Xna.Framework.Input.Buttons"
+    "Microsoft.Xna.Framework.Input.Buttons",
+    "Microsoft.Xna.Framework.Media.MediaSourceType",
+    "Microsoft.Xna.Framework.Media.MediaState"
   ],
   "typeMappings": {
     "System.Void": "Void",
