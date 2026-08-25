@@ -1,14 +1,15 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestones 23 and 24 status:** COMPLETE.
+**Foundation Milestones 23, 24 and 25 status:** COMPLETE.
 
-Three local commits this session, none pushed.
+Four local commits this session, none pushed.
 
 | Commit | What it is |
 |---|---|
 | `d5c0656` | `RETURN_NULLABILITY` — CLR reference nullability and Swift fallibility as independent axes, the pinned per-return-position inventory, the general verifier dimension, the two corrected expected shapes, and the isolated consumer's negative compile fixtures. Evidence: `docs/foundation-23-reference-return-nullability-evidence.md`. |
 | `e0940fb` | `Graphics.IGraphicsDeviceService` — the one XNA type the nullability decision unblocked, and the recorded reason every other candidate is still deferred. Evidence: `docs/foundation-24-graphics-device-service-evidence.md`. |
-| _(this one)_ | The handoff, the parameter-nullability observations, and the BCL authority provenance record. |
+| `71efd1d` | The parameter-nullability observations and the BCL authority provenance record. |
+| _(this one)_ | `Texture2D.Bounds` — the one still-missing member of the five runtime partials that is not native. Evidence: `docs/foundation-25-partial-member-audit-evidence.md`. |
 
 Foundation 22 (`fbc8c5d`) and everything before it are untouched.
 
@@ -44,9 +45,9 @@ SWIFT_TARGET=x86_64-pc-linux-gnu
 SWIFT_TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS
 RELEASE_BUILD=PASS
-DEBUG_TESTS=252 PASS
-RELEASE_TESTS=252 PASS
-NATIVE_TESTS=252 PASS (0 skipped, CNA_NATIVE_LIBRARY set)
+DEBUG_TESTS=253 PASS
+RELEASE_TESTS=253 PASS
+NATIVE_TESTS=253 PASS (0 skipped, CNA_NATIVE_LIBRARY set)
 WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE_INCLUDING_TESTS (forced full rebuild)
 SYMBOL_GRAPH=PASS
 API_SELF_TESTS=2197 PASS
@@ -71,8 +72,8 @@ NATIVE_STRESS=GAME_CYCLES=20 GAME_RECREATION_CYCLES=20 TEXTURE2D_CYCLES=20
     GAMEPAD_CAPABILITIES_CYCLES=20 NATIVE_CRASHES=0 OBSERVED_UAF=0
     OBSERVED_DOUBLE_FREE=0 MODE_FAILURES=0
 GAMEPAD_NATIVE=0 FAILURES HARDWARE_AVAILABLE=NO
-SOURCE_ARCHIVE=257 entries DETERMINISTIC=YES
-    SHA256=99986e966d7ee5d40ef70612325192aa5f2e936b52b9f49f57e3874e60e9746c
+SOURCE_ARCHIVE=259 entries DETERMINISTIC=YES
+    SHA256=2e94a637e06d29a3a60cc318a9d4844ad4d709f1cb658b65c4ebb88453f6dd0c
 ISOLATED_CONSUMER=DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
     REJECTED_NEGATIVE_CONSUMERS=4
 TEMPLATE=86687f62c3a13ee2b59798f338fc083f7399f447 UNCHANGED WORKTREE_CLEAN
@@ -108,10 +109,10 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887          (unchanged: Optional adds no identity)
 TARGET_TYPES=124                     (123 -> 124)
-TARGET_MEMBERS=1695                  (1690 -> 1695)
-TOTAL_DIAGNOSTICS=287                (286 -> 288 -> 287)
+TARGET_MEMBERS=1696                  (1690 -> 1696)
+TOTAL_DIAGNOSTICS=286                (286 -> 288 -> 286)
 MISSING_TYPE=133                     (134 -> 133)
-MISSING_MEMBER=131
+MISSING_MEMBER=130                   (131 -> 130)
 COMPLETE_TYPES=119                   (118 -> 119)
 PARTIAL_TYPES=5
 BASE_MAPPING_MISMATCH=2
@@ -140,18 +141,28 @@ PENDING_RETURN_NULLABILITY_PROJECTIONS=309
 `System.Object` returns arrive Optional from the type mapping whatever their
 verdict.
 
-## Types completed this session
+## Types and members completed this session
 
-One type, 5 mapped Swift XNA identities.
+One type, 5 mapped Swift XNA identities, plus one member on a partial.
 
 ```text
 Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService           5
+Microsoft.Xna.Framework.Graphics.Texture2D.Bounds                 1
 ```
 
 Its `GraphicsDevice` requirement is `PROVEN_NULLABLE_SUCCESS` and infallible,
 decided from its single registered implementor, so it is
 `var GraphicsDevice: Graphics.GraphicsDevice? { get }` — the shape Foundation 23
 made expressible. Nothing conforms to it; a test records that.
+
+`Texture2D.Bounds` is the first `MISSING_MEMBER` of a protected runtime partial
+to be closed. All 131 were tested against the IL for a native boundary: 79
+reach one, 15 name a still-missing type, and of the 29 that are clean, 28 would
+be fabrications because CNA's loop, device creation and window are native.
+`Bounds` is `Rectangle(0, 0, Width, Height)` and composes two members CNA
+already reads from `cna_texture2d_get_info`, so it reaches no native surface of
+its own and adds no ABI symbol. Every one of the other 28 has a recorded
+reason: `docs/foundation-25-partial-member-audit-evidence.md`.
 
 ## Public signatures changed
 
@@ -312,7 +323,8 @@ parameters as Optional. Details:
 - `Microsoft.Xna.Framework.Graphics.Texture2D`
 - `Microsoft.Xna.Framework.Graphics.SpriteBatch`
 
-Their 131 missing members are unchanged. What is new is that every reference
+Their missing members are down to 130, all of them native, blocked on a
+still-missing type, or blocked on an undecided BCL mapping. What is new is that every reference
 return they will eventually carry now has a recorded expected Optional shape:
 `returnNullabilityProjections` in the strict report names all 369 positions
 with the Swift type the pinned verdict requires, 60 of them observed today and

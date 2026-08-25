@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=124
-TARGET_MEMBERS=1695
-TOTAL_DIAGNOSTICS=287
+TARGET_MEMBERS=1696
+TOTAL_DIAGNOSTICS=286
 COMPLETE_TYPES=119
 PARTIAL_TYPES=5
 MISSING_TYPES=133
 MISSING_TYPE=133
-MISSING_MEMBER=131
+MISSING_MEMBER=130
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -329,7 +329,7 @@ Expected members: 21; emitted members: 6.
 
 ### `Microsoft.Xna.Framework.Graphics.Texture2D`
 
-Expected members: 16; emitted members: 4.
+Expected members: 16; emitted members: 5.
 
 - `BASE_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D`: expected base Microsoft.Xna.Framework.Graphics.Texture, found None
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32)`: mapped member is absent
@@ -346,7 +346,6 @@ Expected members: 16; emitted members: 4.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: mapped overload is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.Bounds()`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 

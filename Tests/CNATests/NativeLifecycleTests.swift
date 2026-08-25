@@ -298,6 +298,13 @@ final class NativeLifecycleTests: XCTestCase {
         XCTAssertEqual(game.viewport?.Height, 480)
         XCTAssertEqual(game.texture?.Width, 1)
         XCTAssertEqual(game.texture?.Height, 1)
+        // `Texture2D.get_Bounds` builds a Rectangle at the origin over the
+        // texture's own dimensions and has no failure path, so it composes the
+        // two members above rather than asking the runtime anything.
+        XCTAssertEqual(game.texture?.Bounds.X, 0)
+        XCTAssertEqual(game.texture?.Bounds.Y, 0)
+        XCTAssertEqual(game.texture?.Bounds.Width, game.texture?.Width)
+        XCTAssertEqual(game.texture?.Bounds.Height, game.texture?.Height)
         XCTAssertTrue(game.observedPressedKeys.isEmpty)
         XCTAssertEqual(Array(game.events.prefix(3)), ["Initialize", "LoadContent", "BeginRun"])
         XCTAssertTrue(game.events.contains("EndRun"))

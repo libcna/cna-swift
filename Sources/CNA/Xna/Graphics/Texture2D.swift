@@ -9,6 +9,19 @@ extension Microsoft.Xna.Framework.Graphics {
         public let Width: Int32
         public let Height: Int32
 
+        // `get_Bounds` is
+        //     ldloca V_0; ldc.i4.0; ldc.i4.0;
+        //     ldfld _width; ldfld _height;
+        //     call Rectangle::.ctor(int32,int32,int32,int32); ldloc.0; ret
+        // -- a rectangle at the origin over the texture's own dimensions, with
+        // no branch, no call out and no failure path. Both dimensions are
+        // already CNA members read once from `cna_texture2d_get_info`, so this
+        // composes them exactly as XNA does and reaches no native surface of
+        // its own.
+        public var Bounds: Microsoft.Xna.Framework.Rectangle {
+            Microsoft.Xna.Framework.Rectangle(0, 0, Width, Height)
+        }
+
         private init(handle: UInt64, runtime: RuntimeState, width: Int32, height: Int32) {
             storage = NativeHandleStorage(
                 handle: handle,

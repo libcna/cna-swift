@@ -64,6 +64,20 @@ final class Foundation24ProjectionTests: XCTestCase {
         XCTAssertNil(event as? ReferenceWritableKeyPath<Stub, CNAEvent<CNAEventArgs>>)
     }
 
+    // `Texture2D.Bounds` is derived, not stored: a key path proves the declared
+    // type is the XNA Rectangle and that the reader does not throw, without
+    // needing a native device to hold an instance.
+    func testTextureBoundsIsANonThrowingRectangleReader() {
+        typealias Texture = Microsoft.Xna.Framework.Graphics.Texture2D
+        let path: KeyPath<Texture, Microsoft.Xna.Framework.Rectangle> = \Texture.Bounds
+        XCTAssertNil(path as? ReferenceWritableKeyPath<
+            Texture, Microsoft.Xna.Framework.Rectangle>)
+        let width: KeyPath<Texture, Int32> = \Texture.Width
+        let height: KeyPath<Texture, Int32> = \Texture.Height
+        XCTAssertNotNil(width)
+        XCTAssertNotNil(height)
+    }
+
     // GraphicsDeviceManager is deliberately not a conformer: its own reader is
     // still `get throws` and non-Optional, which no `IGraphicsDeviceService`
     // requirement can witness.

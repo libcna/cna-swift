@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 124,
-    "TARGET_MEMBERS": 1695,
-    "TOTAL_DIAGNOSTICS": 287,
+    "TARGET_MEMBERS": 1696,
+    "TOTAL_DIAGNOSTICS": 286,
     "COMPLETE_TYPES": 119,
     "PARTIAL_TYPES": 5,
     "MISSING_TYPES": 133,
     "MISSING_TYPE": 133,
-    "MISSING_MEMBER": 131,
+    "MISSING_MEMBER": 130,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -1426,11 +1426,6 @@
       "category": "OVERLOAD_MAPPING_MISMATCH",
       "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)",
       "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Bounds()",
-      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -10971,7 +10966,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "status": "PARTIAL",
       "expectedMembers": 16,
-      "targetMembers": 4,
+      "targetMembers": 5,
       "diagnostics": [
         {
           "category": "BASE_MAPPING_MISMATCH",
@@ -11047,11 +11042,6 @@
           "category": "OVERLOAD_MAPPING_MISMATCH",
           "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)",
           "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Bounds()",
-          "detail": "mapped member is absent"
         }
       ]
     },
