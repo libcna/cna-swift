@@ -98,17 +98,22 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=124
-TARGET_MEMBERS=1696
-TOTAL_DIAGNOSTICS=286
-COMPLETE_TYPES=119
+TARGET_TYPES=126
+TARGET_MEMBERS=1706
+TOTAL_DIAGNOSTICS=284
+COMPLETE_TYPES=121
 PARTIAL_TYPES=5
-MISSING_TYPES=133
+MISSING_TYPES=131
 MISSING_MEMBER=130
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=115
 PROVEN_NONNULL_RETURN_PROJECTIONS=128
 UNKNOWN_RETURN_NULLABILITY_PROJECTIONS=126
+BCL_BASE_PROJECTIONS=5
+PROJECTED_BCL_BASE_TYPES=1
+PENDING_BCL_BASE_TYPES=4
+BCL_INHERITED_MEMBER_PROJECTIONS=16
+BCL_SUPPORT_TYPE_MEASUREMENTS=3
 ```
 
 Normal strict verification remains red because deferred XNA types are genuinely
@@ -130,9 +135,55 @@ MouseState, MediaState, MediaSourceType, MicrophoneState, the seven
 Foundation-17 types, TouchLocation, GestureSample, DisplayModeCollection,
 IUpdateable, IDrawable, GameComponentCollectionEventArgs,
 ResourceCreatedEventArgs, ResourceDestroyedEventArgs, AudioListener,
-TouchCollection, TouchCollection.Enumerator, Media.Video, AudioEmitter and
-IGraphicsDeviceService.
+TouchCollection, TouchCollection.Enumerator, Media.Video, AudioEmitter,
+IGraphicsDeviceService, GameComponentCollection and VisualizationData.
 Every implemented member has qualified behavior; missing members remain absent.
+
+## BCL base classes
+
+A CLR class used as the direct base of an XNA class projects through **real
+Swift class inheritance**, and the CLR generic argument is preserved:
+
+```swift
+public final class GameComponentCollection:
+    CNACollection<any Microsoft.Xna.Framework.IGameComponent>
+```
+
+`CNACollection`, `CNAReadOnlyCollection` and `CNAList` are the projections of
+`System.Collections.ObjectModel.Collection<T>`, `ReadOnlyCollection<T>` and
+`System.Collections.Generic.List<T>`, derived from a hash-registered Microsoft
+.NET Framework 4.0 `mscorlib` admitted through a **separate** BCL authority
+registry — `tools/api_compat/bcl-authorities.json`, audited by
+`tools/api_compat/bcl_authority_audit.py` against a pinned selected-shape
+manifest, sentinel facts, mutation self-tests, an independent metadata reader
+and negative controls that must be refused.
+
+They live outside `Microsoft.Xna.Framework`: they are language/BCL-support API,
+not XNA types, and are counted in no XNA scoreboard. `REFERENCE_MEMBERS` stays
+2,964 and `EXPECTED_SWIFT_MEMBERS` stays 2,887; the public surface an XNA type
+inherits from a BCL base is counted separately as
+`BCL_INHERITED_MEMBER_PROJECTIONS`.
+
+Both collection families are `open` classes over a reference-typed backing
+store, because both CLR wrapping constructors store the caller's list **live**
+rather than copying it — a Swift `Array` would discard both the reference
+identity and the live view. `CNACollection`'s public surface is `final` and only
+its four protected hooks (`ClearItems`, `InsertItem`, `RemoveItem`, `SetItem`)
+are `open`, reproducing `mscorlib`'s `virtual final` split exactly: a subclass
+changes behaviour only through the hooks.
+
+The base is measured in two halves, because the compiler's `inheritsFrom`
+relationship names only the generic symbol: the superclass **identity** comes
+from that relationship, and the generic **argument** is supplemented from the
+compiled Swift source declaration, exactly as enum raw values already are. A
+dropped base, a wrong support class, an `Array` substitution, composition in
+place of inheritance, an `Any` erasure and a wrong element type are all
+`BASE_MAPPING_MISMATCH`; unreadable source evidence is reported as unmeasured
+rather than assumed. There is no allowlist.
+
+`System.Exception`, `System.Attribute`, `Dictionary<K,V>`,
+`ExpandableObjectConverter` and `BinaryReader` remain **undecided**, and a type
+implemented on any of them still reports `UNMEASURED_STRUCTURAL_CATEGORY`.
 
 ## Throwing property accessors
 
