@@ -83,6 +83,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation23ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation24ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation28ContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation29ContractTests.swift",
 ]
 
 # Observations whose authority is the admitted Microsoft .NET Framework 4.0

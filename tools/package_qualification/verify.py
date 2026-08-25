@@ -876,6 +876,146 @@ func qualifyFoundation24ServiceSurface() throws {
               "service device key path")
 }
 
+func qualifyFoundation27To29BclSurface() throws {
+    typealias Collection = Microsoft.Xna.Framework.GameComponentCollection
+    typealias Component = any Microsoft.Xna.Framework.IGameComponent
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-27/29 \(what) qualification failed")
+        }
+    }
+
+    // An external package can conform to the XNA protocol and put its own
+    // components into the collection.
+    final class ExternalComponent: Microsoft.Xna.Framework.IGameComponent {
+        let name: String
+        init(_ name: String) { self.name = name }
+        func Initialize() throws {}
+    }
+
+    // The Swift superclass identity is publicly observable, and it is the
+    // exact specialization: this binding compiles only if the superclass is
+    // CNACollection<any IGameComponent>. An Any erasure would not compile.
+    let collection = Collection()
+    let asBase: CNACollection<Component> = collection
+    try check(asBase === collection, "collection superclass identity")
+    try check((collection as Any as? CNACollection<Component>) != nil,
+              "collection superclass specialization")
+    try check((collection as Any as? CNACollection<Any>) == nil,
+              "collection element type is not erased")
+
+    // Construction, and the inherited surface reached from outside.
+    let first = ExternalComponent("first")
+    let second = ExternalComponent("second")
+    try collection.Add(first)
+    try collection.Insert(0, item: second)
+    try check(collection.Count == 2, "collection count")
+    try check(collection.IndexOf(first) == 1, "collection index")
+    try check(collection.Contains(second), "collection contains")
+    try check((try collection.Item(0) as AnyObject) === second, "collection item")
+
+    // Iteration, through the projected throwing enumerator.
+    let enumerator = collection.GetEnumerator()
+    var walked: [String] = []
+    while let item = try enumerator.Next() {
+        walked.append((item as? ExternalComponent)?.name ?? "?")
+    }
+    try check(walked == ["second", "first"], "collection iteration order")
+
+    // Event subscription and ordering, from outside the package.
+    var events: [String] = []
+    let addedToken = collection.ComponentAdded.Add { sender, args in
+        let name = (args.GameComponent as? ExternalComponent)?.name ?? "?"
+        events.append("added:\(name):\((sender as AnyObject) === collection)")
+    }
+    _ = collection.ComponentRemoved.Add { _, args in
+        events.append("removed:\((args.GameComponent as? ExternalComponent)?.name ?? "?")")
+    }
+
+    let third = ExternalComponent("third")
+    try collection.Add(third)
+    try check(events == ["added:third:true"], "component added event")
+
+    // A duplicate is refused and announces nothing.
+    do {
+        try collection.Add(third)
+        throw CNAError.argument("isolated duplicate component was accepted")
+    } catch CNAError.argument {
+        // Exact expected refusal.
+    }
+    try check(events == ["added:third:true"], "duplicate raises no event")
+    try check(collection.Count == 3, "duplicate stores nothing")
+
+    // Indexed assignment is refused outright.
+    do {
+        try collection.SetItem(0, ExternalComponent("replacement"))
+        throw CNAError.argument("isolated indexed assignment was accepted")
+    } catch CNAError.notSupported {
+        // Exact expected refusal.
+    }
+
+    // Removal announces the component that went, after it is gone.
+    events.removeAll()
+    try check(try collection.Remove(third), "component removal")
+    try check(events == ["removed:third"], "component removed event")
+    collection.ComponentAdded.Remove(addedToken)
+
+    // Clear announces every remaining component -- in forward order, while the
+    // collection is still full -- and empties afterwards.
+    events.removeAll()
+    var countsDuringClear: [Int32] = []
+    _ = collection.ComponentRemoved.Add { _, _ in
+        countsDuringClear.append(collection.Count)
+    }
+    try collection.Clear()
+    try check(events == ["removed:second", "removed:first"], "clear announcement order")
+    try check(countsDuringClear == [2, 2], "clear announces while still full")
+    try check(collection.Count == 0, "clear empties the collection")
+
+    // The support classes are usable and derivable from outside the package,
+    // and the four hooks are open.
+    final class ExternalCollection: CNACollection<Int> {
+        var inserted: [Int32] = []
+        override func InsertItem(_ index: Int32, item: Int) throws {
+            inserted.append(index)
+            try super.InsertItem(index, item: item)
+        }
+        override func ClearItems() throws { try super.ClearItems() }
+        override func RemoveItem(_ index: Int32) throws { try super.RemoveItem(index) }
+        override func SetItem(_ index: Int32, item: Int) throws {
+            try super.SetItem(index, item: item)
+        }
+    }
+    let derived = ExternalCollection()
+    try derived.Add(10)
+    try derived.Add(20)
+    try check(derived.inserted == [0, 1], "external override receives the index")
+    try check(derived.Count == 2, "external override stores")
+
+    // The wrapping constructor is a live view, from outside too.
+    let backing = CNAList<Int>()
+    backing.Add(1)
+    let wrapper = CNACollection<Int>(list: backing)
+    backing.Add(2)
+    try check(wrapper.Count == 2, "external live wrapping view")
+    let readOnly = CNAReadOnlyCollection<Int>(list: backing)
+    backing.Add(3)
+    try check(readOnly.Count == 3, "external live read-only view")
+    try check((readOnly as Any as? CNACollection<Int>) == nil,
+              "read-only view is not a mutable collection")
+
+    // VisualizationData: constructible externally, 256 live zeros per view.
+    let visualization = Microsoft.Xna.Framework.Media.VisualizationData()
+    try check(visualization.Frequencies.Count == 256, "visualization frequency count")
+    try check(visualization.Samples.Count == 256, "visualization sample count")
+    try check(try visualization.Frequencies.Item(0) == 0, "visualization starts zeroed")
+    try check(visualization.Frequencies === visualization.Frequencies,
+              "visualization view identity")
+    try check(!(visualization.Frequencies === visualization.Samples),
+              "visualization views are distinct")
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
@@ -887,11 +1027,12 @@ do {
     try qualifyFoundation22AccessorSurface()
     try qualifyFoundation23NullabilitySurface()
     try qualifyFoundation24ServiceSurface()
+    try qualifyFoundation27To29BclSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS foundation23=PASS foundation24=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS foundation23=PASS foundation24=PASS foundation27to29=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -939,6 +1080,60 @@ NEGATIVE_SOURCES: list[tuple[str, str, str]] = [
         "let path = \\Microsoft.Xna.Framework.Input.Touch.TouchCollection"
         ".Enumerator.Current\n"
         "_ = path\n",
+    ),
+    (
+        "BCL base bound with the element type erased to Any",
+        "cannot",
+        "import CNA\n"
+        "let base: CNACollection<Any> = "
+        "Microsoft.Xna.Framework.GameComponentCollection()\n"
+        "_ = base\n",
+    ),
+    (
+        "BCL base bound with the wrong element type",
+        "cannot",
+        "import CNA\n"
+        "let base: CNACollection<any Microsoft.Xna.Framework.IUpdateable> = "
+        "Microsoft.Xna.Framework.GameComponentCollection()\n"
+        "_ = base\n",
+    ),
+    (
+        "a sealed CLR collection subclassed",
+        "inherit",
+        "import CNA\n"
+        "final class Rogue: Microsoft.Xna.Framework.GameComponentCollection {}\n"
+        "_ = Rogue.self\n",
+    ),
+    (
+        "read-only collection used as a mutable one",
+        "cannot",
+        "import CNA\n"
+        "let view = CNAReadOnlyCollection<Int>(list: CNAList<Int>())\n"
+        "let mutable: CNACollection<Int> = view\n"
+        "_ = mutable\n",
+    ),
+    (
+        "mutating through the read-only collection surface",
+        "no member",
+        "import CNA\n"
+        "let view = CNAReadOnlyCollection<Int>(list: CNAList<Int>())\n"
+        "try view.Add(1)\n",
+    ),
+    (
+        "a sealed public collection member overridden",
+        "cannot override",
+        "import CNA\n"
+        "final class Rogue: CNACollection<Int> {\n"
+        "    override func Add(_ item: Int) throws {}\n"
+        "}\n"
+        "_ = Rogue.self\n",
+    ),
+    (
+        "VisualizationData internal producer reached from outside",
+        "no member",
+        "import CNA\n"
+        "let data = Microsoft.Xna.Framework.Media.VisualizationData()\n"
+        "try data.store(frequencies: [], samples: [])\n",
     ),
 ]
 

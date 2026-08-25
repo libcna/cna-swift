@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 125,
-    "TARGET_MEMBERS": 1703,
-    "TOTAL_DIAGNOSTICS": 285,
-    "COMPLETE_TYPES": 120,
+    "TARGET_TYPES": 126,
+    "TARGET_MEMBERS": 1706,
+    "TOTAL_DIAGNOSTICS": 284,
+    "COMPLETE_TYPES": 121,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 132,
-    "MISSING_TYPE": 132,
+    "MISSING_TYPES": 131,
+    "MISSING_TYPE": 131,
     "MISSING_MEMBER": 130,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -84,8 +84,8 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 62,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 66,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 60,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 309,
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 62,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 307,
     "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 5
   },
   "completeTypes": [
@@ -199,6 +199,7 @@
     "Microsoft.Xna.Framework.Media.MediaState",
     "Microsoft.Xna.Framework.Media.Video",
     "Microsoft.Xna.Framework.Media.VideoSoundtrackType",
+    "Microsoft.Xna.Framework.Media.VisualizationData",
     "Microsoft.Xna.Framework.Plane",
     "Microsoft.Xna.Framework.PlaneIntersectionType",
     "Microsoft.Xna.Framework.PlayerIndex",
@@ -344,7 +345,6 @@
     "Microsoft.Xna.Framework.Media.Song",
     "Microsoft.Xna.Framework.Media.SongCollection",
     "Microsoft.Xna.Framework.Media.VideoPlayer",
-    "Microsoft.Xna.Framework.Media.VisualizationData",
     "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
     "Microsoft.Xna.Framework.Storage.StorageDevice",
@@ -1745,11 +1745,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Media.VideoPlayer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.VisualizationData",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -8270,28 +8265,28 @@
       "member": "Frequencies",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[System.Single]",
       "swiftReturnType": "CNAReadOnlyCollection<Float>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAReadOnlyCollection<Float>"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.VisualizationData",
       "member": "Samples",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[System.Single]",
       "swiftReturnType": "CNAReadOnlyCollection<Float>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAReadOnlyCollection<Float>"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Plane",
@@ -12016,16 +12011,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Media.VisualizationData",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.VisualizationData",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Plane",

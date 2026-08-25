@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=124
-TARGET_MEMBERS=1696
-TOTAL_DIAGNOSTICS=286
-COMPLETE_TYPES=119
+TARGET_TYPES=126
+TARGET_MEMBERS=1706
+TOTAL_DIAGNOSTICS=284
+COMPLETE_TYPES=121
 PARTIAL_TYPES=5
-MISSING_TYPES=133
-MISSING_TYPE=133
+MISSING_TYPES=131
+MISSING_TYPE=131
 MISSING_MEMBER=130
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -65,7 +65,12 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 NONPUBLIC_CONSTRUCTION_PROJECTIONS=8
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
-MEASURED_SUPPORT_BASE_PROJECTIONS=4
+BCL_SUPPORT_TYPE_MEASUREMENTS=3
+MEASURED_SUPPORT_BASE_PROJECTIONS=9
+BCL_BASE_PROJECTIONS=5
+PROJECTED_BCL_BASE_TYPES=1
+PENDING_BCL_BASE_TYPES=4
+BCL_INHERITED_MEMBER_PROJECTIONS=16
 REFERENCE_RETURN_PROJECTIONS=369
 OPTIONAL_RETURN_PROJECTIONS=153
 NONOPTIONAL_RETURN_PROJECTIONS=216
@@ -76,8 +81,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=70
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=62
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=66
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=60
-PENDING_RETURN_NULLABILITY_PROJECTIONS=309
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=62
+PENDING_RETURN_NULLABILITY_PROJECTIONS=307
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 ```
 
@@ -101,6 +106,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 - `Microsoft.Xna.Framework.CurveLoopType`
 - `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.DisplayOrientation`
+- `Microsoft.Xna.Framework.GameComponentCollection`
 - `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.Blend`
@@ -192,6 +198,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 - `Microsoft.Xna.Framework.Media.MediaState`
 - `Microsoft.Xna.Framework.Media.Video`
 - `Microsoft.Xna.Framework.Media.VideoSoundtrackType`
+- `Microsoft.Xna.Framework.Media.VisualizationData`
 - `Microsoft.Xna.Framework.Plane`
 - `Microsoft.Xna.Framework.PlaneIntersectionType`
 - `Microsoft.Xna.Framework.PlayerIndex`
@@ -357,7 +364,7 @@ Expected members: 30; emitted members: 4.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.CanResetDevice(_:Microsoft.Xna.Framework.GraphicsDeviceInformation)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:System.Collections.Generic.List<Microsoft.Xna.Framework.GraphicsDeviceInformation>)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceCreated(_:Any?,args:CNAEventArgs)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceDisposing(_:Any?,args:CNAEventArgs)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceReset(_:Any?,args:CNAEventArgs)`: mapped member is absent
@@ -426,7 +433,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.DrawableGameComponent`
 - `Microsoft.Xna.Framework.FrameworkDispatcher`
 - `Microsoft.Xna.Framework.GameComponent`
-- `Microsoft.Xna.Framework.GameComponentCollection`
 - `Microsoft.Xna.Framework.GameServiceContainer`
 - `Microsoft.Xna.Framework.GameWindow`
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
@@ -512,7 +518,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Media.Song`
 - `Microsoft.Xna.Framework.Media.SongCollection`
 - `Microsoft.Xna.Framework.Media.VideoPlayer`
-- `Microsoft.Xna.Framework.Media.VisualizationData`
 - `Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs`
 - `Microsoft.Xna.Framework.Storage.StorageContainer`
 - `Microsoft.Xna.Framework.Storage.StorageDevice`

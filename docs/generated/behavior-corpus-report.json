@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1835,
-  "ASSERTIONS": 1835,
+  "OBSERVATIONS": 1861,
+  "ASSERTIONS": 1861,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -168,7 +168,16 @@
     "testAThrowingHandlerPropagatesAfterTheMutation",
     "testSubscriptionsAreIndependentAndRemovable",
     "testTheTwoEventsAreDistinct",
-    "testEventViewsHaveStableIdentity"
+    "testEventViewsHaveStableIdentity",
+    "testVisualizationDataCarriesTwoHundredFiftySixValues",
+    "testVisualizationDataStartsZeroFilled",
+    "testVisualizationDataCollectionsHaveStableIdentity",
+    "testVisualizationDataFrequenciesAndSamplesAreDistinct",
+    "testVisualizationDataInstancesShareNoStorage",
+    "testVisualizationDataCollectionsAreLiveViewsOfTheirStorage",
+    "testVisualizationDataLengthIsInvariantAcrossWrites",
+    "testVisualizationDataRejectsOutOfRangeIndices",
+    "testVisualizationDataViewsSupportTheReadOnlySurface"
   ],
   "BCL_AUTHORITY": "PURE_BCL_DERIVED",
   "BCL_OBSERVATIONS": 77,

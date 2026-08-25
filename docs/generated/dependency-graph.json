@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 33,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 31,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
@@ -116,23 +116,6 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.GameComponentCollection",
-      "dependencies": [
-        "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
-        "Microsoft.Xna.Framework.IGameComponent"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.Game"
-      ],
-      "transitiveMissingReverseReach": 3,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
-    },
-    {
       "type": "Microsoft.Xna.Framework.GameServiceContainer",
       "dependencies": [],
       "dependencyComplete": true,
@@ -176,6 +159,22 @@
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
       ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Audio.AudioEmitter",
+        "Microsoft.Xna.Framework.Audio.AudioListener",
+        "Microsoft.Xna.Framework.Audio.SoundState"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+        "Microsoft.Xna.Framework.Audio.SoundEffect"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 2,
+      "transitivePartialReverseReach": []
     }
   ]
 }
