@@ -8,3 +8,5 @@
 /build-asan
 /build-tsan
 /build-consumer
+__pycache__/
+*.pyc
