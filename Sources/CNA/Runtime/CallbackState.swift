@@ -46,7 +46,7 @@ private func dispatchLifecycle(
         case .update: try game.Update(runtime.gameTime(from: nativeTime))
         case .draw: try game.Draw(runtime.gameTime(from: nativeTime))
         case .unloadContent: try game.UnloadContent()
-        case .exiting: try game.OnExiting(game, args: CNAEventArgs())
+        case .exiting: try game.OnExiting(game, args: CNAEventArgs.Empty)
         case .beginRun: try game.BeginRun()
         case .endRun: try game.EndRun()
         case .endDraw: try game.EndDraw()

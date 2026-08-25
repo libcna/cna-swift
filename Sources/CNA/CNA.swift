@@ -2,10 +2,36 @@
 
 import Foundation
 
-/// Empty support value used by the formal `System.EventArgs` language mapping.
+/// The formal `System.EventArgs` projection.
+///
+/// This is a CLR *class*, and the whole XNA event-argument hierarchy derives
+/// from it: `GameComponentCollectionEventArgs`, `ResourceCreatedEventArgs`,
+/// `ResourceDestroyedEventArgs` and `PreparingDeviceSettingsEventArgs` all have
+/// `System.EventArgs` as their direct base. Projecting it as a Swift `struct`
+/// would make that hierarchy inexpressible, so it is an `open class`: base
+/// fidelity is worth more than the accidental value semantics the earlier
+/// support struct happened to have. The base is a measured mapping, not a
+/// dropped one — see `BASE_MAPPING_MISMATCH` in the strict verifier.
+///
+/// It deliberately does **not** conform to `Sendable`. It is open, so a
+/// subclass anywhere may add mutable stored state, and neither this type nor
+/// the compiler can make a cross-actor safety promise on that subclass's
+/// behalf. `@unchecked Sendable` would assert exactly the guarantee that
+/// cannot be earned here.
+///
 /// It is deliberately outside the strict XNA namespace and is not counted as
 /// an XNA type.
-public struct CNAEventArgs: Sendable {
+open class CNAEventArgs {
+    /// `System.EventArgs.Empty`.
+    ///
+    /// The pinned XNA IL never constructs an event-argument object for an
+    /// `EventHandler<EventArgs>` raise: all 46 raise sites across the
+    /// registered `Microsoft.Xna.Framework.Game.dll` and
+    /// `Microsoft.Xna.Framework.Graphics.dll` load the static
+    /// `System.EventArgs::Empty` field, and none executes `newobj`. One shared
+    /// instance therefore preserves the object identity a handler observes.
+    public static let Empty = CNAEventArgs()
+
     public init() {}
 }
 

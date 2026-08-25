@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=113
-TARGET_MEMBERS=1641
-TOTAL_DIAGNOSTICS=295
-COMPLETE_TYPES=108
+TARGET_TYPES=118
+TARGET_MEMBERS=1656
+TOTAL_DIAGNOSTICS=290
+COMPLETE_TYPES=113
 PARTIAL_TYPES=5
-MISSING_TYPES=144
-MISSING_TYPE=144
+MISSING_TYPES=139
+MISSING_TYPE=139
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -52,7 +52,10 @@ COLLECTION_INTERFACE_PROJECTIONS=1
 ENUMERATOR_SUPPORT_PROJECTIONS=9
 INDEXED_PROPERTY_ACCESSOR_PROJECTIONS=4
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=5
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=7
+EVENT_PROJECTIONS=49
+EVENT_SUPPORT_TYPE_MEASUREMENTS=4
+MEASURED_SUPPORT_BASE_PROJECTIONS=4
 ```
 
 ## Complete types
@@ -73,6 +76,7 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=5
 - `Microsoft.Xna.Framework.CurveLoopType`
 - `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.DisplayOrientation`
+- `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.Blend`
 - `Microsoft.Xna.Framework.Graphics.BlendFunction`
@@ -116,6 +120,8 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=5
 - `Microsoft.Xna.Framework.Graphics.PresentationParameters`
 - `Microsoft.Xna.Framework.Graphics.PrimitiveType`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetUsage`
+- `Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs`
+- `Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.SetDataOptions`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
@@ -127,8 +133,10 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=5
 - `Microsoft.Xna.Framework.Graphics.VertexElementFormat`
 - `Microsoft.Xna.Framework.Graphics.VertexElementUsage`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
+- `Microsoft.Xna.Framework.IDrawable`
 - `Microsoft.Xna.Framework.IGameComponent`
 - `Microsoft.Xna.Framework.IGraphicsDeviceManager`
+- `Microsoft.Xna.Framework.IUpdateable`
 - `Microsoft.Xna.Framework.Input.ButtonState`
 - `Microsoft.Xna.Framework.Input.Buttons`
 - `Microsoft.Xna.Framework.Input.GamePad`
@@ -390,7 +398,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.FrameworkDispatcher`
 - `Microsoft.Xna.Framework.GameComponent`
 - `Microsoft.Xna.Framework.GameComponentCollection`
-- `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
 - `Microsoft.Xna.Framework.GameServiceContainer`
 - `Microsoft.Xna.Framework.GameWindow`
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
@@ -439,8 +446,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetBinding`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetCube`
-- `Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs`
-- `Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.SamplerState`
 - `Microsoft.Xna.Framework.Graphics.SamplerStateCollection`
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
@@ -457,8 +462,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture`
 - `Microsoft.Xna.Framework.Graphics.VertexPositionTexture`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
-- `Microsoft.Xna.Framework.IDrawable`
-- `Microsoft.Xna.Framework.IUpdateable`
 - `Microsoft.Xna.Framework.Input.Mouse`
 - `Microsoft.Xna.Framework.Input.Touch.TouchCollection`
 - `Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator`

@@ -36,6 +36,12 @@ TYPE_KINDS = {
     "swift.enum": "enum",
 }
 
+# CLR encodes an event as add_/remove_/raise_ accessor methods. Zero reference
+# members in the pinned contract carry these prefixes, so any such name in the
+# strict XNA surface is a leaked CLR accessor, never an XNA identity. Kept in
+# step with `eventAccessorPrefixes` by a self-test.
+EVENT_ACCESSOR_PREFIXES = ("add_", "remove_", "raise_")
+
 OPERATOR_FROM_SWIFT = {
     "==": "op_Equality", "!=": "op_Inequality", "+": "op_Addition",
     "*": "op_Multiply", "/": "op_Division",
@@ -83,6 +89,7 @@ class TypeModel:
     members: list[Member] = dataclasses.field(default_factory=list)
     raw_type: str | None = None
     verify_raw_type: bool = False
+    access: str = ""
 
 
 def load_json(path: Path) -> Any:
@@ -138,6 +145,12 @@ def map_clr_type(
     enumerator = re.fullmatch(r"System\.Collections\.Generic\.IEnumerator`1\[(.+)]", text)
     if enumerator:
         return f"CNAEnumerator<{map_clr_type(enumerator.group(1), rules, generic_parameters)}>"
+    # Every public event in the pinned contract is System.EventHandler<TArgs>.
+    # The delegate is not projected; the event is one get-only property of the
+    # consumer view type. See `eventMapping`.
+    handler = re.fullmatch(r"System\.EventHandler`1\[(.+)]", text)
+    if handler:
+        return f"CNAEvent<{map_clr_type(handler.group(1), rules, generic_parameters)}>"
     generic = re.fullmatch(r"(.+)`(\d+)\[(.*)]", text)
     if generic:
         base = map_type_name(f"{generic.group(1)}`{generic.group(2)}", rules)
@@ -213,6 +226,11 @@ def expected_member(
         mutable = bool(source.get("set"))
     elif kind == "field":
         mutable = not bool(source.get("constant"))
+    elif kind == "event":
+        # A CLR event has add/remove accessors and no setter. The projected
+        # Swift property is therefore get-only, and a writable one is an
+        # EVENT_MAPPING_MISMATCH rather than a silent difference.
+        mutable = False
 
     raw: int | None = None
     if kind == "field" and source.get("value") is not None:
@@ -262,11 +280,13 @@ def build_expected(contract: dict[str, Any], rules: dict[str, Any]) -> dict[str,
         generic_parameters = tuple(
             item["name"] for item in source_type.get("genericParameters", [])
         )
+        clr_base = source_type.get("baseType")
+        mapped_base = map_clr_type(clr_base, rules) if clr_base else None
         model = TypeModel(
             name=name,
             kind=swift_kind,
             flags=flags,
-            base=map_clr_type(source_type.get("baseType"), rules) if source_type.get("baseType") else None,
+            base=mapped_base,
             interfaces=tuple(map_clr_type(value, rules) for value in source_type.get("directInterfaces", [])),
             generic_count=len(generic_parameters),
             generic_parameters=generic_parameters,
@@ -295,6 +315,12 @@ def normalize_swift_type(text: str) -> str:
     value = re.sub(r"\s+", " ", text.strip())
     value = value.replace("Swift.", "").replace("CNA.", "")
     value = value.replace("Self.", "")
+    # `any P` is the Swift 5.7+ spelling of the existential `P`, and the
+    # compiler emits it whether or not the source wrote it. It is the same
+    # type, so it normalizes away. `some P` is deliberately NOT normalized: an
+    # opaque result type is a different type from the existential a CLR
+    # interface-typed member requires, and must still be diagnosed.
+    value = re.sub(r"\bany\s+", "", value)
     if value == "InputStream":
         value = "Foundation.InputStream"
     value = value.replace("()", "Void") if value == "()" else value
@@ -562,6 +588,7 @@ def parse_symbol_graph(
     graph = load_json(path)
     symbols = {item["identifier"]["precise"]: item for item in graph["symbols"]}
     markers = set(rules["namespaceMarkers"])
+    support_names = set(rules.get("eventSupportContract", {}))
     raw_values = source_constant_values(source_root)
     raw_types = source_raw_types(source_root)
     types: dict[str, TypeModel] = {}
@@ -573,7 +600,11 @@ def parse_symbol_graph(
         if path_name.startswith("Microsoft.Xna.Framework"):
             strict_symbols += 1
         swift_kind = symbol["kind"]["identifier"]
-        if swift_kind not in TYPE_KINDS or not path_name.startswith("Microsoft.Xna.Framework") or path_name in markers:
+        selected = (
+            path_name.startswith("Microsoft.Xna.Framework") or
+            path_name in support_names
+        )
+        if swift_kind not in TYPE_KINDS or not selected or path_name in markers:
             continue
         decl = declaration(symbol)
         generic_match = re.search(
@@ -592,6 +623,7 @@ def parse_symbol_graph(
             declaration=decl,
             identifier=symbol["identifier"]["precise"],
             raw_type=raw_types.get(path_name.rsplit(".", 1)[-1]),
+            access=symbol.get("accessLevel", ""),
         )
 
     member_relationships: dict[str, str] = {}
@@ -769,9 +801,11 @@ def parse_symbol_graph(
             "sourceOrigin": display_name,
         })
 
+    support = {name: types.pop(name) for name in support_names if name in types}
+
     return (
         types, diagnostics_context, strict_symbols, observed_projections,
-        indexed_evidence,
+        indexed_evidence, support,
     )
 
 
@@ -783,6 +817,44 @@ def comparable_kind(expected: Member, actual: Member) -> bool:
     if expected.kind == "event" and actual.kind == "property":
         return True
     return False
+
+
+# An XNA base has always been measured. A non-XNA CLR base is measured exactly
+# when the project has decided its support projection: `System.EventArgs` maps
+# to `CNAEventArgs` and is checked, while `System.Object`, `System.ValueType`
+# and the still-undecided BCL bases stay unmeasured rather than silently
+# asserted. Kept in step with `measuredSupportBaseProjections` by a self-test.
+MEASURED_SUPPORT_BASES = ("CNAEventArgs",)
+
+# The three CLR roots carry no projected members, so a type sitting directly on
+# one of them has nothing to inherit and needs no base decision. Every other
+# non-XNA base is a real BCL mapping question.
+CLR_ROOT_BASES = ("Any?", "System.ValueType", "System.Enum")
+
+
+def base_is_measured(mapped_base: str | None) -> bool:
+    if not mapped_base:
+        return False
+    return (
+        mapped_base.startswith("Microsoft.Xna.Framework") or
+        mapped_base in MEASURED_SUPPORT_BASES
+    )
+
+
+def base_is_undecided(mapped_base: str | None) -> bool:
+    """A non-XNA base whose support projection this project has not decided.
+
+    Implementing such a type would drop its CLR base silently -- exactly the
+    failure the `System.EventArgs` decision was made to avoid. Reporting it as
+    unmeasured keeps the deferral honest: `System.Exception`,
+    `System.Attribute`, `Collection<T>`, `ReadOnlyCollection<T>` and
+    `Dictionary<K,V>` cannot be quietly projected as base-less Swift classes to
+    improve the scoreboard, and a future decision plugs into the same measured
+    machinery `CNAEventArgs` uses.
+    """
+    if not mapped_base or base_is_measured(mapped_base):
+        return False
+    return mapped_base not in CLR_ROOT_BASES
 
 
 def system_interface_is_language_mapped(name: str) -> bool:
@@ -877,8 +949,14 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
             ))
 
         expected_base = expected_type.base
-        if expected_base and expected_base.startswith("Microsoft.Xna.Framework") and actual_type.base != expected_base:
+        if base_is_measured(expected_base) and actual_type.base != expected_base:
             result.append(diagnostic("BASE_MAPPING_MISMATCH", name, f"expected base {expected_base}, found {actual_type.base}"))
+        elif base_is_undecided(expected_base):
+            result.append(diagnostic(
+                "UNMEASURED_STRUCTURAL_CATEGORY", name,
+                f"CLR base {expected_base} has no decided Swift support "
+                "projection, so this implemented type's base is unmeasured",
+            ))
         expected_interfaces = {
             item for item in expected_type.interfaces
             if not system_interface_is_language_mapped(item) and item.split("<", 1)[0] in expected
@@ -942,7 +1020,11 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
                 }.get(expected_member_model.kind, "METHOD_SIGNATURE_MAPPING_MISMATCH")
                 result.append(diagnostic(category, subject, f"expected {expected_member_model.kind}, found {candidate.kind}"))
             if expected_member_model.static != candidate.static:
-                category = "PROPERTY_MAPPING_MISMATCH" if expected_member_model.kind in ("property", "field") else "METHOD_SIGNATURE_MAPPING_MISMATCH"
+                category = {
+                    "property": "PROPERTY_MAPPING_MISMATCH",
+                    "field": "PROPERTY_MAPPING_MISMATCH",
+                    "event": "EVENT_MAPPING_MISMATCH",
+                }.get(expected_member_model.kind, "METHOD_SIGNATURE_MAPPING_MISMATCH")
                 result.append(diagnostic(category, subject, "static/instance identity differs"))
             if len(expected_member_model.parameters) != len(candidate.parameters):
                 result.append(diagnostic("OVERLOAD_MAPPING_MISMATCH", subject, f"expected {len(expected_member_model.parameters)} parameters, found {len(candidate.parameters)}"))
@@ -960,11 +1042,18 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
                         f"expected internal parameter order {expected_member_model.parameter_names}, "
                         f"found {candidate.parameter_names}",
                     ))
-            if expected_member_model.kind in ("method", "property", "field") and expected_member_model.return_type != candidate.return_type:
-                category = "RETURN_MAPPING_MISMATCH" if expected_member_model.kind == "method" else ("FIELD_MAPPING_MISMATCH" if expected_member_model.kind == "field" else "PROPERTY_MAPPING_MISMATCH")
+            if expected_member_model.kind in ("method", "property", "field", "event") and expected_member_model.return_type != candidate.return_type:
+                category = {
+                    "method": "RETURN_MAPPING_MISMATCH",
+                    "field": "FIELD_MAPPING_MISMATCH",
+                    "event": "EVENT_MAPPING_MISMATCH",
+                }.get(expected_member_model.kind, "PROPERTY_MAPPING_MISMATCH")
                 result.append(diagnostic(category, subject, f"expected {expected_member_model.return_type}, found {candidate.return_type}"))
             if expected_member_model.mutable is not None and candidate.mutable is not None and expected_member_model.mutable != candidate.mutable:
-                category = "FIELD_MAPPING_MISMATCH" if expected_member_model.kind == "field" else "PROPERTY_MAPPING_MISMATCH"
+                category = {
+                    "field": "FIELD_MAPPING_MISMATCH",
+                    "event": "EVENT_MAPPING_MISMATCH",
+                }.get(expected_member_model.kind, "PROPERTY_MAPPING_MISMATCH")
                 result.append(diagnostic(category, subject, f"expected mutable={expected_member_model.mutable}, found mutable={candidate.mutable}"))
             if (
                 expected_member_model.self_mutating is not None and
@@ -997,6 +1086,15 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
             result.append(diagnostic("UNEXPECTED_TYPE", name, "public XNA-namespace type has no mapped reference identity"))
             if any(part.startswith("_") or part in {"Runtime", "Native", "Internal"} for part in name.split(".")):
                 result.append(diagnostic("INTERNAL_TYPE_LEAK", name, "implementation type leaked into strict XNA namespace"))
+
+    for model in actual.values():
+        for member in model.members:
+            if member.name.startswith(EVENT_ACCESSOR_PREFIXES):
+                result.append(diagnostic(
+                    "EVENT_MAPPING_MISMATCH", member.display,
+                    "CLR event accessor leaked as an XNA identity; a CLR event "
+                    "maps to one get-only CNAEvent property and no accessor",
+                ))
 
     pointer_pattern = re.compile(r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle|CNASwift_|CNA_Handle")
     raw_pattern = re.compile(r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle")
@@ -2830,6 +2928,398 @@ def self_test() -> None:
     # registered in `internalParameterOrderChecks` and the internal names are
     # compared positionally.
     # ------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # CLR event projection, the System.EventArgs base, and the event support
+    # types. All 49 events in the pinned contract are the single shape
+    # System.EventHandler<TArgs>; each maps to exactly one get-only property of
+    # type CNAEvent<TArgs> that keeps the XNA event name. The CLR add_/remove_/
+    # raise_ accessors are the encoding of an event, never XNA identities.
+    # ------------------------------------------------------------------
+    event_self_tests = 0
+
+    if EVENT_ACCESSOR_PREFIXES != tuple(rules.get("eventAccessorPrefixes", [])):
+        failures.append("event accessor prefixes drifted from mapping-rules.json")
+    event_self_tests += 1
+    if sorted(MEASURED_SUPPORT_BASES) != sorted(
+        rules.get("measuredSupportBaseProjections", {}).values()
+    ):
+        failures.append("measured support bases drifted from mapping-rules.json")
+    event_self_tests += 1
+
+    # Every event in the pinned contract really is EventHandler<TArgs>, so the
+    # single projection rule is complete rather than merely convenient.
+    contract_events = [
+        (item["name"], member)
+        for item in contract["types"] for member in item["members"]
+        if member["kind"] == "event"
+    ]
+    if len(contract_events) != 49:
+        failures.append(f"expected 49 pinned events, found {len(contract_events)}")
+    event_self_tests += 1
+    for owner_name, member in contract_events:
+        if not member["type"].startswith("System.EventHandler`1["):
+            failures.append(f"{owner_name}.{member['name']} is not EventHandler<TArgs>")
+        event_self_tests += 1
+
+    updateable_name = "Microsoft.Xna.Framework.IUpdateable"
+    event_expected = {updateable_name: copy.deepcopy(all_expected[updateable_name])}
+    enabled_changed = next(
+        member for member in event_expected[updateable_name].members
+        if member.name == "EnabledChanged"
+    )
+    if enabled_changed.kind != "event":
+        failures.append("IUpdateable.EnabledChanged is not a pinned event")
+    event_self_tests += 1
+    if enabled_changed.return_type != "CNAEvent<CNAEventArgs>":
+        failures.append(
+            "IUpdateable.EnabledChanged does not map to CNAEvent<CNAEventArgs>")
+    event_self_tests += 1
+    if enabled_changed.mutable is not False:
+        failures.append("a pinned CLR event does not map to a get-only property")
+    event_self_tests += 1
+
+    def event_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(
+            member for member in models[updateable_name].members
+            if member.name == name
+        )
+
+    def event_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(event_expected, models)}
+
+    event_good = copy.deepcopy(event_expected)
+    event_good[updateable_name].identifier = updateable_name
+    for index, member in enumerate(event_good[updateable_name].members):
+        member.identifier = f"{updateable_name}:{index}"
+        if member.kind == "event":
+            # What the compiler actually emits for the projection: a get-only
+            # property whose type is the consumer view.
+            member.kind = "property"
+            member.declaration = (
+                f"var {member.name}: CNAEvent<CNAEventArgs> {{ get }}"
+            )
+    if event_categories(event_good):
+        failures.append("the IUpdateable event reference model is not diagnostic-free")
+    event_self_tests += 1
+
+    def event_leak(name: str) -> dict[str, TypeModel]:
+        models = copy.deepcopy(event_good)
+        models[updateable_name].members.append(Member(
+            updateable_name, "method", name, False, ("CNAEvent<CNAEventArgs>",),
+            ("_",), ("",), "Void",
+            declaration=f"func {name}(_ handler: CNAEvent<CNAEventArgs>)",
+            identifier=f"{updateable_name}:{name}",
+        ))
+        return models
+
+    event_mutations: list[tuple[str, str, Any]] = [
+        ("event missing", "MISSING_MEMBER",
+         lambda m: m[updateable_name].members.remove(
+             event_member(m, "EnabledChanged"))),
+        ("event renamed", "MISSING_MEMBER",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "name", "OnEnabledChanged")),
+        ("event projected as a bare closure", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "return_type",
+                           "(Any?, CNAEventArgs) throws -> Void")),
+        ("event projected as an array of closures", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "return_type",
+                           "[(Any?, CNAEventArgs) throws -> Void]")),
+        ("event projected as CNAEventSource", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "return_type",
+                           "CNAEventSource<CNAEventArgs>")),
+        ("support source leaked as the event property", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(event_member(m, "UpdateOrderChanged"), "return_type",
+                           "CNAEventSource<CNAEventArgs>")),
+        ("event property writable", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "mutable", True)),
+        ("wrong TArgs", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "return_type",
+                           "CNAEvent<Microsoft.Xna.Framework.GameComponentCollectionEventArgs>")),
+        ("event static/instance identity", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "static", True)),
+        ("event projected as a callback pointer", "RAW_HANDLE_LEAK",
+         lambda m: setattr(event_member(m, "EnabledChanged"), "declaration",
+                           "var EnabledChanged: UnsafeRawPointer { get }")),
+    ]
+    for label, wanted, mutate in event_mutations:
+        models = copy.deepcopy(event_good)
+        mutate(models)
+        if wanted not in event_categories(models):
+            failures.append(f"event {label}: did not produce {wanted}")
+        event_self_tests += 1
+
+    for prefix in EVENT_ACCESSOR_PREFIXES:
+        observed = event_categories(event_leak(f"{prefix}EnabledChanged"))
+        if "EVENT_MAPPING_MISMATCH" not in observed:
+            failures.append(f"{prefix}EnabledChanged leak was not diagnosed")
+        event_self_tests += 1
+        if "UNEXPECTED_MEMBER" not in observed:
+            failures.append(f"{prefix}EnabledChanged has no reference identity")
+        event_self_tests += 1
+
+    # ------------------------------------------------------------------
+    # System.EventArgs is a MEASURED base, not a dropped one.
+    # ------------------------------------------------------------------
+    args_name = "Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs"
+    args_expected = {args_name: copy.deepcopy(all_expected[args_name])}
+    if args_expected[args_name].base != "CNAEventArgs":
+        failures.append("ResourceCreatedEventArgs does not map its base to CNAEventArgs")
+    event_self_tests += 1
+    if not base_is_measured(args_expected[args_name].base):
+        failures.append("the CNAEventArgs base projection is not measured")
+    event_self_tests += 1
+    if base_is_measured("System.ValueType") or base_is_measured("Any?"):
+        failures.append("an undecided BCL base is being asserted as measured")
+    event_self_tests += 1
+
+    # A CLR root carries no projected members, so it needs no base decision.
+    for root in CLR_ROOT_BASES:
+        if base_is_undecided(root):
+            failures.append(f"CLR root base {root} was reported undecided")
+        event_self_tests += 1
+    if base_is_undecided("Microsoft.Xna.Framework.Graphics.Texture") or \
+            base_is_undecided("CNAEventArgs") or base_is_undecided(None):
+        failures.append("a decided base was reported undecided")
+    event_self_tests += 1
+
+    # Every other non-XNA base is a real BCL mapping question, and implementing
+    # such a type without deciding it must be caught rather than silently
+    # accepted. These are the still-deferred bases named in the handoff.
+    undecided_bases = [
+        "System.Exception",
+        "System.Attribute",
+        "System.Runtime.InteropServices.ExternalException",
+        "System.ComponentModel.ExpandableObjectConverter",
+        "System.IO.BinaryReader",
+        "System.Collections.Generic.Dictionary<String, String>",
+        "System.Collections.ObjectModel.Collection<Microsoft.Xna.Framework.IGameComponent>",
+        "System.Collections.ObjectModel.ReadOnlyCollection<Microsoft.Xna.Framework.Graphics.ModelBone>",
+    ]
+    for undecided in undecided_bases:
+        if not base_is_undecided(undecided):
+            failures.append(f"undecided BCL base {undecided} was treated as decided")
+        event_self_tests += 1
+
+    # GameComponentCollection is the live case: its XNA dependencies are all
+    # complete, so only the base guard stops it being projected as a base-less
+    # Swift class whose entire collection surface would be invented rather than
+    # derived.
+    collection_name = "Microsoft.Xna.Framework.GameComponentCollection"
+    collection_expected = {collection_name: copy.deepcopy(all_expected[collection_name])}
+    if not base_is_undecided(collection_expected[collection_name].base):
+        failures.append("GameComponentCollection's Collection<T> base is not guarded")
+    event_self_tests += 1
+    collection_actual = {collection_name: TypeModel(
+        collection_name, "class", identifier=collection_name,
+        declaration=f"class {collection_name}",
+    )}
+    if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
+        item["category"] for item in compare(collection_expected, collection_actual)
+    }:
+        failures.append(
+            "implementing GameComponentCollection without deciding its base "
+            "was not reported unmeasured")
+    event_self_tests += 1
+
+    args_good = copy.deepcopy(args_expected)
+    args_good[args_name].identifier = args_name
+    for index, member in enumerate(args_good[args_name].members):
+        member.identifier = f"{args_name}:{index}"
+
+    def args_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(args_expected, models)}
+
+    if args_categories(args_good):
+        failures.append("the ResourceCreatedEventArgs reference model is not clean")
+    event_self_tests += 1
+
+    base_mutations: list[tuple[str, Any]] = [
+        ("missing CNAEventArgs base", lambda m: setattr(m[args_name], "base", None)),
+        ("AnyObject in place of the base", lambda m: setattr(m[args_name], "base", "AnyObject")),
+        ("Object in place of the base", lambda m: setattr(m[args_name], "base", "Any?")),
+        ("wrong support base", lambda m: setattr(m[args_name], "base", "CNAEventSubscription")),
+        ("extra incompatible base projection",
+         lambda m: setattr(m[args_name], "base", "CNAEnumerator<CNAEventArgs>")),
+    ]
+    for label, mutate in base_mutations:
+        models = copy.deepcopy(args_good)
+        mutate(models)
+        if "BASE_MAPPING_MISMATCH" not in args_categories(models):
+            failures.append(f"EventArgs base: {label} did not fail")
+        event_self_tests += 1
+
+    # A struct cannot carry the CLR class base, so it is caught twice.
+    models = copy.deepcopy(args_good)
+    models[args_name].kind = "struct"
+    models[args_name].base = None
+    observed = args_categories(models)
+    for category in ("TYPE_KIND_MISMATCH", "BASE_MAPPING_MISMATCH"):
+        if category not in observed:
+            failures.append(
+                f"EventArgs base: struct where a CLR class is required did not "
+                f"produce {category}")
+        event_self_tests += 1
+
+    # ------------------------------------------------------------------
+    # The support types themselves.
+    # ------------------------------------------------------------------
+    def support_member(
+        owner: str, name: str, kind: str, parameters: tuple[str, ...],
+        labels: tuple[str, ...], returns: str, static: bool = False,
+        mutable: bool | None = None, declaration: str = "",
+    ) -> Member:
+        return Member(
+            owner=owner, kind=kind, name=name, static=static,
+            parameters=parameters, labels=labels,
+            directions=tuple("" for _ in parameters), return_type=returns,
+            mutable=mutable, declaration=declaration or f"func {name}()",
+            identifier=f"{owner}:{name}",
+        )
+
+    def support_models() -> dict[str, TypeModel]:
+        models = {
+            "CNAEventArgs": TypeModel(
+                "CNAEventArgs", "class", declaration="class CNAEventArgs",
+                identifier="CNAEventArgs", access="open",
+            ),
+            "CNAEvent": TypeModel(
+                "CNAEvent", "class", generic_count=1,
+                generic_parameters=("TArgs",),
+                declaration="final class CNAEvent<TArgs>",
+                identifier="CNAEvent", access="public",
+            ),
+            "CNAEventSource": TypeModel(
+                "CNAEventSource", "class", generic_count=1,
+                generic_parameters=("TArgs",),
+                declaration="final class CNAEventSource<TArgs>",
+                identifier="CNAEventSource", access="public",
+            ),
+            "CNAEventSubscription": TypeModel(
+                "CNAEventSubscription", "class",
+                declaration="final class CNAEventSubscription",
+                identifier="CNAEventSubscription", access="public",
+            ),
+        }
+        models["CNAEventArgs"].members = [
+            support_member("CNAEventArgs", ".ctor", "constructor", (), (), "Void",
+                           declaration="init()"),
+            support_member("CNAEventArgs", "Empty", "property", (), (),
+                           "CNAEventArgs", static=True, mutable=False,
+                           declaration="static let Empty: CNAEventArgs"),
+        ]
+        models["CNAEvent"].members = [
+            support_member(
+                "CNAEvent", "Add", "method",
+                ("(Any?, TArgs) throws -> Void",), ("_",), "CNAEventSubscription",
+                declaration="func Add(_ handler: @escaping (Any?, TArgs) throws -> Void) -> CNAEventSubscription"),
+            support_member(
+                "CNAEvent", "Remove", "method", ("CNAEventSubscription",), ("_",),
+                "Void",
+                declaration="func Remove(_ subscription: CNAEventSubscription)"),
+        ]
+        models["CNAEventSource"].members = [
+            support_member("CNAEventSource", ".ctor", "constructor", (), (), "Void",
+                           declaration="init()"),
+            support_member("CNAEventSource", "Event", "property", (), (),
+                           "CNAEvent<TArgs>", mutable=False,
+                           declaration="var Event: CNAEvent<TArgs> { get }"),
+            support_member("CNAEventSource", "Raise", "method",
+                           ("Any?", "TArgs"), ("_", "args"), "Void",
+                           declaration="func Raise(_ sender: Any?, args: TArgs) throws"),
+        ]
+        return models
+
+    def support_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in event_support_evidence(models, rules)[1]}
+
+    if support_categories(support_models()):
+        failures.append("the event support reference model is not diagnostic-free")
+    event_self_tests += 1
+    if len(event_support_evidence(support_models(), rules)[0]) != 4:
+        failures.append("the event support evidence does not cover four types")
+    event_self_tests += 1
+
+    raise_member = support_member(
+        "CNAEvent", "Raise", "method", ("Any?", "TArgs"), ("_", "args"), "Void",
+        declaration="func Raise(_ sender: Any?, args: TArgs) throws")
+
+    support_mutations: list[tuple[str, str, Any]] = [
+        # The two rules that carry the whole architecture.
+        ("CNAEvent exposing Raise", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEvent"].members.append(raise_member)),
+        ("CNAEventSource subclassing CNAEvent", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEventSource"], "base", "CNAEvent")),
+        # Removal identity.
+        ("wrong token type returned by Add", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEvent"].members[0], "return_type", "Int")),
+        ("wrong token type accepted by Remove", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEvent"].members[1], "parameters",
+                           ("(Any?, TArgs) throws -> Void",))),
+        ("token carrying a public native handle", "PUBLIC_NATIVE_FFI_LEAK",
+         lambda m: m["CNAEventSubscription"].members.append(support_member(
+             "CNAEventSubscription", "Handle", "property", (), (), "Int",
+             mutable=False,
+             declaration="var Handle: CNA_Handle { get }"))),
+        ("token carrying a public raw pointer", "RAW_HANDLE_LEAK",
+         lambda m: m["CNAEventSubscription"].members.append(support_member(
+             "CNAEventSubscription", "Storage", "property", (), (), "Int",
+             mutable=False,
+             declaration="var Storage: UnsafeMutableRawPointer { get }"))),
+        # Construction and capability boundaries.
+        ("publicly constructible token", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEventSubscription"].members.append(support_member(
+             "CNAEventSubscription", ".ctor", "constructor", (), (), "Void",
+             declaration="init()"))),
+        ("consumer view publicly constructible", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEvent"].members.append(support_member(
+             "CNAEvent", ".ctor", "constructor", (), (), "Void",
+             declaration="init()"))),
+        ("event source is not publicly constructible", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEventSource"].members.pop(0)),
+        ("Raise missing from the event source", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEventSource"].members.pop(2)),
+        ("Event view missing from the event source", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEventSource"].members.pop(1)),
+        ("writable Event view", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEventSource"].members[1], "mutable", True)),
+        ("Add missing from the consumer view", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEvent"].members.pop(0)),
+        ("Remove missing from the consumer view", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEvent"].members.pop(1)),
+        # Shape of the support types.
+        ("CNAEventArgs projected as a struct", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEventArgs"], "kind", "struct")),
+        ("CNAEventArgs not open", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEventArgs"], "access", "public")),
+        ("CNAEventArgs missing Empty", "EVENT_MAPPING_MISMATCH",
+         lambda m: m["CNAEventArgs"].members.pop(1)),
+        ("CNAEventArgs.Empty made an instance member", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEventArgs"].members[1], "static", False)),
+        ("consumer view not final", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEvent"], "declaration", "class CNAEvent<TArgs>")),
+        ("consumer view loses its generic parameter", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEvent"], "generic_parameters", ())),
+        ("handler signature drops the sender", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEvent"].members[0], "parameters",
+                           ("(TArgs) throws -> Void",))),
+        ("Raise drops the sender", "EVENT_MAPPING_MISMATCH",
+         lambda m: setattr(m["CNAEventSource"].members[2], "parameters", ("TArgs",))),
+    ]
+    for label, wanted, mutate in support_mutations:
+        models = support_models()
+        mutate(models)
+        if wanted not in support_categories(models):
+            failures.append(f"event support {label}: did not produce {wanted}")
+        event_self_tests += 1
+
+    # Omitting any support type from measurement is itself a finding.
+    for name in sorted(rules.get("eventSupportContract", {})):
+        models = support_models()
+        models.pop(name, None)
+        if "UNMEASURED_STRUCTURAL_CATEGORY" not in support_categories(models):
+            failures.append(f"event support omitted: {name} was not reported unmeasured")
+        event_self_tests += 1
+
     order_self_tests = 0
     mouse_name = "Microsoft.Xna.Framework.Input.MouseState"
     if f"{mouse_name}.ctor" not in rules.get("internalParameterOrderChecks", []):
@@ -2904,9 +3394,144 @@ def self_test() -> None:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + order_self_tests}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + order_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
+
+
+def event_support_evidence(
+    support: dict[str, TypeModel],
+    rules: dict[str, Any],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Measure the event support types against their pinned shape.
+
+    These types live outside `Microsoft.Xna.Framework`, so they are counted in
+    no XNA scoreboard, but they are the public machinery every projected event
+    is expressed through and they are measured, not assumed. The two rules that
+    carry the architecture are checked here and nowhere else: `CNAEvent` must
+    not expose `Raise`, and `CNAEventSource` must not inherit from `CNAEvent` --
+    if it did, a consumer handed the read-only view could downcast its way to
+    the raise capability that CLR reserves for the declaring type.
+    """
+    contract = rules.get("eventSupportContract", {})
+    evidence: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, str]] = []
+    pointer_pattern = re.compile(
+        r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle|CNASwift_|CNA_Handle"
+    )
+    raw_pattern = re.compile(
+        r"Unsafe(?:Mutable)?(?:Raw)?Pointer|OpaquePointer|nativeHandle"
+    )
+
+    for name in sorted(contract):
+        specification = contract[name]
+        model = support.get(name)
+        if model is None:
+            # Omitting a support type from measurement is itself a finding: the
+            # projection every event depends on would otherwise go unchecked.
+            diagnostics.append(diagnostic(
+                "UNMEASURED_STRUCTURAL_CATEGORY", name,
+                "event support type is absent from the Swift Symbol Graph, so "
+                "the event projection it carries is unmeasured",
+            ))
+            continue
+
+        if model.kind != specification["kind"]:
+            diagnostics.append(diagnostic(
+                "EVENT_MAPPING_MISMATCH", name,
+                f"expected support kind {specification['kind']}, found {model.kind}",
+            ))
+        expected_generics = tuple(specification.get("generics", []))
+        if model.generic_parameters != expected_generics:
+            diagnostics.append(diagnostic(
+                "EVENT_MAPPING_MISMATCH", name,
+                f"expected generic parameters {expected_generics}, "
+                f"found {model.generic_parameters}",
+            ))
+        if model.base != specification.get("base"):
+            diagnostics.append(diagnostic(
+                "EVENT_MAPPING_MISMATCH", name,
+                f"expected base {specification.get('base')}, found {model.base}; "
+                "the consumer view and the event source are composed over "
+                "private storage and neither derives from the other",
+            ))
+        inheritance = specification.get("inheritance")
+        if inheritance == "final" and "final class" not in model.declaration:
+            diagnostics.append(diagnostic(
+                "EVENT_MAPPING_MISMATCH", name,
+                f"expected a final support class, found {model.declaration!r}",
+            ))
+        if inheritance == "open" and model.access != "open":
+            diagnostics.append(diagnostic(
+                "EVENT_MAPPING_MISMATCH", name,
+                f"expected an open support class, found access {model.access!r}",
+            ))
+
+        observed = {member.name: member for member in model.members}
+        for member_name, shape in sorted(specification.get("members", {}).items()):
+            member = observed.get(member_name)
+            if member is None:
+                diagnostics.append(diagnostic(
+                    "EVENT_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    "required event support member is absent",
+                ))
+                continue
+            expected_shape = (
+                shape["kind"], bool(shape.get("static")),
+                tuple(shape.get("parameters", [])),
+                tuple(shape.get("labels", [])), shape["returns"],
+            )
+            observed_shape = (
+                member.kind, member.static, member.parameters,
+                member.labels, member.return_type,
+            )
+            if expected_shape != observed_shape:
+                diagnostics.append(diagnostic(
+                    "EVENT_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    f"expected {expected_shape}, found {observed_shape}",
+                ))
+            if (
+                "mutable" in shape and member.mutable is not None and
+                bool(shape["mutable"]) != member.mutable
+            ):
+                diagnostics.append(diagnostic(
+                    "EVENT_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    f"expected mutable={shape['mutable']}, found mutable={member.mutable}",
+                ))
+
+        for member_name in specification.get("forbiddenMembers", []):
+            if member_name in observed:
+                diagnostics.append(diagnostic(
+                    "EVENT_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    "event support member is forbidden on this type; it would "
+                    "hand a consumer a capability the CLR event model reserves",
+                ))
+
+        for member in model.members:
+            if raw_pattern.search(member.declaration):
+                diagnostics.append(diagnostic(
+                    "RAW_HANDLE_LEAK", member.display, member.declaration,
+                ))
+            if pointer_pattern.search(member.declaration):
+                diagnostics.append(diagnostic(
+                    "PUBLIC_NATIVE_FFI_LEAK", member.display, member.declaration,
+                ))
+
+        evidence.append({
+            "supportType": name,
+            "kind": model.kind,
+            "inheritance": inheritance,
+            "genericParameters": list(model.generic_parameters),
+            "base": model.base,
+            "publicMembers": sorted(observed),
+            "forbiddenMembersAbsent": [
+                item for item in specification.get("forbiddenMembers", [])
+                if item not in observed
+            ],
+            "reason": rules.get("eventSupportMapping", ""),
+        })
+
+    return evidence, diagnostics
 
 
 def protocol_witness_projection_evidence(
@@ -3032,6 +3657,7 @@ def make_report(
     witness_evidence: list[dict[str, Any]],
     indexed_evidence: list[dict[str, Any]],
     system_interface_evidence: list[dict[str, Any]],
+    support_evidence: list[dict[str, Any]],
 ) -> dict[str, Any]:
     counts = collections.Counter(item["category"] for item in diagnostics)
     type_diagnostics: dict[str, list[dict[str, str]]] = collections.defaultdict(list)
@@ -3164,6 +3790,17 @@ def make_report(
     summary["NONPUBLIC_CONSTRUCTION_PROJECTIONS"] = len(
         nonpublic_construction_evidence
     )
+    # One measured event property per CLR event in the pinned contract, and the
+    # support types they are all expressed through.
+    summary["EVENT_PROJECTIONS"] = sum(
+        member["kind"] == "event"
+        for item in contract["types"] for member in item["members"]
+    )
+    summary["EVENT_SUPPORT_TYPE_MEASUREMENTS"] = len(support_evidence)
+    summary["MEASURED_SUPPORT_BASE_PROJECTIONS"] = sum(
+        map_clr_type(item["baseType"], rules) in MEASURED_SUPPORT_BASES
+        for item in contract["types"] if item.get("baseType")
+    )
     return {
         "schemaVersion": 1,
         "profile": contract["profile"],
@@ -3181,6 +3818,7 @@ def make_report(
         "systemInterfaceProjections": system_interface_evidence,
         "indexedPropertyAccessorProjections": indexed_evidence,
         "nonPublicConstructionProjections": nonpublic_construction_evidence,
+        "eventSupportProjections": support_evidence,
         "typeScoreboard": [
             {
                 "type": name,
@@ -3243,9 +3881,13 @@ def main() -> int:
     contract = load_json(REFERENCE)
     rules = load_json(RULES)
     expected = build_expected(contract, rules)
-    actual, parser_diagnostics, _, observed_witnesses, indexed_evidence = parse_symbol_graph(
+    (
+        actual, parser_diagnostics, _, observed_witnesses, indexed_evidence,
+        support,
+    ) = parse_symbol_graph(
         args.symbol_graph, rules, ROOT / "Sources/CNA", expected,
     )
+    support_evidence, support_diagnostics = event_support_evidence(support, rules)
     witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(
         contract, rules, observed_witnesses,
     )
@@ -3254,13 +3896,13 @@ def main() -> int:
     )
     diagnostics, applied_suppressions = apply_manual_suppressions(
         compare(expected, actual) + parser_diagnostics + witness_diagnostics +
-        system_interface_diagnostics,
+        system_interface_diagnostics + support_diagnostics,
         rules.get("manualDiagnosticSuppressions", []),
     )
     report = make_report(
         contract, rules, expected, actual, diagnostics, args.symbol_graph,
         applied_suppressions, witness_evidence, indexed_evidence,
-        system_interface_evidence,
+        system_interface_evidence, support_evidence,
     )
     text = json.dumps(report, indent=2, sort_keys=False) + "\n"
     if args.output:

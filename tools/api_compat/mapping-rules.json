@@ -147,6 +147,46 @@
   "collectionCopyToArrayMutationMapping": "A CopyTo array parameter on a type whose direct CLR interface is ICollection<T> is caller-owned mutable destination storage",
   "enumerableMapping": "System.Collections.Generic.IEnumerable<T> parameters map to Swift Array<T>",
   "enumeratorReturnMapping": "System.Collections.Generic.IEnumerator<T> returns map to CNAEnumerator<T>, whose throwing Next preserves live order and mutation invalidation without a fake Microsoft collection type",
+  "eventMapping": "A CLR event whose type is System.EventHandler<TArgs> maps to exactly one get-only Swift property preserving the XNA event name, of type CNAEvent<TArgs>. The add_/remove_/raise_ accessors are CLR encoding, not XNA identities, and must not appear in the Swift surface. CNAEvent exposes only Add and Remove; the raise capability lives on the separate CNAEventSource, which is composed with CNAEvent over private storage and must never subclass it, so a consumer holding a CNAEvent cannot downcast its way to Raise. Add returns an opaque CNAEventSubscription token: CLR Delegate.Remove matches on delegate identity, which Swift closures do not have, so token-based removal is the LANGUAGE_PROJECTION of that rule and differs from CLR in that duplicate registrations of one closure are independently removable.",
+  "eventAccessorPrefixes": ["add_", "remove_", "raise_"],
+  "existentialSpelling": "Swift emits a CLR interface-typed member as the existential `any P`, which is the same type as `P`, so the spelling normalizes away. The opaque `some P` is a different type and is not normalized.",
+  "measuredSupportBaseProjections": {
+    "System.EventArgs": "CNAEventArgs"
+  },
+  "measuredSupportBaseMapping": "A non-XNA CLR base listed in measuredSupportBaseProjections is a MEASURED base, exactly as an XNA base is: the Swift type must be a class whose compiler-emitted superclass is the mapped support type. A missing base, AnyObject or Object in its place, a struct where the CLR declares a class, a different support base, or any other base projection is a BASE_MAPPING_MISMATCH. It is never silently dropped and never allowlisted.",
+  "eventSupportContract": {
+    "CNAEventArgs": {
+      "kind": "class", "inheritance": "open", "generics": [], "base": null,
+      "members": {
+        ".ctor": {"kind": "constructor", "static": false, "parameters": [], "labels": [], "returns": "Void"},
+        "Empty": {"kind": "property", "static": true, "parameters": [], "labels": [], "returns": "CNAEventArgs", "mutable": false}
+      },
+      "forbiddenMembers": ["Add", "Remove", "Raise", "Event"]
+    },
+    "CNAEvent": {
+      "kind": "class", "inheritance": "final", "generics": ["TArgs"], "base": null,
+      "members": {
+        "Add": {"kind": "method", "static": false, "parameters": ["(Any?, TArgs) throws -> Void"], "labels": ["_"], "returns": "CNAEventSubscription"},
+        "Remove": {"kind": "method", "static": false, "parameters": ["CNAEventSubscription"], "labels": ["_"], "returns": "Void"}
+      },
+      "forbiddenMembers": [".ctor", "Raise", "Event"]
+    },
+    "CNAEventSource": {
+      "kind": "class", "inheritance": "final", "generics": ["TArgs"], "base": null,
+      "members": {
+        ".ctor": {"kind": "constructor", "static": false, "parameters": [], "labels": [], "returns": "Void"},
+        "Event": {"kind": "property", "static": false, "parameters": [], "labels": [], "returns": "CNAEvent<TArgs>", "mutable": false},
+        "Raise": {"kind": "method", "static": false, "parameters": ["Any?", "TArgs"], "labels": ["_", "args"], "returns": "Void"}
+      },
+      "forbiddenMembers": ["Add", "Remove"]
+    },
+    "CNAEventSubscription": {
+      "kind": "class", "inheritance": "final", "generics": [], "base": null,
+      "members": {},
+      "forbiddenMembers": [".ctor", "Add", "Remove", "Raise", "Event"]
+    }
+  },
+  "eventSupportMapping": "The event support types live outside Microsoft.Xna.Framework and are language-support API, not XNA types or XNA identities, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a base where composition is required, a missing required member, or a forbidden member is an EVENT_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",
   "nullableMapping": "System.Nullable<T> maps to Swift T?; ref/out direction remains independently mapped to inout",
   "optionalReferenceParameters": [
     {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "Equals", "parameter": "other"},

@@ -207,8 +207,135 @@ to use a normal Swift subscript where their selected error contract permits.
 | `System.IO.Stream` | `Foundation.InputStream` | The strict `Texture2D.FromStream` projection reads the stream to contiguous bytes internally before CNA decode. |
 | `System.IntPtr` | `Int` | Pointer-width signed integer; see the general rule below. |
 | `System.Object` | `Any?` | Optional preserves CLR null. |
-| `System.EventArgs` | `CNAEventArgs` | Empty public support value outside the XNA namespace. |
+| `System.EventArgs` | `CNAEventArgs` | `open class` outside the XNA namespace; a **measured** base, and `Empty` is one shared instance. See below. |
+| `System.EventHandler<TArgs>` | `CNAEvent<TArgs>` | One get-only property per CLR event; no `add_`/`remove_`/`raise_` identity. See below. |
 | `System.Collections.Generic.IEnumerator<T>` | `CNAEnumerator<T>` | Throwing live enumeration preserves CLR mutation invalidation without a fake Microsoft type. |
+
+### The general CLR event projection
+
+Every public event in the pinned contract has one shape,
+`System.EventHandler<TArgs>` — all 49 of them. Each maps to exactly **one**
+get-only Swift property keeping its XNA name:
+
+```swift
+var EnabledChanged: CNAEvent<CNAEventArgs> { get }
+```
+
+The CLR `add_`/`remove_`/`raise_` accessors are how IL encodes an event, not XNA
+identities, and never appear in the Swift surface. Zero members in the pinned
+contract carry those prefixes, so any such name is a leaked accessor and is
+reported as `EVENT_MAPPING_MISMATCH`.
+
+An event is **not** projected as a bare closure, an array of closures, a
+writable closure property, or a callback pointer. Each of those is a measured
+mismatch with its own self-test.
+
+Three support types outside the XNA namespace carry the projection. They are
+language-support API, not XNA types, so they are counted in no XNA scoreboard —
+but they are measured against a pinned shape, not assumed.
+
+| Support type | Role |
+|---|---|
+| `CNAEvent<TArgs>` | Consumer view. Exactly `Add` and `Remove`. Cannot raise. |
+| `CNAEventSource<TArgs>` | Declaring side. Owns the storage, exposes `Event` and `Raise`. |
+| `CNAEventSubscription` | Opaque registration token returned by `Add`. |
+
+#### Why a token, and where it differs from CLR
+
+CLR removes a handler by **delegate identity**: target object plus method, so
+two references to the same method on the same instance are equal and
+`Delegate.Remove` matches them. Swift closures have no identity — two closures
+spelled identically are simply two values — so that rule cannot be reproduced.
+`Add` therefore returns an opaque token and `Remove` matches on it.
+
+This is recorded as a deliberate `LANGUAGE_PROJECTION` rather than presented as
+equivalence. The observable difference: adding the same closure twice creates
+**two** registrations with **two** tokens, each removed independently, where
+CLR's `Delegate.Remove` would remove the last matching entry of an equal
+delegate. The token exposes no handler and no implementation state, cannot be
+constructed outside the module, and deliberately does **not** unsubscribe on
+`deinit` — a CLR event retains its delegates until they are explicitly removed.
+
+#### Why two types instead of one
+
+CLR reserves raising an event to the declaring type. Swift has no member that is
+public to read and private to invoke, so the capability split is modelled as two
+objects over one private storage. **`CNAEventSource` is composed with
+`CNAEvent`, never derived from it** — both are `final` with no superclass — so a
+consumer handed the view has no downcast that recovers `Raise`. The compiler
+rejects the attempt outright.
+
+`CNAEventSource` is public because an external package must be able to conform
+to `IUpdateable` or `IDrawable` and raise its own events:
+
+```swift
+private let enabledChangedSource = CNAEventSource<CNAEventArgs>()
+
+public var EnabledChanged: CNAEvent<CNAEventArgs> {
+    enabledChangedSource.Event
+}
+
+// inside the declaring type only:
+try enabledChangedSource.Raise(self, args: CNAEventArgs.Empty)
+```
+
+That publicness is language-support machinery, not an XNA identity. The same
+shape is what a future native-backed event will use: a protected runtime type
+owns the source privately and a native callback calls `Raise`, while consumers
+still see only the view. No such event is implemented, and this milestone adds
+no CNA ABI.
+
+#### Subscription and dispatch semantics
+
+- registration order is the invocation order;
+- duplicate registrations are permitted and independently removable;
+- `Remove` on an already-removed token, or on a token belonging to another
+  event, is harmless rather than corrupting;
+- storage retains handlers strongly, as a CLR event retains delegates;
+- dispatch walks a **snapshot**, so adding or removing inside a handler affects
+  later raises, never the raise in progress — this mirrors the CLR raise, which
+  loads the delegate field into a local before invoking;
+- handlers may throw. The first error propagates to the raiser, no later handler
+  runs, and the registration list is left intact. No handler error is swallowed;
+- a non-throwing Swift closure is usable wherever the throwing handler type is
+  expected.
+
+### `System.EventArgs` as a measured base
+
+`CNAEventArgs` was an empty support **struct**, which made the CLR
+event-argument hierarchy inexpressible. It is now an `open class`, and the base
+is measured:
+
+| Requirement | Diagnostic when violated |
+|---|---|
+| Swift superclass is `CNAEventArgs` | `BASE_MAPPING_MISMATCH` |
+| not `AnyObject`, `Object`, or another support base | `BASE_MAPPING_MISMATCH` |
+| not a `struct` where the CLR declares a class | `TYPE_KIND_MISMATCH` + `BASE_MAPPING_MISMATCH` |
+
+It deliberately does **not** conform to `Sendable`. The class is open, so a
+subclass anywhere may add mutable stored state, and `@unchecked Sendable` would
+assert exactly the guarantee that cannot be earned.
+
+`CNAEventArgs.Empty` is one shared instance. This is derived, not assumed: all
+46 `EventHandler<EventArgs>` raise sites across the registered
+`Microsoft.Xna.Framework.Game.dll` and `Microsoft.Xna.Framework.Graphics.dll`
+execute `ldsfld System.EventArgs::Empty`, and none executes
+`newobj System.EventArgs::.ctor`, so every handler observes the same object.
+
+### Undecided BCL bases are unmeasured, never dropped
+
+A non-XNA base that is neither a CLR root (`System.Object`, `System.ValueType`,
+`System.Enum`) nor a decided support projection has **no** silent fallback. If a
+type carrying one were implemented, the verifier reports
+`UNMEASURED_STRUCTURAL_CATEGORY` rather than accepting a base-less Swift class.
+
+Twenty-one still-missing types are guarded this way, including
+`GameComponentCollection` (`Collection<IGameComponent>`), the eight exception
+types (`System.Exception`, `ExternalException`), the five
+`ContentSerializer*Attribute` types (`System.Attribute`), the four
+`ReadOnlyCollection<T>` model types, and `LaunchParameters`
+(`Dictionary<String, String>`). Each remains a genuine BCL mapping decision, and
+a future decision plugs into the same measured machinery `CNAEventArgs` uses.
 
 ### The general `System.IntPtr` language projection
 

@@ -64,6 +64,23 @@ display enumeration, or adapter capability. None of the three has a public
 constructor path to real data: `TouchPanel` and `GraphicsAdapter` are not
 implemented.
 
+Foundation 19 decides and implements the general CLR event projection. Every
+public XNA event maps to exactly one get-only `CNAEvent<TArgs>` property keeping
+its XNA name; the CLR `add_`/`remove_`/`raise_` accessors are never XNA
+identities. Removal uses an opaque `CNAEventSubscription` token, because CLR
+matches handlers by delegate identity and Swift closures have none — recorded as
+a measured language projection, not as equivalence. Raising lives on a separate
+`CNAEventSource<TArgs>` that is *composed* with the consumer view rather than
+derived from it, so a consumer holding a `CNAEvent` has no downcast to `Raise`,
+and an external package can still conform to `IUpdateable` or `IDrawable` and
+raise its own events. `CNAEventArgs` becomes an `open class` so the CLR
+event-argument hierarchy is expressible, with `System.EventArgs` as a *measured*
+base. The milestone completes `IUpdateable`, `IDrawable`,
+`GameComponentCollectionEventArgs`, `ResourceCreatedEventArgs` and
+`ResourceDestroyedEventArgs`, and adds no CNA ABI. No event on `Game`,
+`GraphicsDeviceManager` or `GraphicsDevice` is implemented: those need real
+lifecycle and native raising, and an event that never fires is not implemented.
+
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -73,12 +90,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=113
-TARGET_MEMBERS=1641
-TOTAL_DIAGNOSTICS=295
-COMPLETE_TYPES=108
+TARGET_TYPES=118
+TARGET_MEMBERS=1656
+TOTAL_DIAGNOSTICS=290
+COMPLETE_TYPES=113
 PARTIAL_TYPES=5
-MISSING_TYPES=144
+MISSING_TYPES=139
 MISSING_MEMBER=131
 ```
 
@@ -98,8 +115,10 @@ CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
 DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, the
 25 Foundation-14 pure-managed types listed below, PresentationParameters,
 MouseState, MediaState, MediaSourceType, MicrophoneState, the seven
-Foundation-17 types, TouchLocation, GestureSample, and DisplayModeCollection. Every implemented member has
-qualified behavior; missing members remain absent.
+Foundation-17 types, TouchLocation, GestureSample, DisplayModeCollection,
+IUpdateable, IDrawable, GameComponentCollectionEventArgs,
+ResourceCreatedEventArgs and ResourceDestroyedEventArgs. Every implemented
+member has qualified behavior; missing members remain absent.
 
 ## Foundation 14 pure managed batch
 

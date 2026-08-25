@@ -256,6 +256,241 @@ func qualifyFoundation14ManagedSurface() throws {
 // exercised from an *external* module. The in-module tests use
 // `@testable import`, so only this canary can prove what the genuinely public
 // surface allows and forbids.
+// Foundation 19: real *external* conformers to the XNA event-bearing
+// protocols. This is the canary that matters most for the event architecture:
+// only a package outside CNA can prove that a user type can own private
+// CNAEventSource instances, publish CNAEvent views, satisfy every protocol
+// requirement, and raise its own events — with no `@testable import` and no
+// access to anything internal.
+private final class ExternalUpdateable: Microsoft.Xna.Framework.IUpdateable {
+    private let enabledChangedSource = CNAEventSource<CNAEventArgs>()
+    private let updateOrderChangedSource = CNAEventSource<CNAEventArgs>()
+    private var enabled = true
+    private var updateOrder: Int32 = 0
+    private(set) var updates = 0
+
+    var Enabled: Bool { enabled }
+
+    var UpdateOrder: Int32 { updateOrder }
+
+    var EnabledChanged: CNAEvent<CNAEventArgs> { enabledChangedSource.Event }
+
+    var UpdateOrderChanged: CNAEvent<CNAEventArgs> { updateOrderChangedSource.Event }
+
+    func Update(_ gameTime: Microsoft.Xna.Framework.GameTime) throws { updates += 1 }
+
+    func setEnabled(_ value: Bool) throws {
+        guard enabled != value else { return }
+        enabled = value
+        try enabledChangedSource.Raise(self, args: CNAEventArgs.Empty)
+    }
+
+    func setUpdateOrder(_ value: Int32) throws {
+        guard updateOrder != value else { return }
+        updateOrder = value
+        try updateOrderChangedSource.Raise(self, args: CNAEventArgs.Empty)
+    }
+}
+
+private final class ExternalDrawable: Microsoft.Xna.Framework.IDrawable {
+    private let visibleChangedSource = CNAEventSource<CNAEventArgs>()
+    private let drawOrderChangedSource = CNAEventSource<CNAEventArgs>()
+    private var visible = true
+    private var drawOrder: Int32 = 0
+    private(set) var draws = 0
+
+    var Visible: Bool { visible }
+
+    var DrawOrder: Int32 { drawOrder }
+
+    var VisibleChanged: CNAEvent<CNAEventArgs> { visibleChangedSource.Event }
+
+    var DrawOrderChanged: CNAEvent<CNAEventArgs> { drawOrderChangedSource.Event }
+
+    func Draw(_ gameTime: Microsoft.Xna.Framework.GameTime) throws { draws += 1 }
+
+    func setVisible(_ value: Bool) throws {
+        guard visible != value else { return }
+        visible = value
+        try visibleChangedSource.Raise(self, args: CNAEventArgs.Empty)
+    }
+
+    func setDrawOrder(_ value: Int32) throws {
+        guard drawOrder != value else { return }
+        drawOrder = value
+        try drawOrderChangedSource.Raise(self, args: CNAEventArgs.Empty)
+    }
+}
+
+private final class ExternalComponent: Microsoft.Xna.Framework.IGameComponent {
+    func Initialize() throws {}
+}
+
+// A user subclass of the support base, proving the migrated CNAEventArgs really
+// is open across module boundaries.
+private final class ExternalArgs: CNAEventArgs {
+    let marker: Int32
+    init(marker: Int32) {
+        self.marker = marker
+        super.init()
+    }
+}
+
+func qualifyFoundation19EventSurface() throws {
+    typealias F = Microsoft.Xna.Framework
+    typealias G = Microsoft.Xna.Framework.Graphics
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-19 \(what) qualification failed")
+        }
+    }
+
+    // 1. Both protocols are externally conformable, and the conformers raise
+    //    their own events.
+    let updateable = ExternalUpdateable()
+    // Spelled in full rather than through the `F` alias: Swift 6.0.3 asserts in
+    // IRGen while mangling the debugger type for `any F.IUpdateable`, so the
+    // alias is avoided for existential annotations only.
+    let asUpdateable: Microsoft.Xna.Framework.IUpdateable = updateable
+    try asUpdateable.Update(F.GameTime())
+    try check(updateable.updates == 1, "IUpdateable Update")
+
+    var enabledSenderMatched = false
+    var enabledArgsWereEmpty = false
+    var enabledRaises = 0
+    let enabledToken = asUpdateable.EnabledChanged.Add { sender, args in
+        enabledRaises += 1
+        enabledSenderMatched = (sender as? ExternalUpdateable) === updateable
+        enabledArgsWereEmpty = args === CNAEventArgs.Empty
+    }
+    try updateable.setEnabled(false)
+    try check(!asUpdateable.Enabled, "IUpdateable Enabled mutation")
+    try check(enabledRaises == 1, "IUpdateable EnabledChanged raise")
+    try check(enabledSenderMatched, "IUpdateable EnabledChanged sender identity")
+    try check(enabledArgsWereEmpty, "IUpdateable EnabledChanged EventArgs.Empty identity")
+
+    // 2. Unsubscribe really unsubscribes.
+    asUpdateable.EnabledChanged.Remove(enabledToken)
+    try updateable.setEnabled(true)
+    try check(enabledRaises == 1, "IUpdateable EnabledChanged unsubscribe")
+
+    // 3. Duplicate registrations of one closure are independent, each with its
+    //    own token, and removal is exact.
+    var duplicateCalls = 0
+    let handler: (Any?, CNAEventArgs) throws -> Void = { _, _ in duplicateCalls += 1 }
+    let firstToken = asUpdateable.UpdateOrderChanged.Add(handler)
+    let secondToken = asUpdateable.UpdateOrderChanged.Add(handler)
+    try check(!(firstToken === secondToken), "distinct subscription identities")
+    try updateable.setUpdateOrder(4)
+    try check(duplicateCalls == 2, "duplicate registrations both fire")
+    asUpdateable.UpdateOrderChanged.Remove(firstToken)
+    try updateable.setUpdateOrder(5)
+    try check(duplicateCalls == 3, "exact duplicate removal")
+    // Removing an already-removed token, and a token from another event, are
+    // both harmless.
+    asUpdateable.UpdateOrderChanged.Remove(firstToken)
+    asUpdateable.UpdateOrderChanged.Remove(enabledToken)
+    try updateable.setUpdateOrder(6)
+    try check(duplicateCalls == 4, "repeated and foreign token removal are harmless")
+    asUpdateable.UpdateOrderChanged.Remove(secondToken)
+
+    // 4. A no-change assignment raises nothing, as GameComponent's setters do.
+    try updateable.setUpdateOrder(6)
+    try check(updateable.UpdateOrder == 6, "IUpdateable UpdateOrder mutation")
+
+    // 5. IDrawable is independently conformable and does not imply IUpdateable.
+    let drawable = ExternalDrawable()
+    let asDrawable: Microsoft.Xna.Framework.IDrawable = drawable
+    try asDrawable.Draw(F.GameTime())
+    try check(drawable.draws == 1, "IDrawable Draw")
+    var visibleRaises = 0
+    var drawOrderRaises = 0
+    asDrawable.VisibleChanged.Add { _, _ in visibleRaises += 1 }
+    asDrawable.DrawOrderChanged.Add { _, _ in drawOrderRaises += 1 }
+    try drawable.setVisible(false)
+    try drawable.setDrawOrder(-3)
+    try check(!asDrawable.Visible && asDrawable.DrawOrder == -3, "IDrawable mutation")
+    try check(visibleRaises == 1 && drawOrderRaises == 1, "IDrawable raises")
+    try check(!((asDrawable as Any) is Microsoft.Xna.Framework.IUpdateable),
+              "IDrawable does not extend IUpdateable")
+
+    // 6. A handler error propagates to the raiser, stops the dispatch, and
+    //    leaves the registration list intact.
+    let source = CNAEventSource<CNAEventArgs>()
+    var visited: [Int32] = []
+    source.Event.Add { _, _ in visited.append(1) }
+    source.Event.Add { _, _ in
+        visited.append(2)
+        throw CNAError.argument("external handler failed")
+    }
+    source.Event.Add { _, _ in visited.append(3) }
+    do {
+        try source.Raise(nil, args: CNAEventArgs.Empty)
+        throw CNAError.argument("isolated Foundation-19 handler error was swallowed")
+    } catch CNAError.argument(let message) where message == "external handler failed" {
+        // Exactly the handler's own error, unwrapped.
+    }
+    try check(visited == [1, 2], "throwing handler stops later handlers")
+
+    // 7. Dispatch walks a snapshot: a subscription added by a handler affects
+    //    only later raises.
+    let snapshotSource = CNAEventSource<CNAEventArgs>()
+    var snapshotCalls: Int32 = 0
+    snapshotSource.Event.Add { _, _ in
+        snapshotCalls += 1
+        snapshotSource.Event.Add { _, _ in snapshotCalls += 10 }
+    }
+    try snapshotSource.Raise(nil, args: CNAEventArgs.Empty)
+    try check(snapshotCalls == 1, "dispatch snapshot excludes handlers added mid-raise")
+
+    // 8. CNAEventArgs is open across the module boundary, and a derived
+    //    argument survives dispatch with its dynamic type and object identity.
+    let derivedSource = CNAEventSource<CNAEventArgs>()
+    var observedMarker: Int32 = 0
+    var observedIdentity = false
+    let derived = ExternalArgs(marker: 21)
+    derivedSource.Event.Add { _, args in
+        observedIdentity = args === derived
+        observedMarker = (args as? ExternalArgs)?.marker ?? 0
+    }
+    try derivedSource.Raise(nil, args: derived)
+    try check(observedIdentity, "derived EventArgs object identity")
+    try check(observedMarker == 21, "derived EventArgs dynamic type")
+
+    // 9. The event-argument types are externally usable with exactly their
+    //    pinned construction rules: GameComponentCollectionEventArgs is
+    //    publicly constructible, and the two Graphics ones are not. The closure
+    //    below compiles only if their read-only surface is public with these
+    //    exact names and types; it is never called with a value, because no
+    //    external construction route exists.
+    let componentArgs = F.GameComponentCollectionEventArgs(
+        gameComponent: ExternalComponent())
+    try check(componentArgs.GameComponent is ExternalComponent,
+              "GameComponentCollectionEventArgs storage")
+    try check((componentArgs as Any) is CNAEventArgs,
+              "GameComponentCollectionEventArgs base")
+    let readCreated: (G.ResourceCreatedEventArgs) -> Any? = { $0.Resource }
+    let readDestroyed: (G.ResourceDestroyedEventArgs) -> (String, Any?) = {
+        ($0.Name, $0.Tag)
+    }
+    _ = readCreated
+    _ = readDestroyed
+    try check(String(describing: G.ResourceCreatedEventArgs.self)
+                  == "ResourceCreatedEventArgs",
+              "ResourceCreatedEventArgs type identity")
+    try check(String(describing: G.ResourceDestroyedEventArgs.self)
+                  == "ResourceDestroyedEventArgs",
+              "ResourceDestroyedEventArgs type identity")
+
+    // 10. A typed event carries its own argument type end to end.
+    let typedSource = CNAEventSource<F.GameComponentCollectionEventArgs>()
+    var typedSeen = false
+    typedSource.Event.Add { _, args in typedSeen = args.GameComponent is ExternalComponent }
+    try typedSource.Raise(nil, args: componentArgs)
+    try check(typedSeen, "typed event argument")
+}
+
 func qualifyFoundation15To18ManagedSurface() throws {
     typealias F = Microsoft.Xna.Framework
     typealias G = Microsoft.Xna.Framework.Graphics
@@ -354,11 +589,12 @@ do {
     try qualifyPublicRenderTargetUsageSurface()
     try qualifyFoundation14ManagedSurface()
     try qualifyFoundation15To18ManagedSurface()
+    try qualifyFoundation19EventSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -381,7 +617,8 @@ def validate_canary(output: str, requested: int) -> bool:
     match = re.search(
         r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) "
         r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS) "
-        r"renderTargetUsage=(PASS) foundation14=(PASS)",
+        r"renderTargetUsage=(PASS) foundation14=(PASS) foundation15to18=(PASS) "
+        r"foundation19=(PASS)",
         output,
     )
     if not match:
