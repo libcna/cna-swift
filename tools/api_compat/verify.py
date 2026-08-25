@@ -2477,13 +2477,40 @@ def self_test() -> None:
         "Microsoft.Xna.Framework.IGameComponent",
         "Microsoft.Xna.Framework.IGraphicsDeviceManager",
         "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",
+        "Microsoft.Xna.Framework.Input.Touch.GestureSample",
+        "Microsoft.Xna.Framework.Input.Touch.TouchLocation",
+        "Microsoft.Xna.Framework.Graphics.DisplayModeCollection",
     ]
+    def synthesized_declaration(member: Member) -> str:
+        """A representative Swift declaration for a fixture member.
+
+        The generic-shape check reads the candidate's declaration text, so a
+        fixture whose members carry no declaration silently reports a
+        generic mismatch for any member whose mapped type is generic. Building
+        the declaration from the member's own mapped types keeps the fixture
+        faithful to what the compiler Symbol Graph emits.
+        """
+        parameters = ", ".join(
+            f"{label} value: {'inout ' if direction else ''}{kind}"
+            for label, kind, direction in zip(
+                member.labels, member.parameters, member.directions)
+        )
+        if member.kind == "constructor":
+            return f"public init({parameters})"
+        if member.kind in ("property", "field"):
+            suffix = " { get set }" if member.mutable else " { get }"
+            return f"public var {member.name}: {member.return_type}{suffix}"
+        if member.kind == "event":
+            return f"public var {member.name}: {member.return_type}"
+        return f"public func {member.name}({parameters}) -> {member.return_type}"
+
     for managed_name in batch_managed_names:
         managed_expected = {managed_name: copy.deepcopy(all_expected[managed_name])}
         managed_good = copy.deepcopy(managed_expected)
         managed_good[managed_name].identifier = managed_name
         for index, member in enumerate(managed_good[managed_name].members):
             member.identifier = f"{managed_name}:{index}"
+            member.declaration = synthesized_declaration(member)
         managed_model = managed_expected[managed_name]
         managed_simple = managed_name.rsplit(".", 1)[-1]
         managed_slug = re.sub(r"(?<!^)(?=[A-Z])", "-", managed_simple).lower()

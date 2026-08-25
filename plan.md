@@ -1,10 +1,8 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 17 — Reference assembly registration and Pure
-Managed Batch C. Five additional Microsoft XNA assemblies registered as
-authoritative reference inputs, and the first seven types that unblocks,
-carrying 26 mapped Swift XNA identities, over the completed Foundation 1–16
-baseline.
+**Milestone:** Foundation 18 — Pure Managed Batch D. Three entirely missing
+pure-managed XNA types carrying 21 mapped Swift XNA identities, over the
+completed Foundation 1–17 baseline.
 
 ## Normative rules
 
@@ -64,6 +62,29 @@ baseline.
    candidate is skipped with a recorded reason; it does not stop the batch.
 
 ## Qualified selected surface
+
+Foundation 18 adds exactly these three types, all previously entirely missing:
+
+- `Input.Touch.TouchLocation`, a sealed value struct storing the position as
+  two separate `float32` fields and holding both the current and the previous
+  location in one value. Its typed `Equals` compares five fields and ignores
+  both state fields, while `op_Equality` compares all seven; that asymmetry is
+  in the pinned IL and is preserved. `TryGetPreviousLocation` writes its `out`
+  parameter even when it returns false.
+- `Input.Touch.GestureSample`, a sealed value struct with one constructor and
+  six get-only properties and no equality, hash or string identity.
+- `Graphics.DisplayModeCollection`, a descriptor class with non-public
+  construction, mapping `IEnumerator<T>` to `CNAEnumerator<T>` and
+  `IEnumerable<T>` to a Swift array. Foundation 14 and 16 deferred it on the
+  grounds that any implementation would be permanently empty or fabricate
+  adapter data; that objection describes its *producer*,
+  `GraphicsAdapter.SupportedDisplayModes`, not the collection, which has no
+  accessible constructor at all. The assessment is revised in favour of the
+  `DisplayMode` precedent, and no display or adapter capability is claimed.
+
+`Media.Video` was dependency-complete and pure managed and was still deferred:
+its pinned internal constructor takes a `GraphicsDevice` runtime partial and
+its only producer, `ContentManager`, is not implemented.
 
 Foundation 17 registers `Microsoft.Xna.Framework.Game.dll`,
 `Microsoft.Xna.Framework.Input.Touch.dll`, `Microsoft.Xna.Framework.Xact.dll`,
@@ -166,17 +187,17 @@ callback, or constant was added, and the five runtime partials are untouched.
   the pinned assembly IL for this milestone, as were all 25 Foundation-14
   entries before it.
 - Formal projection: 257 Swift types / 2,887 Swift members.
-- Compiler target: 110 types / 1,620 members; 105 complete, five partial, 147
-  missing. Total diagnostics are 298. Normal strict remains red only for the
+- Compiler target: 113 types / 1,641 members; 108 complete, five partial, 144
+  missing. Total diagnostics are 295. Normal strict remains red only for the
   deferred profile; leak-only is green.
-- Verifier: 1,822 mutation/self-tests pass, up from 1,606. Every completed type
+- Verifier: 1,994 mutation/self-tests pass, up from 1,822. Every completed type
   is locally complete with zero diagnostics. Manual/applied allowlists and
   unmeasured structural categories are zero.
 - Reference assemblies: seven registered, reproducing 257 contract types and
   2,964 contract members exactly; calibration passes and 60 audit mutation
   self-tests pass.
-- Pure behavior: 1,523 XNA-derived observation/assertion sites with zero
-  failures, up from 1,493. Swift projection qualification stays in separate
+- Pure behavior: 1,595 XNA-derived observation/assertion sites with zero
+  failures, up from 1,523. Swift projection qualification stays in separate
   tests and is not counted as XNA behavior.
 - Dependency graph: node names are now mapped exactly as the strict verifier
   maps them, which removed six false-positive dependency-complete candidates

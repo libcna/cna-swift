@@ -76,6 +76,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/PresentationParametersContractTests.swift",
     ROOT / "Tests/CNATests/Foundation16ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation17ContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation18ContractTests.swift",
 ]
 
 
@@ -216,6 +217,16 @@ def main() -> int:
                 "TOUCH_LOCATION_STATE": "TouchLocationStateXnaContract",
                 "GESTURE_TYPE": "GestureTypeXnaContract",
                 "TOUCH_PANEL_CAPABILITIES": "TouchPanelCapabilitiesXnaContract",
+                "DISPLAY_MODE_COLLECTION": "DisplayModeCollectionXnaContract",
+                "GESTURE_SAMPLE": "GestureSampleXnaContract",
+                "TOUCH_LOCATION_CONSTRUCTION":
+                    "TouchLocationXnaContractConstruction",
+                "TOUCH_LOCATION_PREVIOUS":
+                    "TouchLocationXnaContractTryGetPreviousLocation",
+                "TOUCH_LOCATION_EQUALITY":
+                    "TouchLocationXnaContractEqualityAsymmetry",
+                "TOUCH_LOCATION_HASH_AND_STRING":
+                    "TouchLocationXnaContractGetHashCodeAndToString",
             }.items()
         },
         "displayOrientationContract": {
@@ -335,6 +346,52 @@ def main() -> int:
             "IGraphicsDeviceManager from Microsoft.Xna.Framework.Game.dll. "
             "All five assemblies were registered as authoritative reference "
             "inputs in Foundation 17; see docs/generated/pinned-assembly-audit.json",
+        "touchLocationContract": {
+            "kind": "struct",
+            "sealed": True,
+            "layout": "sequential",
+            "baseType": "System.ValueType",
+            "directInterfaces": [
+                "System.IEquatable`1[Microsoft.Xna.Framework.Input.Touch.TouchLocation]",
+            ],
+            "storage": ["id", "state", "x", "y", "prevState", "prevX", "prevY"],
+            "positionStorage":
+                "two separate float32 fields; get_Position rebuilds a Vector2 "
+                "on every read and nothing stores a Vector2",
+            "typedEqualsFields": ["id", "x", "y", "prevX", "prevY"],
+            "operatorEqualityFields": [
+                "id", "state", "x", "y", "prevState", "prevX", "prevY",
+            ],
+            "equalityAsymmetry":
+                "the typed Equals ignores both state fields while op_Equality "
+                "compares all seven; the asymmetry is in the pinned IL",
+            "getHashCode":
+                "id.GetHashCode() + x.GetHashCode() + y.GetHashCode() with "
+                "unchecked int32 addition; Single.GetHashCode() is the raw bit "
+                "pattern except that both signed zeroes hash to 0",
+            "toStringFormat":
+                "String.Format(CultureInfo.CurrentCulture, "
+                "\"{{Position:{0}}}\", Position)",
+            "tryGetPreviousLocation":
+                "absent when prevState is the zero literal Invalid; the out "
+                "parameter is still written with id -1 and every other field "
+                "zeroed, and a returned previous location never itself has a "
+                "previous location",
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "displayModeCollectionContract": {
+            "kind": "class",
+            "sealed": False,
+            "baseType": "System.Object",
+            "publicConstructors": 0,
+            "publicMembers": ["GetEnumerator", "Item"],
+            "itemSemantics":
+                "get_Item walks the backing list once and returns a NEW list "
+                "of every mode whose Format equals the argument, in original "
+                "order; an unmatched format yields an empty result",
+            "runtimeCapabilityClaimed": None,
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
         "mouseStateContract": {
             "kind": "struct",
             "sealed": True,

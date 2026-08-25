@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=110
-TARGET_MEMBERS=1620
-TOTAL_DIAGNOSTICS=298
-COMPLETE_TYPES=105
+TARGET_TYPES=113
+TARGET_MEMBERS=1641
+TOTAL_DIAGNOSTICS=295
+COMPLETE_TYPES=108
 PARTIAL_TYPES=5
-MISSING_TYPES=147
-MISSING_TYPE=147
+MISSING_TYPES=144
+MISSING_TYPE=144
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -52,7 +52,7 @@ COLLECTION_INTERFACE_PROJECTIONS=1
 ENUMERATOR_SUPPORT_PROJECTIONS=9
 INDEXED_PROPERTY_ACCESSOR_PROJECTIONS=4
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=5
 ```
 
 ## Complete types
@@ -84,6 +84,7 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Graphics.CullMode`
 - `Microsoft.Xna.Framework.Graphics.DepthFormat`
 - `Microsoft.Xna.Framework.Graphics.DisplayMode`
+- `Microsoft.Xna.Framework.Graphics.DisplayModeCollection`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterClass`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterType`
 - `Microsoft.Xna.Framework.Graphics.FillMode`
@@ -144,7 +145,9 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Input.KeyboardState`
 - `Microsoft.Xna.Framework.Input.Keys`
 - `Microsoft.Xna.Framework.Input.MouseState`
+- `Microsoft.Xna.Framework.Input.Touch.GestureSample`
 - `Microsoft.Xna.Framework.Input.Touch.GestureType`
+- `Microsoft.Xna.Framework.Input.Touch.TouchLocation`
 - `Microsoft.Xna.Framework.Input.Touch.TouchLocationState`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities`
 - `Microsoft.Xna.Framework.MathHelper`
@@ -398,7 +401,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.DeviceLostException`
 - `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
 - `Microsoft.Xna.Framework.Graphics.DirectionalLight`
-- `Microsoft.Xna.Framework.Graphics.DisplayModeCollection`
 - `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
 - `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.DynamicVertexBuffer`
@@ -458,10 +460,8 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.IDrawable`
 - `Microsoft.Xna.Framework.IUpdateable`
 - `Microsoft.Xna.Framework.Input.Mouse`
-- `Microsoft.Xna.Framework.Input.Touch.GestureSample`
 - `Microsoft.Xna.Framework.Input.Touch.TouchCollection`
 - `Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator`
-- `Microsoft.Xna.Framework.Input.Touch.TouchLocation`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`
 - `Microsoft.Xna.Framework.LaunchParameters`
 - `Microsoft.Xna.Framework.Media.Album`

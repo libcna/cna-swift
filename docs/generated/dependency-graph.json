@@ -5,20 +5,25 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 39,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 38,
   "ranked": [
     {
-      "type": "Microsoft.Xna.Framework.Graphics.DisplayModeCollection",
+      "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
       "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.DepthFormat",
         "Microsoft.Xna.Framework.Graphics.DisplayMode",
+        "Microsoft.Xna.Framework.Graphics.DisplayModeCollection",
+        "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
         "Microsoft.Xna.Framework.Graphics.SurfaceFormat"
       ],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.GraphicsAdapter"
+        "Microsoft.Xna.Framework.GraphicsDeviceInformation"
       ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 53,
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
+      ],
+      "transitiveMissingReverseReach": 52,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -167,15 +172,13 @@
       ]
     },
     {
-      "type": "Microsoft.Xna.Framework.Input.Touch.TouchLocation",
+      "type": "Microsoft.Xna.Framework.Audio.AudioCategory",
       "dependencies": [
-        "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
-        "Microsoft.Xna.Framework.Vector2"
+        "Microsoft.Xna.Framework.Audio.AudioStopOptions"
       ],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
-        "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator"
+        "Microsoft.Xna.Framework.Audio.AudioEngine"
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 3,

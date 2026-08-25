@@ -58,6 +58,12 @@ OptionSet, the `TouchLocationState`, `VideoSoundtrackType` and
 engine, video player, storage device, or graphics device capability is claimed;
 nothing conforms to either protocol.
 
+Foundation 18 adds the `TouchLocation` and `GestureSample` value structs and
+the `DisplayModeCollection` descriptor, without claiming any touch panel,
+display enumeration, or adapter capability. None of the three has a public
+constructor path to real data: `TouchPanel` and `GraphicsAdapter` are not
+implemented.
+
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -67,12 +73,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=110
-TARGET_MEMBERS=1620
-TOTAL_DIAGNOSTICS=298
-COMPLETE_TYPES=105
+TARGET_TYPES=113
+TARGET_MEMBERS=1641
+TOTAL_DIAGNOSTICS=295
+COMPLETE_TYPES=108
 PARTIAL_TYPES=5
-MISSING_TYPES=147
+MISSING_TYPES=144
 MISSING_MEMBER=131
 ```
 
@@ -91,8 +97,8 @@ Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
 DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, the
 25 Foundation-14 pure-managed types listed below, PresentationParameters,
-MouseState, MediaState, MediaSourceType, MicrophoneState, and the seven
-Foundation-17 types. Every implemented member has
+MouseState, MediaState, MediaSourceType, MicrophoneState, the seven
+Foundation-17 types, TouchLocation, GestureSample, and DisplayModeCollection. Every implemented member has
 qualified behavior; missing members remain absent.
 
 ## Foundation 14 pure managed batch
