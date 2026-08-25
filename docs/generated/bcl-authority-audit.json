@@ -21,7 +21,8 @@
   "controlFailures": [],
   "negativeControls": [
     {
-      "control": "/usr/lib/mono/4.5/mscorlib.dll",
+      "control": "mscorlib.dll",
+      "controlSha256": "5b36fcc1d4522a399d5fc278023f1cce866b5db21187cec2b86c532219848d24",
       "offeredAs": "mscorlib.dll",
       "checksRun": 21,
       "rejectedBy": 16,
@@ -45,7 +46,8 @@
       ]
     },
     {
-      "control": "/usr/lib/mono/4.0-api/mscorlib.dll",
+      "control": "mscorlib.dll",
+      "controlSha256": "a8d9bbf287f9340c5d61165d18bf6d21d806eb520231ecfee643447444624cdd",
       "offeredAs": "mscorlib.dll",
       "checksRun": 21,
       "rejectedBy": 12,
@@ -65,7 +67,8 @@
       ]
     },
     {
-      "control": "/home/robertvokac/.wine-cna-xna40/drive_c/windows/Microsoft.NET/assembly/GAC_MSIL/System/v4.0_4.0.0.0__b77a5c561934e089/System.dll",
+      "control": "System.dll",
+      "controlSha256": "c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462",
       "offeredAs": "mscorlib.dll",
       "checksRun": 21,
       "rejectedBy": 10,
@@ -83,7 +86,8 @@
       ]
     },
     {
-      "control": "/rv/tmp/samples/SAMPLE-017-CollisionSample_4_0/xna4-build/bin/Microsoft.Xna.Framework.Game.dll",
+      "control": "Microsoft.Xna.Framework.Game.dll",
+      "controlSha256": "b5dffdd8125abef2a4507ba4e1d2f11062143f0a63d48fe4f298b95ad746a1f0",
       "offeredAs": "mscorlib.dll",
       "checksRun": 21,
       "rejectedBy": 14,

@@ -1121,7 +1121,7 @@ NEGATIVE_SOURCES: list[tuple[str, str, str]] = [
     ),
     (
         "a sealed public collection member overridden",
-        "cannot override",
+        "overriding non-open instance method outside of its defining module",
         "import CNA\n"
         "final class Rogue: CNACollection<Int> {\n"
         "    override func Add(_ item: Int) throws {}\n"
@@ -1130,7 +1130,7 @@ NEGATIVE_SOURCES: list[tuple[str, str, str]] = [
     ),
     (
         "VisualizationData internal producer reached from outside",
-        "no member",
+        "inaccessible due to 'internal' protection level",
         "import CNA\n"
         "let data = Microsoft.Xna.Framework.Media.VisualizationData()\n"
         "try data.store(frequencies: [], samples: [])\n",

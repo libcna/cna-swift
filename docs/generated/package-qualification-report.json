@@ -1,12 +1,14 @@
 {
   "schemaVersion": 1,
-  "SOURCE_ARCHIVE_FILENAME": "cna-swift.zip",
-  "SOURCE_ARCHIVE_SHA256": "a4836d4827bc2f109480fcbccb6e1023b52246086ec4ad0d777e6199d757efce",
-  "SOURCE_ARCHIVE_ENTRIES": 260,
+  "SOURCE_ARCHIVE_FILENAME": "CNA.zip",
+  "SOURCE_ARCHIVE_SHA256": "5eb5e5299853e45a498f08060496bec0ef1c652cee00a9a7b4fb3619c2f50ef2",
+  "SOURCE_ARCHIVE_ENTRIES": 274,
   "FORBIDDEN_ENTRIES": [],
   "NATIVE_LIBRARIES": [],
   "MICROSOFT_REFERENCE_BINARIES": [],
-  "DEVELOPER_PATH_LEAKS": [],
+  "DEVELOPER_PATH_LEAKS": [
+    "CNA/docs/generated/bcl-authority-audit.json"
+  ],
   "DEBUG_BUILD": "PASS",
   "RELEASE_BUILD": "PASS",
   "RUN_60": "PASS",
@@ -15,6 +17,13 @@
     "nullable reference return bound as non-Optional",
     "Optional return assigned to a non-Optional binding",
     "fallible reader called without try",
-    "key path formed to a throwing getter"
+    "key path formed to a throwing getter",
+    "BCL base bound with the element type erased to Any",
+    "BCL base bound with the wrong element type",
+    "a sealed CLR collection subclassed",
+    "read-only collection used as a mutable one",
+    "mutating through the read-only collection surface",
+    "a sealed public collection member overridden",
+    "VisualizationData internal producer reached from outside"
   ]
 }

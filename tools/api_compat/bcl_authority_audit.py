@@ -1134,7 +1134,8 @@ def negative_controls(
             continue
         path = Path(raw).expanduser()
         if not path.is_file():
-            failures.append(f"negative control {path} is not a file")
+            failures.append(
+                f"negative control offered as {name} is not a file")
             checks += 1
             continue
         # Deliberately NOT cached: a control is read once and its
@@ -1145,9 +1146,13 @@ def negative_controls(
         checks += 1
         if not rejected:
             failures.append(
-                f"negative control {path} was NOT rejected as {name}")
+                f"negative control {path.name} was NOT rejected as {name}")
+        # Only the file NAME and the digest are retained, never the path. A
+        # generated report is committed, and a machine-local path in it is a
+        # developer-path leak the package qualification refuses.
         results.append({
-            "control": str(path),
+            "control": path.name,
+            "controlSha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "offeredAs": name,
             "checksRun": made,
             "rejectedBy": len(rejected),
@@ -1196,7 +1201,7 @@ def main() -> int:
             identity_checks += 1
             continue
         if not path.is_file():
-            identity_failures.append(f"{name}: {path} is not a file")
+            identity_failures.append(f"{name}: the supplied binary is not a file")
             identity_checks += 1
             continue
 
