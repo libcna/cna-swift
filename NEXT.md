@@ -2,14 +2,16 @@
 
 **Foundation Milestones 26, 27, 28 and 29 status:** COMPLETE.
 
-Four local commits this session, **none pushed**.
+Six local commits this session, **none pushed**.
 
 | Commit | What it is |
 |---|---|
 | `f1c5370` | `BCL_AUTHORITY` — a separate, non-vacuous registry that admits the exact Microsoft `mscorlib`. Evidence: `docs/foundation-26-bcl-authority-evidence.md`. |
 | `eec4604` | The BCL base rule, `CNACollection`/`CNAReadOnlyCollection`/`CNAList`, and `GameComponentCollection` as its first XNA proof. Evidence: `docs/foundation-27-bcl-base-projection-evidence.md`. |
 | `bb10ba2` | `VisualizationData`, and the audited **stop** on `Game.Components`. Evidence: `docs/foundation-29-collection-consumer-evidence.md`. |
-| _(this one)_ | The path-leak fix, the README section and these final numbers. |
+| `b37911b` | The developer-path leak the package qualification caught in the generated BCL report. |
+| `abd4baf` | The README BCL section and these numbers. |
+| `d58b563` | The final qualified archive digest for the committed tree. |
 
 Everything at and before `b1abe20` is untouched.
 
