@@ -2455,15 +2455,16 @@ def self_test() -> None:
             failures.append(f"{batch_simple} publicly exposed value__ did not fail")
         batch_self_tests += 11
 
-    # Foundation 14 pure managed batch, non-enum closures. The pinned value
-    # struct and the two pinned effect interfaces are driven through a
-    # per-member structural mutation matrix built from their own reference
-    # models, so no member can be renamed, retyped, made read-only, made
-    # static, or dropped without a diagnostic.
+    # Foundation 14 and 15 pure managed closures, non-enum. The pinned value
+    # struct, the two pinned effect interfaces, and the pinned descriptor class
+    # are driven through a per-member structural mutation matrix built from
+    # their own reference models, so no member can be renamed, retyped, made
+    # read-only, made static, or dropped without a diagnostic.
     batch_managed_names = [
         "Microsoft.Xna.Framework.Graphics.IEffectFog",
         "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
         "Microsoft.Xna.Framework.Graphics.VertexElement",
+        "Microsoft.Xna.Framework.Graphics.PresentationParameters",
     ]
     for managed_name in batch_managed_names:
         managed_expected = {managed_name: copy.deepcopy(all_expected[managed_name])}
@@ -2604,11 +2605,181 @@ def self_test() -> None:
             failures.append(f"{managed_simple} expected identity names are not the pinned names")
         batch_self_tests += 5
 
+    # ------------------------------------------------------------------
+    # General `System.IntPtr` -> Swift `Int` language projection.
+    #
+    # `System.IntPtr` maps to Swift `Int`: the opaque pointer-width signed
+    # numeric value of the CLR IntPtr. It is a LANGUAGE PROJECTION and is not a
+    # Swift pointer, a dereferenceable address, a CNA native handle, an SDL
+    # window, or any proof that the value is valid. The expected projection
+    # must therefore never be counted as RAW_HANDLE_LEAK, while every
+    # accidental pointer, native-handle, or fixed-width substitute must still
+    # be a diagnostic. The rule is proved twice: generically against a
+    # synthetic owner, and then against the one real selected XNA identity that
+    # uses it.
+    # ------------------------------------------------------------------
+    intptr_self_tests = 0
+    if map_clr_type("System.IntPtr", rules) != "Int":
+        failures.append("System.IntPtr does not map to Swift Int")
+    intptr_self_tests += 1
+
+    intptr_owner = "Microsoft.Xna.Framework.Graphics.IntPtrProjectionProbe"
+    intptr_source = {
+        "kind": "property", "name": "Handle", "type": "System.IntPtr",
+        "static": False, "get": True, "set": True, "parameters": [],
+    }
+    intptr_reference_member = expected_member(
+        intptr_owner, intptr_source, rules, "class",
+    )
+    if intptr_reference_member.return_type != "Int":
+        failures.append("mapped System.IntPtr property is not Swift Int")
+    intptr_self_tests += 1
+    intptr_expected = {
+        intptr_owner: TypeModel(
+            intptr_owner, "class", members=[intptr_reference_member],
+        ),
+    }
+
+    def intptr_models(swift_type: str) -> dict[str, TypeModel]:
+        model = TypeModel(intptr_owner, "class", identifier=intptr_owner)
+        model.members = [Member(
+            intptr_owner, "property", "Handle", False,
+            return_type=swift_type, mutable=True,
+            declaration=f"public var Handle: {swift_type} {{ get set }}",
+            identifier=f"{intptr_owner}:Handle",
+        )]
+        return {intptr_owner: model}
+
+    def intptr_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(intptr_expected, models)}
+
+    leak = "RAW_HANDLE_LEAK"
+    ffi = "PUBLIC_NATIVE_FFI_LEAK"
+    mismatch = "PROPERTY_MAPPING_MISMATCH"
+    # (label, Swift type, categories required, categories forbidden)
+    intptr_cases: list[tuple[str, str, set[str], set[str]]] = [
+        # 1. The expected CLR-language projection. It is clean: not a leak, and
+        #    not a mapping mismatch.
+        ("expected IntPtr -> Int projection", "Int", set(), {leak, ffi, mismatch}),
+        # 2-4. Accidental public pointer projections.
+        ("accidental UnsafeRawPointer", "UnsafeRawPointer", {leak, ffi}, set()),
+        ("accidental UnsafeMutableRawPointer", "UnsafeMutableRawPointer",
+         {leak, ffi}, set()),
+        ("accidental OpaquePointer", "OpaquePointer", {leak, ffi}, set()),
+        # 5. A fixed-width substitute is not the pointer-width projection.
+        ("incorrect fixed-width Int64 projection", "Int64", {mismatch}, {leak}),
+        # 6. CLR IntPtr is signed, so an unsigned projection is wrong.
+        ("incorrect unsigned UInt projection", "UInt", {mismatch}, {leak}),
+        # 7. Native-handle wrapper leakage, both under the CNA FFI naming that
+        #    the encapsulation gate recognises and under an unrelated platform
+        #    wrapper name that it does not; neither can pass the mapping check.
+        ("CNA native handle wrapper", "CNA_Handle", {ffi, mismatch}, set()),
+        ("CNA shim handle wrapper", "CNASwift_WindowHandle", {ffi, mismatch}, set()),
+        ("native handle property projection", "nativeHandle", {leak, ffi, mismatch}, set()),
+        ("SDL window wrapper", "SDL_Window", {mismatch}, set()),
+    ]
+    for label, swift_type, required, forbidden in intptr_cases:
+        observed = intptr_categories(intptr_models(swift_type))
+        for category in sorted(required):
+            if category not in observed:
+                failures.append(f"IntPtr {label}: did not produce {category}")
+            intptr_self_tests += 1
+        for category in sorted(forbidden):
+            if category in observed:
+                failures.append(f"IntPtr {label}: unexpectedly produced {category}")
+            intptr_self_tests += 1
+
+    # The same rule proved on the one real selected XNA identity that carries a
+    # `System.IntPtr`, so the general policy is anchored to real pinned
+    # metadata rather than only to a synthetic probe.
+    parameters_name = "Microsoft.Xna.Framework.Graphics.PresentationParameters"
+    handle_source = next(
+        item for item in source_types_by_name[parameters_name]["members"]
+        if item["name"] == "DeviceWindowHandle"
+    )
+    if handle_source["type"] != "System.IntPtr":
+        failures.append("DeviceWindowHandle is not a pinned System.IntPtr")
+    intptr_self_tests += 1
+    handle_expected = next(
+        member for member in all_expected[parameters_name].members
+        if member.name == "DeviceWindowHandle"
+    )
+    if handle_expected.return_type != "Int":
+        failures.append("DeviceWindowHandle does not map to Swift Int")
+    if not handle_expected.mutable:
+        failures.append("DeviceWindowHandle is not a read/write mapping")
+    intptr_self_tests += 2
+
+    parameters_expected = {
+        parameters_name: copy.deepcopy(all_expected[parameters_name]),
+    }
+    parameters_good = copy.deepcopy(parameters_expected)
+    parameters_good[parameters_name].identifier = parameters_name
+    for index, member in enumerate(parameters_good[parameters_name].members):
+        member.identifier = f"{parameters_name}:{index}"
+        member.declaration = (
+            f"public var {member.name}: {member.return_type}"
+            if member.kind == "property"
+            else f"public func {member.name}() -> {member.return_type}"
+        )
+
+    def parameters_handle(models: dict[str, TypeModel]) -> Member:
+        return next(
+            member for member in models[parameters_name].members
+            if member.name == "DeviceWindowHandle"
+        )
+
+    def parameters_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(parameters_expected, models)}
+
+    if parameters_categories(parameters_good):
+        failures.append(
+            "PresentationParameters IntPtr reference model is not diagnostic-free")
+    intptr_self_tests += 1
+
+    for label, swift_type, required, forbidden in intptr_cases:
+        models = copy.deepcopy(parameters_good)
+        handle = parameters_handle(models)
+        handle.return_type = swift_type
+        handle.declaration = f"public var DeviceWindowHandle: {swift_type}"
+        observed = parameters_categories(models)
+        for category in sorted(required):
+            if category not in observed:
+                failures.append(
+                    f"DeviceWindowHandle {label}: did not produce {category}")
+            intptr_self_tests += 1
+        for category in sorted(forbidden):
+            if category in observed:
+                failures.append(
+                    f"DeviceWindowHandle {label}: unexpectedly produced {category}")
+            intptr_self_tests += 1
+
+    # The descriptor must stay a descriptor: a public member that would
+    # dereference, resolve, or hand the handle to the native layer is not part
+    # of the pinned contract and must be rejected as an unexpected member.
+    for invented, invented_kind, invented_return in (
+        ("GetWindow", "method", "Int"),
+        ("ResolveDeviceWindow", "method", "Void"),
+        ("NativeWindowHandle", "property", "Int"),
+    ):
+        models = copy.deepcopy(parameters_good)
+        models[parameters_name].members.append(Member(
+            parameters_name, invented_kind, invented, False,
+            return_type=invented_return,
+            mutable=False if invented_kind == "property" else None,
+            declaration=f"public func {invented}()",
+            identifier=f"invented-presentation-parameters-{invented}",
+        ))
+        if "UNEXPECTED_MEMBER" not in parameters_categories(models):
+            failures.append(
+                f"PresentationParameters invented {invented} did not fail")
+        intptr_self_tests += 1
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

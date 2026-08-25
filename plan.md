@@ -1,8 +1,9 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 14 — Pure Managed Batch A. A **multi-type autonomous
-batch** over the completed Foundation 1–13 baseline, completing 25 entirely
-missing pure-managed XNA types carrying 144 mapped Swift XNA identities.
+**Milestone:** Foundation 15 — `PresentationParameters` and the general
+`System.IntPtr` projection. One entirely missing pure-managed XNA descriptor
+class carrying 13 mapped Swift XNA identities, over the completed
+Foundation 1–14 baseline.
 
 ## Normative rules
 
@@ -25,7 +26,13 @@ missing pure-managed XNA types carrying 144 mapped Swift XNA identities.
    PascalCase. Formal Swift projections are measured; manual diagnostic
    allowlisting is forbidden.
 5. Mapping rules are unchanged and no new mapping policy was created to make a
-   candidate convenient:
+   candidate convenient. Foundation 15 promoted the pre-existing
+   `System.IntPtr -> Swift Int` entry to a documented **general** language rule
+   with verifier support and ten negative controls; it invented nothing,
+   because the rule was already in `mapping-rules.json` and the mapping
+   document before this milestone. The expected projection is never
+   `RAW_HANDLE_LEAK`; that exemption covers only the mapped XNA IntPtr value
+   and never a CNA FFI or native implementation handle. Earlier rules:
    - a public non-flags CLR enum maps to a Swift `enum` with the CLR underlying
      type as its raw type and one explicitly valued case per CLR literal;
    - a public `[Flags]` CLR enum maps to a Swift `OptionSet` struct with the CLR
@@ -50,7 +57,22 @@ missing pure-managed XNA types carrying 144 mapped Swift XNA identities.
 
 ## Qualified selected surface
 
-Foundation 14 adds exactly these 25 types, all previously entirely missing:
+Foundation 15 adds exactly one type, previously entirely missing:
+
+- `Microsoft.Xna.Framework.Graphics.PresentationParameters`, a public
+  non-sealed CLR class with a public parameterless constructor, mapping to an
+  `open` Swift class with 13 identities: `init()`, non-virtual `Clone()`, ten
+  read/write properties, and the get-only `Bounds`. Its internal nested
+  `Settings` value struct and `settings` field mirror the pinned `assembly`
+  storage and stay out of the public Swift surface. `IsFullScreen` defaults to
+  `true` per the pinned `ldc.i4.1`; nothing validates, clamps, or rejects any
+  value; `Clone` is a wholesale value-struct copy that yields a base instance
+  even from a derived one; there is no `Clear` member to implement.
+  `DeviceWindowHandle` is pure managed descriptor state and is never
+  dereferenced, validated against a window, resolved through SDL, or handed to
+  CNA.
+
+Foundation 14 added exactly these 25 types, all previously entirely missing:
 
 - 19 ordinary CLR `Int32` enums → Swift `enum: Int32`: `GraphicsProfile`,
   `PresentInterval`, `VertexElementFormat`, `VertexElementUsage`,
@@ -79,18 +101,19 @@ callback, or constant was added, and the five runtime partials are untouched.
 ## Measurement status
 
 - Pinned contract: 257 types / 2,964 members; contract SHA-256
-  `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`. All 25
-  entries were independently re-read and machine-compared against the pinned
-  assembly IL for this milestone.
+  `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`. The
+  Foundation-15 entry was independently re-read and machine-compared against
+  the pinned assembly IL for this milestone, as were all 25 Foundation-14
+  entries before it.
 - Formal projection: 257 Swift types / 2,887 Swift members.
-- Compiler target: 98 types / 1,560 members; 93 complete, five partial, 159
-  missing. Total diagnostics are 310. Normal strict remains red only for the
+- Compiler target: 99 types / 1,573 members; 94 complete, five partial, 158
+  missing. Total diagnostics are 309. Normal strict remains red only for the
   deferred profile; leak-only is green.
-- Verifier: 1,259 mutation/self-tests pass, up from 235. Every batch type is
-  locally complete with zero diagnostics. Manual/applied allowlists and
+- Verifier: 1,396 mutation/self-tests pass, up from 1,259. Every completed type
+  is locally complete with zero diagnostics. Manual/applied allowlists and
   unmeasured structural categories are zero.
-- Pure behavior: 1,348 XNA-derived observation/assertion sites with zero
-  failures, up from 1,271. Swift projection qualification stays in separate
+- Pure behavior: 1,443 XNA-derived observation/assertion sites with zero
+  failures, up from 1,348. Swift projection qualification stays in separate
   tests and is not counted as XNA behavior.
 - Dependency graph: node names are now mapped exactly as the strict verifier
   maps them, which removed six false-positive dependency-complete candidates

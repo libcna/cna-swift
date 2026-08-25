@@ -33,6 +33,14 @@ status, primitive, clear, render-state, vertex-declaration, cube-face, effect
 parameter and audio metadata. None of them claims any renderer, device, buffer,
 effect or audio runtime support.
 
+Foundation 15 adds the managed `PresentationParameters` descriptor class
+without claiming device creation, reset, adapter selection, back-buffer
+creation, native window handling, presentation, or render targets. Its
+`DeviceWindowHandle` is the first XNA public signature to use the general
+`System.IntPtr -> Swift Int` language projection: an opaque pointer-width
+signed value held as pure descriptor state, never dereferenced, resolved, or
+handed to CNA. See `docs/xna-swift-mapping.md` for the general rule.
+
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -42,12 +50,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=98
-TARGET_MEMBERS=1560
-TOTAL_DIAGNOSTICS=310
-COMPLETE_TYPES=93
+TARGET_TYPES=99
+TARGET_MEMBERS=1573
+TOTAL_DIAGNOSTICS=309
+COMPLETE_TYPES=94
 PARTIAL_TYPES=5
-MISSING_TYPES=159
+MISSING_TYPES=158
 MISSING_MEMBER=131
 ```
 
@@ -64,8 +72,8 @@ BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
-DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, and the
-25 Foundation-14 pure-managed types listed below. Every implemented member has
+DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, the
+25 Foundation-14 pure-managed types listed below, and PresentationParameters. Every implemented member has
 qualified behavior; missing members remain absent.
 
 ## Foundation 14 pure managed batch

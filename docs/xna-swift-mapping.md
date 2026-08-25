@@ -170,10 +170,48 @@ to use a normal Swift subscript where their selected error contract permits.
 |---|---|---|
 | `System.TimeSpan` | `Duration` | CNA supplies exact signed 100-nanosecond ticks; Swift constructs seconds/attoseconds without a floating-point interval. |
 | `System.IO.Stream` | `Foundation.InputStream` | The strict `Texture2D.FromStream` projection reads the stream to contiguous bytes internally before CNA decode. |
-| `System.IntPtr` | `Int` | Pointer-width signed integer; the native ABI verifier validates the host width where a selected route first uses it. |
+| `System.IntPtr` | `Int` | Pointer-width signed integer; see the general rule below. |
 | `System.Object` | `Any?` | Optional preserves CLR null. |
 | `System.EventArgs` | `CNAEventArgs` | Empty public support value outside the XNA namespace. |
 | `System.Collections.Generic.IEnumerator<T>` | `CNAEnumerator<T>` | Throwing live enumeration preserves CLR mutation invalidation without a fake Microsoft type. |
+
+### The general `System.IntPtr` language projection
+
+`System.IntPtr` maps to Swift `Int`: the opaque pointer-width signed numeric
+value of the CLR IntPtr. `IntPtr.Zero` maps to `0`. This is a **language
+projection**, and it is deliberately not any of the following:
+
+- a Swift pointer,
+- a dereferenceable address,
+- a CNA native handle,
+- an SDL window,
+- a `GraphicsDevice`,
+- proof that the handle is valid,
+- proof that CNA can consume it.
+
+`Int` is the correct projection precisely because it follows the host pointer
+width rather than fixing one: a `Int64` substitute is a fixed-width choice, and
+a `UInt` substitute contradicts CLR IntPtr's signed semantics, so both remain
+mapping mismatches. The public XNA projection never exposes
+`UnsafeRawPointer`, `UnsafeMutableRawPointer`, or `OpaquePointer` merely
+because the CLR source type is `IntPtr`, and holding an XNA `IntPtr` value must
+never require unsafe pointer manipulation from a consumer of the binding.
+
+Because the mapped value is an ordinary integer, the expected projection is
+**not** counted as `RAW_HANDLE_LEAK`. That exemption is narrow: it applies only
+to the mapped XNA IntPtr value and never to a CNA FFI or native implementation
+handle. `RAW_HANDLE_LEAK` and `PUBLIC_NATIVE_FFI_LEAK` both remain required at
+zero, and the verifier carries negative fixtures for the accidental
+`UnsafeRawPointer`, `UnsafeMutableRawPointer`, `OpaquePointer`, `Int64`, `UInt`,
+CNA-handle-wrapper, and platform-window-wrapper projections. Each is proved
+twice — once against a synthetic owner so the rule is general, and once against
+the real selected identity that carries it.
+
+The first XNA public signature to use the rule is
+`Graphics.PresentationParameters.DeviceWindowHandle`. A stored handle is pure
+managed descriptor state: the projection never dereferences it, validates it
+against a real window, resolves it through SDL, creates or resets a device, or
+hands it to CNA.
 
 The verifier derives `EXPECTED_SWIFT_TYPES=257`. It derives
 `EXPECTED_SWIFT_MEMBERS=2887` by excluding exactly 49 enum backing fields named

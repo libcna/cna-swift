@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 43,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 42,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.DisplayModeCollection",
@@ -19,32 +19,6 @@
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 53,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-        "Microsoft.Xna.Framework.Graphics.Texture2D",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.PresentationParameters",
-      "dependencies": [
-        "Microsoft.Xna.Framework.DisplayOrientation",
-        "Microsoft.Xna.Framework.Graphics.DepthFormat",
-        "Microsoft.Xna.Framework.Graphics.PresentInterval",
-        "Microsoft.Xna.Framework.Graphics.RenderTargetUsage",
-        "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
-        "Microsoft.Xna.Framework.Rectangle"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.GraphicsDeviceInformation"
-      ],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
-      ],
-      "transitiveMissingReverseReach": 52,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -191,6 +165,18 @@
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
       ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.AudioStopOptions",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Audio.AudioCategory",
+        "Microsoft.Xna.Framework.Audio.Cue"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 5,
+      "transitivePartialReverseReach": []
     }
   ]
 }

@@ -153,6 +153,7 @@
     "Microsoft.Xna.Framework.CurveKey.op_Equality",
     "Microsoft.Xna.Framework.CurveKey.op_Inequality"
   ],
+  "intPtrLanguageProjection": "System.IntPtr maps to Swift Int: the opaque pointer-width signed numeric value of the CLR IntPtr, and IntPtr.Zero maps to 0. It is a LANGUAGE PROJECTION and is not a Swift pointer, a dereferenceable address, a CNA native handle, an SDL window, or proof that the value is valid. The expected projection is never RAW_HANDLE_LEAK; UnsafeRawPointer, UnsafeMutableRawPointer, OpaquePointer and native-handle wrappers remain leaks, and a fixed-width Int64 or an unsigned UInt substitute remains a mapping mismatch. RAW_HANDLE_LEAK stays required at zero.",
   "indexedPropertyAccessorMapping": "A read/write CLR indexed property maps to a throwing Item getter plus throwing SetItem method; the verifier combines both compiler symbols into one source property identity",
   "throwsMapping": "Swift throws is LANGUAGE_MAPPING and does not add an XNA member",
   "protectedVirtualMapping": "open",

@@ -62,6 +62,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/DisplayModeContractTests.swift",
     ROOT / "Tests/CNATests/Foundation14GraphicsEnumContractTests.swift",
     ROOT / "Tests/CNATests/Foundation14ManagedTypeContractTests.swift",
+    ROOT / "Tests/CNATests/PresentationParametersContractTests.swift",
 ]
 
 
@@ -172,6 +173,18 @@ def main() -> int:
                 "IEFFECT_MATRICES": "IEffectMatricesXnaContract",
                 "SOUND_STATE": "SoundStateXnaContract",
                 "AUDIO_CHANNELS": "AudioChannelsXnaContract",
+                "PRESENTATION_PARAMETERS_DEFAULTS":
+                    "PresentationParametersXnaContractDefaults",
+                "PRESENTATION_PARAMETERS_MUTATION":
+                    "PresentationParametersXnaContractMutation",
+                "PRESENTATION_PARAMETERS_IS_FULL_SCREEN":
+                    "PresentationParametersXnaContractIsFullScreen",
+                "PRESENTATION_PARAMETERS_BOUNDS":
+                    "PresentationParametersXnaContractBounds",
+                "PRESENTATION_PARAMETERS_DEVICE_WINDOW_HANDLE":
+                    "PresentationParametersXnaContractDeviceWindowHandle",
+                "PRESENTATION_PARAMETERS_CLONE":
+                    "PresentationParametersXnaContractClone",
             }.items()
         },
         "displayOrientationContract": {

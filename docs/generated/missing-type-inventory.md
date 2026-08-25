@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=98
-TARGET_MEMBERS=1560
-TOTAL_DIAGNOSTICS=310
-COMPLETE_TYPES=93
+TARGET_TYPES=99
+TARGET_MEMBERS=1573
+TOTAL_DIAGNOSTICS=309
+COMPLETE_TYPES=94
 PARTIAL_TYPES=5
-MISSING_TYPES=159
-MISSING_TYPE=159
+MISSING_TYPES=158
+MISSING_TYPE=158
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -110,6 +110,7 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Short2`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Short4`
 - `Microsoft.Xna.Framework.Graphics.PresentInterval`
+- `Microsoft.Xna.Framework.Graphics.PresentationParameters`
 - `Microsoft.Xna.Framework.Graphics.PrimitiveType`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetUsage`
 - `Microsoft.Xna.Framework.Graphics.SetDataOptions`
@@ -423,7 +424,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
-- `Microsoft.Xna.Framework.Graphics.PresentationParameters`
 - `Microsoft.Xna.Framework.Graphics.RasterizerState`
 - `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetBinding`

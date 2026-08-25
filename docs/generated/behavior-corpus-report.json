@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1348,
-  "ASSERTIONS": 1348,
+  "OBSERVATIONS": 1443,
+  "ASSERTIONS": 1443,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -106,7 +106,13 @@
     "testIEffectFogXnaContract",
     "testIEffectMatricesXnaContract",
     "testSoundStateXnaContract",
-    "testAudioChannelsXnaContract"
+    "testAudioChannelsXnaContract",
+    "testPresentationParametersXnaContractDefaults",
+    "testPresentationParametersXnaContractMutation",
+    "testPresentationParametersXnaContractIsFullScreenNormalization",
+    "testPresentationParametersXnaContractBounds",
+    "testPresentationParametersXnaContractDeviceWindowHandle",
+    "testPresentationParametersXnaContractClone"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -182,7 +188,13 @@
     "IEFFECT_FOG": 1,
     "IEFFECT_MATRICES": 1,
     "SOUND_STATE": 1,
-    "AUDIO_CHANNELS": 1
+    "AUDIO_CHANNELS": 1,
+    "PRESENTATION_PARAMETERS_DEFAULTS": 1,
+    "PRESENTATION_PARAMETERS_MUTATION": 1,
+    "PRESENTATION_PARAMETERS_IS_FULL_SCREEN": 1,
+    "PRESENTATION_PARAMETERS_BOUNDS": 1,
+    "PRESENTATION_PARAMETERS_DEVICE_WINDOW_HANDLE": 1,
+    "PRESENTATION_PARAMETERS_CLONE": 1
   },
   "displayOrientationContract": {
     "flags": true,
