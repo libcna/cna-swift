@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=118
-TARGET_MEMBERS=1656
-TOTAL_DIAGNOSTICS=290
-COMPLETE_TYPES=113
+TARGET_TYPES=121
+TARGET_MEMBERS=1679
+TOTAL_DIAGNOSTICS=287
+COMPLETE_TYPES=116
 PARTIAL_TYPES=5
-MISSING_TYPES=139
-MISSING_TYPE=139
+MISSING_TYPES=136
+MISSING_TYPE=136
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -46,7 +46,7 @@ FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=10
 INHERITED_MEMBER_PROJECTIONS=3
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
-ARRAY_MUTATION_MAPPINGS=19
+ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
 COLLECTION_INTERFACE_PROJECTIONS=1
 ENUMERATOR_SUPPORT_PROJECTIONS=9
@@ -61,6 +61,7 @@ MEASURED_SUPPORT_BASE_PROJECTIONS=4
 ## Complete types
 
 - `Microsoft.Xna.Framework.Audio.AudioChannels`
+- `Microsoft.Xna.Framework.Audio.AudioListener`
 - `Microsoft.Xna.Framework.Audio.AudioStopOptions`
 - `Microsoft.Xna.Framework.Audio.MicrophoneState`
 - `Microsoft.Xna.Framework.Audio.SoundState`
@@ -155,6 +156,8 @@ MEASURED_SUPPORT_BASE_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Input.MouseState`
 - `Microsoft.Xna.Framework.Input.Touch.GestureSample`
 - `Microsoft.Xna.Framework.Input.Touch.GestureType`
+- `Microsoft.Xna.Framework.Input.Touch.TouchCollection`
+- `Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator`
 - `Microsoft.Xna.Framework.Input.Touch.TouchLocation`
 - `Microsoft.Xna.Framework.Input.Touch.TouchLocationState`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities`
@@ -357,7 +360,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Audio.AudioCategory`
 - `Microsoft.Xna.Framework.Audio.AudioEmitter`
 - `Microsoft.Xna.Framework.Audio.AudioEngine`
-- `Microsoft.Xna.Framework.Audio.AudioListener`
 - `Microsoft.Xna.Framework.Audio.Cue`
 - `Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance`
 - `Microsoft.Xna.Framework.Audio.InstancePlayLimitException`
@@ -463,8 +465,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.VertexPositionTexture`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.Input.Mouse`
-- `Microsoft.Xna.Framework.Input.Touch.TouchCollection`
-- `Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`
 - `Microsoft.Xna.Framework.LaunchParameters`
 - `Microsoft.Xna.Framework.Media.Album`

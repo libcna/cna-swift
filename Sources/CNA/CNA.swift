@@ -54,6 +54,7 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
     case indexOutOfRange(String)
     case nullReference(String)
     case collectionModified
+    case notSupported(String)
 
     public var description: String {
         switch self {
@@ -89,6 +90,8 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
             return "XNA null reference in \(operation)"
         case .collectionModified:
             return "Collection was modified after the enumerator was created"
+        case .notSupported(let operation):
+            return "XNA does not support \(operation)"
         }
     }
 }

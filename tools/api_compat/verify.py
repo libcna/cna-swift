@@ -42,6 +42,15 @@ TYPE_KINDS = {
 # step with `eventAccessorPrefixes` by a self-test.
 EVENT_ACCESSOR_PREFIXES = ("add_", "remove_", "raise_")
 
+# A CopyTo destination array is caller-owned storage. `IList<T>` inherits
+# `ICollection<T>`, so a type whose pinned direct interface is either one has
+# the same caller-owned destination and the same inout projection. Kept in step
+# with `collectionCopyToArrayMutationMapping` by a self-test.
+COLLECTION_COPY_INTERFACES = (
+    "System.Collections.Generic.ICollection`1[",
+    "System.Collections.Generic.IList`1[",
+)
+
 OPERATOR_FROM_SWIFT = {
     "==": "op_Equality", "!=": "op_Inequality", "+": "op_Addition",
     "*": "op_Multiply", "/": "op_Division",
@@ -196,7 +205,7 @@ def expected_member(
             name == "CopyTo" and parameter.get("name") == "array" and
             parameter.get("type", "").endswith("[]") and
             any(
-                item.startswith("System.Collections.Generic.ICollection`1[")
+                item.startswith(COLLECTION_COPY_INTERFACES)
                 for item in owner_direct_interfaces
             )
         )
@@ -3320,6 +3329,75 @@ def self_test() -> None:
             failures.append(f"event support omitted: {name} was not reported unmeasured")
         event_self_tests += 1
 
+    # ------------------------------------------------------------------
+    # IList<T> as a measured direct interface, and its CopyTo destination.
+    # `TouchCollection` is the pinned owner: its declared direct interface is
+    # IList<TouchLocation>, and its CopyTo writes into the caller's array. The
+    # rule that makes that array `inout` used to key on ICollection<T> alone,
+    # which would have silently turned a destination into a value copy here.
+    # ------------------------------------------------------------------
+    list_self_tests = 0
+    if sorted(COLLECTION_COPY_INTERFACES) != sorted(
+        item + "[" for item in [
+            "System.Collections.Generic.ICollection`1",
+            "System.Collections.Generic.IList`1",
+        ]
+    ):
+        failures.append("CopyTo destination interfaces drifted from the rule text")
+    list_self_tests += 1
+    if "System.Collections.Generic.IList`1" not in rules.get(
+        "requiredSystemInterfaceProjections", []
+    ):
+        failures.append("IList<T> is not a required system-interface projection")
+    list_self_tests += 1
+    if "System.Collections.Generic.IList`1" not in rules.get(
+        "systemInterfaceMappings", {}
+    ):
+        failures.append("IList<T> has no configured Swift projection")
+    list_self_tests += 1
+
+    touch_name = "Microsoft.Xna.Framework.Input.Touch.TouchCollection"
+    touch_expected = {touch_name: copy.deepcopy(all_expected[touch_name])}
+    touch_copy_to = next(
+        member for member in touch_expected[touch_name].members
+        if member.name == "CopyTo"
+    )
+    if touch_copy_to.directions != ("inout", ""):
+        failures.append(
+            "TouchCollection.CopyTo destination array is not caller-owned inout")
+    list_self_tests += 1
+
+    touch_good = copy.deepcopy(touch_expected)
+    touch_good[touch_name].identifier = touch_name
+    for index, member in enumerate(touch_good[touch_name].members):
+        member.identifier = f"{touch_name}:{index}"
+
+    def touch_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(touch_expected, models)}
+
+    if touch_categories(touch_good):
+        failures.append("the TouchCollection reference model is not diagnostic-free")
+    list_self_tests += 1
+
+    # A value-copy destination loses every written element, so it must fail.
+    models = copy.deepcopy(touch_good)
+    next(
+        member for member in models[touch_name].members if member.name == "CopyTo"
+    ).directions = ("", "")
+    if "REF_OUT_MAPPING_MISMATCH" not in touch_categories(models):
+        failures.append("TouchCollection.CopyTo value-copy destination did not fail")
+    list_self_tests += 1
+
+    # The read/write indexed Item must expand to the throwing Item/SetItem
+    # pair, not to a plain subscript, because set_Item throws.
+    touch_item = next(
+        member for member in touch_expected[touch_name].members
+        if member.name == "Item"
+    )
+    if not (touch_item.kind == "property" and touch_item.parameters and touch_item.mutable):
+        failures.append("TouchCollection.Item is not a read/write indexed property")
+    list_self_tests += 1
+
     order_self_tests = 0
     mouse_name = "Microsoft.Xna.Framework.Input.MouseState"
     if f"{mouse_name}.ctor" not in rules.get("internalParameterOrderChecks", []):
@@ -3394,7 +3472,7 @@ def self_test() -> None:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + order_self_tests}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + list_self_tests + order_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
@@ -3625,6 +3703,15 @@ def system_interface_projection_evidence(
                     "Add", "Clear", "Contains", "CopyTo", "Remove",
                     "Count", "IsReadOnly",
                 }
+            elif interface_prefix == "System.Collections.Generic.IList`1":
+                # IList<T> inherits ICollection<T>, so its concrete surface is
+                # the seven ICollection members plus the three IList ones and
+                # the indexed Item.
+                required_members = {
+                    "Add", "Clear", "Contains", "CopyTo", "Remove",
+                    "Count", "IsReadOnly",
+                    "IndexOf", "Insert", "RemoveAt", "Item",
+                }
             else:
                 required_members = set()
             declared_members = {member["name"] for member in owner["members"]}
@@ -3705,7 +3792,7 @@ def make_report(
     array_mutation_mappings = 0
     for item in contract["types"]:
         direct_collection = any(
-            interface.startswith("System.Collections.Generic.ICollection`1[")
+            interface.startswith(COLLECTION_COPY_INTERFACES)
             for interface in item.get("directInterfaces", [])
         )
         for member in item["members"]:

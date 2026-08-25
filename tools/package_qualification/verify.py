@@ -336,6 +336,101 @@ private final class ExternalArgs: CNAEventArgs {
     }
 }
 
+// Foundation 20: the pure managed batch that the event milestone unblocked
+// nothing for, but that the frontier surfaced -- an audio data holder and a
+// touch value collection, neither of which needs a device.
+func qualifyFoundation20ManagedSurface() throws {
+    typealias F = Microsoft.Xna.Framework
+    typealias T = Microsoft.Xna.Framework.Input.Touch
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-20 \(what) qualification failed")
+        }
+    }
+
+    // AudioListener is publicly constructible and derivable with no audio
+    // backend. Its defaults carry the XACT handedness flip: Position and
+    // Velocity have a negative-zero Z, while Forward and Up read back as the
+    // exact Vector3 constants.
+    let listener = F.Audio.AudioListener()
+    try check(listener.Position.Z.sign == .minus, "AudioListener default Position sign")
+    try check(listener.Velocity.Z.bitPattern == Float(-0.0).bitPattern,
+              "AudioListener default Velocity bit pattern")
+    try check(listener.Forward.Z == -1 && listener.Forward.X == 0,
+              "AudioListener default Forward")
+    try check(listener.Up.Y == 1 && listener.Up.Z.bitPattern == Float(0).bitPattern,
+              "AudioListener default Up")
+    listener.Position = F.Vector3(1, 2, 3)
+    try check(listener.Position.Z == 3, "AudioListener round-trip")
+    listener.Velocity = F.Vector3(0, 0, -0.0)
+    try check(listener.Velocity.Z.bitPattern == Float(-0.0).bitPattern,
+              "AudioListener negative-zero round-trip")
+
+    // TouchCollection is publicly constructible from an array, rejects a ninth
+    // touch, and exposes a read-only IList surface whose mutators all throw.
+    let touches = [
+        T.TouchLocation(1, .Pressed, F.Vector2(10, 20)),
+        T.TouchLocation(2, .Moved, F.Vector2(30, 40), .Pressed, F.Vector2(25, 35)),
+    ]
+    let collection = try T.TouchCollection(touches)
+    try check(collection.IsConnected && collection.IsReadOnly, "TouchCollection flags")
+    try check(collection.Count == 2, "TouchCollection Count")
+    try check(try collection.Item(1).Id == 2, "TouchCollection Item")
+
+    var found = T.TouchLocation(0, .Invalid, F.Vector2(0, 0))
+    try check(collection.FindById(2, touchLocation: &found), "TouchCollection FindById hit")
+    try check(found.Position.X == 30, "TouchCollection FindById value")
+    try check(!collection.FindById(99, touchLocation: &found), "TouchCollection FindById miss")
+    try check(found.Id == 0 && found.State == .Invalid,
+              "TouchCollection FindById writes default on miss")
+
+    let rebuilt = try collection.Item(0)
+    try check(collection.IndexOf(rebuilt) == 0 && collection.Contains(rebuilt),
+              "TouchCollection IndexOf")
+    try check(collection.IndexOf(T.TouchLocation(1, .Released, F.Vector2(10, 20))) == -1,
+              "TouchCollection IndexOf compares state")
+
+    // CopyTo needs a caller-owned destination; a value copy would lose the
+    // write and this check would fail.
+    var destination = Array(
+        repeating: T.TouchLocation(0, .Invalid, F.Vector2(0, 0)), count: 3)
+    try collection.CopyTo(&destination, arrayIndex: 1)
+    try check(destination[1].Id == 1 && destination[2].Id == 2,
+              "TouchCollection CopyTo destination")
+
+    var mutationsRejected = 0
+    let sample = touches[0]
+    for attempt in [
+        { try collection.Add(sample) },
+        { try collection.Clear() },
+        { try collection.Insert(0, item: sample) },
+        { try collection.RemoveAt(0) },
+        { _ = try collection.Remove(sample) },
+        { try collection.SetItem(0, sample) },
+    ] as [() throws -> Void] {
+        do { try attempt() } catch { mutationsRejected += 1 }
+    }
+    try check(mutationsRejected == 6, "TouchCollection mutators all refuse")
+
+    // Nine touches exceed the pinned eight-slot capacity.
+    let nine = (0..<9).map { T.TouchLocation(Int32($0), .Moved, F.Vector2(0, 0)) }
+    var capacityRejected = false
+    do { _ = try T.TouchCollection(nine) } catch { capacityRejected = true }
+    try check(capacityRejected, "TouchCollection capacity")
+
+    // The nested Enumerator walks a snapshot and throws on Current outside the
+    // valid range.
+    var enumerator = collection.GetEnumerator()
+    var walked: [Int32] = []
+    while enumerator.MoveNext() { walked.append(try enumerator.Current.Id) }
+    try check(walked == [1, 2], "TouchCollection enumeration order")
+    var cursorRejected = false
+    do { _ = try enumerator.Current } catch { cursorRejected = true }
+    try check(cursorRejected, "TouchCollection enumerator past the end")
+    enumerator.Dispose()
+}
+
 func qualifyFoundation19EventSurface() throws {
     typealias F = Microsoft.Xna.Framework
     typealias G = Microsoft.Xna.Framework.Graphics
@@ -590,11 +685,12 @@ do {
     try qualifyFoundation14ManagedSurface()
     try qualifyFoundation15To18ManagedSurface()
     try qualifyFoundation19EventSurface()
+    try qualifyFoundation20ManagedSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -618,7 +714,7 @@ def validate_canary(output: str, requested: int) -> bool:
         r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) "
         r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS) "
         r"renderTargetUsage=(PASS) foundation14=(PASS) foundation15to18=(PASS) "
-        r"foundation19=(PASS)",
+        r"foundation19=(PASS) foundation20=(PASS)",
         output,
     )
     if not match:

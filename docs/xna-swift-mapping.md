@@ -170,7 +170,17 @@ Swift `throws` is the language projection for runtime/XNA failure paths because
 Swift has no CLR unchecked exceptions. It does not add a reference member and
 is ignored only as a measured `LANGUAGE_MAPPING` signature detail. Ordinary
 failures never use `fatalError`, process exit, silent defaults, or no-ops.
-`CNAError` is support API outside the strict XNA namespace.
+`CNAError` is support API outside the strict XNA namespace. It carries the
+projections of the CLR exceptions the pinned surface actually throws, including
+`System.NotSupportedException` as `notSupported`.
+
+Swift has **no throwing property setter**. Repository policy resolves that for
+*indexed* properties only (the `Item`/`SetItem` expansion below). For a plain
+read/write property whose CLR setter validates, the projection is undecided: 32
+such properties exist across the registered assemblies, 11 of them on the
+protected runtime partials, and `GraphicsDevice.Viewport` is currently carried
+as a measured `PROPERTY_MAPPING_MISMATCH` rather than resolved. See
+`docs/foundation-20-pure-managed-batch-evidence.md`.
 
 ## Comparison and collection interfaces
 
@@ -191,6 +201,18 @@ support type `CNAEnumerator<T>` outside the XNA namespace. Its throwing
 `Next() -> T?` preserves a live cursor and mutation invalidation. It does not
 conform to nonthrowing `IteratorProtocol`. The related generic and non-generic
 `IEnumerable` identities add no automatic Swift conformance.
+
+`System.Collections.Generic.IList<T>` maps to the concrete XNA members that
+implement it: the seven inherited `ICollection<T>` members plus `IndexOf`,
+`Insert`, `RemoveAt` and the indexed `Item`. As with `ICollection<T>` there is
+no automatic Swift `Collection`, `MutableCollection` or `RandomAccessCollection`
+conformance.
+
+A `CopyTo` array parameter on a type whose pinned direct interface is
+`ICollection<T>` **or** `IList<T>` is caller-owned mutable destination storage
+and maps to Swift `inout`. `IList<T>` inherits `ICollection<T>`, so the
+destination is the same; projecting it as a value copy would silently discard
+every written element.
 
 A read/write CLR indexed property maps to a throwing getter named `Item` and a
 throwing setter named `SetItem`. Swift has no throwing setter accessor. The

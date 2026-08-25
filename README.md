@@ -81,6 +81,13 @@ base. The milestone completes `IUpdateable`, `IDrawable`,
 `GraphicsDeviceManager` or `GraphicsDevice` is implemented: those need real
 lifecycle and native raising, and an event that never fires is not implemented.
 
+Foundation 20 adds the `AudioListener` data holder and the `TouchCollection`
+value collection with its nested `Enumerator`, claiming no audio, XACT, or touch
+capability: `Cue.Apply3D` and `TouchPanel` are not implemented, so nothing
+produces a live listener consumer or a live touch collection. `AudioListener`
+reproduces the XACT handedness flip its pinned IL applies, including the
+negative-zero Z its default `Position` and `Velocity` actually carry.
+
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -90,12 +97,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=118
-TARGET_MEMBERS=1656
-TOTAL_DIAGNOSTICS=290
-COMPLETE_TYPES=113
+TARGET_TYPES=121
+TARGET_MEMBERS=1679
+TOTAL_DIAGNOSTICS=287
+COMPLETE_TYPES=116
 PARTIAL_TYPES=5
-MISSING_TYPES=139
+MISSING_TYPES=136
 MISSING_MEMBER=131
 ```
 
@@ -117,8 +124,9 @@ DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, the
 MouseState, MediaState, MediaSourceType, MicrophoneState, the seven
 Foundation-17 types, TouchLocation, GestureSample, DisplayModeCollection,
 IUpdateable, IDrawable, GameComponentCollectionEventArgs,
-ResourceCreatedEventArgs and ResourceDestroyedEventArgs. Every implemented
-member has qualified behavior; missing members remain absent.
+ResourceCreatedEventArgs, ResourceDestroyedEventArgs, AudioListener,
+TouchCollection and TouchCollection.Enumerator. Every implemented member has
+qualified behavior; missing members remain absent.
 
 ## Foundation 14 pure managed batch
 

@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 118,
-    "TARGET_MEMBERS": 1656,
-    "TOTAL_DIAGNOSTICS": 290,
-    "COMPLETE_TYPES": 113,
+    "TARGET_TYPES": 121,
+    "TARGET_MEMBERS": 1679,
+    "TOTAL_DIAGNOSTICS": 287,
+    "COMPLETE_TYPES": 116,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 139,
-    "MISSING_TYPE": 139,
+    "MISSING_TYPES": 136,
+    "MISSING_TYPE": 136,
     "MISSING_MEMBER": 131,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -49,7 +49,7 @@
     "NAMESPACE_MARKERS": 10,
     "INHERITED_MEMBER_PROJECTIONS": 3,
     "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 26,
-    "ARRAY_MUTATION_MAPPINGS": 19,
+    "ARRAY_MUTATION_MAPPINGS": 20,
     "COMPARABLE_INTERFACE_PROJECTIONS": 1,
     "COLLECTION_INTERFACE_PROJECTIONS": 1,
     "ENUMERATOR_SUPPORT_PROJECTIONS": 9,
@@ -62,6 +62,7 @@
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
+    "Microsoft.Xna.Framework.Audio.AudioListener",
     "Microsoft.Xna.Framework.Audio.AudioStopOptions",
     "Microsoft.Xna.Framework.Audio.MicrophoneState",
     "Microsoft.Xna.Framework.Audio.SoundState",
@@ -156,6 +157,8 @@
     "Microsoft.Xna.Framework.Input.MouseState",
     "Microsoft.Xna.Framework.Input.Touch.GestureSample",
     "Microsoft.Xna.Framework.Input.Touch.GestureType",
+    "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
+    "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
     "Microsoft.Xna.Framework.Input.Touch.TouchLocation",
     "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",
@@ -186,7 +189,6 @@
     "Microsoft.Xna.Framework.Audio.AudioCategory",
     "Microsoft.Xna.Framework.Audio.AudioEmitter",
     "Microsoft.Xna.Framework.Audio.AudioEngine",
-    "Microsoft.Xna.Framework.Audio.AudioListener",
     "Microsoft.Xna.Framework.Audio.Cue",
     "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
     "Microsoft.Xna.Framework.Audio.InstancePlayLimitException",
@@ -292,8 +294,6 @@
     "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Mouse",
-    "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
-    "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
     "Microsoft.Xna.Framework.LaunchParameters",
     "Microsoft.Xna.Framework.Media.Album",
@@ -337,11 +337,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Audio.AudioEngine",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Audio.AudioListener",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1626,16 +1621,6 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
@@ -2033,6 +2018,24 @@
         "IsReadOnly",
         "Remove"
       ]
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
+      "clrInterface": "System.Collections.Generic.IList`1[Microsoft.Xna.Framework.Input.Touch.TouchLocation]",
+      "swiftProjection": "the concrete XNA members represent the direct interface: the seven inherited ICollection<T> members plus IndexOf/Insert/RemoveAt and the indexed Item; no automatic Swift Collection, MutableCollection or RandomAccessCollection conformance",
+      "requiredConcreteMembers": [
+        "Add",
+        "Clear",
+        "Contains",
+        "CopyTo",
+        "Count",
+        "IndexOf",
+        "Insert",
+        "IsReadOnly",
+        "Item",
+        "Remove",
+        "RemoveAt"
+      ]
     }
   ],
   "indexedPropertyAccessorProjections": [
@@ -2041,6 +2044,15 @@
       "sourceProperty": "Item",
       "getterSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.Item(_:Int32)",
       "setterSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.CurveKey)",
+      "getterObserved": true,
+      "setterObserved": true,
+      "reason": "Swift throwing accessors require a compiler-measured Item/SetItem expansion"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
+      "sourceProperty": "Item",
+      "getterSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Item(_:Int32)",
+      "setterSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.Input.Touch.TouchLocation)",
       "getterObserved": true,
       "setterObserved": true,
       "reason": "Swift throwing accessors require a compiler-measured Item/SetItem expansion"
@@ -2220,16 +2232,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.AudioListener",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Audio.AudioListener",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.AudioStopOptions",
@@ -5051,29 +5057,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 15,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 15,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Touch.TouchLocation",

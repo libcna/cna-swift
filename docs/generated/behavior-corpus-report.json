@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1628,
-  "ASSERTIONS": 1628,
+  "OBSERVATIONS": 1707,
+  "ASSERTIONS": 1707,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -136,7 +136,11 @@
     "testGameComponentCollectionEventArgsXnaContract",
     "testResourceCreatedEventArgsXnaContract",
     "testResourceDestroyedEventArgsXnaContract",
-    "testEventArgsEmptyIsOneSharedObjectXnaContract"
+    "testEventArgsEmptyIsOneSharedObjectXnaContract",
+    "testAudioListenerXnaContract",
+    "testTouchCollectionXnaContract",
+    "testTouchCollectionMutationIsNotSupportedXnaContract",
+    "testTouchCollectionEnumeratorXnaContract"
   ],
   "groupCounts": {
     "Vector2": 2,

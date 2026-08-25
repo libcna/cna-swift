@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 34,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 33,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
@@ -107,21 +107,6 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.Audio.AudioListener",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Vector3"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.Cue",
-        "Microsoft.Xna.Framework.Audio.SoundBank",
-        "Microsoft.Xna.Framework.Audio.SoundEffectInstance"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 5,
-      "transitivePartialReverseReach": []
-    },
-    {
       "type": "Microsoft.Xna.Framework.Audio.AudioCategory",
       "dependencies": [
         "Microsoft.Xna.Framework.Audio.AudioStopOptions"
@@ -208,19 +193,6 @@
       ]
     },
     {
-      "type": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Input.Touch.TouchLocation"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Input.Touch.TouchCollection"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 2,
-      "transitivePartialReverseReach": []
-    },
-    {
       "type": "Microsoft.Xna.Framework.Media.MediaSource",
       "dependencies": [
         "Microsoft.Xna.Framework.Media.MediaSourceType"
@@ -231,68 +203,6 @@
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Media.Video",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Media.VideoSoundtrackType"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Media.VideoPlayer"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Media.VisualizationData",
-      "dependencies": [],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Media.MediaPlayer"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException",
-      "dependencies": [],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 0,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.Microphone",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Audio.MicrophoneState"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 0,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException",
-      "dependencies": [],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 0,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException",
-      "dependencies": [],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 0,
       "transitivePartialReverseReach": []
     }
   ]
