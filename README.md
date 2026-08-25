@@ -358,7 +358,20 @@ python3 tools/native_abi/verify.py \
 python3 tools/gamepad_native/run.py \
   --library "$CNA_NATIVE_LIBRARY" \
   --output docs/generated/gamepad-native-report.json
+python3 tools/api_compat/pinned_assembly_audit.py \
+  --assembly-dir /path/to/xna/redistributable \
+  --require-exact Microsoft.Xna.Framework.dll \
+  --require-exact Microsoft.Xna.Framework.Graphics.dll \
+  --output docs/generated/pinned-assembly-audit.json
 ```
+
+`pinned_assembly_audit.py` decides whether an XNA assembly may be used as a
+behavior authority. It reconstructs each assembly's public metadata from
+`ikdasm` output and diffs it against the retained contract; the seven
+registered assemblies reproduce all 257 types and 2,964 members exactly. It is
+calibrated on the two assemblies registered first and carries 60 mutation
+self-tests, so it cannot pass vacuously. Only assembly hashes are retained; no
+Microsoft binary is in the repository or the release archive.
 
 The normal API verifier exits nonzero until the full selected profile is
 complete; use `--leak-only` for the green encapsulation gate. Architecture,

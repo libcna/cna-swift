@@ -147,6 +147,19 @@ func qualifyPublicRenderTargetUsageSurface() throws {
 // the value struct and the two protocols, with no native library, no device,
 // no buffer, no effect and no audio backend. Naming these types is a
 // public-surface check only and carries no runtime behavior claim.
+private final class ExternalGameComponent: Microsoft.Xna.Framework.IGameComponent {
+    private(set) var initialized = false
+    func Initialize() throws { initialized = true }
+}
+
+private final class ExternalDeviceManager:
+    Microsoft.Xna.Framework.IGraphicsDeviceManager
+{
+    func CreateDevice() throws {}
+    func BeginDraw() throws -> Bool { true }
+    func EndDraw() throws {}
+}
+
 private struct ExternalFogWitness: Microsoft.Xna.Framework.Graphics.IEffectFog {
     var FogEnabled: Bool = false
     var FogStart: Float = 0
@@ -238,16 +251,114 @@ func qualifyFoundation14ManagedSurface() throws {
     try check(readMatrices.World == Microsoft.Xna.Framework.Matrix.Identity, "IEffectMatrices")
 }
 
+
+// Foundation 15-18: the managed surface added after the Foundation 14 batch,
+// exercised from an *external* module. The in-module tests use
+// `@testable import`, so only this canary can prove what the genuinely public
+// surface allows and forbids.
+func qualifyFoundation15To18ManagedSurface() throws {
+    typealias F = Microsoft.Xna.Framework
+    typealias G = Microsoft.Xna.Framework.Graphics
+    typealias I = Microsoft.Xna.Framework.Input
+    typealias T = Microsoft.Xna.Framework.Input.Touch
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-15..18 \(what) qualification failed")
+        }
+    }
+
+    // Foundation 15: PresentationParameters is publicly constructible and
+    // derivable, IsFullScreen defaults to true, Bounds tracks the back buffer
+    // live, and DeviceWindowHandle is a plain Swift Int.
+    let parameters = G.PresentationParameters()
+    try check(parameters.IsFullScreen, "PresentationParameters IsFullScreen default")
+    try check(parameters.BackBufferWidth == 0 && parameters.BackBufferFormat == .Color,
+              "PresentationParameters defaults")
+    try check(parameters.DeviceWindowHandle == 0, "DeviceWindowHandle default")
+    parameters.BackBufferWidth = 800
+    parameters.BackBufferHeight = 480
+    parameters.DeviceWindowHandle = -1
+    parameters.IsFullScreen = false
+    try check(parameters.Bounds.Width == 800 && parameters.Bounds.Height == 480 &&
+              parameters.Bounds.X == 0, "PresentationParameters Bounds")
+    try check(parameters.DeviceWindowHandle == -1, "DeviceWindowHandle signed round trip")
+    let clone = parameters.Clone()
+    try check(clone.BackBufferWidth == 800 && !clone.IsFullScreen && clone.DeviceWindowHandle == -1,
+              "PresentationParameters Clone")
+    clone.BackBufferWidth = 1
+    try check(parameters.BackBufferWidth == 800, "PresentationParameters Clone independence")
+
+    // The IntPtr projection is exactly Int, never a pointer.
+    let handle: Int = parameters.DeviceWindowHandle
+    try check(MemoryLayout.size(ofValue: handle) == MemoryLayout<UnsafeRawPointer>.size,
+              "DeviceWindowHandle is pointer width")
+
+    // Foundation 16: MouseState is publicly constructible with unlabelled
+    // arguments in the pinned order, and its hash is not zero-substituted.
+    let mouse = I.MouseState(10, 20, 30, .Pressed, .Released, .Pressed, .Released, .Pressed)
+    try check(mouse.X == 10 && mouse.Y == 20 && mouse.ScrollWheelValue == 30,
+              "MouseState storage")
+    try check(mouse.MiddleButton == .Released && mouse.RightButton == .Pressed,
+              "MouseState middle/right order")
+    try check(mouse.GetHashCode() == 1, "MouseState hash")
+    try check(I.MouseState(0, 0, 0, .Released, .Released, .Released, .Released, .Released)
+                  .GetHashCode() == 0, "MouseState zero hash is not substituted")
+    try check(mouse.ToString() == "{X:10 Y:20 Buttons:Left Right XButton2 Wheel:30}",
+              "MouseState string")
+    try check(F.Media.MediaState.Paused.rawValue == 2 &&
+              F.Media.MediaSourceType.WindowsMediaConnect.rawValue == 4 &&
+              F.Audio.MicrophoneState.Started.rawValue == 0, "Foundation 16 enums")
+
+    // Foundation 17: the flags/non-flags split, and both protocols are
+    // externally conformable with exactly their pinned requirement sets.
+    let drag: T.GestureType = [.HorizontalDrag, .VerticalDrag]
+    try check(drag.rawValue == 24 && drag.contains(.VerticalDrag), "GestureType flags")
+    try check(T.TouchLocationState.Invalid.rawValue == 0 &&
+              F.Audio.AudioStopOptions.Immediate.rawValue == 1 &&
+              F.Media.VideoSoundtrackType.MusicAndDialog.rawValue == 2,
+              "Foundation 17 enums")
+    let component: Microsoft.Xna.Framework.IGameComponent = ExternalGameComponent()
+    try component.Initialize()
+    let manager: Microsoft.Xna.Framework.IGraphicsDeviceManager = ExternalDeviceManager()
+    try manager.CreateDevice()
+    try check(try manager.BeginDraw(), "IGraphicsDeviceManager BeginDraw")
+    try manager.EndDraw()
+
+    // Foundation 18: TouchLocation's equality asymmetry and out parameter, and
+    // GestureSample's verbatim storage.
+    let location = T.TouchLocation(1, .Moved, F.Vector2(2, 3), .Pressed, F.Vector2(4, 5))
+    let differentStates =
+        T.TouchLocation(1, .Released, F.Vector2(2, 3), .Released, F.Vector2(4, 5))
+    try check(location.Equals(differentStates), "TouchLocation typed Equals ignores state")
+    try check(!(location == differentStates), "TouchLocation op_Equality compares state")
+    try check(location.ToString() == "{Position:{X:2 Y:3}}", "TouchLocation string")
+    try check(T.TouchLocation(7, .Moved, F.Vector2(1, 2)).GetHashCode() == 2139095047,
+              "TouchLocation hash")
+    var previous = T.TouchLocation(0, .Invalid, F.Vector2(0, 0))
+    try check(location.TryGetPreviousLocation(&previous), "TouchLocation previous present")
+    try check(previous.Id == 1 && previous.State == .Pressed && previous.Position.X == 4,
+              "TouchLocation previous promotion")
+    try check(!T.TouchLocation(9, .Moved, F.Vector2(0, 0)).TryGetPreviousLocation(&previous),
+              "TouchLocation previous absent")
+    try check(previous.Id == -1, "TouchLocation absent previous is written")
+    let sample = T.GestureSample(
+        .Tap, .seconds(2), F.Vector2(1, 2), F.Vector2(3, 4), F.Vector2(5, 6), F.Vector2(7, 8))
+    try check(sample.GestureType == .Tap && sample.Timestamp == .seconds(2) &&
+              sample.Delta2.Y == 8, "GestureSample storage")
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
     try qualifyPublicRenderTargetUsageSurface()
     try qualifyFoundation14ManagedSurface()
+    try qualifyFoundation15To18ManagedSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))

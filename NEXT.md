@@ -137,72 +137,158 @@ ABI_MISMATCHES=0
 - `Microsoft.Xna.Framework.Graphics.Texture2D`
 - `Microsoft.Xna.Framework.Graphics.SpriteBatch`
 
-## Next milestone
+## Final gate results
 
-The regenerated graph contains **39** missing types whose XNA public-signature
-dependencies are complete. Foundation Milestone 18 is **not yet selected**.
-With the pinned-assembly blocker closed, every remaining frontier is now a
-**general BCL language-mapping decision** or a **runtime capability**, not a
-provenance gap.
+Run at the end of the Foundation-18 session, on the committed tree:
 
-**A. General BCL language projections that do not exist yet.** Each needs one
-principled general rule, not a per-type exception. In rough value order:
+```text
+DEBUG_BUILD=PASS
+RELEASE_BUILD=PASS
+DEBUG_TESTS=186 PASS
+RELEASE_TESTS=186 PASS
+WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE_INCLUDING_TESTS
+SYMBOL_GRAPH=PASS
+API_SELF_TESTS=1994 PASS
+PINNED_ASSEMBLY_AUDIT=257_TYPES/2964_MEMBERS CALIBRATION=PASS AUDIT_SELF_TESTS=60 PASS
+NORMAL_STRICT=EXPECTED_RED_DEFERRED_PROFILE_ONLY
+LEAK_ONLY=PASS
+PURE_XNA_DERIVED=1595/1595/0
+SWIFT_ASAN=PASS_PURE_CORPUS_126_TESTS_DETECT_LEAKS_DISABLED
+SWIFT_TSAN=PASS_MANAGED_CORPUS_126_TESTS
+NATIVE_ABI=29/91/91/18/2/214 MISSING=0/0 MISMATCHES=0
+NATIVE_STRESS=GAME_CYCLES=20 GAME_RECREATION_CYCLES=20 TEXTURE2D_CYCLES=20
+    SPRITEBATCH_CYCLES=20 CALLBACK_ERROR_CYCLES=20 GAMEPAD_GET_STATE_CYCLES=50
+    GAMEPAD_CAPABILITIES_CYCLES=20 NATIVE_CRASHES=0 OBSERVED_UAF=0
+    OBSERVED_DOUBLE_FREE=0 MODE_FAILURES=0
+GAMEPAD_NATIVE=0 FAILURES HARDWARE_AVAILABLE=NO
+ISOLATED_CONSUMER=DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
+TEMPLATE=86687f62c3a13ee2b59798f338fc083f7399f447 UNCHANGED
+    debug 60 -> updates=60 draws=60 viewport=800x480 texture=128x128
+    release 600 -> updates=600 draws=600 viewport=800x480 texture=128x128
+GIT_DIFF_CHECK=CLEAN
+```
 
-1. **`System.EventHandler<T>` / CLR events.** Unblocks `IUpdateable`,
-   `IDrawable` and, behind them, `GameComponent` and
-   `DrawableGameComponent`. `EVENT_MAPPING_MISMATCH` is a measured category
-   that has never been exercised: all 49 contract events live in missing or
-   partial types. This is the single highest-value general rule remaining.
+The isolated external consumer now additionally qualifies the Foundation
+15-18 public surface. That matters because the in-module tests use
+`@testable import`: only the external canary can prove what the genuinely
+public surface allows — public construction and derivation of
+`PresentationParameters`, the unlabelled `MouseState` constructor in its pinned
+order, external conformance to `IGameComponent` and `IGraphicsDeviceManager`,
+the `TouchLocation` equality asymmetry and `out` parameter — and what it
+forbids.
+
+`swift package archive-source` is **not byte-deterministic**: two consecutive
+invocations on an unchanged tree produce different ZIP hashes, because the
+archive records timestamps. What is stable is the archive's *content*: the same
+226 entries with the same bytes. The tool also refuses forbidden entries,
+native libraries, Microsoft reference binaries and developer path leaks, all of
+which are zero. It also silently declines to overwrite an existing output file,
+so a stale archive must be deleted before re-archiving.
+
+## Why this session stopped
+
+Two legitimate stopping conditions are met together.
+
+**A material architecture decision is required that this prompt and repository
+policy do not resolve.** Every remaining general BCL mapping frontier is a
+genuine fork, not a mechanical gap. In value order:
+
+1. **`System.EventHandler<T>` and CLR events.** All 49 contract events are the
+   single shape `System.EventHandler<TArgs>`, and `EVENT_MAPPING_MISMATCH` is a
+   measured category that has never been exercised because every one of them
+   lives in a missing or partial type. Repository policy *does* decide the
+   outer shape — the `CNAEnumerator<T>` precedent, the documented rule that
+   "public delegate types will receive deterministic named closure
+   projections", and the verifier already accepting `event -> property` all
+   point at a `CNAEvent<TArgs>` support type outside the XNA namespace, exposed
+   as a get-only property. What policy does **not** decide is the part that
+   matters most, and it is not cosmetic:
+   - CLR removes a handler by *delegate identity*. Swift closures have no
+     identity, so removal needs either an opaque subscription token that XNA
+     does not have, or an `AnyObject` owner, or it must be dropped.
+   - CLR lets only the declaring type raise an event. A Swift protocol
+     requirement such as `IUpdateable.EnabledChanged` must be satisfiable by a
+     *user's* type outside this module, so raising has to be publicly
+     reachable — either a public `Raise` on `CNAEvent` (weaker encapsulation
+     than CLR) or a `CNAEvent`/`CNAEventSource` split (two support types for
+     one concept).
+   Whichever is chosen becomes a permanent public support API used by all 49
+   events, including those on the protected partials `Game`,
+   `GraphicsDevice` and `GraphicsDeviceManager`, where the *native* side will
+   eventually raise. That last coupling is the decisive reason not to settle it
+   inside a managed-only milestone.
 2. **`System.EventArgs`.** `ResourceCreatedEventArgs` and
    `ResourceDestroyedEventArgs` (reach 50 each),
-   `GameComponentCollectionEventArgs`, `PreparingDeviceSettingsEventArgs`.
-   Both resource types are sealed, have no public constructor, and derive from
-   `System.EventArgs`, which currently maps to the **`CNAEventArgs` struct**.
-   The strict verifier does not measure non-XNA bases, so they could be
-   completed today as plain Swift classes with internal construction, exactly
-   following the `DisplayMode` precedent — but that models the CLR base as
-   absent rather than as a struct/class conflict. Making `CNAEventArgs` a class
-   would change an existing public API type's kind and value semantics, and it
-   appears in `Game.OnExiting`, a member of a protected partial. **This is a
-   genuine architecture decision and is deliberately left open.**
-3. **`System.Exception`.** Eight sealed exception types across Audio, Content,
-   Graphics and Storage, each with `()`, `(message)`, `(message, inner)`. Swift
-   has no CLR unchecked exceptions; the binding projects failure paths as
-   `throws` and carries `CNAError` outside the XNA namespace. Whether an XNA
-   exception *type* becomes a Swift `Error`-conforming type, and how `inner`
-   chains, is open.
-4. **`System.String.GetHashCode`.** Blocks `Audio.RendererDetail`. The CLR
+   `GameComponentCollectionEventArgs`, `PreparingDeviceSettingsEventArgs`. All
+   derive from `System.EventArgs`, which currently maps to the **`CNAEventArgs`
+   struct**. The strict verifier does not measure non-XNA bases, so they could
+   be completed today as plain Swift classes with internal construction,
+   exactly following the `DisplayMode` precedent — but that models the CLR base
+   as *absent* rather than as a struct/class conflict. Making `CNAEventArgs` a
+   class instead changes an existing public API type's kind and value
+   semantics, and it appears in `Game.OnExiting`, a member of a protected
+   partial. An `open class CNAEventArgs` also cannot keep its current
+   `Sendable` conformance without `@unchecked`.
+3. **`System.Exception`.** Eight exception types across Audio, Content,
+   Graphics and Storage. Beyond deciding whether an XNA exception type becomes
+   a Swift `Error`-conforming type, two of them extend
+   `System.Runtime.InteropServices.ExternalException` rather than
+   `System.Exception`, and four declare a
+   `(SerializationInfo, StreamingContext)` constructor — a whole BCL
+   serialization subsystem. And because the contract lists only *declared*
+   members, a strict projection yields types that store a message no consumer
+   can read; making them useful means extending the inherited-member projection
+   rule to a BCL base and deciding which of `System.Exception`'s members to
+   include. Both readings are defensible.
+4. **`System.String.GetHashCode`** blocks `Audio.RendererDetail`. The CLR
    function is explicitly unspecified and implementation-defined, so it is not
-   derivable from IL. Either the type stays blocked or the project decides that
-   an unspecified BCL hash may be projected onto a documented substitute — a
-   fidelity decision, not a mapping mechanic.
-5. **`System.Attribute`** — five `ContentSerializer*Attribute` types.
-6. **`System.Type` / `System.IServiceProvider`** — `GameServiceContainer`.
-7. **`System.Collections.Generic.Dictionary<K,V>` as a base** —
-   `LaunchParameters`.
-8. **`System.Collections.ObjectModel.ReadOnlyCollection<T>`** —
-   `Media.VisualizationData`.
-9. **`System.ComponentModel.TypeConverter`** — `Design.MathTypeConverter`
-   (reach 12) and its eleven concrete subclasses.
+   derivable from IL; Swift's own `String` hashing is per-process seeded and
+   would not even be stable within the binding. Either the type stays blocked
+   or the project decides an unspecified BCL hash may be projected onto a
+   documented substitute. That is a fidelity decision, not a mapping mechanic.
+5. **`System.Attribute`** (five `ContentSerializer*Attribute` types, one of
+   which has seven properties and a `Clone`), **`System.Type` /
+   `System.IServiceProvider`** (`GameServiceContainer`),
+   **`Dictionary<K,V>` as a base** (`LaunchParameters`),
+   **`ReadOnlyCollection<T>`** (`Media.VisualizationData`), and
+   **`System.ComponentModel.TypeConverter`** (`Design.MathTypeConverter` and
+   its eleven concrete subclasses).
 
-**B. Blocked on runtime capability, not on mapping.**
+**All other remaining candidates require native, runtime or hardware work
+beyond the managed scope.** `GraphicsAdapter` (reach 52) and `Input.Mouse` both
+became dependency-complete during this session — because
+`DisplayModeCollection` and `MouseState` completed — and both are blocked on
+real adapter and device enumeration that would have to be fabricated.
+`EffectAnnotation` needs effect runtime semantics; `ContentManager` and
+`TitleContainer` need the filesystem; `AudioEmitter`, `AudioListener`,
+`AudioCategory`, `Microphone`, `AudioEngine`, `SoundBank`, `WaveBank` and `Cue`
+need the XACT engine; `TouchPanel`, `VideoPlayer`, `StorageDevice` and
+`StorageContainer` need the platform; `SpriteFont` depends on the `Texture2D`
+partial; `FrameworkDispatcher.Update()` pumps audio, media and networking and a
+no-op would be a fabricated answer; `Media.Video`'s pinned internal constructor
+takes a `GraphicsDevice` partial and its only producer is `ContentManager`.
 
-- `DisplayModeCollection` (reach 53) — enumerates `DisplayMode`, whose
-  instances exist only through `GraphicsAdapter` mode enumeration. Any
-  implementation is permanently empty or fabricates adapter data.
-- `EffectAnnotation` (reach 25) — effect runtime semantics are missing.
-- `ContentManager` (reach 8) — filesystem plus disposal lifecycle.
-- `AudioEmitter` / `AudioListener` — native XACT emitter data and handedness.
-- `Input.Touch.TouchLocation` (reach 3), `TouchPanel`, `VideoPlayer`,
-  `StorageDevice`, `AudioEngine` — real hardware or platform capability.
+**No XNA reference input is missing.** The pinned-scope blocker recorded by
+Foundation 14 and 16 was closed in Foundation 17: all seven declaring
+assemblies are registered and together reproduce the retained contract's 257
+types and 2,964 members exactly. **No missing software or Debian package is
+required** — `swift` 6.0.3, `ikdasm`, `monodis` and `mono` are all present and
+were all used.
 
-The recommended next frontier is **the general CLR event/delegate projection**,
-because it is the only remaining general rule that unblocks a whole cluster
-(`IUpdateable`, `IDrawable`, `GameComponent`, `DrawableGameComponent`) and it
-exercises a measured diagnostic category that has never been exercised. If two
-materially different event mappings prove equally plausible and repository
-policy does not decide between them, that is a legitimate architecture stopping
-condition.
+## Recommended next frontier
+
+**The general CLR event/delegate projection**, taken as a deliberate
+architecture decision rather than inside a type milestone. It is the only
+remaining general rule that unblocks a whole cluster — `IUpdateable`,
+`IDrawable`, and behind them `GameComponent` and `DrawableGameComponent` — and
+it exercises a measured diagnostic category that has never been exercised.
+Decide the removal-identity and raise-encapsulation questions in section 1
+above first, ideally together with how a native-raised event on
+`GraphicsDevice` will eventually work, then implement the rule, add verifier
+support and negative mutations, and prove it on `IUpdateable` and `IDrawable`.
+
+`System.EventArgs` (section 2) should be decided in the same pass, because the
+four `*EventArgs` types and the events that carry them are the same design.
 
 ```text
 SELECTED_ONLY=false

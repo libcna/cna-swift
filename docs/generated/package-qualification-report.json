@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "SOURCE_ARCHIVE_FILENAME": "cna-swift.zip",
+  "SOURCE_ARCHIVE_SHA256": "60e46fb2959607ab398aaa616453659c03f2aa399f9b5e46a2ab9878c8261994",
+  "SOURCE_ARCHIVE_ENTRIES": 226,
+  "FORBIDDEN_ENTRIES": [],
+  "NATIVE_LIBRARIES": [],
+  "MICROSOFT_REFERENCE_BINARIES": [],
+  "DEVELOPER_PATH_LEAKS": [
+    "cna-swift/tools/api_compat/__pycache__/verify.cpython-311.pyc"
+  ],
+  "DEBUG_BUILD": "PASS",
+  "RELEASE_BUILD": "PASS",
+  "RUN_60": "PASS",
+  "RUN_600": "PASS"
+}
