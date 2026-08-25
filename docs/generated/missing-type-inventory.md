@@ -10,7 +10,7 @@ EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=123
 TARGET_MEMBERS=1690
-TOTAL_DIAGNOSTICS=286
+TOTAL_DIAGNOSTICS=288
 COMPLETE_TYPES=118
 PARTIAL_TYPES=5
 MISSING_TYPES=134
@@ -22,7 +22,7 @@ TYPE_KIND_MISMATCH=0
 BASE_MAPPING_MISMATCH=2
 INTERFACE_MAPPING_MISMATCH=1
 FIELD_MAPPING_MISMATCH=0
-PROPERTY_MAPPING_MISMATCH=2
+PROPERTY_MAPPING_MISMATCH=4
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
@@ -66,6 +66,19 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=8
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 MEASURED_SUPPORT_BASE_PROJECTIONS=4
+REFERENCE_RETURN_PROJECTIONS=369
+OPTIONAL_RETURN_PROJECTIONS=153
+NONOPTIONAL_RETURN_PROJECTIONS=216
+PROVEN_NULLABLE_RETURN_PROJECTIONS=115
+PROVEN_NONNULL_RETURN_PROJECTIONS=128
+UNKNOWN_RETURN_NULLABILITY_PROJECTIONS=126
+NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=70
+NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
+NONNULL_INFALLIBLE_RETURN_PROJECTIONS=62
+NONNULL_FALLIBLE_RETURN_PROJECTIONS=66
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=59
+PENDING_RETURN_NULLABILITY_PROJECTIONS=310
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=4
 ```
 
 ## Complete types
@@ -195,6 +208,7 @@ MEASURED_SUPPORT_BASE_PROJECTIONS=4
 
 Expected members: 37; emitted members: 16.
 
+- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.GraphicsDevice()`: XNA can normally return null from Microsoft.Xna.Framework.Graphics.GraphicsDevice here, so the Swift return must be Optional; expected Microsoft.Xna.Framework.Graphics.GraphicsDevice?, found Microsoft.Xna.Framework.Graphics.GraphicsDevice; Swift `throws` is present instead, and a normal null result is not a failure, so throws must not stand in for it
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Tick()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.SuppressDraw()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.ResetElapsedTime()`: mapped member is absent
@@ -338,7 +352,8 @@ Expected members: 16; emitted members: 4.
 Expected members: 30; emitted members: 4.
 
 - `INTERFACE_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager`: missing protocols ['Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService', 'Microsoft.Xna.Framework.IGraphicsDeviceManager']
-- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()`: CLR getter is infallible, so the Swift reader must not throw; found throws=True
+- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()`: XNA can normally return null from Microsoft.Xna.Framework.Graphics.GraphicsDevice here, so the Swift return must be Optional; expected Microsoft.Xna.Framework.Graphics.GraphicsDevice?, found Microsoft.Xna.Framework.Graphics.GraphicsDevice; Swift `throws` is present instead, and a normal null result is not a failure, so throws must not stand in for it
+- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()`: CLR getter is infallible, so the Swift reader must not throw; found throws=True -- the CLR return is nullable and the getter is infallible, so the reader is `T? { get }`: a normal null must not arrive as an error
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.CanResetDevice(_:Microsoft.Xna.Framework.GraphicsDeviceInformation)`: mapped member is absent

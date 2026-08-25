@@ -359,7 +359,16 @@ def method_identity(header: str) -> tuple[str | None, int]:
         head = text[:open_index].strip()
         if not head:
             continue
-        name = re.sub(r"<.*$", "", head.split()[-1]).strip("'")
+        # A generic parameter list may carry constraints, and a constraint
+        # contains spaces: `DrawUserIndexedPrimitives<valuetype .ctor
+        # (IVertexType) T>`. Cutting at the first `<` of the *last token* then
+        # names the method `T>`, merging every such method on a type into one
+        # bucket and losing the call edges its properly spelled call sites
+        # carry. The whole balanced group has to go first.
+        tokens = strip_generic_arguments(head).split()
+        if not tokens:
+            continue
+        name = tokens[-1].strip("'")
         return (name or None), len(split_top_level(arguments))
     return None, 0
 
@@ -613,17 +622,19 @@ class CallGraph:
         return sorted(set(result))
 
 
-def overload_merge_disagreements(
-    graph: CallGraph, assemblies: list[Assembly], contract: dict[str, Any],
-) -> list[str]:
-    """Bound the one approximation the graph makes: merging overloads by arity.
+def overload_bounds(graph: CallGraph, assemblies: list[Assembly]) -> dict[str, Any]:
+    """Per-overload lower and upper bounds on fallibility, and the overload sets.
 
-    `graph` treats a call as fallible when *any* same-arity overload is -- an
-    upper bound on a signature-precise analysis. The lower bound requires
-    *every* overload to be fallible. A signature-precise answer is sandwiched
-    between the two, so where the bounds agree the merge provably changed
-    nothing. This returns the accessors where they disagree; the registered
-    contract produces none.
+    `graph` merges same-named, same-arity overloads, which is an upper bound on
+    a signature-precise analysis. Two per-overload closures bracket the precise
+    answer: the *upper* one propagates fallibility from any called overload,
+    the *lower* one only when every overload of the called group is fallible.
+    Wherever the two agree, the precise answer is known and the merge provably
+    changed nothing.
+
+    Returns `lower`, `upper`, `siblings` (group -> its overload keys) and
+    `overloads` (overload key -> Method). An overload key is the group key with
+    the declaration's ordinal appended.
     """
     per_overload: dict[tuple[str, str, int, int], Method] = {}
     for assembly in assemblies:
@@ -675,6 +686,25 @@ def overload_merge_disagreements(
             lower.add(caller)
             queue.append(caller)
 
+    upper = set(direct)
+    queue = collections.deque(direct)
+    while queue:
+        current = queue.popleft()
+        for caller in waiting.get(current[:3], ()):
+            if caller in upper:
+                continue
+            upper.add(caller)
+            queue.append(caller)
+    return {"lower": lower, "upper": upper, "siblings": siblings,
+            "overloads": per_overload}
+
+
+def overload_merge_disagreements(
+    graph: CallGraph, assemblies: list[Assembly], contract: dict[str, Any],
+) -> list[str]:
+    """The contract accessors where the two bounds disagree; there are none."""
+    bounds = overload_bounds(graph, assemblies)
+    lower, siblings = bounds["lower"], bounds["siblings"]
     disagreements: list[str] = []
     for source_type in contract["types"]:
         il_name = source_type["name"].replace("+", "/")

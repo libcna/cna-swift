@@ -160,6 +160,37 @@ by the verifier exactly as the metadata contract is — 114 fallible getters and
 reaches the throw. See `docs/xna-swift-mapping.md` and
 `docs/foundation-22-accessor-projection-evidence.md`.
 
+## Nullable reference returns
+
+A CLR reference return and a CLR failure are independent facts. `null` is a
+normal, successful result; a thrown exception is not a value at all. CNA-Swift
+projects the two orthogonally, so all four combinations occur and none stands
+in for another.
+
+```swift
+// Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs
+public var Resource: Any? { get }                 // nullable, infallible
+
+// Microsoft.Xna.Framework.GraphicsDeviceManager -- the XNA-faithful shape
+public var GraphicsDevice: Graphics.GraphicsDevice? { get }
+```
+
+`throws` never stands in for a normal null, and Optional never absorbs a real
+failure: a member that can both return null and throw is `T?` **and** `throws`.
+No placeholder object, sentinel, `fatalError`, force unwrap, `try?` or
+`catch { return nil }` is used to avoid either.
+
+Which returns are nullable is not a judgement call. It is derived from the CIL
+of the seven registered assemblies by
+`tools/api_compat/return_nullability.py`, pinned as
+`tools/api_compat/reference/xna40-reference-return-nullability.json`, and
+hash-checked by the verifier exactly as the metadata contract is — 115 proven
+nullable, 128 proven non-null and 126 unproven, over all 369 public
+reference-typed return positions. An unproven return keeps the non-Optional
+projection and is named individually rather than guessed either way. See
+`docs/xna-swift-mapping.md` and
+`docs/foundation-23-reference-return-nullability-evidence.md`.
+
 ## Foundation 14 pure managed batch
 
 Foundation 14 is a multi-type batch rather than a single-type closure. It
@@ -428,6 +459,10 @@ python3 tools/api_compat/accessor_fallibility.py \
   --assembly-dir /path/to/xna/redistributable \
   --output tools/api_compat/reference/xna40-accessor-fallibility.json \
   --markdown docs/generated/accessor-fallibility-inventory.md
+python3 tools/api_compat/return_nullability.py \
+  --assembly-dir /path/to/xna/redistributable \
+  --output tools/api_compat/reference/xna40-reference-return-nullability.json \
+  --markdown docs/generated/return-nullability-inventory.md
 ```
 
 `accessor_fallibility.py` regenerates the pinned per-accessor fallibility
@@ -436,10 +471,17 @@ including five mutations that must flip a verdict and a bound proving its one
 approximation immaterial, and the verifier refuses to run if the pinned file's
 digest does not match `accessorFallibilitySha256` in `mapping-rules.json`.
 
-`verify.py --graph-self-test` runs twelve negative fixtures cut from the Symbol
-Graph the compiler actually emitted: each mutates a real declaration the way a
-wrong Swift signature would and must introduce a diagnostic the unmutated graph
-does not already carry.
+`return_nullability.py` regenerates the pinned per-return-position nullability
+verdicts from the same registered assemblies by abstractly interpreting every
+method body and resolving each field's whole construction-and-store lifecycle.
+It carries 115 self-tests, including mutations that must flip a verdict and a
+two-sided per-overload bound, and the verifier refuses to run if the pinned
+file's digest does not match `returnNullabilitySha256` in `mapping-rules.json`.
+
+`verify.py --graph-self-test` runs seventeen negative fixtures cut from the
+Symbol Graph the compiler actually emitted: each mutates a real declaration the
+way a wrong Swift signature would and must introduce a diagnostic the unmutated
+graph does not already carry.
 
 `pinned_assembly_audit.py` decides whether an XNA assembly may be used as a
 behavior authority. It reconstructs each assembly's public metadata from

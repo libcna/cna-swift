@@ -764,6 +764,62 @@ func qualifyFoundation22AccessorSurface() throws {
     }
 }
 
+func qualifyFoundation23NullabilitySurface() throws {
+    typealias F = Microsoft.Xna.Framework
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-23 \(what) qualification failed")
+        }
+    }
+
+    // Compiler-level, not runtime. A key path can only be written when the
+    // property's declared type matches exactly, and Swift cannot form one to a
+    // throwing property at all, so these two bindings prove from outside the
+    // package that a proven-nullable reference return is Optional *and*
+    // infallible, while a return the CIL does not prove nullable is neither
+    // Optional nor throwing. The matching negative fixtures -- the same key
+    // paths written non-Optional, and one to a throwing getter -- are compiled
+    // separately and must fail.
+    let nullableReturn: KeyPath<F.Graphics.ResourceCreatedEventArgs, Any?> = \.Resource
+    let nonOptionalReturn: KeyPath<F.Graphics.ResourceDestroyedEventArgs, String> = \.Name
+    let optionalTag: KeyPath<F.Graphics.ResourceDestroyedEventArgs, Any?> = \.Tag
+    _ = (nullableReturn, nonOptionalReturn, optionalTag)
+
+    // The nil and the non-nil path of an Optional reference, written the way a
+    // consumer writes them, with no `try` anywhere: null is not an error.
+    func describe(_ value: Any?) -> Int {
+        guard let value else { return 0 }
+        return value is F.Vector3 ? 1 : 2
+    }
+    try check(describe(nil) == 0, "Optional reference nil path")
+    try check(describe(F.Vector3(1, 2, 3)) == 1, "Optional reference non-nil path")
+
+    // The same two axes on members a consumer can construct. An infallible
+    // Optional return unwraps with no `try` and yields nil rather than an
+    // error when XNA has no value.
+    let sphere = try F.BoundingSphere(F.Vector3(0, 0, 0), 1)
+    let hit: Float? = F.Ray(F.Vector3(0, 0, -5), F.Vector3(0, 0, 1)).Intersects(sphere)
+    guard let distance = hit else {
+        throw CNAError.argument("isolated nullable intersection returned nil")
+    }
+    try check(distance == 4, "infallible Optional return unwraps without try")
+    let miss: Float? = F.Ray(F.Vector3(0, 0, -5), F.Vector3(0, 1, 0)).Intersects(sphere)
+    try check(miss == nil, "infallible Optional return is nil, not an error")
+
+    // A fallible member still requires `try`, and its failure arrives as an
+    // error rather than as nil. The two axes never merge.
+    let keys = F.CurveKeyCollection()
+    keys.Add(F.CurveKey(position: 1, value: 2))
+    try check(try keys.Item(0).Value == 2, "fallible reader still requires try")
+    do {
+        _ = try keys.Item(1)
+        throw CNAError.argument("isolated out-of-range Item did not throw")
+    } catch CNAError.argumentOutOfRange {
+        // A real failure is an error. It is never nil.
+    }
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
@@ -773,17 +829,61 @@ do {
     try qualifyFoundation19EventSurface()
     try qualifyFoundation20ManagedSurface()
     try qualifyFoundation22AccessorSurface()
+    try qualifyFoundation23NullabilitySurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS foundation23=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
     Foundation.exit(1)
 }
 '''
+
+
+# Sources that must NOT compile. A projection whose Optional and throws are
+# only decorative would let every one of these through, so the qualification is
+# not complete until the compiler has rejected each one for the right reason.
+NEGATIVE_SOURCES: list[tuple[str, str, str]] = [
+    (
+        "nullable reference return bound as non-Optional",
+        "cannot assign value of type",
+        "import CNA\n"
+        "let path: KeyPath<Microsoft.Xna.Framework.Graphics"
+        ".ResourceCreatedEventArgs, Any> = \\.Resource\n"
+        "_ = path\n",
+    ),
+    (
+        "Optional return assigned to a non-Optional binding",
+        "must be unwrapped",
+        "import CNA\n"
+        "typealias F = Microsoft.Xna.Framework\n"
+        "let sphere = try! F.BoundingSphere(F.Vector3(0, 0, 0), 1)\n"
+        "let distance: Float = F.Ray(F.Vector3(0, 0, -5), "
+        "F.Vector3(0, 0, 1)).Intersects(sphere)\n"
+        "_ = distance\n",
+    ),
+    (
+        "fallible reader called without try",
+        "can throw",
+        "import CNA\n"
+        "typealias F = Microsoft.Xna.Framework\n"
+        "let keys = F.CurveKeyCollection()\n"
+        "keys.Add(F.CurveKey(position: 1, value: 2))\n"
+        "let first = keys.Item(0)\n"
+        "_ = first\n",
+    ),
+    (
+        "key path formed to a throwing getter",
+        "key path",
+        "import CNA\n"
+        "let path = \\Microsoft.Xna.Framework.Input.Touch.TouchCollection"
+        ".Enumerator.Current\n"
+        "_ = path\n",
+    ),
+]
 
 
 def run(command: list[str], cwd: Path, environment: dict[str, str]) -> str:
@@ -801,7 +901,8 @@ def validate_canary(output: str, requested: int) -> bool:
         r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) "
         r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS) "
         r"renderTargetUsage=(PASS) foundation14=(PASS) foundation15to18=(PASS) "
-        r"foundation19=(PASS) foundation20=(PASS)",
+        r"foundation19=(PASS) foundation20=(PASS) foundation22=(PASS) "
+        r"foundation23=(PASS)",
         output,
     )
     if not match:
@@ -813,10 +914,7 @@ def validate_canary(output: str, requested: int) -> bool:
         draws == requested and
         width == 1 and
         height == 1 and
-        match.group(6) == "PASS" and
-        match.group(7) == "PASS" and
-        match.group(8) == "PASS" and
-        match.group(9) == "PASS"
+        all(match.group(index) == "PASS" for index in range(6, 14))
     )
 
 
@@ -834,6 +932,7 @@ def main() -> int:
         parser.error("--library must be an absolute existing file")
 
     forbidden: list[str] = []
+    negative_compiles: list[str] = []
     native_libraries: list[str] = []
     microsoft_reference_binaries: list[str] = []
     path_leaks: list[str] = []
@@ -896,6 +995,24 @@ def main() -> int:
                     "debug archive consumer callback/dimension evidence did not match:\n" +
                     debug_output
                 )
+            for label, wanted, negative in NEGATIVE_SOURCES:
+                (sources / "main.swift").write_text(negative, encoding="utf-8")
+                completed = subprocess.run(
+                    [args.swift_build, "--scratch-path", str(scratch)],
+                    cwd=consumer, env=environment, text=True,
+                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                )
+                if completed.returncode == 0:
+                    raise RuntimeError(
+                        f"negative consumer fixture compiled: {label}\n"
+                        + completed.stdout)
+                if wanted not in completed.stdout:
+                    raise RuntimeError(
+                        f"negative consumer fixture {label!r} failed for the "
+                        f"wrong reason; expected {wanted!r}:\n" + completed.stdout)
+                negative_compiles.append(label)
+            (sources / "main.swift").write_text(SOURCE, encoding="utf-8")
+
             if not validate_canary(release_output, 600):
                 raise RuntimeError(
                     "release archive consumer callback/dimension evidence did not match:\n" +
@@ -915,6 +1032,7 @@ def main() -> int:
         "RELEASE_BUILD": "PASS",
         "RUN_60": "PASS",
         "RUN_600": "PASS",
+        "REJECTED_NEGATIVE_CONSUMERS": negative_compiles,
     }
     rendered = json.dumps(report, indent=2) + "\n"
     if args.output:
@@ -926,6 +1044,7 @@ def main() -> int:
         "SOURCE_ARCHIVE_FILENAME", "SOURCE_ARCHIVE_SHA256", "SOURCE_ARCHIVE_ENTRIES",
         "DEBUG_BUILD", "RELEASE_BUILD", "RUN_60", "RUN_600"
     )))
+    print(f"REJECTED_NEGATIVE_CONSUMERS={len(negative_compiles)}")
     return 1 if forbidden or native_libraries or path_leaks or microsoft_reference_binaries else 0
 
 

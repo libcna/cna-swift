@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1752,
-  "ASSERTIONS": 1752,
+  "OBSERVATIONS": 1766,
+  "ASSERTIONS": 1766,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -143,7 +143,10 @@
     "testMediaVideoXnaContract",
     "testTouchCollectionEnumeratorXnaContract",
     "testAudioEmitterXnaContract",
-    "testAudioEmitterDopplerScaleBoundaryXnaContract"
+    "testAudioEmitterDopplerScaleBoundaryXnaContract",
+    "testResourceCreatedEventArgsReturnsItsFieldVerbatim",
+    "testResourceDestroyedEventArgsReturnsItsFieldsVerbatim",
+    "testNullResultAndThrownFailureRemainDistinct"
   ],
   "groupCounts": {
     "Vector2": 2,

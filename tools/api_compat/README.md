@@ -74,10 +74,39 @@ Thirty-four self-tests run on every invocation, including five mutations that
 must flip a verdict and a two-sided bound proving that merging same-named
 overloads by arity changes no accessor verdict.
 
+`return_nullability.py` derives, from the CIL of the same registered
+assemblies, whether each public reference-typed return position can normally
+return null. A CLR reference return and a CLR failure are independent facts, so
+this answer is orthogonal to `accessor_fallibility.py`'s: Optional and `throws`
+are decided separately and all four combinations occur.
+
+```text
+python3 tools/api_compat/return_nullability.py \
+  --assembly-dir /path/to/xna/redistributable \
+  --output tools/api_compat/reference/xna40-reference-return-nullability.json \
+  --markdown docs/generated/return-nullability-inventory.md
+```
+
+Every method body is abstractly interpreted over `NONNULL < UNKNOWN < NULLABLE`
+on a simulated evaluation stack, with an environment for arguments, locals and
+field reads so that a null guard refines exactly what it tests; method and
+field summaries reach a least fixpoint together, and a field is decided by its
+whole construction-and-store lifecycle rather than by one read. The emitted
+JSON is a *pinned reference*, hash-checked by `verify.py` against
+`returnNullabilitySha256` in `mapping-rules.json`, and records only CLR facts —
+no Swift spelling, no mapping rule, no machine-local path — so it is a function
+of the pinned contract and the seven registered binaries alone. It regenerates
+byte-identically. Self-tests run on every invocation, including mutations that
+must flip a verdict and a two-sided per-overload bound proving the arity merge
+decides every in-scope method's fallibility.
+
 `verify.py --graph-self-test --symbol-graph <path>` is the reader's own
-negative-fixture suite: twelve mutations of the Symbol Graph the compiler
+negative-fixture suite: seventeen mutations of the Symbol Graph the compiler
 actually emitted, each of which must introduce a diagnostic the unmutated graph
-does not already carry.
+does not already carry. Five of them break the reference-return nullability
+projection — losing an Optional, gaining one, gaining a `throws` beside an
+Optional, moving the Optional to the wrong generic level, and applying one to a
+CLR value type that is not `System.Nullable<T>`.
 
 `--require-exact` is the calibration gate. The reconstruction's correctness is
 not asserted, it is demonstrated on the assemblies whose provenance was already
