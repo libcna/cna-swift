@@ -179,11 +179,24 @@ order, external conformance to `IGameComponent` and `IGraphicsDeviceManager`,
 the `TouchLocation` equality asymmetry and `out` parameter — and what it
 forbids.
 
-`swift package archive-source` **is byte-deterministic**: three consecutive
-invocations on an unchanged tree produced the identical SHA-256. It does,
-however, silently decline to overwrite an existing output file while still
+`swift package archive-source` **is byte-deterministic**: repeated invocations
+on an unchanged tree, with the same output name, produce the identical SHA-256.
+The output filename becomes the archive's root directory, so it is part of the
+hash; two archives of the same tree under different names differ legitimately.
+
+The tool does silently decline to overwrite an existing output file while still
 printing "Created", so a stale archive must be deleted before re-archiving or
 the audit will report on the previous one.
+
+The final artifact, archived from the committed tree as `cna-swift.zip`:
+
+```text
+SOURCE_ARCHIVE_SHA256=448c3e5f79f77047e5e307e992c84e4534033b88d3a8340ab0b8bb7bda9d85c8
+SOURCE_ARCHIVE_ENTRIES=225
+FORBIDDEN_ENTRIES=0 NATIVE_LIBRARIES=0
+MICROSOFT_REFERENCE_BINARIES=0 DEVELOPER_PATH_LEAKS=0
+DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
+```
 
 The archive audit found one real leak this session and it is fixed: a
 `verify.cpython-311.pyc` had been committed, because the pre-existing
