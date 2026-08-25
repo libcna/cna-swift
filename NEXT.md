@@ -161,6 +161,8 @@ NATIVE_STRESS=GAME_CYCLES=20 GAME_RECREATION_CYCLES=20 TEXTURE2D_CYCLES=20
     GAMEPAD_CAPABILITIES_CYCLES=20 NATIVE_CRASHES=0 OBSERVED_UAF=0
     OBSERVED_DOUBLE_FREE=0 MODE_FAILURES=0
 GAMEPAD_NATIVE=0 FAILURES HARDWARE_AVAILABLE=NO
+SOURCE_ARCHIVE=225 entries FORBIDDEN=0 NATIVE_LIBRARIES=0
+    MICROSOFT_REFERENCE_BINARIES=0 DEVELOPER_PATH_LEAKS=0 DETERMINISTIC=YES
 ISOLATED_CONSUMER=DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
 TEMPLATE=86687f62c3a13ee2b59798f338fc083f7399f447 UNCHANGED
     debug 60 -> updates=60 draws=60 viewport=800x480 texture=128x128
@@ -177,13 +179,20 @@ order, external conformance to `IGameComponent` and `IGraphicsDeviceManager`,
 the `TouchLocation` equality asymmetry and `out` parameter — and what it
 forbids.
 
-`swift package archive-source` is **not byte-deterministic**: two consecutive
-invocations on an unchanged tree produce different ZIP hashes, because the
-archive records timestamps. What is stable is the archive's *content*: the same
-226 entries with the same bytes. The tool also refuses forbidden entries,
-native libraries, Microsoft reference binaries and developer path leaks, all of
-which are zero. It also silently declines to overwrite an existing output file,
-so a stale archive must be deleted before re-archiving.
+`swift package archive-source` **is byte-deterministic**: three consecutive
+invocations on an unchanged tree produced the identical SHA-256. It does,
+however, silently decline to overwrite an existing output file while still
+printing "Created", so a stale archive must be deleted before re-archiving or
+the audit will report on the previous one.
+
+The archive audit found one real leak this session and it is fixed: a
+`verify.cpython-311.pyc` had been committed, because the pre-existing
+`.gitignore` pattern `./tools/api_compat/__pycache__` is malformed — a leading
+`./` is not valid gitignore syntax — and a `git add -A` picked the bytecode up
+once the verifier was run as an importable module. The tracked bytecode is
+removed and the pattern replaced with `__pycache__/` and `*.pyc`. The final
+archive has 225 entries with zero forbidden entries, zero native libraries,
+zero Microsoft reference binaries and zero developer path leaks.
 
 ## Why this session stopped
 
