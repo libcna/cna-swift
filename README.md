@@ -98,13 +98,17 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=123
-TARGET_MEMBERS=1690
-TOTAL_DIAGNOSTICS=286
-COMPLETE_TYPES=118
+TARGET_TYPES=124
+TARGET_MEMBERS=1695
+TOTAL_DIAGNOSTICS=287
+COMPLETE_TYPES=119
 PARTIAL_TYPES=5
-MISSING_TYPES=134
+MISSING_TYPES=133
 MISSING_MEMBER=131
+REFERENCE_RETURN_PROJECTIONS=369
+PROVEN_NULLABLE_RETURN_PROJECTIONS=115
+PROVEN_NONNULL_RETURN_PROJECTIONS=128
+UNKNOWN_RETURN_NULLABILITY_PROJECTIONS=126
 ```
 
 Normal strict verification remains red because deferred XNA types are genuinely
@@ -126,7 +130,8 @@ MouseState, MediaState, MediaSourceType, MicrophoneState, the seven
 Foundation-17 types, TouchLocation, GestureSample, DisplayModeCollection,
 IUpdateable, IDrawable, GameComponentCollectionEventArgs,
 ResourceCreatedEventArgs, ResourceDestroyedEventArgs, AudioListener,
-TouchCollection, TouchCollection.Enumerator, Media.Video and AudioEmitter.
+TouchCollection, TouchCollection.Enumerator, Media.Video, AudioEmitter and
+IGraphicsDeviceService.
 Every implemented member has qualified behavior; missing members remain absent.
 
 ## Throwing property accessors
