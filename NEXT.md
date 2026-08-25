@@ -2,7 +2,17 @@
 
 **Foundation Milestones 26, 27, 28 and 29 status:** COMPLETE.
 
-Six local commits this session, **none pushed**.
+The Foundation 26–29 implementation/evidence sequence consists of the six
+source/evidence commits listed below. Handoff-only correction commits may
+follow them, so this document records **no** count of unpublished commits and
+**no** current `HEAD`: any such number invalidates itself the moment the next
+documentation commit is made. Resolve both from live Git instead:
+
+```text
+git rev-list --count origin/develop..HEAD     # how many are unpublished
+git log --oneline --decorate origin/develop..HEAD
+git status --short --branch
+```
 
 | Commit | What it is |
 |---|---|
@@ -11,7 +21,7 @@ Six local commits this session, **none pushed**.
 | `bb10ba2` | `VisualizationData`, and the audited **stop** on `Game.Components`. Evidence: `docs/foundation-29-collection-consumer-evidence.md`. |
 | `b37911b` | The developer-path leak the package qualification caught in the generated BCL report. |
 | `abd4baf` | The README BCL section and these numbers. |
-| `d58b563` | The final qualified archive digest for the committed tree. |
+| `d58b563` | The qualified source-archive digest, measured on the tree of `abd4baf`. |
 
 Everything at and before `b1abe20` is untouched.
 
@@ -198,7 +208,8 @@ NATIVE_STRESS=GAME_CYCLES=20 GAME_RECREATION_CYCLES=20 TEXTURE2D_CYCLES=20
 GAMEPAD_NATIVE=0 FAILURES HARDWARE_AVAILABLE=NO
 SOURCE_ARCHIVE=274 entries DETERMINISTIC=YES
     SHA256=5c675df6bac26f7d186fccd9db727038bf6dcdc575dcb53b07b5a1badeb04b23
-    measured on commit abd4baf, the tree this file describes
+    measured on the tree of commit abd4baf; handoff-only commits after it
+    change this file and therefore the digest, so re-measure rather than assume
 ISOLATED_CONSUMER=DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
     REJECTED_NEGATIVE_CONSUMERS=11  (4 -> 11)
     FORBIDDEN_ENTRIES=0 NATIVE_LIBRARIES=0 MICROSOFT_REFERENCE_BINARIES=0
