@@ -63,6 +63,7 @@
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
     "MEASURED_ACCESSOR_PROJECTIONS": 18,
+    "PENDING_ACCESSOR_PROJECTIONS": 95,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 8,
     "EVENT_PROJECTIONS": 49,
@@ -2294,6 +2295,958 @@
       "readerObserved": true,
       "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    }
+  ],
+  "pendingAccessorProjections": [
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+      "sourceProperty": "IsLooped",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetIsLooped",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.Microphone",
+      "sourceProperty": "BufferDuration",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetBufferDuration",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "Name",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetName",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "MasterVolume",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetMasterVolume",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "SpeedOfSound",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetSpeedOfSound",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "DopplerScale",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDopplerScale",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "DistanceScale",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDistanceScale",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "Volume",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetVolume",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "Pitch",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetPitch",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "Pan",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetPan",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "IsLooped",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetIsLooped",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Content.ContentManager",
+      "sourceProperty": "RootDirectory",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetRootDirectory",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
+      "sourceProperty": "CollectionItemName",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetCollectionItemName",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.GameWindow",
+      "sourceProperty": "Title",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetTitle",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
+      "sourceProperty": "FogColor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetFogColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
+      "sourceProperty": "Texture",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetTexture",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BasicEffect",
+      "sourceProperty": "SpecularColor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetSpecularColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BasicEffect",
+      "sourceProperty": "SpecularPower",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetSpecularPower",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BasicEffect",
+      "sourceProperty": "FogColor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetFogColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BasicEffect",
+      "sourceProperty": "Texture",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetTexture",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "MultiSampleMask",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetMultiSampleMask",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "BlendFactor",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetBlendFactor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "ColorWriteChannels3",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetColorWriteChannels3",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "ColorWriteChannels2",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetColorWriteChannels2",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "ColorWriteChannels1",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetColorWriteChannels1",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "ColorWriteChannels",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetColorWriteChannels",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "AlphaBlendFunction",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetAlphaBlendFunction",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "AlphaDestinationBlend",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetAlphaDestinationBlend",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "AlphaSourceBlend",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetAlphaSourceBlend",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "ColorBlendFunction",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetColorBlendFunction",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "ColorDestinationBlend",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetColorDestinationBlend",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "sourceProperty": "ColorSourceBlend",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetColorSourceBlend",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "ReferenceStencil",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetReferenceStencil",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "StencilWriteMask",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetStencilWriteMask",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "StencilMask",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetStencilMask",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "CounterClockwiseStencilDepthBufferFail",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetCounterClockwiseStencilDepthBufferFail",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "CounterClockwiseStencilFail",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetCounterClockwiseStencilFail",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "CounterClockwiseStencilPass",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetCounterClockwiseStencilPass",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "CounterClockwiseStencilFunction",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetCounterClockwiseStencilFunction",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "TwoSidedStencilMode",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetTwoSidedStencilMode",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "StencilDepthBufferFail",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetStencilDepthBufferFail",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "StencilFail",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetStencilFail",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "StencilPass",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetStencilPass",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "StencilFunction",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetStencilFunction",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "StencilEnable",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetStencilEnable",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "DepthBufferFunction",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDepthBufferFunction",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "DepthBufferWriteEnable",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDepthBufferWriteEnable",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "sourceProperty": "DepthBufferEnable",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDepthBufferEnable",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DirectionalLight",
+      "sourceProperty": "Enabled",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetEnabled",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DirectionalLight",
+      "sourceProperty": "Direction",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDirection",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DirectionalLight",
+      "sourceProperty": "DiffuseColor",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDiffuseColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DirectionalLight",
+      "sourceProperty": "SpecularColor",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetSpecularColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DualTextureEffect",
+      "sourceProperty": "FogColor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetFogColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DualTextureEffect",
+      "sourceProperty": "Texture",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetTexture",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.DualTextureEffect",
+      "sourceProperty": "Texture2",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetTexture2",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.Effect",
+      "sourceProperty": "CurrentTechnique",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetCurrentTechnique",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
+      "sourceProperty": "FogColor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetFogColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
+      "sourceProperty": "Texture",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetTexture",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
+      "sourceProperty": "EnvironmentMap",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetEnvironmentMap",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
+      "sourceProperty": "EnvironmentMapAmount",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetEnvironmentMapAmount",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
+      "sourceProperty": "EnvironmentMapSpecular",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetEnvironmentMapSpecular",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
+      "sourceProperty": "FresnelFactor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetFresnelFactor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.RasterizerState",
+      "sourceProperty": "SlopeScaleDepthBias",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetSlopeScaleDepthBias",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.RasterizerState",
+      "sourceProperty": "DepthBias",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDepthBias",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.RasterizerState",
+      "sourceProperty": "MultiSampleAntiAlias",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetMultiSampleAntiAlias",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.RasterizerState",
+      "sourceProperty": "ScissorTestEnable",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetScissorTestEnable",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.RasterizerState",
+      "sourceProperty": "FillMode",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetFillMode",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.RasterizerState",
+      "sourceProperty": "CullMode",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetCullMode",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "sourceProperty": "MipMapLevelOfDetailBias",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetMipMapLevelOfDetailBias",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "sourceProperty": "MaxMipLevel",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetMaxMipLevel",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "sourceProperty": "MaxAnisotropy",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetMaxAnisotropy",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "sourceProperty": "AddressW",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetAddressW",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "sourceProperty": "AddressV",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetAddressV",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "sourceProperty": "AddressU",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetAddressU",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "sourceProperty": "Filter",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetFilter",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
+      "sourceProperty": "Item",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetItem",
+      "writerThrows": true,
+      "indexed": true,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
+      "sourceProperty": "SpecularColor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetSpecularColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
+      "sourceProperty": "SpecularPower",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetSpecularPower",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
+      "sourceProperty": "FogColor",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetFogColor",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
+      "sourceProperty": "Texture",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetTexture",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
+      "sourceProperty": "WeightsPerVertex",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetWeightsPerVertex",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SpriteFont",
+      "sourceProperty": "DefaultCharacter",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDefaultCharacter",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.TextureCollection",
+      "sourceProperty": "Item",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetItem",
+      "writerThrows": true,
+      "indexed": true,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
+      "sourceProperty": "Adapter",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetAdapter",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
+      "sourceProperty": "EnabledGestures",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetEnabledGestures",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
+      "sourceProperty": "DisplayOrientation",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetDisplayOrientation",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsShuffled",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetIsShuffled",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsRepeating",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetIsRepeating",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "Volume",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetVolume",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsMuted",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetIsMuted",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsVisualizationEnabled",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetIsVisualizationEnabled",
+      "writerThrows": true,
+      "indexed": false,
+      "static": true
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaQueue",
+      "sourceProperty": "ActiveSongIndex",
+      "typeState": "missing",
+      "readerThrows": true,
+      "writerName": "SetActiveSongIndex",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.VideoPlayer",
+      "sourceProperty": "IsLooped",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetIsLooped",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.VideoPlayer",
+      "sourceProperty": "IsMuted",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetIsMuted",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.VideoPlayer",
+      "sourceProperty": "Volume",
+      "typeState": "missing",
+      "readerThrows": false,
+      "writerName": "SetVolume",
+      "writerThrows": true,
+      "indexed": false,
+      "static": false
     }
   ],
   "nonPublicConstructionProjections": [

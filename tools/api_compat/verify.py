@@ -4365,6 +4365,34 @@ def make_report(
     ):
         summary[key] = accessor_projection_counts[key]
     summary["MEASURED_ACCESSOR_PROJECTIONS"] = len(accessor_evidence)
+    # Every writer method the rule requires that no Swift symbol answers yet,
+    # because the property or its whole type is still missing. Recording the
+    # shape is not implementing it: these stay MISSING_MEMBER / MISSING_TYPE,
+    # and a native runtime member must not gain a fabricated managed setter
+    # just because its writer name is now known.
+    measured_accessors = {
+        (item["ownerType"], item["sourceProperty"]) for item in accessor_evidence
+    }
+    pending_accessors = [
+        {
+            "ownerType": owner_name,
+            "sourceProperty": member.name,
+            "typeState": (
+                "partial" if owner_name in set(partial_types)
+                else "missing" if owner_name in set(missing_types) else "complete"
+            ),
+            "readerThrows": bool(member.getter_throws),
+            "writerName": member.writer_name,
+            "writerThrows": bool(member.writer_throws),
+            "indexed": bool(member.parameters),
+            "static": member.static,
+        }
+        for owner_name, model in sorted(expected.items())
+        for member in model.members
+        if member.kind == "property" and member.writer_kind == WRITER_METHOD and
+        (owner_name, member.name) not in measured_accessors
+    ]
+    summary["PENDING_ACCESSOR_PROJECTIONS"] = len(pending_accessors)
     summary["GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS"] = len(
         rules.get("globalOperatorProjections", [])
     )
@@ -4398,6 +4426,7 @@ def make_report(
         "protocolWitnessProjections": witness_evidence,
         "systemInterfaceProjections": system_interface_evidence,
         "accessorProjections": accessor_evidence,
+        "pendingAccessorProjections": pending_accessors,
         "nonPublicConstructionProjections": nonpublic_construction_evidence,
         "eventSupportProjections": support_evidence,
         "typeScoreboard": [
