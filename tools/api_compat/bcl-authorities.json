@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "profile": "Microsoft .NET Framework 4.0 BCL behaviour authority",
+  "note": "The hash-registered Microsoft .NET Framework 4.0 BCL assemblies that are the behaviour authority for the selected BCL families this binding derives its support classes from. This registry is deliberately SEPARATE from tools/api_compat/registered-assemblies.json: that one is calibrated by reproducing the pinned 257-type/2964-member XNA contract, and a BCL assembly declares zero XNA contract types, so that gate would pass vacuously. Authority here is earned instead by reproducing a pinned selected-shape manifest, by independently-stated sentinel facts, by mutation self-tests, and by an independent metadata reader. Only digests and identity are retained; no Microsoft binary is stored in the repository.",
+  "calibration": "tools/api_compat/reference/bcl40-selected-shape.json",
+  "authorities": [
+    {
+      "assembly": "mscorlib.dll",
+      "assemblyName": "mscorlib",
+      "assemblyVersion": "4.0.0.0",
+      "publicKey": "00000000000000000400000000000000",
+      "publicKeyToken": "b77a5c561934e089",
+      "sha256": "5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+      "fileSize": 5196112,
+      "moduleName": "CommonLanguageRuntimeLibrary",
+      "versionResource": {
+        "CompanyName": "Microsoft Corporation",
+        "FileDescription": "Microsoft Common Language Runtime Class Library",
+        "FileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
+        "ProductName": "Microsoft\u00ae .NET Framework",
+        "ProductVersion": "4.0.30319.1",
+        "OriginalFilename": "mscorlib.dll",
+        "InternalName": "mscorlib.dll"
+      },
+      "strongNameKeyFile": "f:\\dd\\Tools\\devdiv\\ecmapublickey.snk",
+      "requiredModuleImports": ["clr.dll", "mscoree.dll"],
+      "forbiddenProvenanceMarkers": [
+        "Mono.Runtime",
+        "Mono.RuntimeStructs",
+        "System.Private.CoreLib",
+        "MonoTODO"
+      ],
+      "registered": "Foundation 26",
+      "selectedFamilies": [
+        {
+          "type": "System.Collections.ObjectModel.Collection`1",
+          "reason": "The direct CLR base of Microsoft.Xna.Framework.GameComponentCollection. Its public surface, its protected Items view and its four protected virtual hooks are the behaviour CNACollection<Element> projects."
+        },
+        {
+          "type": "System.Collections.ObjectModel.ReadOnlyCollection`1",
+          "reason": "The direct CLR base of ModelBoneCollection, ModelMeshCollection, ModelMeshPartCollection and ModelEffectCollection, and the declared return type of several still-deferred XNA members. Projected as CNAReadOnlyCollection<Element>."
+        },
+        {
+          "type": "System.Collections.Generic.List`1",
+          "reason": "Collection<T>..ctor() allocates exactly this type as its backing store, so its observable list behaviour -- bounds rules, version bumps and element ordering -- is part of Collection<T>'s own behaviour. Projected as CNAList<Element>."
+        },
+        {
+          "type": "System.Collections.Generic.List`1+Enumerator",
+          "reason": "Collection<T>.GetEnumerator() returns the backing list's enumerator, so this is where the mutation-invalidation contract CNAEnumerator projects is actually declared."
+        },
+        {
+          "type": "System.Collections.Generic.IList`1",
+          "reason": "The declared type of Collection<T>.items and ReadOnlyCollection<T>.list, of both wrapping constructors and of the protected Items property. Every one of the four hooks is a call on this interface."
+        },
+        {
+          "type": "System.Collections.Generic.ICollection`1",
+          "reason": "Supplies the Count and IsReadOnly reads that guard every Collection<T> mutator, and the Clear/Contains/CopyTo the hooks and public methods delegate to."
+        },
+        {
+          "type": "System.Collections.Generic.IEnumerable`1",
+          "reason": "Supplies the GetEnumerator that Collection<T>.GetEnumerator and ReadOnlyCollection<T>.GetEnumerator delegate to."
+        },
+        {
+          "type": "System.Collections.Generic.IEnumerator`1",
+          "reason": "The declared return type of GetEnumerator on both selected collection families; it is the CLR contract CNAEnumerator<Element> projects."
+        }
+      ]
+    }
+  ],
+  "availableButNotAdmitted": [
+    {
+      "assembly": "System.dll",
+      "assemblyVersion": "4.0.0.0",
+      "publicKeyToken": "b77a5c561934e089",
+      "sha256": "c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462",
+      "reason": "Present and identity-established on this machine, but no family it declares is required by any implemented projection. System.ComponentModel.TypeConverter and ExpandableObjectConverter remain an undecided public support-family question, so admitting the assembly now would register authority nothing consumes."
+    }
+  ]
+}

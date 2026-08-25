@@ -113,3 +113,35 @@ not asserted, it is demonstrated on the assemblies whose provenance was already
 established, and only then trusted for the others. No Microsoft binary is
 stored in the repository; only the SHA-256 of each registered assembly is
 retained, in `docs/xna-swift-mapping.md`.
+
+## BCL behaviour authority
+
+`bcl_authority_audit.py` decides whether a Microsoft .NET Framework BCL
+assembly may be used as a behaviour authority. It is deliberately **separate**
+from `pinned_assembly_audit.py`: that gate earns authority by reproducing the
+pinned XNA contract, and a BCL assembly declares zero XNA contract types, so it
+would pass vacuously. The registry is `bcl-authorities.json` and the
+calibration is `reference/bcl40-selected-shape.json`.
+
+```text
+python3 tools/api_compat/bcl_authority_audit.py \
+  --assembly mscorlib.dll=/path/to/mscorlib.dll \
+  --cross-check \
+  --negative-control mscorlib.dll=/usr/lib/mono/4.5/mscorlib.dll \
+  --output docs/generated/bcl-authority-audit.json
+```
+
+Authority is earned by five independent things, each counted separately:
+exact identity including a **recomputed** strong-name token
+(`BCL_IDENTITY_CHECKS`), reproduction of the pinned selected-shape manifest
+(`BCL_MANIFEST_CHECKS`), sentinel facts stated independently of the extractor
+(`BCL_SENTINEL_CHECKS`), mutation self-tests that must each be detected
+(`BCL_MUTATION_SELF_TESTS`), and agreement from `monodis`, an independent
+metadata reader (`BCL_CROSS_CHECKS`). `--negative-control NAME=PATH` offers a
+binary that must be **refused**, which is what keeps the gate honest; the Mono
+`mscorlib` builds are the standing controls. Authority is demand-driven: only
+the families the binding actually derives behaviour from are admitted, each
+with a recorded reason. `--write-manifest` regenerates the manifest, which is
+byte-identical with and without an IL cache. The BCL counters share no name
+with any XNA counter, and no XNA measurement changes when a BCL assembly is
+admitted. No Microsoft binary is stored in the repository.

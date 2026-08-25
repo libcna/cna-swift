@@ -1,0 +1,2025 @@
+{
+  "schemaVersion": 1,
+  "profile": "Microsoft .NET Framework 4.0 BCL behaviour authority",
+  "note": "The selected BCL shape this binding's support classes are derived from, reconstructed mechanically from the hash-registered Microsoft binaries named in bcl-authorities.json. It records CLR facts only -- no Swift spelling, no mapping rule and no machine-local path -- so it is a function of those binaries alone and regenerates byte-identically. No Microsoft binary is stored in the repository.",
+  "types": [
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.ICollection`1",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.IEnumerable`1[!T]",
+        "System.Collections.IEnumerable"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "Add",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Clear",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Contains",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "!0[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arrayIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IsReadOnly",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.IEnumerable`1",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.IEnumerable"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Collections.Generic.IEnumerator`1[!0]",
+          "genericParameters": [],
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.IEnumerator`1",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.IEnumerator",
+        "System.IDisposable"
+      ],
+      "members": [
+        {
+          "kind": "property",
+          "name": "Current",
+          "type": "!0",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.IList`1",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[!T]",
+        "System.Collections.Generic.IEnumerable`1[!T]",
+        "System.Collections.IEnumerable"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "IndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveAt",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "!0",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": true,
+          "setOverridable": true,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.Int32"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.List`1",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[!T]",
+        "System.Collections.Generic.IEnumerable`1[!T]",
+        "System.Collections.Generic.IList`1[!T]",
+        "System.Collections.ICollection",
+        "System.Collections.IEnumerable",
+        "System.Collections.IList"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "collection",
+              "type": "System.Collections.Generic.IEnumerable`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Add",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AddRange",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "collection",
+              "type": "System.Collections.Generic.IEnumerable`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AsReadOnly",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[!0]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "BinarySearch",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "comparer",
+              "type": "System.Collections.Generic.IComparer`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "BinarySearch",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "comparer",
+              "type": "System.Collections.Generic.IComparer`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "BinarySearch",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Clear",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Contains",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertAll",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.List`1[!!0]",
+          "genericParameters": [
+            "TOutput"
+          ],
+          "parameters": [
+            {
+              "name": "converter",
+              "type": "System.Converter`2[!0,!!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "!0[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arrayIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "!0[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "array",
+              "type": "!0[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arrayIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Exists",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Find",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "!0",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindAll",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.List`1[!0]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindIndex",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindIndex",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindIndex",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindLast",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "!0",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindLastIndex",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindLastIndex",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FindLastIndex",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ForEach",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "action",
+              "type": "System.Action`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.List`1+Enumerator[!0]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetRange",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.List`1[!0]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "InsertRange",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "collection",
+              "type": "System.Collections.Generic.IEnumerable`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "LastIndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "LastIndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "LastIndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveAll",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveAt",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveRange",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Reverse",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Reverse",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "comparer",
+              "type": "System.Collections.Generic.IComparer`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "comparison",
+              "type": "System.Comparison`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "comparer",
+              "type": "System.Collections.Generic.IComparer`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ToArray",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "!0[]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "TrimExcess",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "TrueForAll",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "match",
+              "type": "System.Predicate`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Capacity",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "!0",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.Int32"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.List`1+Enumerator",
+      "kind": "struct",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.ValueType",
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.IEnumerator`1[!T]",
+        "System.Collections.IEnumerator",
+        "System.IDisposable"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "Dispose",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "MoveNext",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Current",
+          "type": "!0",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.ObjectModel.Collection`1",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[!T]",
+        "System.Collections.Generic.IEnumerable`1[!T]",
+        "System.Collections.Generic.IList`1[!T]",
+        "System.Collections.ICollection",
+        "System.Collections.IEnumerable",
+        "System.Collections.IList"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "list",
+              "type": "System.Collections.Generic.IList`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Add",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Clear",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ClearItems",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Contains",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "!0[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.IEnumerator`1[!0]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "IndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "InsertItem",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveAt",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveItem",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "SetItem",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "item",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "!0",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Items",
+          "type": "System.Collections.Generic.IList`1[!0]",
+          "static": false,
+          "getAccess": "protected",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.ObjectModel.ReadOnlyCollection`1",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[!T]",
+        "System.Collections.Generic.IEnumerable`1[!T]",
+        "System.Collections.Generic.IList`1[!T]",
+        "System.Collections.ICollection",
+        "System.Collections.IEnumerable",
+        "System.Collections.IList"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "list",
+              "type": "System.Collections.Generic.IList`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Contains",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "!0[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.IEnumerator`1[!0]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "IndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "!0",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Items",
+          "type": "System.Collections.Generic.IList`1[!0]",
+          "static": false,
+          "getAccess": "protected",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    }
+  ]
+}

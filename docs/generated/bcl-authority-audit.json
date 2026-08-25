@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "registrySha256": "e41836e64b8881732c4b057d1c7d116618e19cdb5fa35165ee232cc73be4066a",
+  "manifestSha256": "ef5f2428a546b677d797b5def4c07c44e04419844418b13de9a20f61aa323f0e",
+  "BCL_AUTHORITY_STATUS": "PASS",
+  "BCL_AUTHORITY_ASSEMBLIES": 1,
+  "BCL_AUTHORITY_TYPES": 8,
+  "BCL_AUTHORITY_MEMBERS": 94,
+  "BCL_IDENTITY_CHECKS": 21,
+  "BCL_SENTINEL_CHECKS": 125,
+  "BCL_MANIFEST_CHECKS": 8,
+  "BCL_MUTATION_SELF_TESTS": 97,
+  "BCL_CROSS_CHECKS": 41,
+  "BCL_NEGATIVE_CONTROLS": 4,
+  "BCL_CROSS_CHECK_TOOL": "monodis",
+  "identityFailures": [],
+  "manifestFailures": [],
+  "sentinelFailures": [],
+  "mutationFailures": [],
+  "crossCheckFailures": [],
+  "controlFailures": [],
+  "negativeControls": [
+    {
+      "control": "/usr/lib/mono/4.5/mscorlib.dll",
+      "offeredAs": "mscorlib.dll",
+      "checksRun": 21,
+      "rejectedBy": 16,
+      "reasons": [
+        "mscorlib.dll: sha256 5b36fcc1d4522a399d5fc278023f1cce866b5db21187cec2b86c532219848d24 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+        "mscorlib.dll: size 4812288 != registered 5196112",
+        "mscorlib.dll: module 'mscorlib.dll' != registered 'CommonLanguageRuntimeLibrary'",
+        "mscorlib.dll: version resource CompanyName=None != registered 'Microsoft Corporation'",
+        "mscorlib.dll: version resource FileDescription=None != registered 'Microsoft Common Language Runtime Class Library'",
+        "mscorlib.dll: version resource FileVersion=None != registered '4.0.30319.1 (RTMRel.030319-0100)'",
+        "mscorlib.dll: version resource ProductName=None != registered 'Microsoft\u00ae .NET Framework'",
+        "mscorlib.dll: version resource ProductVersion=None != registered '4.0.30319.1'",
+        "mscorlib.dll: version resource OriginalFilename=None != registered 'mscorlib.dll'",
+        "mscorlib.dll: version resource InternalName=None != registered 'mscorlib.dll'",
+        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
+        "mscorlib.dll: required module import clr.dll is absent",
+        "mscorlib.dll: required module import mscoree.dll is absent",
+        "mscorlib.dll: reimplementation marker 'Mono.Runtime' is present",
+        "mscorlib.dll: reimplementation marker 'Mono.RuntimeStructs' is present",
+        "mscorlib.dll: reimplementation marker 'MonoTODO' is present"
+      ]
+    },
+    {
+      "control": "/usr/lib/mono/4.0-api/mscorlib.dll",
+      "offeredAs": "mscorlib.dll",
+      "checksRun": 21,
+      "rejectedBy": 12,
+      "reasons": [
+        "mscorlib.dll: sha256 a8d9bbf287f9340c5d61165d18bf6d21d806eb520231ecfee643447444624cdd does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+        "mscorlib.dll: size 774656 != registered 5196112",
+        "mscorlib.dll: module 'mscorlib.dll' != registered 'CommonLanguageRuntimeLibrary'",
+        "mscorlib.dll: version resource CompanyName='Mono development team' != registered 'Microsoft Corporation'",
+        "mscorlib.dll: version resource FileDescription='mscorlib.dll' != registered 'Microsoft Common Language Runtime Class Library'",
+        "mscorlib.dll: version resource FileVersion='4.0.30319.1' != registered '4.0.30319.1 (RTMRel.030319-0100)'",
+        "mscorlib.dll: version resource ProductName='Mono Common Language Infrastructure' != registered 'Microsoft\u00ae .NET Framework'",
+        "mscorlib.dll: version resource InternalName='mscorlib' != registered 'mscorlib.dll'",
+        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
+        "mscorlib.dll: required module import clr.dll is absent",
+        "mscorlib.dll: required module import mscoree.dll is absent",
+        "mscorlib.dll: reimplementation marker 'MonoTODO' is present"
+      ]
+    },
+    {
+      "control": "/home/robertvokac/.wine-cna-xna40/drive_c/windows/Microsoft.NET/assembly/GAC_MSIL/System/v4.0_4.0.0.0__b77a5c561934e089/System.dll",
+      "offeredAs": "mscorlib.dll",
+      "checksRun": 21,
+      "rejectedBy": 10,
+      "reasons": [
+        "mscorlib.dll: sha256 c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+        "mscorlib.dll: size 3481928 != registered 5196112",
+        "mscorlib.dll: module 'System.dll' != registered 'CommonLanguageRuntimeLibrary'",
+        "mscorlib.dll: version resource FileDescription='.NET Framework' != registered 'Microsoft Common Language Runtime Class Library'",
+        "mscorlib.dll: version resource FileVersion='4.0.30319.1 built by: RTMRel' != registered '4.0.30319.1 (RTMRel.030319-0100)'",
+        "mscorlib.dll: version resource OriginalFilename='System.dll' != registered 'mscorlib.dll'",
+        "mscorlib.dll: version resource InternalName='System.dll' != registered 'mscorlib.dll'",
+        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
+        "mscorlib.dll: required module import clr.dll is absent",
+        "mscorlib.dll: required module import mscoree.dll is absent"
+      ]
+    },
+    {
+      "control": "/rv/tmp/samples/SAMPLE-017-CollisionSample_4_0/xna4-build/bin/Microsoft.Xna.Framework.Game.dll",
+      "offeredAs": "mscorlib.dll",
+      "checksRun": 21,
+      "rejectedBy": 14,
+      "reasons": [
+        "mscorlib.dll: sha256 b5dffdd8125abef2a4507ba4e1d2f11062143f0a63d48fe4f298b95ad746a1f0 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+        "mscorlib.dll: size 74752 != registered 5196112",
+        "mscorlib.dll: public key '' != registered '00000000000000000400000000000000'",
+        "mscorlib.dll: public key token '' recomputed from the assembly's own key != registered 'b77a5c561934e089'",
+        "mscorlib.dll: module 'Microsoft.Xna.Framework.Game.dll' != registered 'CommonLanguageRuntimeLibrary'",
+        "mscorlib.dll: version resource FileDescription='Microsoft.Xna.Framework.Game.dll' != registered 'Microsoft Common Language Runtime Class Library'",
+        "mscorlib.dll: version resource FileVersion='4.0.30901.0' != registered '4.0.30319.1 (RTMRel.030319-0100)'",
+        "mscorlib.dll: version resource ProductName='Microsoft XNA Game Studio 4.0' != registered 'Microsoft\u00ae .NET Framework'",
+        "mscorlib.dll: version resource ProductVersion='4.0.30901.0' != registered '4.0.30319.1'",
+        "mscorlib.dll: version resource OriginalFilename='Microsoft.Xna.Framework.Game.dll' != registered 'mscorlib.dll'",
+        "mscorlib.dll: version resource InternalName='Microsoft.Xna.Framework.Game.dll' != registered 'mscorlib.dll'",
+        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
+        "mscorlib.dll: required module import clr.dll is absent",
+        "mscorlib.dll: required module import mscoree.dll is absent"
+      ]
+    }
+  ],
+  "assemblies": [
+    {
+      "assembly": "mscorlib.dll",
+      "assemblyName": "mscorlib",
+      "assemblyVersion": "4.0.0.0",
+      "publicKeyToken": "b77a5c561934e089",
+      "publicKeyTokenRecomputed": "b77a5c561934e089",
+      "sha256": "5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+      "fileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
+      "selectedTypes": 8,
+      "selectedMembers": 94
+    }
+  ]
+}
