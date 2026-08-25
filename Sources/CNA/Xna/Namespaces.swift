@@ -16,6 +16,9 @@ public enum Microsoft {
             public enum Input {}
 
             /// Namespace marker only; excluded from XNA type counts.
+            public enum Audio {}
+
+            /// Namespace marker only; excluded from XNA type counts.
             public enum Content {}
         }
     }

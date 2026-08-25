@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=73
-TARGET_MEMBERS=1416
-TOTAL_DIAGNOSTICS=335
-COMPLETE_TYPES=68
+TARGET_TYPES=98
+TARGET_MEMBERS=1560
+TOTAL_DIAGNOSTICS=310
+COMPLETE_TYPES=93
 PARTIAL_TYPES=5
-MISSING_TYPES=184
-MISSING_TYPE=184
+MISSING_TYPES=159
+MISSING_TYPE=159
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -40,10 +40,10 @@ PUBLIC_NATIVE_FFI_LEAK=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=113
+LANGUAGE_PROJECTION_EXCLUSIONS=114
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
-NAMESPACE_MARKERS=7
+NAMESPACE_MARKERS=8
 INHERITED_MEMBER_PROJECTIONS=3
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
 ARRAY_MUTATION_MAPPINGS=19
@@ -57,6 +57,8 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 
 ## Complete types
 
+- `Microsoft.Xna.Framework.Audio.AudioChannels`
+- `Microsoft.Xna.Framework.Audio.SoundState`
 - `Microsoft.Xna.Framework.BoundingBox`
 - `Microsoft.Xna.Framework.BoundingFrustum`
 - `Microsoft.Xna.Framework.BoundingSphere`
@@ -70,10 +72,24 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.GameTime`
+- `Microsoft.Xna.Framework.Graphics.Blend`
+- `Microsoft.Xna.Framework.Graphics.BlendFunction`
 - `Microsoft.Xna.Framework.Graphics.BufferUsage`
+- `Microsoft.Xna.Framework.Graphics.ClearOptions`
+- `Microsoft.Xna.Framework.Graphics.ColorWriteChannels`
+- `Microsoft.Xna.Framework.Graphics.CompareFunction`
+- `Microsoft.Xna.Framework.Graphics.CubeMapFace`
+- `Microsoft.Xna.Framework.Graphics.CullMode`
 - `Microsoft.Xna.Framework.Graphics.DepthFormat`
 - `Microsoft.Xna.Framework.Graphics.DisplayMode`
+- `Microsoft.Xna.Framework.Graphics.EffectParameterClass`
+- `Microsoft.Xna.Framework.Graphics.EffectParameterType`
 - `Microsoft.Xna.Framework.Graphics.FillMode`
+- `Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus`
+- `Microsoft.Xna.Framework.Graphics.GraphicsProfile`
+- `Microsoft.Xna.Framework.Graphics.IEffectFog`
+- `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
+- `Microsoft.Xna.Framework.Graphics.IndexElementSize`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444`
@@ -93,10 +109,19 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Short2`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Short4`
+- `Microsoft.Xna.Framework.Graphics.PresentInterval`
+- `Microsoft.Xna.Framework.Graphics.PrimitiveType`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetUsage`
+- `Microsoft.Xna.Framework.Graphics.SetDataOptions`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
+- `Microsoft.Xna.Framework.Graphics.StencilOperation`
 - `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
+- `Microsoft.Xna.Framework.Graphics.TextureAddressMode`
+- `Microsoft.Xna.Framework.Graphics.TextureFilter`
+- `Microsoft.Xna.Framework.Graphics.VertexElement`
+- `Microsoft.Xna.Framework.Graphics.VertexElementFormat`
+- `Microsoft.Xna.Framework.Graphics.VertexElementUsage`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
 - `Microsoft.Xna.Framework.Input.ButtonState`
 - `Microsoft.Xna.Framework.Input.Buttons`
@@ -307,7 +332,6 @@ Expected members: 30; emitted members: 4.
 ## Missing types
 
 - `Microsoft.Xna.Framework.Audio.AudioCategory`
-- `Microsoft.Xna.Framework.Audio.AudioChannels`
 - `Microsoft.Xna.Framework.Audio.AudioEmitter`
 - `Microsoft.Xna.Framework.Audio.AudioEngine`
 - `Microsoft.Xna.Framework.Audio.AudioListener`
@@ -323,7 +347,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Audio.SoundBank`
 - `Microsoft.Xna.Framework.Audio.SoundEffect`
 - `Microsoft.Xna.Framework.Audio.SoundEffectInstance`
-- `Microsoft.Xna.Framework.Audio.SoundState`
 - `Microsoft.Xna.Framework.Audio.WaveBank`
 - `Microsoft.Xna.Framework.Content.ContentLoadException`
 - `Microsoft.Xna.Framework.Content.ContentManager`
@@ -360,14 +383,7 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
 - `Microsoft.Xna.Framework.Graphics.AlphaTestEffect`
 - `Microsoft.Xna.Framework.Graphics.BasicEffect`
-- `Microsoft.Xna.Framework.Graphics.Blend`
-- `Microsoft.Xna.Framework.Graphics.BlendFunction`
 - `Microsoft.Xna.Framework.Graphics.BlendState`
-- `Microsoft.Xna.Framework.Graphics.ClearOptions`
-- `Microsoft.Xna.Framework.Graphics.ColorWriteChannels`
-- `Microsoft.Xna.Framework.Graphics.CompareFunction`
-- `Microsoft.Xna.Framework.Graphics.CubeMapFace`
-- `Microsoft.Xna.Framework.Graphics.CullMode`
 - `Microsoft.Xna.Framework.Graphics.DepthStencilState`
 - `Microsoft.Xna.Framework.Graphics.DeviceLostException`
 - `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
@@ -381,25 +397,18 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.EffectAnnotationCollection`
 - `Microsoft.Xna.Framework.Graphics.EffectMaterial`
 - `Microsoft.Xna.Framework.Graphics.EffectParameter`
-- `Microsoft.Xna.Framework.Graphics.EffectParameterClass`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterCollection`
-- `Microsoft.Xna.Framework.Graphics.EffectParameterType`
 - `Microsoft.Xna.Framework.Graphics.EffectPass`
 - `Microsoft.Xna.Framework.Graphics.EffectPassCollection`
 - `Microsoft.Xna.Framework.Graphics.EffectTechnique`
 - `Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection`
 - `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
-- `Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus`
-- `Microsoft.Xna.Framework.Graphics.GraphicsProfile`
 - `Microsoft.Xna.Framework.Graphics.GraphicsResource`
-- `Microsoft.Xna.Framework.Graphics.IEffectFog`
 - `Microsoft.Xna.Framework.Graphics.IEffectLights`
-- `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
 - `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
 - `Microsoft.Xna.Framework.Graphics.IVertexType`
 - `Microsoft.Xna.Framework.Graphics.IndexBuffer`
-- `Microsoft.Xna.Framework.Graphics.IndexElementSize`
 - `Microsoft.Xna.Framework.Graphics.Model`
 - `Microsoft.Xna.Framework.Graphics.ModelBone`
 - `Microsoft.Xna.Framework.Graphics.ModelBoneCollection`
@@ -414,9 +423,7 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
-- `Microsoft.Xna.Framework.Graphics.PresentInterval`
 - `Microsoft.Xna.Framework.Graphics.PresentationParameters`
-- `Microsoft.Xna.Framework.Graphics.PrimitiveType`
 - `Microsoft.Xna.Framework.Graphics.RasterizerState`
 - `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetBinding`
@@ -425,22 +432,15 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.SamplerState`
 - `Microsoft.Xna.Framework.Graphics.SamplerStateCollection`
-- `Microsoft.Xna.Framework.Graphics.SetDataOptions`
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`
-- `Microsoft.Xna.Framework.Graphics.StencilOperation`
 - `Microsoft.Xna.Framework.Graphics.Texture`
 - `Microsoft.Xna.Framework.Graphics.Texture3D`
-- `Microsoft.Xna.Framework.Graphics.TextureAddressMode`
 - `Microsoft.Xna.Framework.Graphics.TextureCollection`
 - `Microsoft.Xna.Framework.Graphics.TextureCube`
-- `Microsoft.Xna.Framework.Graphics.TextureFilter`
 - `Microsoft.Xna.Framework.Graphics.VertexBuffer`
 - `Microsoft.Xna.Framework.Graphics.VertexBufferBinding`
 - `Microsoft.Xna.Framework.Graphics.VertexDeclaration`
-- `Microsoft.Xna.Framework.Graphics.VertexElement`
-- `Microsoft.Xna.Framework.Graphics.VertexElementFormat`
-- `Microsoft.Xna.Framework.Graphics.VertexElementUsage`
 - `Microsoft.Xna.Framework.Graphics.VertexPositionColor`
 - `Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture`
 - `Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture`

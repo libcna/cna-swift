@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 73,
-    "TARGET_MEMBERS": 1416,
-    "TOTAL_DIAGNOSTICS": 335,
-    "COMPLETE_TYPES": 68,
+    "TARGET_TYPES": 98,
+    "TARGET_MEMBERS": 1560,
+    "TOTAL_DIAGNOSTICS": 310,
+    "COMPLETE_TYPES": 93,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 184,
-    "MISSING_TYPE": 184,
+    "MISSING_TYPES": 159,
+    "MISSING_TYPE": 159,
     "MISSING_MEMBER": 131,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -43,10 +43,10 @@
     "UNMEASURED_STRUCTURAL_CATEGORY": 0,
     "ALLOWLIST_ENTRIES": 0,
     "APPLIED_ALLOWLIST_ENTRIES": 0,
-    "LANGUAGE_PROJECTION_EXCLUSIONS": 113,
+    "LANGUAGE_PROJECTION_EXCLUSIONS": 114,
     "ENUM_STORAGE_FIELD_EXCLUSIONS": 49,
     "FINALIZER_LANGUAGE_MAPPINGS": 28,
-    "NAMESPACE_MARKERS": 7,
+    "NAMESPACE_MARKERS": 8,
     "INHERITED_MEMBER_PROJECTIONS": 3,
     "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 26,
     "ARRAY_MUTATION_MAPPINGS": 19,
@@ -58,6 +58,8 @@
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 4
   },
   "completeTypes": [
+    "Microsoft.Xna.Framework.Audio.AudioChannels",
+    "Microsoft.Xna.Framework.Audio.SoundState",
     "Microsoft.Xna.Framework.BoundingBox",
     "Microsoft.Xna.Framework.BoundingFrustum",
     "Microsoft.Xna.Framework.BoundingSphere",
@@ -71,10 +73,24 @@
     "Microsoft.Xna.Framework.CurveTangent",
     "Microsoft.Xna.Framework.DisplayOrientation",
     "Microsoft.Xna.Framework.GameTime",
+    "Microsoft.Xna.Framework.Graphics.Blend",
+    "Microsoft.Xna.Framework.Graphics.BlendFunction",
     "Microsoft.Xna.Framework.Graphics.BufferUsage",
+    "Microsoft.Xna.Framework.Graphics.ClearOptions",
+    "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
+    "Microsoft.Xna.Framework.Graphics.CompareFunction",
+    "Microsoft.Xna.Framework.Graphics.CubeMapFace",
+    "Microsoft.Xna.Framework.Graphics.CullMode",
     "Microsoft.Xna.Framework.Graphics.DepthFormat",
     "Microsoft.Xna.Framework.Graphics.DisplayMode",
+    "Microsoft.Xna.Framework.Graphics.EffectParameterClass",
+    "Microsoft.Xna.Framework.Graphics.EffectParameterType",
     "Microsoft.Xna.Framework.Graphics.FillMode",
+    "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
+    "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
+    "Microsoft.Xna.Framework.Graphics.IEffectFog",
+    "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
+    "Microsoft.Xna.Framework.Graphics.IndexElementSize",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444",
@@ -94,10 +110,19 @@
     "Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Short2",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Short4",
+    "Microsoft.Xna.Framework.Graphics.PresentInterval",
+    "Microsoft.Xna.Framework.Graphics.PrimitiveType",
     "Microsoft.Xna.Framework.Graphics.RenderTargetUsage",
+    "Microsoft.Xna.Framework.Graphics.SetDataOptions",
     "Microsoft.Xna.Framework.Graphics.SpriteEffects",
     "Microsoft.Xna.Framework.Graphics.SpriteSortMode",
+    "Microsoft.Xna.Framework.Graphics.StencilOperation",
     "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
+    "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
+    "Microsoft.Xna.Framework.Graphics.TextureFilter",
+    "Microsoft.Xna.Framework.Graphics.VertexElement",
+    "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
+    "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
     "Microsoft.Xna.Framework.Graphics.Viewport",
     "Microsoft.Xna.Framework.Input.ButtonState",
     "Microsoft.Xna.Framework.Input.Buttons",
@@ -136,7 +161,6 @@
   ],
   "missingTypes": [
     "Microsoft.Xna.Framework.Audio.AudioCategory",
-    "Microsoft.Xna.Framework.Audio.AudioChannels",
     "Microsoft.Xna.Framework.Audio.AudioEmitter",
     "Microsoft.Xna.Framework.Audio.AudioEngine",
     "Microsoft.Xna.Framework.Audio.AudioListener",
@@ -152,7 +176,6 @@
     "Microsoft.Xna.Framework.Audio.SoundBank",
     "Microsoft.Xna.Framework.Audio.SoundEffect",
     "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-    "Microsoft.Xna.Framework.Audio.SoundState",
     "Microsoft.Xna.Framework.Audio.WaveBank",
     "Microsoft.Xna.Framework.Content.ContentLoadException",
     "Microsoft.Xna.Framework.Content.ContentManager",
@@ -189,14 +212,7 @@
     "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
     "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
     "Microsoft.Xna.Framework.Graphics.BasicEffect",
-    "Microsoft.Xna.Framework.Graphics.Blend",
-    "Microsoft.Xna.Framework.Graphics.BlendFunction",
     "Microsoft.Xna.Framework.Graphics.BlendState",
-    "Microsoft.Xna.Framework.Graphics.ClearOptions",
-    "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
-    "Microsoft.Xna.Framework.Graphics.CompareFunction",
-    "Microsoft.Xna.Framework.Graphics.CubeMapFace",
-    "Microsoft.Xna.Framework.Graphics.CullMode",
     "Microsoft.Xna.Framework.Graphics.DepthStencilState",
     "Microsoft.Xna.Framework.Graphics.DeviceLostException",
     "Microsoft.Xna.Framework.Graphics.DeviceNotResetException",
@@ -210,25 +226,18 @@
     "Microsoft.Xna.Framework.Graphics.EffectAnnotationCollection",
     "Microsoft.Xna.Framework.Graphics.EffectMaterial",
     "Microsoft.Xna.Framework.Graphics.EffectParameter",
-    "Microsoft.Xna.Framework.Graphics.EffectParameterClass",
     "Microsoft.Xna.Framework.Graphics.EffectParameterCollection",
-    "Microsoft.Xna.Framework.Graphics.EffectParameterType",
     "Microsoft.Xna.Framework.Graphics.EffectPass",
     "Microsoft.Xna.Framework.Graphics.EffectPassCollection",
     "Microsoft.Xna.Framework.Graphics.EffectTechnique",
     "Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection",
     "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
     "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
-    "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
-    "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
     "Microsoft.Xna.Framework.Graphics.GraphicsResource",
-    "Microsoft.Xna.Framework.Graphics.IEffectFog",
     "Microsoft.Xna.Framework.Graphics.IEffectLights",
-    "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
     "Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService",
     "Microsoft.Xna.Framework.Graphics.IVertexType",
     "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-    "Microsoft.Xna.Framework.Graphics.IndexElementSize",
     "Microsoft.Xna.Framework.Graphics.Model",
     "Microsoft.Xna.Framework.Graphics.ModelBone",
     "Microsoft.Xna.Framework.Graphics.ModelBoneCollection",
@@ -243,9 +252,7 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
-    "Microsoft.Xna.Framework.Graphics.PresentInterval",
     "Microsoft.Xna.Framework.Graphics.PresentationParameters",
-    "Microsoft.Xna.Framework.Graphics.PrimitiveType",
     "Microsoft.Xna.Framework.Graphics.RasterizerState",
     "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
     "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
@@ -254,22 +261,15 @@
     "Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs",
     "Microsoft.Xna.Framework.Graphics.SamplerState",
     "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
-    "Microsoft.Xna.Framework.Graphics.SetDataOptions",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
     "Microsoft.Xna.Framework.Graphics.SpriteFont",
-    "Microsoft.Xna.Framework.Graphics.StencilOperation",
     "Microsoft.Xna.Framework.Graphics.Texture",
     "Microsoft.Xna.Framework.Graphics.Texture3D",
-    "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
     "Microsoft.Xna.Framework.Graphics.TextureCollection",
     "Microsoft.Xna.Framework.Graphics.TextureCube",
-    "Microsoft.Xna.Framework.Graphics.TextureFilter",
     "Microsoft.Xna.Framework.Graphics.VertexBuffer",
     "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
     "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
-    "Microsoft.Xna.Framework.Graphics.VertexElement",
-    "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
-    "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
     "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
     "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
     "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
@@ -324,11 +324,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Audio.AudioCategory",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Audio.AudioChannels",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -404,11 +399,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Audio.SoundState",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -703,42 +693,7 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.Blend",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.BlendFunction",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.BlendState",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.ClearOptions",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.CompareFunction",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.CubeMapFace",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.CullMode",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -808,17 +763,7 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.EffectParameterClass",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.EffectParameterCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.EffectParameterType",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1138,32 +1083,12 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.IEffectFog",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.IEffectLights",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1179,11 +1104,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.IndexElementSize",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1258,17 +1178,7 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PresentInterval",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.PresentationParameters",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.PrimitiveType",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1309,11 +1219,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.SetDataOptions",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1463,11 +1368,6 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.StencilOperation",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.Texture",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
@@ -1558,22 +1458,12 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.TextureCollection",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.TextureCube",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.TextureFilter",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1589,21 +1479,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexElement",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2314,16 +2189,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.AudioChannels",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Audio.AudioChannels",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.AudioEmitter",
@@ -2522,16 +2391,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.SoundState",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Audio.SoundState",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.WaveBank",
@@ -3212,29 +3075,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Blend",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 13,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.Blend",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 13,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.BlendFunction",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.BlendFunction",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.BlendState",
@@ -3258,68 +3109,38 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.ClearOptions",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.ClearOptions",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 6,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 6,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.CompareFunction",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 8,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.CompareFunction",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 8,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.CubeMapFace",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 6,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.CubeMapFace",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 6,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.CullMode",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.CullMode",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.DepthFormat",
@@ -3506,16 +3327,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.EffectParameterClass",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.EffectParameterClass",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.EffectParameterCollection",
@@ -3532,16 +3347,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.EffectParameterType",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.EffectParameterType",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.EffectPass",
@@ -3923,29 +3732,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
@@ -3962,16 +3759,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IEffectFog",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 4,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.IEffectFog",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 4,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IEffectLights",
@@ -3988,16 +3779,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService",
@@ -4040,16 +3825,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IndexElementSize",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.IndexElementSize",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Model",
@@ -4368,16 +4147,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PresentInterval",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 4,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PresentInterval",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 4,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PresentationParameters",
@@ -4394,16 +4167,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.PrimitiveType",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 4,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.PrimitiveType",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 4,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.RasterizerState",
@@ -4518,16 +4285,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SetDataOptions",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.SetDataOptions",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
@@ -4714,16 +4475,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.StencilOperation",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 8,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.StencilOperation",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 8,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
@@ -4848,16 +4603,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
@@ -4887,16 +4636,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureFilter",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.TextureFilter",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
@@ -4939,42 +4682,24 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexElement",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexElement",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 12,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 12,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 13,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 13,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexPositionColor",

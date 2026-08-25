@@ -10,6 +10,35 @@ import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+REFERENCE = ROOT / "tools/api_compat/reference/xna40-windows-runtime-contract.json"
+
+# Foundation 14 pure managed batch. Each entry is a pinned XNA metadata
+# closure; the table below is read back out of the pinned contract rather
+# than transcribed, so the report cannot drift from the reference.
+FOUNDATION_14_BATCH = [
+    "Microsoft.Xna.Framework.Audio.AudioChannels",
+    "Microsoft.Xna.Framework.Audio.SoundState",
+    "Microsoft.Xna.Framework.Graphics.Blend",
+    "Microsoft.Xna.Framework.Graphics.BlendFunction",
+    "Microsoft.Xna.Framework.Graphics.ClearOptions",
+    "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
+    "Microsoft.Xna.Framework.Graphics.CompareFunction",
+    "Microsoft.Xna.Framework.Graphics.CubeMapFace",
+    "Microsoft.Xna.Framework.Graphics.CullMode",
+    "Microsoft.Xna.Framework.Graphics.EffectParameterClass",
+    "Microsoft.Xna.Framework.Graphics.EffectParameterType",
+    "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
+    "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
+    "Microsoft.Xna.Framework.Graphics.IndexElementSize",
+    "Microsoft.Xna.Framework.Graphics.PresentInterval",
+    "Microsoft.Xna.Framework.Graphics.PrimitiveType",
+    "Microsoft.Xna.Framework.Graphics.SetDataOptions",
+    "Microsoft.Xna.Framework.Graphics.StencilOperation",
+    "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
+    "Microsoft.Xna.Framework.Graphics.TextureFilter",
+    "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
+    "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
+]
 TEST_SOURCES = [
     ROOT / "Tests/CNATests/PureValueTests.swift",
     ROOT / "Tests/CNATests/LinearAlgebraTests.swift",
@@ -31,6 +60,8 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/RenderTargetUsageContractTests.swift",
     ROOT / "Tests/CNATests/SurfaceFormatContractTests.swift",
     ROOT / "Tests/CNATests/DisplayModeContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation14GraphicsEnumContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation14ManagedTypeContractTests.swift",
 ]
 
 
@@ -51,6 +82,22 @@ def main() -> int:
     assertions = len(re.findall(r"\bXCTAssert\w*\s*\(", source))
     tests = re.findall(r"\bfunc\s+(test\w+)\s*\(", source)
     failures = 0 if completed.returncode == 0 else 1
+    contract = json.loads(REFERENCE.read_text(encoding="utf-8"))
+    pinned = {item["name"]: item for item in contract["types"]}
+    batch_contracts = {
+        name: {
+            "kind": "OptionSet" if pinned[name]["flags"] else "enum",
+            "flags": pinned[name]["flags"],
+            "underlyingType": pinned[name]["underlyingType"],
+            "values": {
+                member["name"]: int(member["value"])
+                for member in pinned[name]["members"]
+                if member["kind"] == "field" and member["name"] != "value__"
+            },
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        }
+        for name in FOUNDATION_14_BATCH
+    }
     report = {
         "schemaVersion": 1,
         "authority": "PURE_XNA_DERIVED",
@@ -65,7 +112,8 @@ def main() -> int:
                 "Quaternion": "Quaternion", "Matrix": "Matrix", "Viewport": "Viewport",
                 "Plane": "Plane", "Ray": "Ray", "BoundingBox": "BoundingBox",
                 "BoundingSphere": "BoundingSphere", "BoundingFrustum": "BoundingFrustum",
-                "GeometryEnums": "GeometryEnums", "Color": "Color",
+                "GeometryEnums": "GeometryEnums",
+                "Color": r"Color(?!WriteChannels)",
                 "PACKED_ALPHA": "PackedAlpha",
                 "PACKED_565_4444_5551": "Packed565_4444_5551",
                 "PACKED_BYTE": "PackedByte", "PACKED_HALF": "PackedHalf",
@@ -99,6 +147,31 @@ def main() -> int:
                 "DISPLAY_MODE_ASPECT_RATIO": "DisplayModeAspectRatio",
                 "DISPLAY_MODE_TITLE_SAFE_AREA": "DisplayModeTitleSafeArea",
                 "DISPLAY_MODE_TO_STRING": "DisplayModeToString",
+                "BLEND": "BlendXnaContract",
+                "BLEND_FUNCTION": "BlendFunctionXnaContract",
+                "CLEAR_OPTIONS": "ClearOptionsXnaContract",
+                "COLOR_WRITE_CHANNELS": "ColorWriteChannelsXnaContract",
+                "COMPARE_FUNCTION": "CompareFunctionXnaContract",
+                "CUBE_MAP_FACE": "CubeMapFaceXnaContract",
+                "CULL_MODE": "CullModeXnaContract",
+                "EFFECT_PARAMETER_CLASS": "EffectParameterClassXnaContract",
+                "EFFECT_PARAMETER_TYPE": "EffectParameterTypeXnaContract",
+                "GRAPHICS_DEVICE_STATUS": "GraphicsDeviceStatusXnaContract",
+                "GRAPHICS_PROFILE": "GraphicsProfileXnaContract",
+                "INDEX_ELEMENT_SIZE": "IndexElementSizeXnaContract",
+                "PRESENT_INTERVAL": "PresentIntervalXnaContract",
+                "PRIMITIVE_TYPE": "PrimitiveTypeXnaContract",
+                "SET_DATA_OPTIONS": "SetDataOptionsXnaContract",
+                "STENCIL_OPERATION": "StencilOperationXnaContract",
+                "TEXTURE_ADDRESS_MODE": "TextureAddressModeXnaContract",
+                "TEXTURE_FILTER": "TextureFilterXnaContract",
+                "VERTEX_ELEMENT_FORMAT": "VertexElementFormatXnaContract",
+                "VERTEX_ELEMENT_USAGE": "VertexElementUsageXnaContract",
+                "VERTEX_ELEMENT": "VertexElementXnaContract",
+                "IEFFECT_FOG": "IEffectFogXnaContract",
+                "IEFFECT_MATRICES": "IEffectMatricesXnaContract",
+                "SOUND_STATE": "SoundStateXnaContract",
+                "AUDIO_CHANNELS": "AudioChannelsXnaContract",
             }.items()
         },
         "displayOrientationContract": {
@@ -206,6 +279,63 @@ def main() -> int:
                 "_width, _height, Format, AspectRatio)",
             "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },
+        "foundation14PureManagedBatchContracts": batch_contracts,
+        "vertexElementContract": {
+            "kind": "struct",
+            "sealed": True,
+            "layout": "sequential",
+            "baseType": "System.ValueType",
+            "directInterfaces": [],
+            "storage": ["_offset", "_format", "_usage", "_usageIndex"],
+            "publicMembers": [
+                ".ctor", "GetHashCode", "ToString", "Equals", "op_Equality",
+                "op_Inequality", "Offset", "VertexElementFormat",
+                "VertexElementUsage", "UsageIndex",
+            ],
+            "constructorValidation": "none; all four arguments are stored verbatim",
+            "propertyAccessors": "plain field load/store",
+            "equality":
+                "op_Equality compares _offset, then _usageIndex, then _usage, "
+                "then _format; op_Inequality is its negation; Equals(object) is "
+                "false for null and for a different runtime type",
+            "getHashCode":
+                "Helpers.SmartGetHashCode XORs Marshal.SizeOf/4 int32 words of "
+                "the pinned box and returns 0x7FFFFFFF when the XOR is zero",
+            "toString":
+                "string.Format(CultureInfo.CurrentCulture, "
+                "\"{{Offset:{0} Format:{1} Usage:{2} UsageIndex:{3}}}\", "
+                "Offset, VertexElementFormat, VertexElementUsage, UsageIndex)",
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "effectInterfaceContracts": {
+            "Microsoft.Xna.Framework.Graphics.IEffectFog": {
+                "kind": "interface",
+                "baseInterfaces": [],
+                "readWriteProperties": {
+                    "FogEnabled": "System.Boolean",
+                    "FogStart": "System.Single",
+                    "FogEnd": "System.Single",
+                    "FogColor": "Microsoft.Xna.Framework.Vector3",
+                },
+                "methods": [],
+            },
+            "Microsoft.Xna.Framework.Graphics.IEffectMatrices": {
+                "kind": "interface",
+                "baseInterfaces": [],
+                "readWriteProperties": {
+                    "World": "Microsoft.Xna.Framework.Matrix",
+                    "View": "Microsoft.Xna.Framework.Matrix",
+                    "Projection": "Microsoft.Xna.Framework.Matrix",
+                },
+                "methods": [],
+            },
+            "conformerRequired": False,
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "foundation14PureManagedBatchProvenance":
+            "pinned XNA metadata closure per type; the Swift projection "
+            "qualification of each type is a separate language-projection "
+            "test and is not counted as XNA runtime behavior",
         "colorPaletteGoldenEntries": len(re.findall(
             r'\("[A-Za-z]+",\s*\.[A-Za-z]+,\s*0x[0-9A-Fa-f_]+\)', source,
         )),

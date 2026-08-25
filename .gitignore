@@ -5,3 +5,6 @@
 /DerivedData
 .swiftpm/
 .swiftlib/
+/build-asan
+/build-tsan
+/build-consumer

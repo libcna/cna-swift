@@ -25,6 +25,14 @@ support, plus the standalone managed `DisplayMode` descriptor class without
 claiming monitor enumeration, display-mode discovery, or resolution switching,
 plus the standalone managed non-flags `RenderTargetUsage` enum without claiming
 render targets or any content discard/preserve behavior.
+
+Foundation 14 adds a further 25 pure-managed types in one batch — 22 exact
+enums, the `VertexElement` value struct, and the `IEffectFog` and
+`IEffectMatrices` protocols — covering graphics profile, presentation, device
+status, primitive, clear, render-state, vertex-declaration, cube-face, effect
+parameter and audio metadata. None of them claims any renderer, device, buffer,
+effect or audio runtime support.
+
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -34,12 +42,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=73
-TARGET_MEMBERS=1416
-TOTAL_DIAGNOSTICS=335
-COMPLETE_TYPES=68
+TARGET_TYPES=98
+TARGET_MEMBERS=1560
+TOTAL_DIAGNOSTICS=310
+COMPLETE_TYPES=93
 PARTIAL_TYPES=5
-MISSING_TYPES=184
+MISSING_TYPES=159
 MISSING_MEMBER=131
 ```
 
@@ -56,9 +64,69 @@ BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
-DepthFormat, FillMode, SurfaceFormat, DisplayMode, and RenderTargetUsage. Every
-implemented member has qualified behavior;
-missing members remain absent.
+DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, and the
+25 Foundation-14 pure-managed types listed below. Every implemented member has
+qualified behavior; missing members remain absent.
+
+## Foundation 14 pure managed batch
+
+Foundation 14 is a multi-type batch rather than a single-type closure. It
+completes 25 entirely missing pure-managed types carrying 144 mapped XNA
+identities, and stops on the 25-type batch limit.
+
+```text
+Graphics.GraphicsProfile        Reach=0, HiDef=1
+Graphics.PresentInterval        Default=0, One=1, Two=2, Immediate=3
+Graphics.VertexElementFormat    Single=0 .. HalfVector4=11
+Graphics.VertexElementUsage     Position=0 .. TessellateFactor=12
+Graphics.CompareFunction        Always=0 .. NotEqual=7
+Graphics.CubeMapFace            PositiveX=0 .. NegativeZ=5
+Graphics.IndexElementSize       SixteenBits=0, ThirtyTwoBits=1
+Graphics.Blend                  One=0 .. SourceAlphaSaturation=12
+Graphics.BlendFunction          Add=0 .. Max=4
+Graphics.ColorWriteChannels     [Flags] None=0, Red=1, Green=2, Blue=4,
+                                Alpha=8, All=15
+Graphics.CullMode               None=0, CullClockwiseFace=1,
+                                CullCounterClockwiseFace=2
+Graphics.StencilOperation       Keep=0 .. Invert=7
+Graphics.TextureAddressMode     Wrap=0, Clamp=1, Mirror=2
+Graphics.TextureFilter          Linear=0 .. MinPointMagLinearMipPoint=8
+Graphics.ClearOptions           [Flags] Target=1, DepthBuffer=2, Stencil=4
+Graphics.GraphicsDeviceStatus   Normal=0, Lost=1, NotReset=2
+Graphics.PrimitiveType          TriangleList=0 .. LineStrip=3
+Graphics.EffectParameterClass   Scalar=0 .. Struct=4
+Graphics.EffectParameterType    Void=0 .. TextureCube=9
+Graphics.SetDataOptions         [Flags] None=0, Discard=1, NoOverwrite=2
+Graphics.VertexElement          value struct, 10 identities
+Graphics.IEffectFog             protocol, 4 read/write properties
+Graphics.IEffectMatrices        protocol, 3 read/write properties
+Audio.SoundState                Playing=0, Paused=1, Stopped=2
+Audio.AudioChannels             Mono=1, Stereo=2
+```
+
+`[Flags]` is an observed property of the pinned binaries: it is present on
+exactly `ColorWriteChannels`, `ClearOptions`, and `SetDataOptions` and absent
+from the other 19 enums, so those three are Swift `OptionSet` structs and the
+rest are ordinary `enum: Int32`. No `None`, `Default`, or `All` literal was
+invented, and no enum gained a `description`, `ToString`, predicate, alias, or
+native-conversion helper.
+
+`VertexElement` reproduces the pinned IL exactly: verbatim unvalidated
+construction, plain field accessors, four-field `op_Equality` with `!=` as its
+negation, `Equals(object)` null/type guards, the internal `SmartGetHashCode`
+word XOR with `0x7FFFFFFF` for a zero result, and
+`{Offset:O Format:F Usage:U UsageIndex:I}`. The two element enums gain no
+public string surface; the name tables stay private to `VertexElement`.
+
+`SoundState` and `AudioChannels` are the first `Microsoft.Xna.Framework.Audio`
+types, so that namespace marker was added. They are metadata only: there is no
+audio engine, and the audio backend remains NULL.
+
+This batch is managed metadata and managed value logic only. No CNA source, C
+ABI, native binding, renderer, device, texture, sprite-batch, callback,
+thread-affinity, filesystem or audio-engine work is included, and none of the
+five runtime-partial types was touched. See
+`docs/foundation-14-pure-managed-batch-evidence.md`.
 
 ## Managed RenderTargetUsage
 

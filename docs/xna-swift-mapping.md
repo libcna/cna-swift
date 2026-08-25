@@ -17,9 +17,11 @@ the retained snapshot hash before projecting it.
 ## Names and kinds
 
 - Namespace marker enums produce `Microsoft.Xna.Framework`, `.Graphics`,
-  `.Graphics.PackedVector`, `.Input`, and `.Content`. Markers are mapping
-  infrastructure, not XNA types, and the verifier excludes the seven marker
-  symbols.
+  `.Graphics.PackedVector`, `.Input`, `.Content`, and `.Audio`. Markers are
+  mapping infrastructure, not XNA types, and the verifier excludes the eight
+  marker symbols. A namespace gains its marker when its first type is
+  implemented; `.Audio` was added in Foundation 14 for `SoundState` and
+  `AudioChannels`.
 - CLR class -> Swift class; an externally subclassable CLR class -> `open`
   Swift class where required.
 - A public CLR class whose declared constructors are all non-public is not
@@ -181,7 +183,7 @@ are language mappings. No missing functional API is hidden by those omissions.
 The report reserves `ALLOWLIST_ENTRIES` for genuine manual diagnostic
 suppressions; it is currently zero. Deterministic projection transformations
 are reported separately as `LANGUAGE_PROJECTION_EXCLUSIONS` (49 enum storage
-fields, 28 finalizer mappings, seven namespace markers, three inherited member
+fields, 28 finalizer mappings, eight namespace markers, three inherited member
 projections, and 26 explicit-interface protocol witnesses). Comparison,
 collection, enumerator, indexed-property, optional-operator-placement,
 caller-owned-array, and non-public-construction mappings have their own precise

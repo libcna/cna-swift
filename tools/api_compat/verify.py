@@ -2278,11 +2278,337 @@ def self_test() -> None:
         failures.append(
             "RenderTargetUsage publicly exposed value__ did not fail")
 
+    # Foundation 14 pure managed batch. Every batch enum is driven through the
+    # same structural mutation matrix, built from its own pinned reference model
+    # rather than from a transcribed table, so a batch type cannot be registered
+    # without negative coverage for its exact literals.
+    batch_enum_names = [
+        "Microsoft.Xna.Framework.Graphics.Blend",
+        "Microsoft.Xna.Framework.Graphics.BlendFunction",
+        "Microsoft.Xna.Framework.Graphics.ClearOptions",
+        "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
+        "Microsoft.Xna.Framework.Graphics.CompareFunction",
+        "Microsoft.Xna.Framework.Graphics.CubeMapFace",
+        "Microsoft.Xna.Framework.Graphics.CullMode",
+        "Microsoft.Xna.Framework.Graphics.EffectParameterClass",
+        "Microsoft.Xna.Framework.Graphics.EffectParameterType",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
+        "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
+        "Microsoft.Xna.Framework.Graphics.IndexElementSize",
+        "Microsoft.Xna.Framework.Graphics.PresentInterval",
+        "Microsoft.Xna.Framework.Graphics.PrimitiveType",
+        "Microsoft.Xna.Framework.Graphics.SetDataOptions",
+        "Microsoft.Xna.Framework.Graphics.StencilOperation",
+        "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
+        "Microsoft.Xna.Framework.Graphics.TextureFilter",
+        "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
+        "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
+        "Microsoft.Xna.Framework.Audio.AudioChannels",
+        "Microsoft.Xna.Framework.Audio.SoundState",
+    ]
+    source_types_by_name = {item["name"]: item for item in contract["types"]}
+    batch_self_tests = 0
+    for batch_name in batch_enum_names:
+        batch_expected = {batch_name: copy.deepcopy(all_expected[batch_name])}
+        batch_good = copy.deepcopy(batch_expected)
+        batch_good[batch_name].identifier = batch_name
+        for index, member in enumerate(batch_good[batch_name].members):
+            member.identifier = f"{batch_name}:{index}"
+        batch_model = batch_expected[batch_name]
+        batch_flags = batch_model.flags
+        batch_simple = batch_name.rsplit(".", 1)[-1]
+        batch_slug = re.sub(r"(?<!^)(?=[A-Z])", "-", batch_simple).lower()
+        pinned_table = {
+            member.name: member.raw_value for member in batch_model.members
+        }
+
+        def batch_member(models: dict[str, TypeModel], name: str, owner: str) -> Member:
+            return next(
+                member for member in models[owner].members if member.name == name
+            )
+
+        def batch_categories(
+            models: dict[str, TypeModel], reference: dict[str, TypeModel] = batch_expected,
+        ) -> set[str]:
+            return {item["category"] for item in compare(reference, models)}
+
+        raw_type_category = (
+            "FLAGS_MAPPING_MISMATCH" if batch_flags else "TYPE_KIND_MISMATCH"
+        )
+        batch_mutations: list[tuple[str, str, Any]] = [
+            (f"{batch_simple} missing type", "MISSING_TYPE",
+             lambda m, n=batch_name: m.pop(n)),
+            (f"{batch_simple} wrong namespace", "MISSING_TYPE",
+             lambda m, n=batch_name, s=batch_simple: m.__setitem__(
+                 f"Microsoft.Xna.Framework.{s}", m.pop(n))),
+            (f"{batch_simple} wrong raw type", raw_type_category,
+             lambda m, n=batch_name: setattr(m[n], "raw_type", "UInt32")),
+            (f"{batch_simple} Int raw type", raw_type_category,
+             lambda m, n=batch_name: setattr(m[n], "raw_type", "Int")),
+            (f"{batch_simple} inverted flags metadata", "FLAGS_MAPPING_MISMATCH",
+             lambda m, n=batch_name, f=batch_flags: setattr(m[n], "flags", not f)),
+            (f"{batch_simple} unexpected invented literal", "UNEXPECTED_MEMBER",
+             lambda m, n=batch_name, s=batch_slug, v=max(pinned_table.values()) + 1:
+                 m[n].members.append(Member(
+                     n, "field", "Invented", True, return_type=n, mutable=False,
+                     raw_value=v, identifier=f"invented-{s}-literal"))),
+            (f"{batch_simple} public description helper", "UNEXPECTED_MEMBER",
+             lambda m, n=batch_name, s=batch_slug: m[n].members.append(Member(
+                 n, "property", "description", False, return_type="String",
+                 mutable=False, identifier=f"invented-{s}-description"))),
+            (f"{batch_simple} public ToString helper", "UNEXPECTED_MEMBER",
+             lambda m, n=batch_name, s=batch_slug: m[n].members.append(Member(
+                 n, "method", "ToString", False, return_type="String",
+                 identifier=f"invented-{s}-to-string"))),
+            (f"{batch_simple} public predicate helper", "UNEXPECTED_MEMBER",
+             lambda m, n=batch_name, s=batch_slug: m[n].members.append(Member(
+                 n, "property", "isDefault", False, return_type="Bool",
+                 mutable=False, identifier=f"invented-{s}-predicate"))),
+            (f"{batch_simple} public native mapping helper", "UNEXPECTED_MEMBER",
+             lambda m, n=batch_name, s=batch_slug: m[n].members.append(Member(
+                 n, "property", "nativeValue", False, return_type="Int32",
+                 mutable=False, identifier=f"invented-{s}-native"))),
+        ]
+        if batch_flags:
+            batch_mutations.append((
+                f"{batch_simple} ordinary enum instead of OptionSet",
+                "TYPE_KIND_MISMATCH",
+                lambda m, n=batch_name: (setattr(m[n], "kind", "enum"),
+                                         setattr(m[n], "flags", False))))
+        else:
+            batch_mutations.append((
+                f"{batch_simple} struct instead of enum", "TYPE_KIND_MISMATCH",
+                lambda m, n=batch_name: setattr(m[n], "kind", "struct")))
+            batch_mutations.append((
+                f"{batch_simple} OptionSet instead of ordinary enum",
+                "FLAGS_MAPPING_MISMATCH",
+                lambda m, n=batch_name: (setattr(m[n], "kind", "struct"),
+                                         setattr(m[n], "flags", True))))
+        for literal, literal_value in pinned_table.items():
+            batch_mutations.append((
+                f"{batch_simple} wrong {literal}", "ENUM_VALUE_MISMATCH",
+                lambda m, n=batch_name, k=literal, v=literal_value: setattr(
+                    batch_member(m, k, n), "raw_value", v + 1)))
+            batch_mutations.append((
+                f"{batch_simple} missing {literal}", "MISSING_MEMBER",
+                lambda m, n=batch_name, k=literal: m[n].members.remove(
+                    batch_member(m, k, n))))
+            batch_mutations.append((
+                f"{batch_simple} renamed {literal}", "MISSING_MEMBER",
+                lambda m, n=batch_name, k=literal: setattr(
+                    batch_member(m, k, n), "name", f"{k}Renamed")))
+        for label, wanted, mutate in batch_mutations:
+            models = copy.deepcopy(batch_good)
+            mutate(models)
+            if wanted not in batch_categories(models):
+                failures.append(f"{label}: did not produce {wanted}")
+        batch_self_tests += len(batch_mutations)
+
+        if batch_categories(batch_good):
+            failures.append(f"{batch_simple} reference model is not diagnostic-free")
+        if batch_model.kind != ("struct" if batch_flags else "enum"):
+            failures.append(f"{batch_simple} expected Swift kind is wrong")
+        if batch_model.raw_type != "Int32":
+            failures.append(f"{batch_simple} expected raw type is not Int32")
+        if not batch_model.verify_raw_type:
+            failures.append(f"{batch_simple} raw type is not verified")
+        if any(member.name == "value__" for member in batch_model.members):
+            failures.append(
+                f"{batch_simple} value__ was not excluded from the Swift contract")
+        if any(
+            member.kind != "field" or not member.static
+            for member in batch_model.members
+        ):
+            failures.append(
+                f"{batch_simple} expected identity is not a static enum literal")
+        if any(member.kind == "constructor" for member in batch_model.members):
+            failures.append(f"{batch_simple} expected a public constructor identity")
+        source_literals = {
+            member["name"]: int(member["value"])
+            for member in source_types_by_name[batch_name]["members"]
+            if member["kind"] == "field" and member["name"] != "value__"
+        }
+        if pinned_table != source_literals:
+            failures.append(f"{batch_simple} expected raw table is not the pinned table")
+        if len(batch_model.members) != len(source_literals):
+            failures.append(
+                f"{batch_simple} expected Swift member count is not the pinned count")
+        batch_storage_expected = copy.deepcopy(batch_expected)
+        batch_storage_expected[batch_name].members.append(Member(
+            batch_name, "field", "value__", False, return_type="Int32",
+            mutable=True, identifier=f"incorrectly-required-{batch_slug}-storage",
+        ))
+        if "MISSING_MEMBER" not in {
+            item["category"]
+            for item in compare(batch_storage_expected, batch_good)
+        }:
+            failures.append(f"{batch_simple} value__ treated as required did not fail")
+        batch_storage_actual = copy.deepcopy(batch_good)
+        batch_storage_actual[batch_name].members.append(Member(
+            batch_name, "field", "value__", False, return_type="Int32",
+            mutable=True, identifier=f"incorrectly-exposed-{batch_slug}-storage",
+        ))
+        if "UNEXPECTED_MEMBER" not in {
+            item["category"]
+            for item in compare(batch_expected, batch_storage_actual)
+        }:
+            failures.append(f"{batch_simple} publicly exposed value__ did not fail")
+        batch_self_tests += 11
+
+    # Foundation 14 pure managed batch, non-enum closures. The pinned value
+    # struct and the two pinned effect interfaces are driven through a
+    # per-member structural mutation matrix built from their own reference
+    # models, so no member can be renamed, retyped, made read-only, made
+    # static, or dropped without a diagnostic.
+    batch_managed_names = [
+        "Microsoft.Xna.Framework.Graphics.IEffectFog",
+        "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
+        "Microsoft.Xna.Framework.Graphics.VertexElement",
+    ]
+    for managed_name in batch_managed_names:
+        managed_expected = {managed_name: copy.deepcopy(all_expected[managed_name])}
+        managed_good = copy.deepcopy(managed_expected)
+        managed_good[managed_name].identifier = managed_name
+        for index, member in enumerate(managed_good[managed_name].members):
+            member.identifier = f"{managed_name}:{index}"
+        managed_model = managed_expected[managed_name]
+        managed_simple = managed_name.rsplit(".", 1)[-1]
+        managed_slug = re.sub(r"(?<!^)(?=[A-Z])", "-", managed_simple).lower()
+
+        def managed_member(
+            models: dict[str, TypeModel], owner: str, name: str, arity: int,
+        ) -> Member:
+            return next(
+                member for member in models[owner].members
+                if member.name == name and len(member.parameters) == arity
+            )
+
+        def managed_categories(
+            models: dict[str, TypeModel],
+            reference: dict[str, TypeModel] = managed_expected,
+        ) -> set[str]:
+            return {item["category"] for item in compare(reference, models)}
+
+        other_kind = "class" if managed_model.kind != "class" else "struct"
+        managed_mutations: list[tuple[str, str, Any]] = [
+            (f"{managed_simple} missing type", "MISSING_TYPE",
+             lambda m, n=managed_name: m.pop(n)),
+            (f"{managed_simple} wrong namespace", "MISSING_TYPE",
+             lambda m, n=managed_name, s=managed_simple: m.__setitem__(
+                 f"Microsoft.Xna.Framework.{s}", m.pop(n))),
+            (f"{managed_simple} wrong Swift kind", "TYPE_KIND_MISMATCH",
+             lambda m, n=managed_name, k=other_kind: setattr(m[n], "kind", k)),
+            (f"{managed_simple} unexpected description helper", "UNEXPECTED_MEMBER",
+             lambda m, n=managed_name, s=managed_slug: m[n].members.append(Member(
+                 n, "property", "description", False, return_type="String",
+                 mutable=False, identifier=f"invented-{s}-description"))),
+            (f"{managed_simple} unexpected native mapping helper", "UNEXPECTED_MEMBER",
+             lambda m, n=managed_name, s=managed_slug: m[n].members.append(Member(
+                 n, "property", "nativeValue", False, return_type="Int32",
+                 mutable=False, identifier=f"invented-{s}-native"))),
+            (f"{managed_simple} unexpected invented method", "UNEXPECTED_MEMBER",
+             lambda m, n=managed_name, s=managed_slug: m[n].members.append(Member(
+                 n, "method", "Apply", False, return_type="Void",
+                 identifier=f"invented-{s}-method"))),
+        ]
+        for member in managed_model.members:
+            key = (member.name, len(member.parameters))
+            is_property = member.kind == "property"
+            kind_category = (
+                "PROPERTY_MAPPING_MISMATCH" if is_property
+                else "METHOD_SIGNATURE_MAPPING_MISMATCH"
+            )
+            return_category = (
+                "PROPERTY_MAPPING_MISMATCH" if is_property
+                else "RETURN_MAPPING_MISMATCH"
+            )
+            managed_mutations.append((
+                f"{managed_simple} missing {member.name}/{key[1]}", "MISSING_MEMBER",
+                lambda m, n=managed_name, k=key: m[n].members.remove(
+                    managed_member(m, n, k[0], k[1]))))
+            managed_mutations.append((
+                f"{managed_simple} renamed {member.name}/{key[1]}", "MISSING_MEMBER",
+                lambda m, n=managed_name, k=key: setattr(
+                    managed_member(m, n, k[0], k[1]), "name", f"{k[0]}Renamed")))
+            managed_mutations.append((
+                f"{managed_simple} {member.name}/{key[1]} wrong Swift kind",
+                kind_category,
+                lambda m, n=managed_name, k=key, p=is_property: setattr(
+                    managed_member(m, n, k[0], k[1]), "kind",
+                    "method" if p else "property")))
+            managed_mutations.append((
+                f"{managed_simple} {member.name}/{key[1]} static identity flipped",
+                kind_category,
+                lambda m, n=managed_name, k=key: setattr(
+                    managed_member(m, n, k[0], k[1]), "static",
+                    not managed_member(m, n, k[0], k[1]).static)))
+            if member.kind in ("method", "property"):
+                managed_mutations.append((
+                    f"{managed_simple} {member.name}/{key[1]} wrong result type",
+                    return_category,
+                    lambda m, n=managed_name, k=key: setattr(
+                        managed_member(m, n, k[0], k[1]), "return_type",
+                        "Microsoft.Xna.Framework.Point")))
+            if member.mutable is not None:
+                managed_mutations.append((
+                    f"{managed_simple} {member.name}/{key[1]} mutability flipped",
+                    "PROPERTY_MAPPING_MISMATCH",
+                    lambda m, n=managed_name, k=key: setattr(
+                        managed_member(m, n, k[0], k[1]), "mutable",
+                        not managed_member(m, n, k[0], k[1]).mutable)))
+            if member.parameters:
+                managed_mutations.append((
+                    f"{managed_simple} {member.name}/{key[1]} wrong parameter type",
+                    "PARAMETER_MAPPING_MISMATCH",
+                    lambda m, n=managed_name, k=key: setattr(
+                        managed_member(m, n, k[0], k[1]), "parameters",
+                        ("Microsoft.Xna.Framework.Point",) +
+                        managed_member(m, n, k[0], k[1]).parameters[1:])))
+                managed_mutations.append((
+                    f"{managed_simple} {member.name}/{key[1]} wrong external label",
+                    "PARAMETER_MAPPING_MISMATCH",
+                    lambda m, n=managed_name, k=key: setattr(
+                        managed_member(m, n, k[0], k[1]), "labels",
+                        ("invented",) +
+                        managed_member(m, n, k[0], k[1]).labels[1:])))
+                managed_mutations.append((
+                    f"{managed_simple} {member.name}/{key[1]} dropped parameter",
+                    "OVERLOAD_MAPPING_MISMATCH",
+                    lambda m, n=managed_name, k=key: (lambda found: [
+                        setattr(found, field, getattr(found, field)[1:])
+                        for field in ("parameters", "labels", "directions")
+                    ])(managed_member(m, n, k[0], k[1]))))
+        for label, wanted, mutate in managed_mutations:
+            models = copy.deepcopy(managed_good)
+            mutate(models)
+            if wanted not in managed_categories(models):
+                failures.append(f"{label}: did not produce {wanted}")
+        batch_self_tests += len(managed_mutations)
+
+        if managed_categories(managed_good):
+            failures.append(f"{managed_simple} reference model is not diagnostic-free")
+        source_managed = source_types_by_name[managed_name]
+        expected_kind = {
+            "interface": "protocol", "struct": "struct", "class": "class",
+        }[source_managed["kind"]]
+        if managed_model.kind != expected_kind:
+            failures.append(f"{managed_simple} expected Swift kind is not {expected_kind}")
+        if managed_model.flags or managed_model.raw_type is not None:
+            failures.append(f"{managed_simple} is not an enum and must carry no raw type")
+        if len(managed_model.members) != len(source_managed["members"]):
+            failures.append(
+                f"{managed_simple} expected identity count is not the pinned count")
+        if {member.name for member in managed_model.members} != {
+            member["name"] for member in source_managed["members"]
+        }:
+            failures.append(f"{managed_simple} expected identity names are not the pinned names")
+        batch_self_tests += 5
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

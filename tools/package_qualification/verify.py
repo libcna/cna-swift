@@ -141,15 +141,113 @@ func qualifyPublicRenderTargetUsageSurface() throws {
     }
 }
 
+
+// Foundation 14 pure managed batch. An external consumer must be able to name
+// all 25 types in their exact namespaces, read every pinned raw value, and use
+// the value struct and the two protocols, with no native library, no device,
+// no buffer, no effect and no audio backend. Naming these types is a
+// public-surface check only and carries no runtime behavior claim.
+private struct ExternalFogWitness: Microsoft.Xna.Framework.Graphics.IEffectFog {
+    var FogEnabled: Bool = false
+    var FogStart: Float = 0
+    var FogEnd: Float = 0
+    var FogColor: Microsoft.Xna.Framework.Vector3 = .Zero
+}
+
+private struct ExternalMatricesWitness: Microsoft.Xna.Framework.Graphics.IEffectMatrices {
+    var World: Microsoft.Xna.Framework.Matrix = .Identity
+    var View: Microsoft.Xna.Framework.Matrix = .Identity
+    var Projection: Microsoft.Xna.Framework.Matrix = .Identity
+}
+
+func qualifyFoundation14ManagedSurface() throws {
+    typealias G = Microsoft.Xna.Framework.Graphics
+    typealias A = Microsoft.Xna.Framework.Audio
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-14 \(what) qualification failed")
+        }
+    }
+
+    // Ordinary Int32 raw enums: exact raw values, and no representation for an
+    // undefined pattern.
+    try check(G.GraphicsProfile.Reach.rawValue == 0 && G.GraphicsProfile.HiDef.rawValue == 1, "GraphicsProfile")
+    try check(G.GraphicsProfile(rawValue: 2) == nil, "GraphicsProfile undefined")
+    try check(G.PresentInterval.Default.rawValue == 0 && G.PresentInterval.Immediate.rawValue == 3, "PresentInterval")
+    try check(G.VertexElementFormat.Single.rawValue == 0 && G.VertexElementFormat.HalfVector4.rawValue == 11, "VertexElementFormat")
+    try check(G.VertexElementUsage.Position.rawValue == 0 && G.VertexElementUsage.TessellateFactor.rawValue == 12, "VertexElementUsage")
+    try check(G.CompareFunction.Always.rawValue == 0 && G.CompareFunction.NotEqual.rawValue == 7, "CompareFunction")
+    try check(G.CubeMapFace.PositiveX.rawValue == 0 && G.CubeMapFace.NegativeZ.rawValue == 5, "CubeMapFace")
+    try check(G.IndexElementSize.SixteenBits.rawValue == 0 && G.IndexElementSize.ThirtyTwoBits.rawValue == 1, "IndexElementSize")
+    try check(G.Blend.One.rawValue == 0 && G.Blend.SourceAlphaSaturation.rawValue == 12, "Blend")
+    try check(G.BlendFunction.Add.rawValue == 0 && G.BlendFunction.Max.rawValue == 4, "BlendFunction")
+    try check(G.CullMode.None.rawValue == 0 && G.CullMode.CullCounterClockwiseFace.rawValue == 2, "CullMode")
+    try check(G.StencilOperation.Keep.rawValue == 0 && G.StencilOperation.Invert.rawValue == 7, "StencilOperation")
+    try check(G.TextureAddressMode.Wrap.rawValue == 0 && G.TextureAddressMode.Mirror.rawValue == 2, "TextureAddressMode")
+    try check(G.TextureFilter.Linear.rawValue == 0 && G.TextureFilter.MinPointMagLinearMipPoint.rawValue == 8, "TextureFilter")
+    try check(G.GraphicsDeviceStatus.Normal.rawValue == 0 && G.GraphicsDeviceStatus.NotReset.rawValue == 2, "GraphicsDeviceStatus")
+    try check(G.PrimitiveType.TriangleList.rawValue == 0 && G.PrimitiveType.LineStrip.rawValue == 3, "PrimitiveType")
+    try check(G.EffectParameterClass.Scalar.rawValue == 0 && G.EffectParameterClass.Struct.rawValue == 4, "EffectParameterClass")
+    try check(G.EffectParameterType.Void.rawValue == 0 && G.EffectParameterType.TextureCube.rawValue == 9, "EffectParameterType")
+    try check(A.SoundState.Playing.rawValue == 0 && A.SoundState.Stopped.rawValue == 2, "SoundState")
+    try check(A.AudioChannels.Mono.rawValue == 1 && A.AudioChannels.Stereo.rawValue == 2, "AudioChannels")
+    try check(A.AudioChannels(rawValue: 0) == nil, "AudioChannels undefined zero")
+
+    // The three pinned [Flags] enums are Int32 OptionSets.
+    func requireInt32OptionSet<T: OptionSet>(_ value: T) -> Int32 where T.RawValue == Int32 {
+        value.rawValue
+    }
+    try check(requireInt32OptionSet(G.ColorWriteChannels.All) == 15, "ColorWriteChannels")
+    try check(G.ColorWriteChannels.All.rawValue ==
+              G.ColorWriteChannels.Red.rawValue | G.ColorWriteChannels.Green.rawValue |
+              G.ColorWriteChannels.Blue.rawValue | G.ColorWriteChannels.Alpha.rawValue,
+              "ColorWriteChannels composite")
+    try check(requireInt32OptionSet(G.ClearOptions.Target.union(.DepthBuffer).union(.Stencil)) == 7, "ClearOptions")
+    try check(requireInt32OptionSet(G.SetDataOptions.None) == 0 &&
+              G.SetDataOptions.NoOverwrite.rawValue == 2, "SetDataOptions")
+
+    // The value struct: verbatim construction, four-field equality, the
+    // reference word-XOR hash with its zero substitution, and the exact string.
+    var element = G.VertexElement(12, .Vector3, .Normal, 3)
+    try check(element.Offset == 12 && element.VertexElementFormat == .Vector3 &&
+              element.VertexElementUsage == .Normal && element.UsageIndex == 3, "VertexElement storage")
+    element.Offset = -4
+    try check(element.Offset == -4, "VertexElement mutation")
+    try check(G.VertexElement(0, .Vector3, .Position, 0) == G.VertexElement(0, .Vector3, .Position, 0), "VertexElement equality")
+    try check(G.VertexElement(0, .Vector3, .Position, 0) != G.VertexElement(1, .Vector3, .Position, 0), "VertexElement inequality")
+    try check(G.VertexElement(0, .Single, .Position, 0).GetHashCode() == Int32.max, "VertexElement zero hash")
+    try check(G.VertexElement(8, .Vector2, .Color, 4).GetHashCode() == 8 ^ 1 ^ 1 ^ 4, "VertexElement hash")
+    try check(G.VertexElement(0, .Vector3, .Position, 0).ToString() ==
+              "{Offset:0 Format:Vector3 Usage:Position UsageIndex:0}", "VertexElement string")
+    try check(!G.VertexElement(0, .Vector3, .Position, 0).Equals(nil), "VertexElement Equals null")
+
+    // The two protocols are externally conformable with exactly their pinned
+    // requirement sets.
+    var fog = ExternalFogWitness()
+    fog.FogEnabled = true
+    fog.FogEnd = 40
+    // Spelled in full rather than through the `G` typealias: Swift 6.0.3
+    // asserts while mangling debug info for an existential named through a
+    // nested typealias ("While mangling type for debugger type 'any
+    // G.IEffectFog'"). The protocol itself is fine either way.
+    let readFog: Microsoft.Xna.Framework.Graphics.IEffectFog = fog
+    try check(readFog.FogEnabled && readFog.FogEnd == 40, "IEffectFog")
+    let readMatrices: Microsoft.Xna.Framework.Graphics.IEffectMatrices =
+        ExternalMatricesWitness()
+    try check(readMatrices.World == Microsoft.Xna.Framework.Matrix.Identity, "IEffectMatrices")
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
     try qualifyPublicRenderTargetUsageSurface()
+    try qualifyFoundation14ManagedSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -172,7 +270,7 @@ def validate_canary(output: str, requested: int) -> bool:
     match = re.search(
         r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) "
         r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS) "
-        r"renderTargetUsage=(PASS)",
+        r"renderTargetUsage=(PASS) foundation14=(PASS)",
         output,
     )
     if not match:
@@ -186,7 +284,8 @@ def validate_canary(output: str, requested: int) -> bool:
         height == 1 and
         match.group(6) == "PASS" and
         match.group(7) == "PASS" and
-        match.group(8) == "PASS"
+        match.group(8) == "PASS" and
+        match.group(9) == "PASS"
     )
 
 
