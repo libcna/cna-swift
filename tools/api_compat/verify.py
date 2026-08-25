@@ -1720,6 +1720,80 @@ def self_test() -> None:
             failures.append(f"{label}: did not produce {wanted}")
         accessor_writer_self_tests += 1
     accessor_writer_self_tests += 2
+    # Every branch of the general accessor rule, including the four the pinned
+    # contract never exercises. An unexercised branch that no test touches is
+    # an unmeasured category; these make all twelve a measured number.
+    accessor_rule_cases = [
+        # (indexed, getter fallible, setter declared, setter fallible)
+        #     -> (expected get throws, writer kind, writer throws, writer name)
+        ((False, False, False, False), (False, WRITER_ABSENT, False, None)),
+        ((False, False, True, False), (False, WRITER_PROPERTY, False, None)),
+        ((False, False, True, True), (False, WRITER_METHOD, True, "SetP")),
+        ((False, True, False, False), (True, WRITER_ABSENT, False, None)),
+        ((False, True, True, True), (True, WRITER_METHOD, True, "SetP")),
+        ((False, True, True, False), (True, WRITER_METHOD, False, "SetP")),
+        ((True, False, False, False), (False, WRITER_ABSENT, False, None)),
+        ((True, False, True, False), (False, WRITER_PROPERTY, False, None)),
+        ((True, False, True, True), (False, WRITER_METHOD, True, "SetItem")),
+        ((True, True, False, False), (True, WRITER_ABSENT, False, None)),
+        ((True, True, True, True), (True, WRITER_METHOD, True, "SetItem")),
+        ((True, True, True, False), (True, WRITER_METHOD, False, "SetItem")),
+    ]
+    for (indexed, get_fallible, has_set, set_fallible), wanted in accessor_rule_cases:
+        source = {
+            "kind": "property", "name": "P", "type": "System.Single",
+            "static": False, "get": True, "set": has_set,
+            "parameters": [{"name": "index", "type": "System.Int32"}] if indexed else [],
+        }
+        verdict = {"getter": get_fallible, "setter": set_fallible}
+        observed = accessor_projection(source, verdict)
+        if observed != wanted[:3]:
+            failures.append(
+                f"accessor rule {(indexed, get_fallible, has_set, set_fallible)}: "
+                f"expected {wanted[:3]}, produced {observed}")
+        accessor_writer_self_tests += 1
+        member = expected_member(
+            "Microsoft.Xna.Framework.Foo", source, rules, "class",
+            accessor_verdict=verdict,
+        )
+        if (member.getter_throws, member.writer_kind, member.writer_throws,
+                member.writer_name) != wanted:
+            failures.append(
+                f"expected_member {(indexed, get_fallible, has_set, set_fallible)}: "
+                f"expected {wanted}, produced "
+                f"{(member.getter_throws, member.writer_kind, member.writer_throws, member.writer_name)}")
+        if member.mutable != (member.writer_kind == WRITER_PROPERTY):
+            failures.append(
+                "a property whose writer is a method must not be Swift-mutable")
+        accessor_writer_self_tests += 2
+
+    # A write-only CLR property projects only its writer; no getter is invented.
+    for set_fallible in (False, True):
+        write_only = {
+            "kind": "property", "name": "P", "type": "System.Single",
+            "static": True, "get": False, "set": True, "parameters": [],
+        }
+        member = expected_member(
+            "Microsoft.Xna.Framework.Foo", write_only, rules, "class",
+            accessor_verdict={"getter": False, "setter": set_fallible},
+        )
+        if member.writer_kind != (WRITER_METHOD if set_fallible else WRITER_PROPERTY):
+            failures.append("write-only projection ignored its setter fallibility")
+        if member.getter_throws:
+            failures.append("a write-only property must not invent a throwing getter")
+        if not member.static:
+            failures.append("a static CLR setter must project to a static writer")
+        accessor_writer_self_tests += 3
+
+    # The writer name preserves XNA capitalisation and is never invented.
+    for name, indexed, wanted_name in (
+        ("Viewport", False, "SetViewport"), ("DopplerScale", False, "SetDopplerScale"),
+        ("Item", True, "SetItem"), ("foo", False, "Setfoo"),
+    ):
+        if writer_method_name(name, indexed) != wanted_name:
+            failures.append(f"writer name for {name} is not {wanted_name}")
+        accessor_writer_self_tests += 1
+
     mutating_requirement = dataclasses.replace(curve_item, writer_self_mutating=True)
     if "METHOD_SIGNATURE_MAPPING_MISMATCH" not in {
         item["category"] for item in writer_method_shape_diagnostics(

@@ -160,11 +160,19 @@ private final class ExternalDeviceManager:
     func EndDraw() throws {}
 }
 
-private struct ExternalFogWitness: Microsoft.Xna.Framework.Graphics.IEffectFog {
+// A class, not a struct: FogColor's CLR accessors are both fallible in every
+// registered implementor, so the reader is `{ get throws }` and the writer is
+// the non-mutating `SetFogColor` method, which only a reference type can
+// witness. Every XNA implementor of this interface is a class.
+private final class ExternalFogWitness: Microsoft.Xna.Framework.Graphics.IEffectFog {
     var FogEnabled: Bool = false
     var FogStart: Float = 0
     var FogEnd: Float = 0
-    var FogColor: Microsoft.Xna.Framework.Vector3 = .Zero
+    private var fogColor = Microsoft.Xna.Framework.Vector3.Zero
+    var FogColor: Microsoft.Xna.Framework.Vector3 { fogColor }
+    func SetFogColor(_ value: Microsoft.Xna.Framework.Vector3) throws {
+        fogColor = value
+    }
 }
 
 private struct ExternalMatricesWitness: Microsoft.Xna.Framework.Graphics.IEffectMatrices {
@@ -237,7 +245,7 @@ func qualifyFoundation14ManagedSurface() throws {
 
     // The two protocols are externally conformable with exactly their pinned
     // requirement sets.
-    var fog = ExternalFogWitness()
+    let fog = ExternalFogWitness()
     fog.FogEnabled = true
     fog.FogEnd = 40
     // Spelled in full rather than through the `G` typealias: Swift 6.0.3
@@ -690,6 +698,72 @@ func qualifyFoundation15To18ManagedSurface() throws {
               sample.Delta2.Y == 8, "GestureSample storage")
 }
 
+func qualifyFoundation22AccessorSurface() throws {
+    typealias F = Microsoft.Xna.Framework
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-22 \(what) qualification failed")
+        }
+    }
+
+    // The general accessor projection, exercised from outside the package.
+    // AudioEmitter's four Vector3 properties are infallible on both accessors
+    // and stay ordinary Swift properties; DopplerScale's setter validates, so
+    // the writer is a method and the property is read-only.
+    let emitter = F.Audio.AudioEmitter()
+    try check(emitter.Position.Z.sign == .minus, "AudioEmitter default Position sign")
+    try check(emitter.Forward.Z.bitPattern == Float(-1).bitPattern,
+              "AudioEmitter default Forward")
+    try check(emitter.DopplerScale.bitPattern == Float(1).bitPattern,
+              "AudioEmitter default DopplerScale")
+    emitter.Position = F.Vector3(1, 2, 3)
+    try check(emitter.Position.Z == 3, "AudioEmitter Position round-trip")
+
+    try emitter.SetDopplerScale(2.5)
+    try check(emitter.DopplerScale.bitPattern == Float(2.5).bitPattern,
+              "AudioEmitter SetDopplerScale store")
+
+    // `bge.un` accepts NaN and -0.0 and rejects every ordered negative.
+    try emitter.SetDopplerScale(Float(bitPattern: 0xFFC0_0000))
+    try check(emitter.DopplerScale.isNaN, "AudioEmitter DopplerScale NaN accepted")
+    try emitter.SetDopplerScale(-0.0)
+    try check(emitter.DopplerScale.sign == .minus, "AudioEmitter DopplerScale -0 accepted")
+    try emitter.SetDopplerScale(3)
+    do {
+        try emitter.SetDopplerScale(-Float.leastNonzeroMagnitude)
+        throw CNAError.argument("isolated AudioEmitter negative DopplerScale was accepted")
+    } catch CNAError.argumentOutOfRange(let parameter) {
+        try check(parameter == "value", "AudioEmitter DopplerScale failure parameter")
+    }
+    try check(emitter.DopplerScale.bitPattern == Float(3).bitPattern,
+              "AudioEmitter rejected DopplerScale left the value intact")
+
+    // A throwing reader is usable through a protocol existential, and a
+    // non-throwing witness satisfies it.
+    var fog: any Microsoft.Xna.Framework.Graphics.IEffectFog = ExternalFogWitness()
+    fog.FogEnabled = true
+    try fog.SetFogColor(F.Vector3(4, 5, 6))
+    let readFog = try fog.FogColor
+    try check(readFog.Y == 5, "IEffectFog throwing reader through the existential")
+
+    // A throwing getter on a concrete value type, and the indexed pair.
+    let touches = try F.Input.Touch.TouchCollection([
+        F.Input.Touch.TouchLocation(7, .Pressed, F.Vector2(1, 2)),
+    ])
+    var cursor = touches.GetEnumerator()
+    try check(cursor.MoveNext(), "TouchCollection enumerator advance")
+    let current = try cursor.Current
+    try check(current.Id == 7, "TouchCollection throwing Current")
+    try check(!cursor.MoveNext(), "TouchCollection enumerator exhaustion")
+    do {
+        _ = try cursor.Current
+        throw CNAError.argument("isolated exhausted Current did not throw")
+    } catch CNAError.argumentOutOfRange {
+        // Exact expected indexer failure past the last element.
+    }
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
@@ -698,11 +772,12 @@ do {
     try qualifyFoundation15To18ManagedSurface()
     try qualifyFoundation19EventSurface()
     try qualifyFoundation20ManagedSurface()
+    try qualifyFoundation22AccessorSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
