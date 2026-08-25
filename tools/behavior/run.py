@@ -81,6 +81,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation20ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation22ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation23ContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation24ContractTests.swift",
 ]
 
 

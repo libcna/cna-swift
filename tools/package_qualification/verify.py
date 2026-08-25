@@ -820,6 +820,62 @@ func qualifyFoundation23NullabilitySurface() throws {
     }
 }
 
+// A CLR interface whose only undecided question was the nullability of its
+// reference return, declared once that question was measured. Conforming to it
+// from outside the package proves the requirement's exact shape: Optional, and
+// with no failure path at all.
+final class ExternalGraphicsDeviceService:
+    Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService {
+    private let created = CNAEventSource<CNAEventArgs>()
+    private let disposing = CNAEventSource<CNAEventArgs>()
+    private let reset = CNAEventSource<CNAEventArgs>()
+    private let resetting = CNAEventSource<CNAEventArgs>()
+
+    var GraphicsDevice: Microsoft.Xna.Framework.Graphics.GraphicsDevice? { nil }
+    var DeviceCreated: CNAEvent<CNAEventArgs> { created.Event }
+    var DeviceDisposing: CNAEvent<CNAEventArgs> { disposing.Event }
+    var DeviceReset: CNAEvent<CNAEventArgs> { reset.Event }
+    var DeviceResetting: CNAEvent<CNAEventArgs> { resetting.Event }
+
+    func raiseAll() throws {
+        for source in [created, resetting, reset, disposing] {
+            try source.Raise(self, args: CNAEventArgs.Empty)
+        }
+    }
+}
+
+func qualifyFoundation24ServiceSurface() throws {
+    typealias Service = Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService
+
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw CNAError.argument("isolated Foundation-24 \(what) qualification failed")
+        }
+    }
+
+    let service: any Service = ExternalGraphicsDeviceService()
+    // No `try`, no `do`/`catch`: a service with no device answers nil, and nil
+    // is a value rather than a failure.
+    try check(service.GraphicsDevice == nil, "service device absence is nil")
+
+    var seen: [String] = []
+    _ = service.DeviceCreated.Add { _, _ in seen.append("created") }
+    _ = service.DeviceResetting.Add { _, _ in seen.append("resetting") }
+    _ = service.DeviceReset.Add { _, _ in seen.append("reset") }
+    _ = service.DeviceDisposing.Add { _, _ in seen.append("disposing") }
+    try (service as! ExternalGraphicsDeviceService).raiseAll()
+    try check(seen == ["created", "resetting", "reset", "disposing"],
+              "service event order")
+
+    // The requirement's declared type is exactly the Optional class, and a key
+    // path can only be formed to a non-throwing property.
+    let path: KeyPath<ExternalGraphicsDeviceService,
+                      Microsoft.Xna.Framework.Graphics.GraphicsDevice?> =
+        \ExternalGraphicsDeviceService.GraphicsDevice
+    try check(ExternalGraphicsDeviceService()[keyPath: path] == nil,
+              "service device key path")
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
@@ -830,11 +886,12 @@ do {
     try qualifyFoundation20ManagedSurface()
     try qualifyFoundation22AccessorSurface()
     try qualifyFoundation23NullabilitySurface()
+    try qualifyFoundation24ServiceSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS foundation23=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS foundation23=PASS foundation24=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -902,7 +959,7 @@ def validate_canary(output: str, requested: int) -> bool:
         r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS) "
         r"renderTargetUsage=(PASS) foundation14=(PASS) foundation15to18=(PASS) "
         r"foundation19=(PASS) foundation20=(PASS) foundation22=(PASS) "
-        r"foundation23=(PASS)",
+        r"foundation23=(PASS) foundation24=(PASS)",
         output,
     )
     if not match:
@@ -914,7 +971,7 @@ def validate_canary(output: str, requested: int) -> bool:
         draws == requested and
         width == 1 and
         height == 1 and
-        all(match.group(index) == "PASS" for index in range(6, 14))
+        all(match.group(index) == "PASS" for index in range(6, 15))
     )
 
 

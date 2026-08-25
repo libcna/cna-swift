@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=123
-TARGET_MEMBERS=1690
-TOTAL_DIAGNOSTICS=288
-COMPLETE_TYPES=118
+TARGET_TYPES=124
+TARGET_MEMBERS=1695
+TOTAL_DIAGNOSTICS=287
+COMPLETE_TYPES=119
 PARTIAL_TYPES=5
-MISSING_TYPES=134
-MISSING_TYPE=134
+MISSING_TYPES=133
+MISSING_TYPE=133
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -76,9 +76,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=70
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=62
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=66
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=59
-PENDING_RETURN_NULLABILITY_PROJECTIONS=310
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=4
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=60
+PENDING_RETURN_NULLABILITY_PROJECTIONS=309
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 ```
 
 ## Complete types
@@ -121,6 +121,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=4
 - `Microsoft.Xna.Framework.Graphics.GraphicsProfile`
 - `Microsoft.Xna.Framework.Graphics.IEffectFog`
 - `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
+- `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
 - `Microsoft.Xna.Framework.Graphics.IndexElementSize`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
@@ -454,7 +455,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
 - `Microsoft.Xna.Framework.Graphics.GraphicsResource`
 - `Microsoft.Xna.Framework.Graphics.IEffectLights`
-- `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
 - `Microsoft.Xna.Framework.Graphics.IVertexType`
 - `Microsoft.Xna.Framework.Graphics.IndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.Model`

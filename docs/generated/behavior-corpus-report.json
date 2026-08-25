@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1766,
-  "ASSERTIONS": 1766,
+  "OBSERVATIONS": 1768,
+  "ASSERTIONS": 1768,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -146,7 +146,9 @@
     "testAudioEmitterDopplerScaleBoundaryXnaContract",
     "testResourceCreatedEventArgsReturnsItsFieldVerbatim",
     "testResourceDestroyedEventArgsReturnsItsFieldsVerbatim",
-    "testNullResultAndThrownFailureRemainDistinct"
+    "testNullResultAndThrownFailureRemainDistinct",
+    "testGraphicsDeviceServiceRequirementIsNullableAndInfallible",
+    "testGraphicsDeviceServiceRaisesItsFourEvents"
   ],
   "groupCounts": {
     "Vector2": 2,
