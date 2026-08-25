@@ -2,14 +2,15 @@
 
 **Foundation Milestones 23, 24 and 25 status:** COMPLETE.
 
-Four local commits this session, none pushed.
+Five local commits this session, none pushed.
 
 | Commit | What it is |
 |---|---|
 | `d5c0656` | `RETURN_NULLABILITY` — CLR reference nullability and Swift fallibility as independent axes, the pinned per-return-position inventory, the general verifier dimension, the two corrected expected shapes, and the isolated consumer's negative compile fixtures. Evidence: `docs/foundation-23-reference-return-nullability-evidence.md`. |
 | `e0940fb` | `Graphics.IGraphicsDeviceService` — the one XNA type the nullability decision unblocked, and the recorded reason every other candidate is still deferred. Evidence: `docs/foundation-24-graphics-device-service-evidence.md`. |
 | `71efd1d` | The parameter-nullability observations and the BCL authority provenance record. |
-| _(this one)_ | `Texture2D.Bounds` — the one still-missing member of the five runtime partials that is not native. Evidence: `docs/foundation-25-partial-member-audit-evidence.md`. |
+| `a2d46b7` | `Texture2D.Bounds` — the one still-missing member of the five runtime partials that is not native. Evidence: `docs/foundation-25-partial-member-audit-evidence.md`. |
+| _(this one)_ | The final qualified numbers for the committed tree. |
 
 Foundation 22 (`fbc8c5d`) and everything before it are untouched.
 
@@ -72,8 +73,8 @@ NATIVE_STRESS=GAME_CYCLES=20 GAME_RECREATION_CYCLES=20 TEXTURE2D_CYCLES=20
     GAMEPAD_CAPABILITIES_CYCLES=20 NATIVE_CRASHES=0 OBSERVED_UAF=0
     OBSERVED_DOUBLE_FREE=0 MODE_FAILURES=0
 GAMEPAD_NATIVE=0 FAILURES HARDWARE_AVAILABLE=NO
-SOURCE_ARCHIVE=259 entries DETERMINISTIC=YES
-    SHA256=2e94a637e06d29a3a60cc318a9d4844ad4d709f1cb658b65c4ebb88453f6dd0c
+SOURCE_ARCHIVE=260 entries DETERMINISTIC=YES
+    SHA256=a4836d4827bc2f109480fcbccb6e1023b52246086ec4ad0d777e6199d757efce
 ISOLATED_CONSUMER=DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
     REJECTED_NEGATIVE_CONSUMERS=4
 TEMPLATE=86687f62c3a13ee2b59798f338fc083f7399f447 UNCHANGED WORKTREE_CLEAN
