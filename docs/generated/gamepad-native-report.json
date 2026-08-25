@@ -8,8 +8,8 @@
     "test": "NativeLifecycleTests.testGamePadQueriesFollowCurrentGeneration"
   },
   "hardwareAvailable": false,
-  "library": "/tmp/cna-java-native-working-070/modules/c-api/libcna_c_api.so",
-  "librarySHA256": "42e099146bf3b470f82fd963a516f8bdd7ff0406da8c37dd53747699117db086",
+  "library": "libcna_c_api.so",
+  "librarySHA256": "c62949d23d3745964f5e557a06665875621ed4cb6e2930e3f282afd5911f2dcb",
   "positiveCapabilityPath": "HARDWARE_PENDING",
   "positiveStatePath": "HARDWARE_PENDING",
   "positiveVibrationPath": "HARDWARE_PENDING",

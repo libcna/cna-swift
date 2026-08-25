@@ -61,6 +61,25 @@ func qualifyManagedCurve() throws {
     }
 }
 
+// DisplayMode is a managed descriptor with no public constructor, so an
+// external consumer can name the type and consume its read-only surface but can
+// never construct one and never needs a native library to do either. This
+// closure compiles only if all six pinned identities are public with exactly
+// these names, kinds and types, and it is deliberately never called with a
+// value, because no external construction route exists.
+func qualifyPublicDisplayModeSurface() throws {
+    typealias Mode = Microsoft.Xna.Framework.Graphics.DisplayMode
+    let read: (Mode) -> (Int32, Int32, Microsoft.Xna.Framework.Graphics.SurfaceFormat,
+                         Float, Microsoft.Xna.Framework.Rectangle, String) = { mode in
+        (mode.Width, mode.Height, mode.Format, mode.AspectRatio,
+         mode.TitleSafeArea, mode.ToString())
+    }
+    _ = read
+    guard String(describing: Mode.self) == "DisplayMode" else {
+        throw CNAError.argument("isolated DisplayMode type qualification failed")
+    }
+}
+
 final class ArchiveGame: Microsoft.Xna.Framework.Game {
     let requested: Int
     var manager: Microsoft.Xna.Framework.GraphicsDeviceManager?
@@ -101,11 +120,12 @@ final class ArchiveGame: Microsoft.Xna.Framework.Game {
 
 do {
     try qualifyManagedCurve()
+    try qualifyPublicDisplayModeSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -126,7 +146,8 @@ def run(command: list[str], cwd: Path, environment: dict[str, str]) -> str:
 
 def validate_canary(output: str, requested: int) -> bool:
     match = re.search(
-        r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) texture=(\d+)x(\d+) curve=(PASS)",
+        r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) "
+        r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS)",
         output,
     )
     if not match:
@@ -138,7 +159,8 @@ def validate_canary(output: str, requested: int) -> bool:
         draws == requested and
         width == 1 and
         height == 1 and
-        match.group(6) == "PASS"
+        match.group(6) == "PASS" and
+        match.group(7) == "PASS"
     )
 
 

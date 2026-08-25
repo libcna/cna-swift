@@ -12,6 +12,7 @@ Qualified boundary: Swift 6.0.3, `x86_64-pc-linux-gnu`, canonical CNA C ABI
 | DepthFormat | VERIFIED_MANAGED | Exact Graphics non-flags Int32 enum values None=0, Depth16=1, Depth24=2, and Depth24Stencil8=3; no depth buffer, stencil, render-target, GPU-format, or native capability is claimed. |
 | FillMode | VERIFIED_MANAGED | Exact Graphics non-flags Int32 enum values Solid=0 and WireFrame=1; no RasterizerState, polygon mode, or wireframe rendering capability is claimed. |
 | SurfaceFormat | VERIFIED_MANAGED | Exact Graphics non-flags Int32 enum with all twenty pinned literals; no texture, render-target, display, GPU-format, DXT, HDR, or native capability is claimed. |
+| DisplayMode managed descriptor contract | VERIFIED_MANAGED | Exact Graphics class with six pinned identities, no public constructor, internal-only construction, verbatim Width/Height/Format storage, guarded binary32 AspectRatio, unmodified Windows TitleSafeArea rectangle, and exact ToString; no monitor enumeration, display-mode discovery, resolution switching, GraphicsAdapter, GraphicsDevice.DisplayMode, fullscreen mode management, or native display capability is claimed. |
 | Game lifecycle | VERIFIED_NATIVE | CNA drives Initialize through shutdown; 60/600 frames pass. |
 | Game callback error containment | VERIFIED_NATIVE | Errors in Initialize, LoadContent, Update, Draw, and UnloadContent return normally through C and rethrow at Swift boundaries. |
 | Game recreation | VERIFIED_NATIVE | 20 cycles pass with generation invalidation. |

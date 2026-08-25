@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=71
-TARGET_MEMBERS=1407
-TOTAL_DIAGNOSTICS=337
-COMPLETE_TYPES=66
+TARGET_TYPES=72
+TARGET_MEMBERS=1413
+TOTAL_DIAGNOSTICS=336
+COMPLETE_TYPES=67
 PARTIAL_TYPES=5
-MISSING_TYPES=186
-MISSING_TYPE=186
+MISSING_TYPES=185
+MISSING_TYPE=185
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -52,6 +52,7 @@ COLLECTION_INTERFACE_PROJECTIONS=1
 ENUMERATOR_SUPPORT_PROJECTIONS=9
 INDEXED_PROPERTY_ACCESSOR_PROJECTIONS=4
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 ```
 
 ## Complete types
@@ -71,6 +72,7 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.BufferUsage`
 - `Microsoft.Xna.Framework.Graphics.DepthFormat`
+- `Microsoft.Xna.Framework.Graphics.DisplayMode`
 - `Microsoft.Xna.Framework.Graphics.FillMode`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
@@ -369,7 +371,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.DeviceLostException`
 - `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
 - `Microsoft.Xna.Framework.Graphics.DirectionalLight`
-- `Microsoft.Xna.Framework.Graphics.DisplayMode`
 - `Microsoft.Xna.Framework.Graphics.DisplayModeCollection`
 - `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
 - `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`

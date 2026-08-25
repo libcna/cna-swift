@@ -6,7 +6,10 @@ reference contains 257 public types and 2,964 declared members. The retained
 contract SHA-256 is
 `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`.
 Its primary `Microsoft.Xna.Framework.dll` input has SHA-256
-`38e7093f52d7474bbc6256906519781a1210d7da50a1c667b52716fcf49ca130`.
+`38e7093f52d7474bbc6256906519781a1210d7da50a1c667b52716fcf49ca130`, and the
+companion `Microsoft.Xna.Framework.Graphics.dll` that owns the Graphics
+namespace has SHA-256
+`560080fc39021c611ca9d076dcebed312faf6d7d1413c2dc523683ea635e9f55`.
 The snapshot was extracted from the Microsoft XNA 4.0 Windows runtime metadata
 by mature-binding tooling and copied byte-for-byte; `tools/api_compat` verifies
 the retained snapshot hash before projecting it.
@@ -19,6 +22,12 @@ the retained snapshot hash before projecting it.
   symbols.
 - CLR class -> Swift class; an externally subclassable CLR class -> `open`
   Swift class where required.
+- A public CLR class whose declared constructors are all non-public is not
+  externally constructible or derivable. It maps to a plain Swift `public class`
+  that is neither `open` — because no accessible constructor makes it externally
+  subclassable — nor `final` unless the CLR type is itself sealed, because
+  `sealed=false` must not be strengthened. Openness is never chosen
+  mechanically from the sealed bit alone; constructor accessibility is inspected.
 - CLR struct -> Swift struct.
 - CLR interface -> Swift protocol.
 - CLR enum -> Swift enum with the reviewed fixed-width raw type.
@@ -57,6 +66,13 @@ the retained snapshot hash before projecting it.
   allowlist.
 - CLR protected virtual lifecycle members -> `open` methods. Their additional
   Swift visibility is `LANGUAGE_MAPPING`, not an unexpected XNA member.
+- A non-public CLR constructor maps to an `internal` Swift initializer with the
+  same arity, parameter order and types. It is implementation infrastructure:
+  the compiler-emitted public Symbol Graph must expose zero public `init`
+  identities for such a type, and no public static factory may substitute for
+  it. `NONPUBLIC_CONSTRUCTION_PROJECTIONS` measures every implemented reference
+  class in this category and records its observed public Swift initializer
+  count, so the rule is enforced generally rather than per named type.
 - A selected inherited public member may temporarily be declared on a partial
   subtype until its XNA base exists. It must exactly match a selected ancestor.
   `System.IDisposable` maps to public `Dispose()`. These are counted mapping
@@ -167,8 +183,8 @@ suppressions; it is currently zero. Deterministic projection transformations
 are reported separately as `LANGUAGE_PROJECTION_EXCLUSIONS` (49 enum storage
 fields, 28 finalizer mappings, seven namespace markers, three inherited member
 projections, and 26 explicit-interface protocol witnesses). Comparison,
-collection, enumerator, indexed-property, optional-operator-placement, and
-caller-owned-array mappings have their own precise counters. A verifier
-self-test proves that a real suppression counts
-as an allowlist entry and that a missing geometry member cannot be reclassified
-as a projection rule.
+collection, enumerator, indexed-property, optional-operator-placement,
+caller-owned-array, and non-public-construction mappings have their own precise
+counters. A verifier self-test proves that a real suppression counts as an
+allowlist entry and that a missing geometry member cannot be reclassified as a
+projection rule.

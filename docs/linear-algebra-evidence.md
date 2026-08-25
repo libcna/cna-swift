@@ -43,8 +43,12 @@ NaN components; it does not throw or substitute Identity.
 XNA `GetHashCode` is implemented as wrapping addition of component
 `System.Single.GetHashCode` projections, with both signed-zero encodings hashing
 as zero. Swift's randomized `hashValue` is not used. Parameterless `ToString`
-uses the XNA field labels/order and a narrow invariant general-float formatter;
-full `CultureInfo` behavior remains outside this value-only milestone.
+uses the XNA field labels/order and a narrow invariant general-float formatter.
+That formatter reproduces the CLR "G7" general format — seven significant
+digits, trailing zeros removed, and scientific notation with an upper-case
+marker and a signed two-digit exponent once the decimal exponent leaves
+`[-4, 6]`. Full `CultureInfo` behavior remains outside this value-only
+milestone.
 
 ## Vectors and array transforms
 

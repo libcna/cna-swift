@@ -27,3 +27,12 @@ The `SURFACE_FORMAT` group likewise records only the pinned non-flags enum,
 Int32 underlying type, and complete twenty-value literal table. Swift raw-value
 initialization, unknown-value rejection, and copy qualification remain in a
 separate projection test and are not counted as XNA runtime behavior.
+
+The four `DISPLAY_MODE_*` groups record only pinned XNA facts for the managed
+`DisplayMode` descriptor: verbatim width/height/format storage through the
+non-public constructor, the exact binary32 `AspectRatio` bit patterns including
+the zero-dimension short circuit, the unmodified Windows `TitleSafeArea`
+rectangle, and the exact `ToString` strings for every pinned SurfaceFormat
+literal. Swift class-reference identity, internal-only construction, immutable
+public state, and Rectangle value semantics remain in a separate projection
+test and are not counted as XNA runtime behavior.

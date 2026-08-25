@@ -1939,11 +1939,179 @@ def self_test() -> None:
     }:
         failures.append("DepthFormat value__ treated as required did not fail")
 
+    mode_name = "Microsoft.Xna.Framework.Graphics.DisplayMode"
+    mode_expected = {
+        mode_name: copy.deepcopy(all_expected[mode_name]),
+    }
+    mode_good = copy.deepcopy(mode_expected)
+    mode_good[mode_name].identifier = mode_name
+    for index, member in enumerate(mode_good[mode_name].members):
+        member.identifier = f"{mode_name}:{index}"
+
+    def mode_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(
+            member for member in models[mode_name].members
+            if member.name == name
+        )
+
+    def mode_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {item["category"] for item in compare(mode_expected, models)}
+
+    def mode_extra(name: str, **overrides: Any) -> Any:
+        defaults: dict[str, Any] = {
+            "kind": "method", "static": False, "return_type": "Void",
+            "identifier": f"invented-display-mode-{name}",
+        }
+        defaults.update(overrides)
+        return lambda m: m[mode_name].members.append(Member(
+            mode_name, defaults["kind"], name, defaults["static"],
+            parameters=defaults.get("parameters", ()),
+            labels=defaults.get("labels", ()),
+            directions=defaults.get("directions", ()),
+            return_type=defaults["return_type"],
+            mutable=defaults.get("mutable"),
+            identifier=defaults["identifier"],
+        ))
+
+    mode_mutations: list[tuple[str, str, Any]] = [
+        ("DisplayMode missing type", "MISSING_TYPE",
+         lambda m: m.pop(mode_name)),
+        ("DisplayMode wrong namespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.DisplayMode", m.pop(mode_name),
+         )),
+        ("DisplayMode struct instead of class", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[mode_name], "kind", "struct")),
+        ("DisplayMode protocol instead of class", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[mode_name], "kind", "protocol")),
+        ("DisplayMode enum instead of class", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[mode_name], "kind", "enum")),
+        ("DisplayMode missing ToString", "MISSING_MEMBER",
+         lambda m: m[mode_name].members.remove(mode_member(m, "ToString"))),
+        ("DisplayMode ToString wrong return type", "RETURN_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "ToString"), "return_type", "Int32")),
+        ("DisplayMode ToString wrong arity", "OVERLOAD_MAPPING_MISMATCH",
+         lambda m: (setattr(mode_member(m, "ToString"), "parameters", ("Int32",)),
+                    setattr(mode_member(m, "ToString"), "labels", ("_",)),
+                    setattr(mode_member(m, "ToString"), "directions", ("",)))),
+        ("DisplayMode ToString as property", "METHOD_SIGNATURE_MAPPING_MISMATCH",
+         lambda m: (setattr(mode_member(m, "ToString"), "kind", "property"),
+                    setattr(mode_member(m, "ToString"), "mutable", False))),
+        ("DisplayMode ToString static", "METHOD_SIGNATURE_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "ToString"), "static", True)),
+        ("DisplayMode missing Format", "MISSING_MEMBER",
+         lambda m: m[mode_name].members.remove(mode_member(m, "Format"))),
+        ("DisplayMode missing Width", "MISSING_MEMBER",
+         lambda m: m[mode_name].members.remove(mode_member(m, "Width"))),
+        ("DisplayMode missing Height", "MISSING_MEMBER",
+         lambda m: m[mode_name].members.remove(mode_member(m, "Height"))),
+        ("DisplayMode missing AspectRatio", "MISSING_MEMBER",
+         lambda m: m[mode_name].members.remove(mode_member(m, "AspectRatio"))),
+        ("DisplayMode missing TitleSafeArea", "MISSING_MEMBER",
+         lambda m: m[mode_name].members.remove(mode_member(m, "TitleSafeArea"))),
+        ("DisplayMode Format wrong type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "Format"), "return_type", "Int32")),
+        ("DisplayMode Width wrong type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "Width"), "return_type", "Int64")),
+        ("DisplayMode Height wrong type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "Height"), "return_type", "Float")),
+        ("DisplayMode AspectRatio wrong type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "AspectRatio"), "return_type", "Double")),
+        ("DisplayMode TitleSafeArea wrong type", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(
+             mode_member(m, "TitleSafeArea"), "return_type",
+             "Microsoft.Xna.Framework.Graphics.Viewport",
+         )),
+        ("DisplayMode Format as method", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "Format"), "kind", "method")),
+        ("DisplayMode Width static", "PROPERTY_MAPPING_MISMATCH",
+         lambda m: setattr(mode_member(m, "Width"), "static", True)),
+        ("DisplayMode public initializer exposed", "UNEXPECTED_MEMBER",
+         mode_extra(
+             ".ctor", kind="constructor", return_type=mode_name,
+             parameters=("Int32", "Int32",
+                         "Microsoft.Xna.Framework.Graphics.SurfaceFormat"),
+             labels=("width", "height", "format"), directions=("", "", ""),
+             identifier="invented-display-mode-public-init",
+         )),
+        ("DisplayMode extra public Equals", "UNEXPECTED_MEMBER",
+         mode_extra(
+             "Equals", parameters=(mode_name,), labels=("_",),
+             directions=("",), return_type="Bool",
+         )),
+        ("DisplayMode extra public GetHashCode", "UNEXPECTED_MEMBER",
+         mode_extra("GetHashCode", return_type="Int32")),
+        ("DisplayMode extra public op_Equality", "UNEXPECTED_MEMBER",
+         mode_extra(
+             "op_Equality", static=True, parameters=(mode_name, mode_name),
+             labels=("_", "_"), directions=("", ""), return_type="Bool",
+         )),
+        ("DisplayMode extra public op_Inequality", "UNEXPECTED_MEMBER",
+         mode_extra(
+             "op_Inequality", static=True, parameters=(mode_name, mode_name),
+             labels=("_", "_"), directions=("", ""), return_type="Bool",
+         )),
+        ("DisplayMode extra public description helper", "UNEXPECTED_MEMBER",
+         mode_extra(
+             "description", kind="property", return_type="String", mutable=False,
+         )),
+        ("DisplayMode extra public convenience helper", "UNEXPECTED_MEMBER",
+         mode_extra(
+             "WithFormat", parameters=(
+                 "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
+             ),
+             labels=("_",), directions=("",), return_type=mode_name,
+         )),
+    ]
+    # Every declared DisplayMode property is get-only in the pinned contract;
+    # this is validated generically rather than for a hand-picked subset.
+    mode_read_only = ("Format", "Height", "Width", "AspectRatio", "TitleSafeArea")
+    for property_name in mode_read_only:
+        mode_mutations.append((
+            f"DisplayMode {property_name} writable", "PROPERTY_MAPPING_MISMATCH",
+            (lambda name: lambda m: setattr(
+                mode_member(m, name), "mutable", True,
+            ))(property_name),
+        ))
+    for label, wanted, mutate in mode_mutations:
+        models = copy.deepcopy(mode_good)
+        mutate(models)
+        if wanted not in mode_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    if mode_categories(mode_good):
+        failures.append("DisplayMode reference model is not diagnostic-free")
+    if len(mode_expected[mode_name].members) != 6:
+        failures.append("DisplayMode expected Swift member count is not exactly 6")
+    if {member.name for member in mode_expected[mode_name].members} != {
+        "ToString", "Format", "Height", "Width", "AspectRatio", "TitleSafeArea",
+    }:
+        failures.append("DisplayMode expected Swift identities are not the pinned six")
+    if any(
+        member.mutable for member in mode_expected[mode_name].members
+        if member.kind == "property"
+    ):
+        failures.append("DisplayMode expected a writable property")
+    if any(
+        member.kind == "constructor"
+        for member in mode_expected[mode_name].members
+    ):
+        failures.append("DisplayMode expected a public constructor identity")
+
+    # The System.Object base is a language mapping and is not required, but a
+    # genuinely mapped XNA base must still be measured on this type.
+    mode_base_expected = copy.deepcopy(mode_expected)
+    mode_base_expected[mode_name].base = "Microsoft.Xna.Framework.Graphics.Texture2D"
+    if "BASE_MAPPING_MISMATCH" not in {
+        item["category"] for item in compare(mode_base_expected, mode_good)
+    }:
+        failures.append("DisplayMode wrong mapped base did not fail")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
@@ -2147,6 +2315,30 @@ def make_report(
         bool(member.get("get")) and bool(member.get("set"))
         for item in contract["types"] for member in item["members"]
     )
+    # A public CLR class whose declared constructors are all non-public cannot
+    # be constructed or derived from outside its own assembly. The Swift
+    # projection therefore exposes no public init; any initializer it needs is
+    # internal implementation infrastructure. This is measured generally for
+    # every implemented reference class, never per named type.
+    nonpublic_construction_evidence: list[dict[str, Any]] = []
+    for item in contract["types"]:
+        if item["kind"] != "class":
+            continue
+        if any(member["kind"] == "constructor" for member in item["members"]):
+            continue
+        name = map_type_name(item["name"], rules)
+        model = actual.get(name)
+        if model is None:
+            continue
+        nonpublic_construction_evidence.append({
+            "type": name,
+            "clrSealed": bool(item.get("sealed")),
+            "referencePublicConstructors": 0,
+            "swiftPublicInitializers": sum(
+                member.kind == "constructor" for member in model.members
+            ),
+            "reason": rules["nonPublicConstructionMapping"],
+        })
     summary["ALLOWLIST_ENTRIES"] = len(rules.get("manualDiagnosticSuppressions", []))
     summary["APPLIED_ALLOWLIST_ENTRIES"] = applied_suppressions
     summary["LANGUAGE_PROJECTION_EXCLUSIONS"] = (
@@ -2176,6 +2368,9 @@ def make_report(
     summary["GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS"] = len(
         rules.get("globalOperatorProjections", [])
     )
+    summary["NONPUBLIC_CONSTRUCTION_PROJECTIONS"] = len(
+        nonpublic_construction_evidence
+    )
     return {
         "schemaVersion": 1,
         "profile": contract["profile"],
@@ -2192,6 +2387,7 @@ def make_report(
         "protocolWitnessProjections": witness_evidence,
         "systemInterfaceProjections": system_interface_evidence,
         "indexedPropertyAccessorProjections": indexed_evidence,
+        "nonPublicConstructionProjections": nonpublic_construction_evidence,
         "typeScoreboard": [
             {
                 "type": name,

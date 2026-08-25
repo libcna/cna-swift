@@ -133,7 +133,10 @@ def main() -> int:
     report = {
         "schemaVersion": 1,
         "authority": "CANONICAL_CNA_NATIVE_QUALIFICATION",
-        "library": str(args.library),
+        # Only the artifact identity is retained. The absolute developer path is
+        # deliberately not recorded: the exact source archive audit rejects
+        # developer path leaks, and identity is the reproducible fact.
+        "library": args.library.name,
         "librarySHA256": sha256(args.library),
         "backend": snapshot.get("backend", "UNKNOWN"),
         "hardwareAvailable": connected,

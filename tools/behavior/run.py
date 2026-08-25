@@ -29,6 +29,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/DepthFormatContractTests.swift",
     ROOT / "Tests/CNATests/FillModeContractTests.swift",
     ROOT / "Tests/CNATests/SurfaceFormatContractTests.swift",
+    ROOT / "Tests/CNATests/DisplayModeContractTests.swift",
 ]
 
 
@@ -92,6 +93,10 @@ def main() -> int:
                 "DEPTH_FORMAT": "DepthFormatXnaContract",
                 "FILL_MODE": "FillModeXnaContract",
                 "SURFACE_FORMAT": "SurfaceFormatXnaContract",
+                "DISPLAY_MODE_PROPERTIES": "DisplayModeProperties",
+                "DISPLAY_MODE_ASPECT_RATIO": "DisplayModeAspectRatio",
+                "DISPLAY_MODE_TITLE_SAFE_AREA": "DisplayModeTitleSafeArea",
+                "DISPLAY_MODE_TO_STRING": "DisplayModeToString",
             }.items()
         },
         "displayOrientationContract": {
@@ -162,6 +167,30 @@ def main() -> int:
                 "HalfVector4": 18,
                 "HdrBlendable": 19,
             },
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "displayModeContract": {
+            "kind": "class",
+            "sealed": False,
+            "baseType": "System.Object",
+            "publicConstructors": 0,
+            "nonPublicConstructor":
+                "assembly .ctor(int32 width, int32 height, "
+                "valuetype Microsoft.Xna.Framework.Graphics.SurfaceFormat format)",
+            "publicMembers": [
+                "ToString", "Format", "Height", "Width", "AspectRatio",
+                "TitleSafeArea",
+            ],
+            "aspectRatio":
+                "if (_height != 0 && _width != 0) "
+                "return (float)_width / (float)_height; return 0f;",
+            "titleSafeArea":
+                "Viewport.GetTitleSafeArea(0, 0, _width, _height) == "
+                "new Rectangle(0, 0, _width, _height) on the Windows runtime",
+            "toString":
+                "string.Format(CultureInfo.CurrentCulture, "
+                "\"{{Width:{0} Height:{1} Format:{2} AspectRatio:{3}}}\", "
+                "_width, _height, Format, AspectRatio)",
             "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },
         "colorPaletteGoldenEntries": len(re.findall(

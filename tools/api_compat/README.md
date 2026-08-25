@@ -20,3 +20,15 @@ python3 tools/api_compat/verify.py \
 
 The command exits nonzero in normal strict mode while future XNA types remain
 missing. `--leak-only` fails only public implementation/pointer/FFI leaks.
+
+`dependency_graph.py` builds the public-signature dependency graph from the same
+pinned contract and the generated strict report. `--type NAME` reports one
+type's direct and transitive reverse consumers; without it the tool ranks every
+still-missing type whose XNA dependencies are strict-complete, which is the
+deterministic selection input for the next milestone.
+
+```text
+python3 tools/api_compat/dependency_graph.py \
+  --report docs/generated/api-compat-report.json \
+  --output docs/generated/dependency-graph.json
+```

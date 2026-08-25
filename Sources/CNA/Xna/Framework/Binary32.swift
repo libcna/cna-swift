@@ -34,12 +34,22 @@ import Foundation
     return Int32(bitPattern: value.bitPattern)
 }
 
+// System.Single.ToString() on the pinned .NET Framework runtime is the "G7"
+// general format: seven significant digits, trailing zeros removed, and
+// scientific notation with a signed two-digit exponent once the decimal
+// exponent leaves [-4, 6]. C's "%.7g" selects the same notation, digits, and
+// exponent width, but spells the exponent marker in lower case, so the marker
+// is normalised to the CLR's upper case. Only the invariant/en-US rendering is
+// projected; full CultureInfo behaviour remains outside the value milestones.
 internal func xnaFloatString(_ value: Float) -> String {
     if value.isNaN { return "NaN" }
     if value == .infinity { return "Infinity" }
     if value == -.infinity { return "-Infinity" }
     if value == 0 { return "0" }
-    return String(format: "%.7g", locale: Locale(identifier: "en_US_POSIX"), Double(value))
+    let general = String(
+        format: "%.7g", locale: Locale(identifier: "en_US_POSIX"), Double(value)
+    )
+    return general.replacingOccurrences(of: "e", with: "E")
 }
 
 internal func xnaValidateTransformArrayRanges(

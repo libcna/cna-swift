@@ -21,7 +21,9 @@ renderer support, plus the standalone
 managed non-flags `FillMode` enum without claiming rasterizer or wireframe
 rendering support, plus the standalone managed non-flags `SurfaceFormat` enum
 without claiming texture, render-target, display, DXT, HDR, or GPU format
-support. The old flat API and known fake behaviors are absent.
+support, plus the standalone managed `DisplayMode` descriptor class without
+claiming monitor enumeration, display-mode discovery, or resolution switching.
+The old flat API and known fake behaviors are absent.
 
 ## Measured surface
 
@@ -30,12 +32,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=71
-TARGET_MEMBERS=1407
-TOTAL_DIAGNOSTICS=337
-COMPLETE_TYPES=66
+TARGET_TYPES=72
+TARGET_MEMBERS=1413
+TOTAL_DIAGNOSTICS=336
+COMPLETE_TYPES=67
 PARTIAL_TYPES=5
-MISSING_TYPES=186
+MISSING_TYPES=185
 MISSING_MEMBER=131
 ```
 
@@ -52,9 +54,37 @@ BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
-DepthFormat, FillMode, and SurfaceFormat. Every implemented member has
-qualified behavior;
+DepthFormat, FillMode, SurfaceFormat, and DisplayMode. Every implemented member
+has qualified behavior;
 missing members remain absent.
+
+## Managed DisplayMode
+
+`Microsoft.Xna.Framework.Graphics.DisplayMode` is the exact managed descriptor
+class with the pinned six identities: `ToString`, `Format`, `Height`, `Width`,
+`AspectRatio`, and `TitleSafeArea`. The pinned public contract declares **no
+constructor**, so the Swift class exposes no public initializer; the CLR's
+`assembly`-accessible `.ctor(width, height, format)` maps to an `internal` Swift
+initializer that is implementation infrastructure and never public XNA surface.
+The class is deliberately neither `open` — no accessible CLR constructor makes
+it externally subclassable — nor `final`, because metadata says `sealed=false`.
+
+`Width`, `Height` and `Format` are verbatim get-only stored values with no
+validation. `AspectRatio` is the guarded binary32 quotient: positive zero
+whenever either dimension is zero, otherwise `Float(Width) / Float(Height)`
+computed without Double widening, without clamping and without absolute value.
+`TitleSafeArea` is exactly `Rectangle(0, 0, Width, Height)` — the unmodified
+Windows result, with no overscan inset, no Xbox policy and no display query.
+`ToString` reproduces `{Width:W Height:H Format:F AspectRatio:A}`.
+
+There is no `Equals`, `GetHashCode`, `==`, `!=`, `Equatable`, `Hashable`,
+setter, static factory, `description`, or convenience helper, and SurfaceFormat
+gains no public string surface.
+
+This is a managed descriptor only. DisplayModeCollection, GraphicsAdapter,
+`GraphicsDevice.DisplayMode`, PresentationParameters, monitor enumeration,
+display-mode discovery, resolution switching, fullscreen mode management, and
+native display support remain deferred. See `docs/display-mode-evidence.md`.
 
 ## Managed DepthFormat
 
@@ -82,7 +112,7 @@ complete 0...19 table, rejects representative unknown positive and negative
 values with `nil`, and preserves ordinary value-copy behavior without adding
 XNA members.
 
-This is managed metadata only. DisplayMode, DisplayModeCollection,
+This is managed metadata only. DisplayModeCollection,
 GraphicsAdapter, PresentationParameters, texture and render-target APIs,
 GraphicsDeviceManager format properties, GraphicsDevice format operations,
 pixel/DXT conversion, HDR capability, GPU format negotiation, and native
@@ -197,6 +227,9 @@ python3 tools/api_compat/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
   --output docs/generated/api-compat-report.json \
   --inventory-output docs/generated/missing-type-inventory.md
+python3 tools/api_compat/dependency_graph.py \
+  --report docs/generated/api-compat-report.json \
+  --output docs/generated/dependency-graph.json
 python3 tools/native_abi/verify.py \
   --cna-include /path/to/cna/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY"

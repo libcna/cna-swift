@@ -132,6 +132,7 @@
   "indexedPropertyAccessorMapping": "A read/write CLR indexed property maps to a throwing Item getter plus throwing SetItem method; the verifier combines both compiler symbols into one source property identity",
   "throwsMapping": "Swift throws is LANGUAGE_MAPPING and does not add an XNA member",
   "protectedVirtualMapping": "open",
+  "nonPublicConstructionMapping": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph",
   "inheritedPublicMemberProjection": "A selected public inherited member may be declared on a partial Swift subtype until its XNA base exists; the verifier requires an exact ancestor identity. System.IDisposable maps to a public Dispose() member.",
   "manualDiagnosticSuppressions": [],
   "nestedTypeMapping": "replace CLR + nesting separator with Swift . nesting",

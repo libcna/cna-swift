@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1251,
-  "ASSERTIONS": 1251,
+  "OBSERVATIONS": 1269,
+  "ASSERTIONS": 1269,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -76,7 +76,11 @@
     "testBufferUsageXnaContract",
     "testDepthFormatXnaContract",
     "testFillModeXnaContract",
-    "testSurfaceFormatXnaContract"
+    "testSurfaceFormatXnaContract",
+    "testDisplayModePropertiesXnaContract",
+    "testDisplayModeAspectRatioXnaContract",
+    "testDisplayModeTitleSafeAreaXnaContract",
+    "testDisplayModeToStringXnaContract"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -122,7 +126,11 @@
     "BUFFER_USAGE": 1,
     "DEPTH_FORMAT": 1,
     "FILL_MODE": 1,
-    "SURFACE_FORMAT": 1
+    "SURFACE_FORMAT": 1,
+    "DISPLAY_MODE_PROPERTIES": 1,
+    "DISPLAY_MODE_ASPECT_RATIO": 1,
+    "DISPLAY_MODE_TITLE_SAFE_AREA": 1,
+    "DISPLAY_MODE_TO_STRING": 1
   },
   "displayOrientationContract": {
     "flags": true,
@@ -192,6 +200,25 @@
       "HalfVector4": 18,
       "HdrBlendable": 19
     },
+    "swiftProjectionQualificationCountedAsXnaBehavior": false
+  },
+  "displayModeContract": {
+    "kind": "class",
+    "sealed": false,
+    "baseType": "System.Object",
+    "publicConstructors": 0,
+    "nonPublicConstructor": "assembly .ctor(int32 width, int32 height, valuetype Microsoft.Xna.Framework.Graphics.SurfaceFormat format)",
+    "publicMembers": [
+      "ToString",
+      "Format",
+      "Height",
+      "Width",
+      "AspectRatio",
+      "TitleSafeArea"
+    ],
+    "aspectRatio": "if (_height != 0 && _width != 0) return (float)_width / (float)_height; return 0f;",
+    "titleSafeArea": "Viewport.GetTitleSafeArea(0, 0, _width, _height) == new Rectangle(0, 0, _width, _height) on the Windows runtime",
+    "toString": "string.Format(CultureInfo.CurrentCulture, \"{{Width:{0} Height:{1} Format:{2} AspectRatio:{3}}}\", _width, _height, Format, AspectRatio)",
     "swiftProjectionQualificationCountedAsXnaBehavior": false
   },
   "colorPaletteGoldenEntries": 141,
