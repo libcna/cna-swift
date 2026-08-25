@@ -4,27 +4,8 @@
     "path": "tools/api_compat/reference/xna40-windows-runtime-contract.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 72,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 71,
   "ranked": [
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.RenderTargetUsage",
-      "dependencies": [],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.PresentationParameters",
-        "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
-        "Microsoft.Xna.Framework.Graphics.RenderTargetCube"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 50,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-        "Microsoft.Xna.Framework.Graphics.Texture2D",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
-    },
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
       "dependencies": [],
@@ -109,6 +90,96 @@
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 48,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.CompareFunction",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
+        "Microsoft.Xna.Framework.Graphics.DepthStencilState"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 47,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.CubeMapFace",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
+        "Microsoft.Xna.Framework.Graphics.TextureCube"
+      ],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
+      ],
+      "transitiveMissingReverseReach": 47,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.IndexElementSize",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer",
+        "Microsoft.Xna.Framework.Graphics.IndexBuffer"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 47,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.Blend",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.BlendState"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 47,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.BlendFunction",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.BlendState"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 47,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",

@@ -1,93 +1,103 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 12 — complete exactly the standalone
-`Microsoft.Xna.Framework.Graphics.DisplayMode` managed descriptor class over the
-completed Foundation 1–11 baseline.
+**Milestone:** Foundation 13 — complete exactly the standalone
+`Microsoft.Xna.Framework.Graphics.RenderTargetUsage` managed enum over the
+completed Foundation 1–12 baseline.
 
 ## Normative rules
 
 1. Pinned Microsoft XNA 4.0 Windows runtime metadata is the public shape
    authority, and the hash-matched assembly IL is the behavior authority. FNA
-   and MonoGame are engineering comparators only.
-2. DisplayMode is managed-only and introduces no native route, constant,
-   layout, callback, adapter, collection, presentation, monitor, or display
-   query.
-3. A complete descriptor class does not imply display capability. Monitor
-   enumeration, display-mode discovery, resolution switching, fullscreen mode
-   management, and native display support remain unclaimed.
+   and MonoGame are engineering comparators only. For a type whose entire
+   contract is metadata, the pinned contract alone is sufficient and no
+   behavior surrogate or reference probe is created.
+2. RenderTargetUsage is managed-only and introduces no native route, constant,
+   layout, callback, render target, presentation parameter, adapter, device
+   member, or renderer operation.
+3. A complete enum does not imply runtime capability. Render-target creation,
+   content discard, content preservation, platform-defined content policy,
+   depth attachments, MSAA, and native usage mapping remain unclaimed.
 4. Public strict names use `Microsoft.Xna.Framework...` and exact XNA
    PascalCase. Formal Swift projections are measured; manual diagnostic
    allowlisting is forbidden.
-5. A public CLR class whose declared constructors are all non-public maps to a
-   plain Swift `public class` — not `open`, because no accessible constructor
-   makes it externally subclassable, and not `final`, because metadata
-   `sealed=false` must not be strengthened. Its Swift initializer stays
-   `internal` implementation infrastructure and must not appear in the public
-   Symbol Graph. This rule is general and formally measured.
+5. A public non-flags CLR enum maps to a Swift `enum` with the CLR underlying
+   type as its raw type and one explicitly valued case per CLR literal. It is
+   never an `OptionSet`, a `struct`, an `Int` alias, or a differently signed
+   raw type, and it gains no string, predicate, alias, or conversion helper.
+   The synthetic `value__` storage identity is the existing enum-storage
+   language mapping and never appears in the public Swift surface. This rule is
+   general and already formally measured; Foundation 13 adds no new mapping
+   rule.
 6. Exact CNA ABI 0.7.0 only. Native selection is an absolute environment
    override or installed soname, never a developer-tree fallback.
-7. Foundation 12 does not consume DisplayMode from DisplayModeCollection,
-   GraphicsAdapter, GraphicsDevice, PresentationParameters, or CNA.
+7. Foundation 13 does not consume RenderTargetUsage from RenderTarget2D,
+   RenderTargetCube, RenderTargetBinding, PresentationParameters,
+   GraphicsDevice, or CNA.
 
 ## Qualified selected surface
 
-Foundation Milestone 12 adds exactly
-`Microsoft.Xna.Framework.Graphics.DisplayMode`: one CLR class with six declared
-public identities and six mapped Swift XNA identities. The pinned contract
-declares zero public constructors, so the Swift projection exposes zero public
-initializers.
+Foundation Milestone 13 adds exactly
+`Microsoft.Xna.Framework.Graphics.RenderTargetUsage`: one CLR enum with four
+declared identities and three mapped Swift XNA identities. It is sealed and
+non-flags with `System.Int32` underlying storage, `System.Enum` base, and no
+direct interfaces.
 
-`Width`, `Height` and `Format` are verbatim stored values with get-only public
-access. `AspectRatio` is the guarded binary32 quotient — positive zero whenever
-either dimension is zero, otherwise `Float(Width) / Float(Height)` with no
-Double widening, no clamping and no absolute value. `TitleSafeArea` is exactly
-`Rectangle(0, 0, Width, Height)`, the unmodified Windows result of the internal
-`Viewport.GetTitleSafeArea`, with independent value semantics and no display
-query. `ToString` reproduces
-`{Width:W Height:H Format:F AspectRatio:A}` with the CLR literal format name
-and the invariant general-float rendering.
+The Swift projection is a `public enum RenderTargetUsage: Int32` in the exact
+`Microsoft.Xna.Framework.Graphics` namespace with `DiscardContents = 0`,
+`PreserveContents = 1`, and `PlatformContents = 2`. Every raw value is
+explicit. There is no Framework-root alias, no `RenderTarget` subnamespace, and
+no native or interop namespace.
 
-No `Equals`, `GetHashCode`, `op_Equality`, `op_Inequality`, `Equatable`,
-`Hashable`, setter, public initializer, static factory, `description`, or
-convenience helper is added. SurfaceFormat gains no public string surface; the
-literal-name table is private to DisplayMode.
+The CLR storage identity `value__` is not exposed. Compiler-provided
+`rawValue`, `init?(rawValue:)`, equality, and value copying are Swift language
+surface and add no XNA identity. Valid raw initializers 0, 1, and 2 return
+their exact cases; 3, -1, `Int32.max`, and `Int32.min` return `nil`.
 
-No DisplayModeCollection, GraphicsAdapter, `GraphicsDevice.DisplayMode`,
-PresentationParameters, monitor query, renderer work, CNAShim declaration,
-native manifest row, native function, C layout, callback, or constant is added.
-Game, GraphicsDeviceManager, GraphicsDevice, Texture2D, and SpriteBatch remain
-the same honest runtime partials.
+No `OptionSet` conformance, union, intersection, `contains`, bitwise operation,
+`HasFlag`, `CustomStringConvertible`, `description`, `ToString`, `String`,
+`isDiscard`, `preservesContents`, `platformDefault`, `requiresPreservation`,
+`nativeUsage`, `Default`, `None`, `KeepContents`, `Discard`, or `Preserve`
+member is added.
+
+No RenderTarget2D, RenderTargetCube, RenderTargetBinding,
+PresentationParameters, `GraphicsDevice.SetRenderTarget`, GraphicsAdapter,
+renderer work, CNAShim declaration, native manifest row, native function, C
+layout, callback, or constant is added. Game, GraphicsDeviceManager,
+GraphicsDevice, Texture2D, and SpriteBatch remain the same honest runtime
+partials, and DisplayMode is unchanged.
 
 ## Measurement status
 
 - Pinned contract: 257 types / 2,964 members; contract SHA-256
-  `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`.
-  DisplayMode behavior comes from `Microsoft.Xna.Framework.Graphics.dll`
-  SHA-256
-  `560080fc39021c611ca9d076dcebed312faf6d7d1413c2dc523683ea635e9f55`.
-- Formal projection: 257 Swift types / 2,887 Swift members.
-- Compiler target: 72 types / 1,413 members; 67 complete, five partial, 185
-  missing. Total diagnostics are 336. Normal strict remains red only for the
+  `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`. The
+  RenderTargetUsage entry was independently re-read for this milestone and
+  confirms `SOURCE_MEMBERS=4`.
+- Formal projection: 257 Swift types / 2,887 Swift members;
+  `EXPECTED_SWIFT_MEMBERS=3` for RenderTargetUsage after the existing
+  enum-storage exclusion.
+- Compiler target: 73 types / 1,416 members; 68 complete, five partial, 184
+  missing. Total diagnostics are 335. Normal strict remains red only for the
   deferred profile; leak-only is green.
-- Verifier: 201 mutation/self-tests pass. DisplayMode is locally 6/6 with zero
-  diagnostics. Manual/applied allowlists and unmeasured structural categories
-  are zero. `NONPUBLIC_CONSTRUCTION_PROJECTIONS` is the one added formal
-  counter and reports four implemented reference classes, each with zero public
-  Swift initializers.
-- Pure behavior: 1,269 XNA-derived observation/assertion sites with zero
-  failures. The four `DISPLAY_MODE_*` records carry the retained reference
-  tables and keep Swift class/reference/immutability qualification in a
-  separate projection test.
-- Dependency graph: two missing types and one partial type are direct reverse
-  dependents; 51 missing types and all five partials remain in the transitive
-  reverse closure. No dependent is implemented or started.
+- Verifier: 235 mutation/self-tests pass. RenderTargetUsage is locally 3/3 with
+  zero diagnostics. Manual/applied allowlists and unmeasured structural
+  categories are zero. Every formal projection counter is unchanged, including
+  the 49 enum-storage exclusions, which already contained this type's
+  `value__`.
+- Pure behavior: 1,271 XNA-derived observation/assertion sites with zero
+  failures. The `RENDER_TARGET_USAGE` group carries the pinned kind, flags,
+  storage, and complete raw table; Swift projection qualification stays in a
+  separate test.
+- Dependency graph: three missing types are direct reverse dependents, there is
+  no direct partial reverse dependent, and 50 missing types plus all five
+  partials remain in the transitive reverse closure. No dependent is
+  implemented or started.
 - Native ABI: 29 functions, 91 prototype positions, 91 C/Swift measurements,
   18 layouts, 2 callbacks, and 214 constants; header, library, and ABI mismatch
-  counters are zero.
-- SurfaceFormat, Rectangle, DepthFormat, FillMode, BufferUsage,
-  DisplayOrientation, ordinary enum, flags, PackedVector, GamePad, Keyboard,
-  managed value, native lifecycle, template, archive, and isolated-consumer
-  gates remain required.
+  counters are zero and unchanged.
+- DisplayMode, SurfaceFormat, Rectangle, Viewport, DepthFormat, FillMode,
+  BufferUsage, DisplayOrientation, ordinary enum, flags, PackedVector, GamePad,
+  Keyboard, managed value, native lifecycle, template, archive, and
+  isolated-consumer gates remain required.
 
 ## Platform and release policy
 

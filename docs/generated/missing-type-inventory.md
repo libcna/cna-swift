@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=72
-TARGET_MEMBERS=1413
-TOTAL_DIAGNOSTICS=336
-COMPLETE_TYPES=67
+TARGET_TYPES=73
+TARGET_MEMBERS=1416
+TOTAL_DIAGNOSTICS=335
+COMPLETE_TYPES=68
 PARTIAL_TYPES=5
-MISSING_TYPES=185
-MISSING_TYPE=185
+MISSING_TYPES=184
+MISSING_TYPE=184
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -93,6 +93,7 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Rgba64`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Short2`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Short4`
+- `Microsoft.Xna.Framework.Graphics.RenderTargetUsage`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
 - `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
@@ -420,7 +421,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetBinding`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetCube`
-- `Microsoft.Xna.Framework.Graphics.RenderTargetUsage`
 - `Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.SamplerState`

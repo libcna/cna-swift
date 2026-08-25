@@ -23,6 +23,14 @@ underlying type, and complete four-value literal table. Swift raw-value
 initialization, unknown-value rejection, and copy qualification remain in a
 separate projection test and are not counted as XNA runtime behavior.
 
+The `RENDER_TARGET_USAGE` group records only the pinned non-flags enum, Int32
+underlying type, and complete three-value literal table `DiscardContents=0`,
+`PreserveContents=1`, and `PlatformContents=2`. Swift raw-value initialization,
+unknown-value rejection, and copy qualification remain in a separate projection
+test and are not counted as XNA runtime behavior. The literal names describe
+XNA's render-target preservation policy and are not evidence that any discard,
+preserve, or platform-defined content behavior is implemented.
+
 The `SURFACE_FORMAT` group likewise records only the pinned non-flags enum,
 Int32 underlying type, and complete twenty-value literal table. Swift raw-value
 initialization, unknown-value rejection, and copy qualification remain in a

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1269,
-  "ASSERTIONS": 1269,
+  "OBSERVATIONS": 1271,
+  "ASSERTIONS": 1271,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -76,6 +76,7 @@
     "testBufferUsageXnaContract",
     "testDepthFormatXnaContract",
     "testFillModeXnaContract",
+    "testRenderTargetUsageXnaContract",
     "testSurfaceFormatXnaContract",
     "testDisplayModePropertiesXnaContract",
     "testDisplayModeAspectRatioXnaContract",
@@ -126,6 +127,7 @@
     "BUFFER_USAGE": 1,
     "DEPTH_FORMAT": 1,
     "FILL_MODE": 1,
+    "RENDER_TARGET_USAGE": 1,
     "SURFACE_FORMAT": 1,
     "DISPLAY_MODE_PROPERTIES": 1,
     "DISPLAY_MODE_ASPECT_RATIO": 1,
@@ -171,6 +173,17 @@
     "values": {
       "Solid": 0,
       "WireFrame": 1
+    },
+    "swiftProjectionQualificationCountedAsXnaBehavior": false
+  },
+  "renderTargetUsageContract": {
+    "kind": "enum",
+    "flags": false,
+    "underlyingType": "System.Int32",
+    "values": {
+      "DiscardContents": 0,
+      "PreserveContents": 1,
+      "PlatformContents": 2
     },
     "swiftProjectionQualificationCountedAsXnaBehavior": false
   },

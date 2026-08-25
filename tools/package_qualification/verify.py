@@ -118,14 +118,38 @@ final class ArchiveGame: Microsoft.Xna.Framework.Game {
     }
 }
 
+// RenderTargetUsage is a pure managed non-flags Int32 enum. An external
+// consumer must be able to name it in the exact Graphics namespace, read every
+// pinned raw value, round-trip each one through the raw initializer, and get
+// nil for an undefined pattern, all without a native library, a render target,
+// or any device. Naming the type is not evidence that discard, preserve, or
+// platform-defined content behavior exists anywhere in the runtime.
+func qualifyPublicRenderTargetUsageSurface() throws {
+    typealias Usage = Microsoft.Xna.Framework.Graphics.RenderTargetUsage
+    let table: [(Int32, Usage)] = [
+        (0, .DiscardContents), (1, .PreserveContents), (2, .PlatformContents),
+    ]
+    for (rawValue, value) in table {
+        let observed: Int32 = value.rawValue
+        guard observed == rawValue, Usage(rawValue: rawValue) == value else {
+            throw CNAError.argument("isolated RenderTargetUsage table qualification failed")
+        }
+    }
+    guard Usage(rawValue: 3) == nil, Usage(rawValue: -1) == nil,
+          String(describing: Usage.self) == "RenderTargetUsage" else {
+        throw CNAError.argument("isolated RenderTargetUsage projection qualification failed")
+    }
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
+    try qualifyPublicRenderTargetUsageSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -147,7 +171,8 @@ def run(command: list[str], cwd: Path, environment: dict[str, str]) -> str:
 def validate_canary(output: str, requested: int) -> bool:
     match = re.search(
         r"ARCHIVE_CANARY requested=(\d+) updates=(\d+) draws=(\d+) "
-        r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS)",
+        r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS) "
+        r"renderTargetUsage=(PASS)",
         output,
     )
     if not match:
@@ -160,7 +185,8 @@ def validate_canary(output: str, requested: int) -> bool:
         width == 1 and
         height == 1 and
         match.group(6) == "PASS" and
-        match.group(7) == "PASS"
+        match.group(7) == "PASS" and
+        match.group(8) == "PASS"
     )
 
 

@@ -22,7 +22,9 @@ managed non-flags `FillMode` enum without claiming rasterizer or wireframe
 rendering support, plus the standalone managed non-flags `SurfaceFormat` enum
 without claiming texture, render-target, display, DXT, HDR, or GPU format
 support, plus the standalone managed `DisplayMode` descriptor class without
-claiming monitor enumeration, display-mode discovery, or resolution switching.
+claiming monitor enumeration, display-mode discovery, or resolution switching,
+plus the standalone managed non-flags `RenderTargetUsage` enum without claiming
+render targets or any content discard/preserve behavior.
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -32,12 +34,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=72
-TARGET_MEMBERS=1413
-TOTAL_DIAGNOSTICS=336
-COMPLETE_TYPES=67
+TARGET_TYPES=73
+TARGET_MEMBERS=1416
+TOTAL_DIAGNOSTICS=335
+COMPLETE_TYPES=68
 PARTIAL_TYPES=5
-MISSING_TYPES=185
+MISSING_TYPES=184
 MISSING_MEMBER=131
 ```
 
@@ -54,9 +56,28 @@ BoundingBox/Sphere/Frustum and their enums, keyboard values, SpriteSortMode,
 SpriteEffects, Color, the packed protocols, all concrete PackedVector formats,
 Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
-DepthFormat, FillMode, SurfaceFormat, and DisplayMode. Every implemented member
-has qualified behavior;
+DepthFormat, FillMode, SurfaceFormat, DisplayMode, and RenderTargetUsage. Every
+implemented member has qualified behavior;
 missing members remain absent.
+
+## Managed RenderTargetUsage
+
+`Microsoft.Xna.Framework.Graphics.RenderTargetUsage` is the exact managed
+non-flags `Int32` enum with `DiscardContents=0`, `PreserveContents=1`, and
+`PlatformContents=2`. The three literals are mutually exclusive alternatives,
+not bit flags, so the type is a Swift `enum` and never an `OptionSet`. The CLR
+`value__` storage identity is the existing enum-storage language mapping. Swift
+raw-value initialization accepts the complete 0...2 table, rejects
+representative unknown positive and negative values with `nil`, and preserves
+ordinary value-copy behavior without adding XNA members. There is no
+`description`, `ToString`, predicate helper, alias, or native conversion.
+
+This is managed metadata only. RenderTarget2D, RenderTargetCube,
+RenderTargetBinding, PresentationParameters, render-target creation, depth
+attachments, MSAA, `GraphicsDevice.SetRenderTarget`, and native usage mapping
+remain deferred. The names describe XNA's content-preservation policy;
+CNA-Swift does not implement or claim discard, preserve, or platform-defined
+content semantics. See `docs/render-target-usage-evidence.md`.
 
 ## Managed DisplayMode
 

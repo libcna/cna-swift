@@ -2107,11 +2107,182 @@ def self_test() -> None:
     }:
         failures.append("DisplayMode wrong mapped base did not fail")
 
+    usage_name = "Microsoft.Xna.Framework.Graphics.RenderTargetUsage"
+    usage_expected = {
+        usage_name: copy.deepcopy(all_expected[usage_name]),
+    }
+    usage_good = copy.deepcopy(usage_expected)
+    usage_good[usage_name].identifier = usage_name
+    for index, member in enumerate(usage_good[usage_name].members):
+        member.identifier = f"{usage_name}:{index}"
+
+    def usage_member(models: dict[str, TypeModel], name: str) -> Member:
+        return next(
+            member for member in models[usage_name].members
+            if member.name == name
+        )
+
+    def usage_categories(models: dict[str, TypeModel]) -> set[str]:
+        return {
+            item["category"] for item in compare(usage_expected, models)
+        }
+
+    usage_mutations: list[tuple[str, str, Any]] = [
+        ("RenderTargetUsage missing type", "MISSING_TYPE",
+         lambda m: m.pop(usage_name)),
+        ("RenderTargetUsage wrong namespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.RenderTargetUsage",
+             m.pop(usage_name),
+         )),
+        ("RenderTargetUsage RenderTarget subnamespace", "MISSING_TYPE",
+         lambda m: m.__setitem__(
+             "Microsoft.Xna.Framework.Graphics.RenderTarget.RenderTargetUsage",
+             m.pop(usage_name),
+         )),
+        ("RenderTargetUsage struct instead of enum", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[usage_name], "kind", "struct")),
+        ("RenderTargetUsage OptionSet instead of ordinary enum",
+         "FLAGS_MAPPING_MISMATCH",
+         lambda m: (setattr(m[usage_name], "kind", "struct"),
+                    setattr(m[usage_name], "flags", True))),
+        ("RenderTargetUsage wrong raw type", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[usage_name], "raw_type", "UInt32")),
+        ("RenderTargetUsage Int raw type", "TYPE_KIND_MISMATCH",
+         lambda m: setattr(m[usage_name], "raw_type", "Int")),
+        ("RenderTargetUsage flags metadata present", "FLAGS_MAPPING_MISMATCH",
+         lambda m: setattr(m[usage_name], "flags", True)),
+        ("RenderTargetUsage wrong DiscardContents", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(usage_member(m, "DiscardContents"), "raw_value", 1)),
+        ("RenderTargetUsage wrong PreserveContents", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(usage_member(m, "PreserveContents"), "raw_value", 2)),
+        ("RenderTargetUsage wrong PlatformContents", "ENUM_VALUE_MISMATCH",
+         lambda m: setattr(usage_member(m, "PlatformContents"), "raw_value", 3)),
+        ("RenderTargetUsage missing DiscardContents", "MISSING_MEMBER",
+         lambda m: m[usage_name].members.remove(
+             usage_member(m, "DiscardContents"))),
+        ("RenderTargetUsage missing middle PreserveContents", "MISSING_MEMBER",
+         lambda m: m[usage_name].members.remove(
+             usage_member(m, "PreserveContents"))),
+        ("RenderTargetUsage missing final PlatformContents", "MISSING_MEMBER",
+         lambda m: m[usage_name].members.remove(
+             usage_member(m, "PlatformContents"))),
+        ("RenderTargetUsage renamed DiscardContents", "MISSING_MEMBER",
+         lambda m: setattr(usage_member(m, "DiscardContents"), "name", "Discard")),
+        ("RenderTargetUsage renamed PreserveContents", "MISSING_MEMBER",
+         lambda m: setattr(
+             usage_member(m, "PreserveContents"), "name", "KeepContents")),
+        ("RenderTargetUsage unexpected extra enum case", "UNEXPECTED_MEMBER",
+         lambda m: m[usage_name].members.append(Member(
+             usage_name, "field", "Default", True,
+             return_type=usage_name, mutable=False, raw_value=3,
+             identifier="invented-render-target-usage-case",
+         ))),
+        ("RenderTargetUsage public description helper", "UNEXPECTED_MEMBER",
+         lambda m: m[usage_name].members.append(Member(
+             usage_name, "property", "description", False,
+             return_type="String", mutable=False,
+             identifier="invented-render-target-usage-description",
+         ))),
+        ("RenderTargetUsage public ToString helper", "UNEXPECTED_MEMBER",
+         lambda m: m[usage_name].members.append(Member(
+             usage_name, "method", "ToString", False, return_type="String",
+             identifier="invented-render-target-usage-to-string",
+         ))),
+        ("RenderTargetUsage public predicate helper", "UNEXPECTED_MEMBER",
+         lambda m: m[usage_name].members.append(Member(
+             usage_name, "property", "preservesContents", False,
+             return_type="Bool", mutable=False,
+             identifier="invented-render-target-usage-predicate",
+         ))),
+        ("RenderTargetUsage public consumer helper", "UNEXPECTED_MEMBER",
+         lambda m: m[usage_name].members.append(Member(
+             usage_name, "method", "Apply", False,
+             parameters=("Microsoft.Xna.Framework.Graphics.RenderTarget2D",),
+             labels=("_",), directions=("",), return_type="Void",
+             identifier="invented-render-target-usage-consumer",
+         ))),
+        ("RenderTargetUsage public native mapping helper", "UNEXPECTED_MEMBER",
+         lambda m: m[usage_name].members.append(Member(
+             usage_name, "property", "nativeUsage", False,
+             return_type="Int32", mutable=False,
+             identifier="invented-render-target-usage-native",
+         ))),
+    ]
+    for label, wanted, mutate in usage_mutations:
+        models = copy.deepcopy(usage_good)
+        mutate(models)
+        if wanted not in usage_categories(models):
+            failures.append(f"{label}: did not produce {wanted}")
+
+    if usage_categories(usage_good):
+        failures.append("RenderTargetUsage reference model is not diagnostic-free")
+    if usage_expected[usage_name].kind != "enum":
+        failures.append("RenderTargetUsage expected Swift kind is not enum")
+    if usage_expected[usage_name].flags:
+        failures.append("RenderTargetUsage expected flags is not false")
+    if usage_expected[usage_name].raw_type != "Int32":
+        failures.append("RenderTargetUsage expected raw type is not Int32")
+    if not usage_expected[usage_name].verify_raw_type:
+        failures.append("RenderTargetUsage raw type is not verified")
+    if len(usage_expected[usage_name].members) != 3:
+        failures.append(
+            "RenderTargetUsage expected Swift member count is not exactly 3")
+    if {
+        member.name: member.raw_value
+        for member in usage_expected[usage_name].members
+    } != {"DiscardContents": 0, "PreserveContents": 1, "PlatformContents": 2}:
+        failures.append("RenderTargetUsage expected raw table is not the pinned table")
+    if any(
+        member.kind != "field" or not member.static
+        for member in usage_expected[usage_name].members
+    ):
+        failures.append(
+            "RenderTargetUsage expected identity is not a static enum literal")
+    if any(
+        member.kind == "constructor"
+        for member in usage_expected[usage_name].members
+    ):
+        failures.append("RenderTargetUsage expected a public constructor identity")
+
+    if any(
+        member.name == "value__"
+        for member in usage_expected[usage_name].members
+    ):
+        failures.append(
+            "RenderTargetUsage value__ was not excluded from the Swift contract")
+    usage_value_storage_expected = copy.deepcopy(usage_expected)
+    usage_value_storage_expected[usage_name].members.append(Member(
+        usage_name, "field", "value__", False,
+        return_type="Int32", mutable=True,
+        identifier="incorrectly-required-render-target-usage-storage",
+    ))
+    if "MISSING_MEMBER" not in {
+        item["category"] for item in compare(
+            usage_value_storage_expected, usage_good,
+        )
+    }:
+        failures.append(
+            "RenderTargetUsage value__ treated as required did not fail")
+    usage_value_storage_actual = copy.deepcopy(usage_good)
+    usage_value_storage_actual[usage_name].members.append(Member(
+        usage_name, "field", "value__", False,
+        return_type="Int32", mutable=True,
+        identifier="incorrectly-exposed-render-target-usage-storage",
+    ))
+    if "UNEXPECTED_MEMBER" not in {
+        item["category"] for item in compare(
+            usage_expected, usage_value_storage_actual,
+        )
+    }:
+        failures.append(
+            "RenderTargetUsage publicly exposed value__ did not fail")
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + 5 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

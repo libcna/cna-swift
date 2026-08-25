@@ -28,6 +28,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/BufferUsageContractTests.swift",
     ROOT / "Tests/CNATests/DepthFormatContractTests.swift",
     ROOT / "Tests/CNATests/FillModeContractTests.swift",
+    ROOT / "Tests/CNATests/RenderTargetUsageContractTests.swift",
     ROOT / "Tests/CNATests/SurfaceFormatContractTests.swift",
     ROOT / "Tests/CNATests/DisplayModeContractTests.swift",
 ]
@@ -92,6 +93,7 @@ def main() -> int:
                 "BUFFER_USAGE": "BufferUsageXnaContract",
                 "DEPTH_FORMAT": "DepthFormatXnaContract",
                 "FILL_MODE": "FillModeXnaContract",
+                "RENDER_TARGET_USAGE": "RenderTargetUsageXnaContract",
                 "SURFACE_FORMAT": "SurfaceFormatXnaContract",
                 "DISPLAY_MODE_PROPERTIES": "DisplayModeProperties",
                 "DISPLAY_MODE_ASPECT_RATIO": "DisplayModeAspectRatio",
@@ -138,6 +140,17 @@ def main() -> int:
             "values": {
                 "Solid": 0,
                 "WireFrame": 1,
+            },
+            "swiftProjectionQualificationCountedAsXnaBehavior": False,
+        },
+        "renderTargetUsageContract": {
+            "kind": "enum",
+            "flags": False,
+            "underlyingType": "System.Int32",
+            "values": {
+                "DiscardContents": 0,
+                "PreserveContents": 1,
+                "PlatformContents": 2,
             },
             "swiftProjectionQualificationCountedAsXnaBehavior": False,
         },
