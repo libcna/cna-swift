@@ -194,6 +194,9 @@ NATIVE_STRESS=GAME_CYCLES=20 GAME_RECREATION_CYCLES=20 TEXTURE2D_CYCLES=20
     GAMEPAD_CAPABILITIES_CYCLES=20 NATIVE_CRASHES=0 OBSERVED_UAF=0
     OBSERVED_DOUBLE_FREE=0 MODE_FAILURES=0
 GAMEPAD_NATIVE=0 FAILURES HARDWARE_AVAILABLE=NO
+SOURCE_ARCHIVE=274 entries DETERMINISTIC=YES
+    SHA256=5c675df6bac26f7d186fccd9db727038bf6dcdc575dcb53b07b5a1badeb04b23
+    measured on commit abd4baf, the tree this file describes
 ISOLATED_CONSUMER=DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
     REJECTED_NEGATIVE_CONSUMERS=11  (4 -> 11)
     FORBIDDEN_ENTRIES=0 NATIVE_LIBRARIES=0 MICROSOFT_REFERENCE_BINARIES=0
@@ -350,6 +353,14 @@ package is missing.**
 `~/deps/xna-il-cache/` is shared with other sessions and is a convenience, never
 an authority: the BCL audit re-hashes what it is pointed at, keys its cache by
 digest, and the byte-identical manifest regeneration was also run with no cache.
+
+One archiving detail worth knowing, because it looks like non-determinism and
+is not: `swift package archive-source` names the archive's **root directory
+after the output file**, so `--output a1.zip` and `--output a2.zip` of the same
+tree differ in every entry path and therefore in digest. Archive to a fixed
+`CNA.zip` name (in different directories if you need two) and the bytes are
+identical — verified twice this session, same tree, same 274 entries, same
+digest.
 
 ```text
 SELECTED_ONLY=false
