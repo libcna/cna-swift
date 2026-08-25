@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 33,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 32,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
@@ -203,6 +203,204 @@
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 1,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.VisualizationData",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Media.MediaPlayer"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 1,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.Microphone",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Audio.MicrophoneState"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentLoadException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.FrameworkDispatcher",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.DeviceLostException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.DeviceNotResetException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.SpriteFont",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Vector2"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch"
+      ],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Input.Mouse",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Input.MouseState"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
+      "dependencies": [
+        "Microsoft.Xna.Framework.DisplayOrientation",
+        "Microsoft.Xna.Framework.Input.Touch.GestureSample",
+        "Microsoft.Xna.Framework.Input.Touch.GestureType",
+        "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
+        "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.TitleContainer",
+      "dependencies": [],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
       "transitivePartialReverseReach": []
     }
   ]

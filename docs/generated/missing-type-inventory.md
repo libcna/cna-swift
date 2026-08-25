@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=121
-TARGET_MEMBERS=1679
-TOTAL_DIAGNOSTICS=287
-COMPLETE_TYPES=116
+TARGET_TYPES=122
+TARGET_MEMBERS=1684
+TOTAL_DIAGNOSTICS=286
+COMPLETE_TYPES=117
 PARTIAL_TYPES=5
-MISSING_TYPES=136
-MISSING_TYPE=136
+MISSING_TYPES=135
+MISSING_TYPE=135
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -52,7 +52,7 @@ COLLECTION_INTERFACE_PROJECTIONS=1
 ENUMERATOR_SUPPORT_PROJECTIONS=9
 INDEXED_PROPERTY_ACCESSOR_PROJECTIONS=4
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=7
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=8
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 MEASURED_SUPPORT_BASE_PROJECTIONS=4
@@ -165,6 +165,7 @@ MEASURED_SUPPORT_BASE_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Matrix`
 - `Microsoft.Xna.Framework.Media.MediaSourceType`
 - `Microsoft.Xna.Framework.Media.MediaState`
+- `Microsoft.Xna.Framework.Media.Video`
 - `Microsoft.Xna.Framework.Media.VideoSoundtrackType`
 - `Microsoft.Xna.Framework.Plane`
 - `Microsoft.Xna.Framework.PlaneIntersectionType`
@@ -485,7 +486,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Media.PlaylistCollection`
 - `Microsoft.Xna.Framework.Media.Song`
 - `Microsoft.Xna.Framework.Media.SongCollection`
-- `Microsoft.Xna.Framework.Media.Video`
 - `Microsoft.Xna.Framework.Media.VideoPlayer`
 - `Microsoft.Xna.Framework.Media.VisualizationData`
 - `Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs`

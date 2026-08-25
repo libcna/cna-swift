@@ -96,6 +96,30 @@ final class Foundation20ProjectionTests: XCTestCase {
         XCTAssertEqual(String(describing: F.Audio.AudioListener.self), "AudioListener")
     }
 
+    func testMediaVideoExposesNoPublicConstructionRoute() {
+        typealias M = Microsoft.Xna.Framework.Media
+
+        // The pinned class is sealed with an `assembly`-only constructor, so
+        // the projection is final and exposes no public init. This closure
+        // compiles only if all five identities are public with exactly these
+        // names and types; it is deliberately never called with a value,
+        // because no external construction route exists.
+        let read: (M.Video) -> (Duration, Int32, Int32, Float, M.VideoSoundtrackType) = {
+            ($0.Duration, $0.Width, $0.Height, $0.FramesPerSecond, $0.VideoSoundtrackType)
+        }
+        _ = read
+        XCTAssertEqual(String(describing: M.Video.self), "Video")
+
+        // A CLR class projects to a Swift class, so two descriptors built from
+        // the same values are distinct objects.
+        let first = M.Video(durationMilliseconds: 1, width: 2, height: 3,
+                            framesPerSecond: 4, soundtrackType: .Music)
+        let second = M.Video(durationMilliseconds: 1, width: 2, height: 3,
+                             framesPerSecond: 4, soundtrackType: .Music)
+        XCTAssertFalse(first === second)
+        XCTAssertTrue(first === first)
+    }
+
     func testFlipHandednessIsABitwiseInvolution() {
         // The support helper the accessors are built on. Applying it twice must
         // restore the exact bit pattern, which is what makes the XACT-space

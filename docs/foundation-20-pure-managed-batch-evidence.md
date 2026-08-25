@@ -6,13 +6,14 @@ than an assertion — the general rule that blocks the rest of the same cluster.
 
 ## Types completed
 
-Three types carrying 23 mapped Swift XNA identities:
+Four types carrying 28 mapped Swift XNA identities:
 
 | Type | Assembly | Identities |
 |---|---|---|
 | `Microsoft.Xna.Framework.Audio.AudioListener` | Microsoft.Xna.Framework.dll | 5 |
 | `Microsoft.Xna.Framework.Input.Touch.TouchCollection` | Input.Touch.dll | 15 |
 | `Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator` | Input.Touch.dll | 3 |
+| `Microsoft.Xna.Framework.Media.Video` | Microsoft.Xna.Framework.Video.dll | 5 |
 
 ### `AudioListener` is data, not audio
 
@@ -78,6 +79,26 @@ Behaviour transcribed from the IL, all of it measured by tests:
   `Current` forwards straight to the indexer, so reading it before the first
   `MoveNext` or after the last throws rather than returning a default;
   `MoveNext` clamps the cursor to `Count`; `Dispose` is a single `ret`.
+
+### `Media.Video` is a descriptor with no producer
+
+Pinned as a public **sealed** class whose only constructor is `assembly`, so it
+maps to a `final class` with no public initializer -- the
+`DisplayModeCollection` precedent again. The five public identities each return
+a stored field verbatim.
+
+One derived detail is worth keeping: the pinned constructor takes the duration
+as an `int32` and builds the stored `TimeSpan` with
+`TimeSpan(0, 0, 0, 0, duration)`, the days/hours/minutes/seconds/**milliseconds**
+overload. The argument is whole milliseconds, and the internal initializer
+preserves that conversion rather than asking a caller for a `Duration`.
+
+The IL also declares `assembly` `GraphicsDevice` and `Filename` accessors.
+Neither is public contract, and their only consumer is `VideoPlayer`, which is
+not implemented, so neither is carried -- nothing could read them. Completing
+the type claims no video capability: there is no public constructor, and XNA's
+only producer is `ContentManager`. Nothing opens a file, decodes a frame, or
+invents a duration.
 
 ## Verifier
 
@@ -151,17 +172,18 @@ pure-managed batch, for one property on one type, would be the wrong place.
 
 ```text
                         before   after
-COMPLETE_TYPES             113     116
+COMPLETE_TYPES             113     117
 PARTIAL_TYPES                5       5
-MISSING_TYPE               139     136
-TARGET_TYPES               118     121
-TARGET_MEMBERS            1656    1679
-TOTAL_DIAGNOSTICS          290     287
+MISSING_TYPE               139     135
+TARGET_TYPES               118     122
+TARGET_MEMBERS            1656    1684
+TOTAL_DIAGNOSTICS          290     286
 MISSING_MEMBER             131     131
 ARRAY_MUTATION_MAPPINGS     19      20
+NONPUBLIC_CONSTRUCTION       7       8
 API_COMPAT_SELF_TESTS     2119    2126
-DEBUG_TESTS                218     229
-BEHAVIOR_ASSERTIONS       1628    1707
+DEBUG_TESTS                218     231
+BEHAVIOR_ASSERTIONS       1628    1717
 ```
 
 Every mapping/leak category is unchanged: `BASE_MAPPING_MISMATCH=2`,
@@ -180,3 +202,22 @@ surfaced it (`'1e-45' underflows and loses precision during conversion to
 'Float'`), and it is fixed. The warnings-as-errors gate is only meaningful after
 forcing a full rebuild, and both configurations are now green that way. Release
 additionally needs `-Xswiftc -enable-testing` to build the test target at all.
+
+## The frontier is now exhausted for safe managed work
+
+After this batch the dependency graph reports 32 dependency-complete missing
+types, and every one of them is blocked on something outside a managed batch:
+
+| Blocker | Types |
+|---|---|
+| Undecided BCL base | 13 — 8 exception types, 5 `ContentSerializer*Attribute`, plus `MathTypeConverter`, `GameComponentCollection`, `LaunchParameters` |
+| Undecided BCL member type | `VisualizationData` and `SpriteFont` (`ReadOnlyCollection<T>`), `GameServiceContainer` (`System.Type`) |
+| Undecided throwing property writer | `AudioEmitter`, `GameWindow`, `ContentManager`, `SpriteFont` |
+| Real hardware or device enumeration | `GraphicsAdapter`, `Input.Mouse`, `TouchPanel`, `Microphone` |
+| Real runtime subsystem | `EffectAnnotation`, `ContentManager`, `TitleContainer`, `FrameworkDispatcher`, `AudioCategory`, `MediaSource` |
+| Unspecified BCL hash | `RendererDetail` (`System.String.GetHashCode`) |
+| Protected runtime partial | `SpriteFont` (`Texture2D`) |
+
+`GameComponent` and `DrawableGameComponent` remain outside that list entirely:
+they depend on the `Game` and `GraphicsDevice` partials, so they are not
+dependency-complete and were not forced.

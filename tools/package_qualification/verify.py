@@ -419,6 +419,18 @@ func qualifyFoundation20ManagedSurface() throws {
     do { _ = try T.TouchCollection(nine) } catch { capacityRejected = true }
     try check(capacityRejected, "TouchCollection capacity")
 
+    // Media.Video is sealed with an assembly-only constructor: an external
+    // consumer can name the type and read its surface but can never construct
+    // one, and needs no video runtime to do either. The closure compiles only
+    // if all five identities are public with exactly these names and types.
+    let readVideo: (F.Media.Video)
+        -> (Duration, Int32, Int32, Float, F.Media.VideoSoundtrackType) = {
+        ($0.Duration, $0.Width, $0.Height, $0.FramesPerSecond, $0.VideoSoundtrackType)
+    }
+    _ = readVideo
+    try check(String(describing: F.Media.Video.self) == "Video",
+              "Media.Video type identity")
+
     // The nested Enumerator walks a snapshot and throws on Current outside the
     // valid range.
     var enumerator = collection.GetEnumerator()

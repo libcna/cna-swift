@@ -186,6 +186,41 @@ extension PureValueTests {
         XCTAssertEqual(try collection.Item(0).Id, 1)
     }
 
+    // Media.Video is a sealed descriptor whose only constructor is `assembly`.
+    // Its five public identities each return a stored field verbatim.
+    func testMediaVideoXnaContract() {
+        typealias M = Microsoft.Xna.Framework.Media
+
+        // The pinned constructor takes the duration as an int32 and builds the
+        // stored TimeSpan with TimeSpan(0, 0, 0, 0, duration) -- the
+        // days/hours/minutes/seconds/MILLISECONDS overload -- so the argument
+        // is whole milliseconds.
+        let video = M.Video(
+            durationMilliseconds: 90_500, width: 1280, height: 720,
+            framesPerSecond: 29.97, soundtrackType: .MusicAndDialog)
+
+        XCTAssertEqual(video.Duration, .milliseconds(90_500))
+        XCTAssertEqual(video.Duration, .seconds(90) + .milliseconds(500))
+        XCTAssertEqual(video.Width, 1280)
+        XCTAssertEqual(video.Height, 720)
+        XCTAssertEqual(video.FramesPerSecond, 29.97)
+        XCTAssertEqual(video.VideoSoundtrackType, .MusicAndDialog)
+
+        // Nothing is validated or defaulted: the fields are stored verbatim.
+        let degenerate = M.Video(
+            durationMilliseconds: 0, width: 0, height: 0,
+            framesPerSecond: 0, soundtrackType: .Music)
+        XCTAssertEqual(degenerate.Duration, .zero)
+        XCTAssertEqual(degenerate.Width, 0)
+        XCTAssertEqual(degenerate.FramesPerSecond, 0)
+
+        // A negative duration is representable and is stored as given.
+        XCTAssertEqual(
+            M.Video(durationMilliseconds: -1, width: 1, height: 1,
+                    framesPerSecond: 1, soundtrackType: .Dialog).Duration,
+            .milliseconds(-1))
+    }
+
     // The nested Enumerator is a value struct holding a copy of the collection
     // and a cursor starting at -1.
     func testTouchCollectionEnumeratorXnaContract() throws {

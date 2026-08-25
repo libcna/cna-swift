@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1707,
-  "ASSERTIONS": 1707,
+  "OBSERVATIONS": 1717,
+  "ASSERTIONS": 1717,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -140,6 +140,7 @@
     "testAudioListenerXnaContract",
     "testTouchCollectionXnaContract",
     "testTouchCollectionMutationIsNotSupportedXnaContract",
+    "testMediaVideoXnaContract",
     "testTouchCollectionEnumeratorXnaContract"
   ],
   "groupCounts": {
