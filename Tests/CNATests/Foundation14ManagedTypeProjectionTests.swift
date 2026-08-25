@@ -7,11 +7,22 @@ import XCTest
 // these exist purely to prove the Swift requirement sets are exactly the pinned
 // member sets and are satisfiable. They are test code and add no public
 // surface.
-private struct FogWitness: Microsoft.Xna.Framework.Graphics.IEffectFog {
+// A class, not a struct: `SetFogColor` projects a CLR setter that mutates a
+// class, so the requirement is non-mutating and only a reference type can
+// witness it. Every registered XNA implementor of this interface is a class.
+private final class FogWitness: Microsoft.Xna.Framework.Graphics.IEffectFog {
     var FogEnabled: Bool = false
     var FogStart: Float = 0
     var FogEnd: Float = 0
-    var FogColor: Microsoft.Xna.Framework.Vector3 = .Zero
+    private var fogColor: Microsoft.Xna.Framework.Vector3 = .Zero
+
+    // A non-throwing witness satisfies a `{ get throws }` requirement; the
+    // reverse is what the compiler rejects.
+    var FogColor: Microsoft.Xna.Framework.Vector3 { fogColor }
+
+    func SetFogColor(_ value: Microsoft.Xna.Framework.Vector3) throws {
+        fogColor = value
+    }
 }
 
 private struct MatricesWitness: Microsoft.Xna.Framework.Graphics.IEffectMatrices {
@@ -46,17 +57,22 @@ final class Foundation14ManagedTypeProjectionTests: XCTestCase {
         XCTAssertEqual(String(describing: Element.self), "VertexElement")
     }
 
-    func testEffectInterfaceRequirementSetsAreSatisfiable() {
-        var fog = FogWitness()
+    func testEffectInterfaceRequirementSetsAreSatisfiable() throws {
+        let fog = FogWitness()
         fog.FogEnabled = true
         fog.FogStart = 1.5
         fog.FogEnd = 40
-        fog.FogColor = Microsoft.Xna.Framework.Vector3(1, 0, 0)
+        try fog.SetFogColor(Microsoft.Xna.Framework.Vector3(1, 0, 0))
         let readFog: Microsoft.Xna.Framework.Graphics.IEffectFog = fog
         XCTAssertTrue(readFog.FogEnabled)
         XCTAssertEqual(readFog.FogStart.bitPattern, Float(1.5).bitPattern)
         XCTAssertEqual(readFog.FogEnd.bitPattern, Float(40).bitPattern)
-        XCTAssertTrue(readFog.FogColor == Microsoft.Xna.Framework.Vector3(1, 0, 0))
+        XCTAssertTrue(try readFog.FogColor == Microsoft.Xna.Framework.Vector3(1, 0, 0))
+
+        // The writer is the only write path: the reader is get-only, so no
+        // unchecked assignment to FogColor exists on the protocol at all.
+        try readFog.SetFogColor(Microsoft.Xna.Framework.Vector3(0, 1, 0))
+        XCTAssertTrue(try readFog.FogColor == Microsoft.Xna.Framework.Vector3(0, 1, 0))
 
         var matrices = MatricesWitness()
         matrices.World = Microsoft.Xna.Framework.Matrix.CreateTranslation(

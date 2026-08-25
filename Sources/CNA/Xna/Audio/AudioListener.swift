@@ -59,9 +59,7 @@ extension Microsoft.Xna.Framework.Audio {
 
     // `UnsafeNativeStructures.FlipHandedness` from the pinned IL:
     // `Vector3(vector.X, vector.Y, -vector.Z)`. Internal support, not an XNA
-    // identity. `AudioEmitter` uses the same helper and is deferred -- see the
-    // Foundation 20 evidence -- because its `DopplerScale` setter throws, and
-    // Swift has no throwing property setter.
+    // identity. `AudioEmitter` uses the same helper.
     internal static func flipHandedness(
         _ vector: Microsoft.Xna.Framework.Vector3
     ) -> Microsoft.Xna.Framework.Vector3 {

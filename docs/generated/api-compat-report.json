@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 122,
-    "TARGET_MEMBERS": 1684,
+    "TARGET_TYPES": 123,
+    "TARGET_MEMBERS": 1690,
     "TOTAL_DIAGNOSTICS": 286,
-    "COMPLETE_TYPES": 117,
+    "COMPLETE_TYPES": 118,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 135,
-    "MISSING_TYPE": 135,
+    "MISSING_TYPES": 134,
+    "MISSING_TYPE": 134,
     "MISSING_MEMBER": 131,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -25,7 +25,7 @@
     "BASE_MAPPING_MISMATCH": 2,
     "INTERFACE_MAPPING_MISMATCH": 1,
     "FIELD_MAPPING_MISMATCH": 0,
-    "PROPERTY_MAPPING_MISMATCH": 1,
+    "PROPERTY_MAPPING_MISMATCH": 2,
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
@@ -53,7 +53,16 @@
     "COMPARABLE_INTERFACE_PROJECTIONS": 1,
     "COLLECTION_INTERFACE_PROJECTIONS": 1,
     "ENUMERATOR_SUPPORT_PROJECTIONS": 9,
-    "INDEXED_PROPERTY_ACCESSOR_PROJECTIONS": 4,
+    "ACCESSOR_PROJECTIONS": 840,
+    "INDEXED_ACCESSOR_PROJECTIONS": 24,
+    "THROWING_GETTER_PROJECTIONS": 114,
+    "PROPERTY_SETTER_PROJECTIONS": 166,
+    "WRITER_METHOD_PROJECTIONS": 113,
+    "THROWING_WRITER_METHOD_PROJECTIONS": 113,
+    "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
+    "GETTER_ONLY_PROJECTIONS": 561,
+    "WRITE_ONLY_PROJECTIONS": 0,
+    "MEASURED_ACCESSOR_PROJECTIONS": 18,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 8,
     "EVENT_PROJECTIONS": 49,
@@ -62,6 +71,7 @@
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
+    "Microsoft.Xna.Framework.Audio.AudioEmitter",
     "Microsoft.Xna.Framework.Audio.AudioListener",
     "Microsoft.Xna.Framework.Audio.AudioStopOptions",
     "Microsoft.Xna.Framework.Audio.MicrophoneState",
@@ -188,7 +198,6 @@
   ],
   "missingTypes": [
     "Microsoft.Xna.Framework.Audio.AudioCategory",
-    "Microsoft.Xna.Framework.Audio.AudioEmitter",
     "Microsoft.Xna.Framework.Audio.AudioEngine",
     "Microsoft.Xna.Framework.Audio.Cue",
     "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
@@ -327,11 +336,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Audio.AudioCategory",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Audio.AudioEmitter",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -777,7 +781,7 @@
     {
       "category": "PROPERTY_MAPPING_MISMATCH",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()",
-      "detail": "expected mutable=True, found mutable=False"
+      "detail": "the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -1475,6 +1479,11 @@
       "detail": "missing protocols ['Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService', 'Microsoft.Xna.Framework.IGraphicsDeviceManager']"
     },
     {
+      "category": "PROPERTY_MAPPING_MISMATCH",
+      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()",
+      "detail": "CLR getter is infallible, so the Swift reader must not throw; found throws=True"
+    },
+    {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()",
       "detail": "mapped member is absent"
@@ -2033,24 +2042,258 @@
       ]
     }
   ],
-  "indexedPropertyAccessorProjections": [
+  "accessorProjections": [
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.AudioEmitter",
+      "sourceProperty": "DopplerScale",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.AudioEmitter.DopplerScale()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.AudioEmitter.SetDopplerScale(_:Float)",
+      "writerName": "SetDopplerScale",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
     {
       "ownerType": "Microsoft.Xna.Framework.CurveKeyCollection",
       "sourceProperty": "Item",
-      "getterSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.Item(_:Int32)",
-      "setterSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.CurveKey)",
-      "getterObserved": true,
-      "setterObserved": true,
-      "reason": "Swift throwing accessors require a compiler-measured Item/SetItem expansion"
+      "indexed": true,
+      "readerSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.Item(_:Int32)",
+      "readerForm": "method",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.CurveKeyCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.CurveKey)",
+      "writerName": "SetItem",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Game",
+      "sourceProperty": "InactiveSleepTime",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetInactiveSleepTime",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Game",
+      "sourceProperty": "TargetElapsedTime",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetTargetElapsedTime",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Game",
+      "sourceProperty": "Content",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetContent",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "ScissorRectangle",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": null,
+      "writerName": "SetScissorRectangle",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "Indices",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetIndices",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "Viewport",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()",
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": null,
+      "writerName": "SetViewport",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "RasterizerState",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetRasterizerState",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "ReferenceStencil",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetReferenceStencil",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "DepthStencilState",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetDepthStencilState",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "MultiSampleMask",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetMultiSampleMask",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "BlendFactor",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetBlendFactor",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "sourceProperty": "BlendState",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetBlendState",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.IEffectFog",
+      "sourceProperty": "FogColor",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.IEffectFog.FogColor()",
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.IEffectFog.SetFogColor(_:Microsoft.Xna.Framework.Vector3)",
+      "writerName": "SetFogColor",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "sourceProperty": "PreferredBackBufferWidth",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetPreferredBackBufferWidth",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "sourceProperty": "PreferredBackBufferHeight",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": null,
+      "writerName": "SetPreferredBackBufferHeight",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
       "sourceProperty": "Item",
-      "getterSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Item(_:Int32)",
-      "setterSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.Input.Touch.TouchLocation)",
-      "getterObserved": true,
-      "setterObserved": true,
-      "reason": "Swift throwing accessors require a compiler-measured Item/SetItem expansion"
+      "indexed": true,
+      "readerSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Item(_:Int32)",
+      "readerForm": "method",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.Input.Touch.TouchLocation)",
+      "writerName": "SetItem",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     }
   ],
   "nonPublicConstructionProjections": [
@@ -2208,16 +2451,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.AudioEmitter",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 6,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Audio.AudioEmitter",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 6,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.AudioEngine",
@@ -3428,7 +3665,7 @@
         {
           "category": "PROPERTY_MAPPING_MISMATCH",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()",
-          "detail": "expected mutable=True, found mutable=False"
+          "detail": "the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent"
         },
         {
           "category": "MISSING_MEMBER",
@@ -4747,6 +4984,11 @@
           "category": "INTERFACE_MAPPING_MISMATCH",
           "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager",
           "detail": "missing protocols ['Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService', 'Microsoft.Xna.Framework.IGraphicsDeviceManager']"
+        },
+        {
+          "category": "PROPERTY_MAPPING_MISMATCH",
+          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()",
+          "detail": "CLR getter is infallible, so the Swift reader must not throw; found throws=True"
         },
         {
           "category": "MISSING_MEMBER",

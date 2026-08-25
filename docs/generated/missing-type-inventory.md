@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=122
-TARGET_MEMBERS=1684
+TARGET_TYPES=123
+TARGET_MEMBERS=1690
 TOTAL_DIAGNOSTICS=286
-COMPLETE_TYPES=117
+COMPLETE_TYPES=118
 PARTIAL_TYPES=5
-MISSING_TYPES=135
-MISSING_TYPE=135
+MISSING_TYPES=134
+MISSING_TYPE=134
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -22,7 +22,7 @@ TYPE_KIND_MISMATCH=0
 BASE_MAPPING_MISMATCH=2
 INTERFACE_MAPPING_MISMATCH=1
 FIELD_MAPPING_MISMATCH=0
-PROPERTY_MAPPING_MISMATCH=1
+PROPERTY_MAPPING_MISMATCH=2
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
@@ -50,7 +50,16 @@ ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
 COLLECTION_INTERFACE_PROJECTIONS=1
 ENUMERATOR_SUPPORT_PROJECTIONS=9
-INDEXED_PROPERTY_ACCESSOR_PROJECTIONS=4
+ACCESSOR_PROJECTIONS=840
+INDEXED_ACCESSOR_PROJECTIONS=24
+THROWING_GETTER_PROJECTIONS=114
+PROPERTY_SETTER_PROJECTIONS=166
+WRITER_METHOD_PROJECTIONS=113
+THROWING_WRITER_METHOD_PROJECTIONS=113
+INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
+GETTER_ONLY_PROJECTIONS=561
+WRITE_ONLY_PROJECTIONS=0
+MEASURED_ACCESSOR_PROJECTIONS=18
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 NONPUBLIC_CONSTRUCTION_PROJECTIONS=8
 EVENT_PROJECTIONS=49
@@ -61,6 +70,7 @@ MEASURED_SUPPORT_BASE_PROJECTIONS=4
 ## Complete types
 
 - `Microsoft.Xna.Framework.Audio.AudioChannels`
+- `Microsoft.Xna.Framework.Audio.AudioEmitter`
 - `Microsoft.Xna.Framework.Audio.AudioListener`
 - `Microsoft.Xna.Framework.Audio.AudioStopOptions`
 - `Microsoft.Xna.Framework.Audio.MicrophoneState`
@@ -211,7 +221,7 @@ Expected members: 37; emitted members: 16.
 
 Expected members: 56; emitted members: 2.
 
-- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()`: expected mutable=True, found mutable=False
+- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()`: the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present(_:Microsoft.Xna.Framework.Rectangle?,destinationRectangle:Microsoft.Xna.Framework.Rectangle?,overrideWindowHandle:Int)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present()`: mapped member is absent
@@ -327,6 +337,7 @@ Expected members: 16; emitted members: 4.
 Expected members: 30; emitted members: 4.
 
 - `INTERFACE_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager`: missing protocols ['Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService', 'Microsoft.Xna.Framework.IGraphicsDeviceManager']
+- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()`: CLR getter is infallible, so the Swift reader must not throw; found throws=True
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.CanResetDevice(_:Microsoft.Xna.Framework.GraphicsDeviceInformation)`: mapped member is absent
@@ -359,7 +370,6 @@ Expected members: 30; emitted members: 4.
 ## Missing types
 
 - `Microsoft.Xna.Framework.Audio.AudioCategory`
-- `Microsoft.Xna.Framework.Audio.AudioEmitter`
 - `Microsoft.Xna.Framework.Audio.AudioEngine`
 - `Microsoft.Xna.Framework.Audio.Cue`
 - `Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance`

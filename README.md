@@ -98,12 +98,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=122
-TARGET_MEMBERS=1684
+TARGET_TYPES=123
+TARGET_MEMBERS=1690
 TOTAL_DIAGNOSTICS=286
-COMPLETE_TYPES=117
+COMPLETE_TYPES=118
 PARTIAL_TYPES=5
-MISSING_TYPES=135
+MISSING_TYPES=134
 MISSING_MEMBER=131
 ```
 
@@ -126,8 +126,39 @@ MouseState, MediaState, MediaSourceType, MicrophoneState, the seven
 Foundation-17 types, TouchLocation, GestureSample, DisplayModeCollection,
 IUpdateable, IDrawable, GameComponentCollectionEventArgs,
 ResourceCreatedEventArgs, ResourceDestroyedEventArgs, AudioListener,
-TouchCollection, TouchCollection.Enumerator and Media.Video. Every implemented
-member has qualified behavior; missing members remain absent.
+TouchCollection, TouchCollection.Enumerator, Media.Video and AudioEmitter.
+Every implemented member has qualified behavior; missing members remain absent.
+
+## Throwing property accessors
+
+Swift has no throwing property setter, and the compiler separately refuses any
+`set` beside a getter that is `throws`. CNA-Swift projects CLR properties
+**per accessor**: the getter keeps property or subscript syntax and gains
+`get throws` exactly when the XNA getter is fallible, and a setter Swift cannot
+express becomes the method `Set<PropertyName>` carrying the setter's own
+`throws`.
+
+```swift
+// Microsoft.Xna.Framework.Audio.AudioEmitter
+public var Position: Microsoft.Xna.Framework.Vector3 { get set }   // both infallible
+public var DopplerScale: Float { get }                             // getter infallible
+public func SetDopplerScale(_ value: Float) throws                 // setter validates
+```
+
+`SetDopplerScale` is the projection of the CLR **setter accessor**, not a second
+XNA member; `DopplerScale` remains one member in every scoreboard, and there is
+deliberately no writable property beside the writer, because an unchecked path
+would accept values XNA rejects. The `Item`/`SetItem` rule for indexed
+properties is the same rule, unchanged.
+
+Which accessors are fallible is not a judgement call. It is derived from the
+CIL of the seven registered assemblies by
+`tools/api_compat/accessor_fallibility.py`, pinned as
+`tools/api_compat/reference/xna40-accessor-fallibility.json`, and hash-checked
+by the verifier exactly as the metadata contract is — 114 fallible getters and
+113 fallible setters out of 840 properties, each carrying the call chain that
+reaches the throw. See `docs/xna-swift-mapping.md` and
+`docs/foundation-22-accessor-projection-evidence.md`.
 
 ## Foundation 14 pure managed batch
 
@@ -373,6 +404,8 @@ swift test
 swift test -c release
 swift package dump-symbol-graph
 python3 tools/api_compat/verify.py --self-test
+python3 tools/api_compat/verify.py --graph-self-test \
+  --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json
 python3 tools/api_compat/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
   --output docs/generated/api-compat-report.json \
@@ -391,7 +424,22 @@ python3 tools/api_compat/pinned_assembly_audit.py \
   --require-exact Microsoft.Xna.Framework.dll \
   --require-exact Microsoft.Xna.Framework.Graphics.dll \
   --output docs/generated/pinned-assembly-audit.json
+python3 tools/api_compat/accessor_fallibility.py \
+  --assembly-dir /path/to/xna/redistributable \
+  --output tools/api_compat/reference/xna40-accessor-fallibility.json \
+  --markdown docs/generated/accessor-fallibility-inventory.md
 ```
+
+`accessor_fallibility.py` regenerates the pinned per-accessor fallibility
+verdicts from the same registered assemblies. It carries 34 self-tests,
+including five mutations that must flip a verdict and a bound proving its one
+approximation immaterial, and the verifier refuses to run if the pinned file's
+digest does not match `accessorFallibilitySha256` in `mapping-rules.json`.
+
+`verify.py --graph-self-test` runs twelve negative fixtures cut from the Symbol
+Graph the compiler actually emitted: each mutates a real declaration the way a
+wrong Swift signature would and must introduce a diagnostic the unmutated graph
+does not already carry.
 
 `pinned_assembly_audit.py` decides whether an XNA assembly may be used as a
 behavior authority. It reconstructs each assembly's public metadata from

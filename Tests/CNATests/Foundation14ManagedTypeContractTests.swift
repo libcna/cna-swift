@@ -85,21 +85,27 @@ extension PureValueTests {
 
     func testIEffectFogXnaContract() {
         // The pinned interface declares exactly four abstract read/write
-        // properties with these names and types and no method. Naming every
-        // requirement in a getter/setter pair is the whole contract; the
-        // interface has no behavior of its own.
+        // properties with these names and types and no method. Three project
+        // to ordinary Swift properties. `FogColor` is fallible in every
+        // registered implementor -- both accessors forward to
+        // `EffectParameter`, which validates and throws -- so its reader is
+        // `{ get throws }` and its writer is the projected `SetFogColor`
+        // accessor method. That is one CLR member, not two.
         typealias Fog = Microsoft.Xna.Framework.Graphics.IEffectFog
-        let read: (Fog) -> (Bool, Float, Float, Microsoft.Xna.Framework.Vector3) = {
-            ($0.FogEnabled, $0.FogStart, $0.FogEnd, $0.FogColor)
+        let read: (Fog) throws -> (Bool, Float, Float, Microsoft.Xna.Framework.Vector3) = {
+            ($0.FogEnabled, $0.FogStart, $0.FogEnd, try $0.FogColor)
         }
-        let write: (inout Fog, Bool, Float, Float, Microsoft.Xna.Framework.Vector3) -> Void = {
+        let write: (inout Fog, Bool, Float, Float) -> Void = {
             $0.FogEnabled = $1
             $0.FogStart = $2
             $0.FogEnd = $3
-            $0.FogColor = $4
+        }
+        let writeColor: (Fog, Microsoft.Xna.Framework.Vector3) throws -> Void = {
+            try $0.SetFogColor($1)
         }
         _ = read
         _ = write
+        _ = writeColor
         XCTAssertEqual(String(describing: Fog.self), "IEffectFog")
     }
 

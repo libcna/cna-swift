@@ -53,6 +53,32 @@ type and member shape in the contract's own schema, and diffs it. It exits
 nonzero if a calibration assembly is not reproduced exactly, or if its own
 mutation self-tests fail.
 
+`accessor_fallibility.py` derives, from the CIL of the same registered
+assemblies, whether each public property accessor has a contract-relevant
+failure path. Swift cannot express a throwing setter, so that per-accessor
+answer decides whether a CLR property projects to `var P { get set }` or to
+`var P { get }` plus a `SetP(_:) throws` writer method.
+
+```text
+python3 tools/api_compat/accessor_fallibility.py \
+  --assembly-dir /path/to/xna/redistributable \
+  --output tools/api_compat/reference/xna40-accessor-fallibility.json \
+  --markdown docs/generated/accessor-fallibility-inventory.md
+```
+
+The emitted JSON is a *pinned reference*, hash-checked by `verify.py` against
+`accessorFallibilitySha256` in `mapping-rules.json`, so the verifier still runs
+with no Microsoft binary present. Every fallible verdict carries the shortest
+call chain that reaches the throw and the exception types constructed there.
+Thirty-four self-tests run on every invocation, including five mutations that
+must flip a verdict and a two-sided bound proving that merging same-named
+overloads by arity changes no accessor verdict.
+
+`verify.py --graph-self-test --symbol-graph <path>` is the reader's own
+negative-fixture suite: twelve mutations of the Symbol Graph the compiler
+actually emitted, each of which must introduce a diagnostic the unmutated graph
+does not already carry.
+
 `--require-exact` is the calibration gate. The reconstruction's correctness is
 not asserted, it is demonstrated on the assemblies whose provenance was already
 established, and only then trusted for the others. No Microsoft binary is
