@@ -32,3 +32,29 @@ python3 tools/api_compat/dependency_graph.py \
   --report docs/generated/api-compat-report.json \
   --output docs/generated/dependency-graph.json
 ```
+
+## Reference assembly registration
+
+`pinned_assembly_audit.py` decides whether a Microsoft XNA assembly may be used
+as a behavior authority. The retained contract is the public-shape authority;
+an assembly earns behavior authority only by machine-comparing its public
+metadata against every contract entry it declares.
+
+```text
+python3 tools/api_compat/pinned_assembly_audit.py \
+  --assembly-dir /path/to/xna/redistributable \
+  --require-exact Microsoft.Xna.Framework.dll \
+  --require-exact Microsoft.Xna.Framework.Graphics.dll \
+  --output docs/generated/pinned-assembly-audit.json
+```
+
+The tool disassembles each assembly with `ikdasm`, reconstructs the public
+type and member shape in the contract's own schema, and diffs it. It exits
+nonzero if a calibration assembly is not reproduced exactly, or if its own
+mutation self-tests fail.
+
+`--require-exact` is the calibration gate. The reconstruction's correctness is
+not asserted, it is demonstrated on the assemblies whose provenance was already
+established, and only then trusted for the others. No Microsoft binary is
+stored in the repository; only the SHA-256 of each registered assembly is
+retained, in `docs/xna-swift-mapping.md`.

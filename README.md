@@ -47,6 +47,17 @@ without claiming any mouse device, cursor, microphone, capture, media player,
 media library, or video support. `MouseState` is a value snapshot with no
 producer: `Input.Mouse` is not implemented.
 
+Foundation 17 registers five more Microsoft XNA assemblies as authoritative
+reference inputs — `Game`, `Input.Touch`, `Xact`, `Video` and `Storage` — after
+machine-comparing their public metadata against the retained contract, which
+reproduces all 257 types and 2,964 members exactly from seven hash-identified
+files. It then consumes the first seven types that unblocks: the `GestureType`
+OptionSet, the `TouchLocationState`, `VideoSoundtrackType` and
+`AudioStopOptions` enums, the `TouchPanelCapabilities` value struct, and the
+`IGameComponent` and `IGraphicsDeviceManager` protocols. No touch panel, XACT
+engine, video player, storage device, or graphics device capability is claimed;
+nothing conforms to either protocol.
+
 The old flat API and known fake behaviors are absent.
 
 ## Measured surface
@@ -56,12 +67,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=103
-TARGET_MEMBERS=1594
-TOTAL_DIAGNOSTICS=305
-COMPLETE_TYPES=98
+TARGET_TYPES=110
+TARGET_MEMBERS=1620
+TOTAL_DIAGNOSTICS=298
+COMPLETE_TYPES=105
 PARTIAL_TYPES=5
-MISSING_TYPES=154
+MISSING_TYPES=147
 MISSING_MEMBER=131
 ```
 
@@ -80,7 +91,8 @@ Curve, CurveKey, CurveKeyCollection, CurveContinuity, CurveLoopType,
 CurveTangent, all eleven GamePad-family types, DisplayOrientation, BufferUsage,
 DepthFormat, FillMode, SurfaceFormat, DisplayMode, RenderTargetUsage, the
 25 Foundation-14 pure-managed types listed below, PresentationParameters,
-MouseState, MediaState, MediaSourceType, and MicrophoneState. Every implemented member has
+MouseState, MediaState, MediaSourceType, MicrophoneState, and the seven
+Foundation-17 types. Every implemented member has
 qualified behavior; missing members remain absent.
 
 ## Foundation 14 pure managed batch

@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=103
-TARGET_MEMBERS=1594
-TOTAL_DIAGNOSTICS=305
-COMPLETE_TYPES=98
+TARGET_TYPES=110
+TARGET_MEMBERS=1620
+TOTAL_DIAGNOSTICS=298
+COMPLETE_TYPES=105
 PARTIAL_TYPES=5
-MISSING_TYPES=154
-MISSING_TYPE=154
+MISSING_TYPES=147
+MISSING_TYPE=147
 MISSING_MEMBER=131
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -40,10 +40,10 @@ PUBLIC_NATIVE_FFI_LEAK=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=115
+LANGUAGE_PROJECTION_EXCLUSIONS=116
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
-NAMESPACE_MARKERS=9
+NAMESPACE_MARKERS=10
 INHERITED_MEMBER_PROJECTIONS=3
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
 ARRAY_MUTATION_MAPPINGS=19
@@ -58,6 +58,7 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 ## Complete types
 
 - `Microsoft.Xna.Framework.Audio.AudioChannels`
+- `Microsoft.Xna.Framework.Audio.AudioStopOptions`
 - `Microsoft.Xna.Framework.Audio.MicrophoneState`
 - `Microsoft.Xna.Framework.Audio.SoundState`
 - `Microsoft.Xna.Framework.BoundingBox`
@@ -125,6 +126,8 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Graphics.VertexElementFormat`
 - `Microsoft.Xna.Framework.Graphics.VertexElementUsage`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
+- `Microsoft.Xna.Framework.IGameComponent`
+- `Microsoft.Xna.Framework.IGraphicsDeviceManager`
 - `Microsoft.Xna.Framework.Input.ButtonState`
 - `Microsoft.Xna.Framework.Input.Buttons`
 - `Microsoft.Xna.Framework.Input.GamePad`
@@ -141,10 +144,14 @@ NONPUBLIC_CONSTRUCTION_PROJECTIONS=4
 - `Microsoft.Xna.Framework.Input.KeyboardState`
 - `Microsoft.Xna.Framework.Input.Keys`
 - `Microsoft.Xna.Framework.Input.MouseState`
+- `Microsoft.Xna.Framework.Input.Touch.GestureType`
+- `Microsoft.Xna.Framework.Input.Touch.TouchLocationState`
+- `Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities`
 - `Microsoft.Xna.Framework.MathHelper`
 - `Microsoft.Xna.Framework.Matrix`
 - `Microsoft.Xna.Framework.Media.MediaSourceType`
 - `Microsoft.Xna.Framework.Media.MediaState`
+- `Microsoft.Xna.Framework.Media.VideoSoundtrackType`
 - `Microsoft.Xna.Framework.Plane`
 - `Microsoft.Xna.Framework.PlaneIntersectionType`
 - `Microsoft.Xna.Framework.PlayerIndex`
@@ -340,7 +347,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Audio.AudioEmitter`
 - `Microsoft.Xna.Framework.Audio.AudioEngine`
 - `Microsoft.Xna.Framework.Audio.AudioListener`
-- `Microsoft.Xna.Framework.Audio.AudioStopOptions`
 - `Microsoft.Xna.Framework.Audio.Cue`
 - `Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance`
 - `Microsoft.Xna.Framework.Audio.InstancePlayLimitException`
@@ -450,18 +456,13 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.VertexPositionTexture`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.IDrawable`
-- `Microsoft.Xna.Framework.IGameComponent`
-- `Microsoft.Xna.Framework.IGraphicsDeviceManager`
 - `Microsoft.Xna.Framework.IUpdateable`
 - `Microsoft.Xna.Framework.Input.Mouse`
 - `Microsoft.Xna.Framework.Input.Touch.GestureSample`
-- `Microsoft.Xna.Framework.Input.Touch.GestureType`
 - `Microsoft.Xna.Framework.Input.Touch.TouchCollection`
 - `Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator`
 - `Microsoft.Xna.Framework.Input.Touch.TouchLocation`
-- `Microsoft.Xna.Framework.Input.Touch.TouchLocationState`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`
-- `Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities`
 - `Microsoft.Xna.Framework.LaunchParameters`
 - `Microsoft.Xna.Framework.Media.Album`
 - `Microsoft.Xna.Framework.Media.AlbumCollection`
@@ -483,7 +484,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Media.SongCollection`
 - `Microsoft.Xna.Framework.Media.Video`
 - `Microsoft.Xna.Framework.Media.VideoPlayer`
-- `Microsoft.Xna.Framework.Media.VideoSoundtrackType`
 - `Microsoft.Xna.Framework.Media.VisualizationData`
 - `Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs`
 - `Microsoft.Xna.Framework.Storage.StorageContainer`

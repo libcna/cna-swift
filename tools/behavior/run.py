@@ -15,6 +15,12 @@ REFERENCE = ROOT / "tools/api_compat/reference/xna40-windows-runtime-contract.js
 # Foundation 14 pure managed batch. Each entry is a pinned XNA metadata
 # closure; the table below is read back out of the pinned contract rather
 # than transcribed, so the report cannot drift from the reference.
+FOUNDATION_17_BATCH = [
+    "Microsoft.Xna.Framework.Audio.AudioStopOptions",
+    "Microsoft.Xna.Framework.Input.Touch.GestureType",
+    "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
+    "Microsoft.Xna.Framework.Media.VideoSoundtrackType",
+]
 FOUNDATION_16_BATCH = [
     "Microsoft.Xna.Framework.Audio.MicrophoneState",
     "Microsoft.Xna.Framework.Media.MediaSourceType",
@@ -69,6 +75,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation14ManagedTypeContractTests.swift",
     ROOT / "Tests/CNATests/PresentationParametersContractTests.swift",
     ROOT / "Tests/CNATests/Foundation16ContractTests.swift",
+    ROOT / "Tests/CNATests/Foundation17ContractTests.swift",
 ]
 
 
@@ -109,6 +116,7 @@ def main() -> int:
 
     batch_contracts = enum_contracts(FOUNDATION_14_BATCH)
     foundation16_contracts = enum_contracts(FOUNDATION_16_BATCH)
+    foundation17_contracts = enum_contracts(FOUNDATION_17_BATCH)
     report = {
         "schemaVersion": 1,
         "authority": "PURE_XNA_DERIVED",
@@ -203,6 +211,11 @@ def main() -> int:
                 "MEDIA_STATE": "MediaStateXnaContract",
                 "MEDIA_SOURCE_TYPE": "MediaSourceTypeXnaContract",
                 "MICROPHONE_STATE": "MicrophoneStateXnaContract",
+                "AUDIO_STOP_OPTIONS": "AudioStopOptionsXnaContract",
+                "VIDEO_SOUNDTRACK_TYPE": "VideoSoundtrackTypeXnaContract",
+                "TOUCH_LOCATION_STATE": "TouchLocationStateXnaContract",
+                "GESTURE_TYPE": "GestureTypeXnaContract",
+                "TOUCH_PANEL_CAPABILITIES": "TouchPanelCapabilitiesXnaContract",
             }.items()
         },
         "displayOrientationContract": {
@@ -312,6 +325,16 @@ def main() -> int:
         },
         "foundation14PureManagedBatchContracts": batch_contracts,
         "foundation16PureManagedBatchContracts": foundation16_contracts,
+        "foundation17PureManagedBatchContracts": foundation17_contracts,
+        "foundation17ReferenceInputs":
+            "AudioStopOptions from Microsoft.Xna.Framework.Xact.dll; "
+            "GestureType and TouchLocationState from "
+            "Microsoft.Xna.Framework.Input.Touch.dll; VideoSoundtrackType from "
+            "Microsoft.Xna.Framework.Video.dll; TouchPanelCapabilities from "
+            "Microsoft.Xna.Framework.Input.Touch.dll; IGameComponent and "
+            "IGraphicsDeviceManager from Microsoft.Xna.Framework.Game.dll. "
+            "All five assemblies were registered as authoritative reference "
+            "inputs in Foundation 17; see docs/generated/pinned-assembly-audit.json",
         "mouseStateContract": {
             "kind": "struct",
             "sealed": True,

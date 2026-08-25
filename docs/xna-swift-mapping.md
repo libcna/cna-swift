@@ -5,14 +5,49 @@ runtime metadata contract, not CNA and not a sibling binding. The selected
 reference contains 257 public types and 2,964 declared members. The retained
 contract SHA-256 is
 `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`.
-Its primary `Microsoft.Xna.Framework.dll` input has SHA-256
-`38e7093f52d7474bbc6256906519781a1210d7da50a1c667b52716fcf49ca130`, and the
-companion `Microsoft.Xna.Framework.Graphics.dll` that owns the Graphics
-namespace has SHA-256
-`560080fc39021c611ca9d076dcebed312faf6d7d1413c2dc523683ea635e9f55`.
 The snapshot was extracted from the Microsoft XNA 4.0 Windows runtime metadata
 by mature-binding tooling and copied byte-for-byte; `tools/api_compat` verifies
 the retained snapshot hash before projecting it.
+
+## Registered reference assemblies
+
+A hash-matched assembly is the **behaviour** authority for the types it
+declares. All seven assemblies below are version 4.0.0.0 of the same Microsoft
+XNA Framework redistributable and are registered as authoritative reference
+inputs. No Microsoft binary or extracted proprietary source is in the
+repository or the release archive; only the hashes are retained.
+
+| Contract types | Assembly | SHA-256 | Registered |
+|---:|---|---|---|
+| 120 | `Microsoft.Xna.Framework.dll` | `38e7093f52d7474bbc6256906519781a1210d7da50a1c667b52716fcf49ca130` | Foundation 1 |
+| 99 | `Microsoft.Xna.Framework.Graphics.dll` | `560080fc39021c611ca9d076dcebed312faf6d7d1413c2dc523683ea635e9f55` | Foundation 1 |
+| 17 | `Microsoft.Xna.Framework.Game.dll` | `b5dffdd8125abef2a4507ba4e1d2f11062143f0a63d48fe4f298b95ad746a1f0` | Foundation 17 |
+| 8 | `Microsoft.Xna.Framework.Input.Touch.dll` | `b0585224c18022c3661057ae79544644c10f33f1dc529678364f3d6b25151c25` | Foundation 17 |
+| 7 | `Microsoft.Xna.Framework.Xact.dll` | `a14d5364dca7cf49fb90639e87ba04d52b59a700dc9198efa5707ce8eae28f0a` | Foundation 17 |
+| 3 | `Microsoft.Xna.Framework.Video.dll` | `17538b1ca9d48a993e2cd88c96b436df08e7abb4aec5d4758eb21feb580d6e06` | Foundation 17 |
+| 3 | `Microsoft.Xna.Framework.Storage.dll` | `798f678e9ae3d9afc3bed66c30123bc9634fb923b6d200188344b618e608cbb8` | Foundation 17 |
+
+Registration is a deliberate provenance step, never a side effect of selecting
+a type. An assembly is registered only after
+`tools/api_compat/pinned_assembly_audit.py` machine-compares its public
+metadata against every retained contract entry it owns. That comparison
+reproduces the contract's **257 types and all 2,964 members exactly**, with
+zero mismatches, from these seven files and no others.
+
+The audit's own correctness is not asserted, it is calibrated: the two
+assemblies registered before the tool existed must reproduce their entries
+exactly, and `--require-exact` makes that a hard gate. Sixty mutation
+self-tests additionally prove the comparison is not vacuous — a dropped,
+renamed, retyped, restaticed or invented member, a changed constant, a flipped
+`sealed` bit, a changed base type and a dropped declared interface must each
+be detected.
+
+The contract records a *reduced* direct-interface set: an interface already
+implied as a base of another listed entry is omitted, as `IEnumerable` is
+behind `IEnumerable<T>`. The audit therefore requires the sound relation —
+every interface the contract records is actually declared by the assembly —
+and reports the 43 reductions separately rather than treating them as
+discrepancies.
 
 ## Names and kinds
 

@@ -2278,12 +2278,17 @@ def self_test() -> None:
         failures.append(
             "RenderTargetUsage publicly exposed value__ did not fail")
 
-    # Foundation 14 and 16 pure managed batches. Every batch enum is driven
-    # through the same structural mutation matrix, built from its own pinned
-    # reference model rather than from a transcribed table, so a batch type
-    # cannot be registered without negative coverage for its exact literals.
+    # Foundation 14, 16 and 17 pure managed batches. Every batch enum is
+    # driven through the same structural mutation matrix, built from its own
+    # pinned reference model rather than from a transcribed table, so a batch
+    # type cannot be registered without negative coverage for its exact
+    # literals.
     batch_enum_names = [
+        "Microsoft.Xna.Framework.Audio.AudioStopOptions",
         "Microsoft.Xna.Framework.Audio.MicrophoneState",
+        "Microsoft.Xna.Framework.Input.Touch.GestureType",
+        "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
+        "Microsoft.Xna.Framework.Media.VideoSoundtrackType",
         "Microsoft.Xna.Framework.Media.MediaSourceType",
         "Microsoft.Xna.Framework.Media.MediaState",
         "Microsoft.Xna.Framework.Graphics.Blend",
@@ -2469,6 +2474,9 @@ def self_test() -> None:
         "Microsoft.Xna.Framework.Graphics.VertexElement",
         "Microsoft.Xna.Framework.Graphics.PresentationParameters",
         "Microsoft.Xna.Framework.Input.MouseState",
+        "Microsoft.Xna.Framework.IGameComponent",
+        "Microsoft.Xna.Framework.IGraphicsDeviceManager",
+        "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",
     ]
     for managed_name in batch_managed_names:
         managed_expected = {managed_name: copy.deepcopy(all_expected[managed_name])}
@@ -2498,9 +2506,12 @@ def self_test() -> None:
         managed_mutations: list[tuple[str, str, Any]] = [
             (f"{managed_simple} missing type", "MISSING_TYPE",
              lambda m, n=managed_name: m.pop(n)),
+            # The relocation target must differ from the type's own
+            # namespace, otherwise the mutation is a no-op for a type that
+            # already lives at the namespace root.
             (f"{managed_simple} wrong namespace", "MISSING_TYPE",
              lambda m, n=managed_name, s=managed_simple: m.__setitem__(
-                 f"Microsoft.Xna.Framework.{s}", m.pop(n))),
+                 f"Microsoft.Xna.Framework.Relocated.{s}", m.pop(n))),
             (f"{managed_simple} wrong Swift kind", "TYPE_KIND_MISMATCH",
              lambda m, n=managed_name, k=other_kind: setattr(m[n], "kind", k)),
             (f"{managed_simple} unexpected description helper", "UNEXPECTED_MEMBER",

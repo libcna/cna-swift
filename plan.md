@@ -1,13 +1,22 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 16 — Pure Managed Batch B. Four entirely missing
-pure-managed XNA types carrying 21 mapped Swift XNA identities, over the
-completed Foundation 1–15 baseline.
+**Milestone:** Foundation 17 — Reference assembly registration and Pure
+Managed Batch C. Five additional Microsoft XNA assemblies registered as
+authoritative reference inputs, and the first seven types that unblocks,
+carrying 26 mapped Swift XNA identities, over the completed Foundation 1–16
+baseline.
 
 ## Normative rules
 
 1. Pinned Microsoft XNA 4.0 Windows runtime metadata is the public shape
-   authority, and the hash-matched assembly IL is the behavior authority. FNA
+   authority, and the hash-matched assembly IL is the behavior authority. An
+   assembly earns behavior authority only by **registration**: its SHA-256 is
+   recorded and `tools/api_compat/pinned_assembly_audit.py` machine-compares
+   its public metadata against every retained contract entry it declares. The
+   audit is calibrated on the assemblies whose provenance predates it and
+   carries its own mutation self-tests, so it cannot pass vacuously. Seven
+   assemblies are registered and together reproduce the contract's 257 types
+   and 2,964 members exactly. FNA
    and MonoGame are engineering comparators only. For a type whose entire
    contract is metadata, the pinned contract alone is sufficient and no
    behavior surrogate or reference probe is created. Every type completed in
@@ -56,7 +65,35 @@ completed Foundation 1–15 baseline.
 
 ## Qualified selected surface
 
-Foundation 16 adds exactly these four types, all previously entirely missing:
+Foundation 17 registers `Microsoft.Xna.Framework.Game.dll`,
+`Microsoft.Xna.Framework.Input.Touch.dll`, `Microsoft.Xna.Framework.Xact.dll`,
+`Microsoft.Xna.Framework.Video.dll` and `Microsoft.Xna.Framework.Storage.dll`,
+and adds exactly these seven types, all previously entirely missing:
+
+- `Input.Touch.GestureType`, the one Foundation-17 enum carrying
+  `System.FlagsAttribute`, mapping to a Swift `OptionSet` with `None` as the
+  empty set and ten disjoint single bits.
+- Three ordinary `Int32` enums with no `[Flags]` attribute:
+  `Input.Touch.TouchLocationState`, `Media.VideoSoundtrackType`, and
+  `Audio.AudioStopOptions` — whose flags-free status is corroborated by the
+  pinned `CA1027:MarkEnumsWithFlags` suppression it carries.
+- `Input.Touch.TouchPanelCapabilities`, a sealed value struct whose two auto
+  properties have private setters, projected with internal construction and no
+  public initializer. `TouchPanel` is not implemented and no capability is
+  claimed, queried, or invented.
+- `IGameComponent` and `IGraphicsDeviceManager`, mapping to Swift protocols
+  whose four requirements all take the established `throws` projection. Nothing
+  conforms to either; `GraphicsDeviceManager` remains an untouched partial.
+
+`Audio.RendererDetail` was dependency-complete and within a newly registered
+assembly and was still deferred: its `GetHashCode` depends on
+`System.String.GetHashCode()`, which is an unspecified, implementation-defined
+function that is not derivable from IL. Semantic fidelity outranks scoreboard
+progress.
+
+`Microsoft.Xna.Framework.Input.Touch` gained its namespace marker.
+
+Foundation 16 added exactly these four types, all previously entirely missing:
 
 - `Microsoft.Xna.Framework.Input.MouseState`, a sealed sequential value struct
   mapping to a Swift struct with 14 identities: the constructor, eight get-only
@@ -129,14 +166,17 @@ callback, or constant was added, and the five runtime partials are untouched.
   the pinned assembly IL for this milestone, as were all 25 Foundation-14
   entries before it.
 - Formal projection: 257 Swift types / 2,887 Swift members.
-- Compiler target: 103 types / 1,594 members; 98 complete, five partial, 154
-  missing. Total diagnostics are 305. Normal strict remains red only for the
+- Compiler target: 110 types / 1,620 members; 105 complete, five partial, 147
+  missing. Total diagnostics are 298. Normal strict remains red only for the
   deferred profile; leak-only is green.
-- Verifier: 1,606 mutation/self-tests pass, up from 1,396. Every completed type
+- Verifier: 1,822 mutation/self-tests pass, up from 1,606. Every completed type
   is locally complete with zero diagnostics. Manual/applied allowlists and
   unmeasured structural categories are zero.
-- Pure behavior: 1,493 XNA-derived observation/assertion sites with zero
-  failures, up from 1,443. Swift projection qualification stays in separate
+- Reference assemblies: seven registered, reproducing 257 contract types and
+  2,964 contract members exactly; calibration passes and 60 audit mutation
+  self-tests pass.
+- Pure behavior: 1,523 XNA-derived observation/assertion sites with zero
+  failures, up from 1,493. Swift projection qualification stays in separate
   tests and is not counted as XNA behavior.
 - Dependency graph: node names are now mapped exactly as the strict verifier
   maps them, which removed six false-positive dependency-complete candidates

@@ -13,7 +13,10 @@ public enum Microsoft {
             }
 
             /// Namespace marker only; excluded from XNA type counts.
-            public enum Input {}
+            public enum Input {
+                /// Namespace marker only; excluded from XNA type counts.
+                public enum Touch {}
+            }
 
             /// Namespace marker only; excluded from XNA type counts.
             public enum Audio {}

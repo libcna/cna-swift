@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1493,
-  "ASSERTIONS": 1493,
+  "OBSERVATIONS": 1523,
+  "ASSERTIONS": 1523,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -119,7 +119,12 @@
     "testMouseStateXnaContractToString",
     "testMediaStateXnaContract",
     "testMediaSourceTypeXnaContract",
-    "testMicrophoneStateXnaContract"
+    "testMicrophoneStateXnaContract",
+    "testAudioStopOptionsXnaContract",
+    "testVideoSoundtrackTypeXnaContract",
+    "testTouchLocationStateXnaContract",
+    "testGestureTypeXnaContract",
+    "testTouchPanelCapabilitiesXnaContract"
   ],
   "groupCounts": {
     "Vector2": 2,
@@ -208,7 +213,12 @@
     "MOUSE_STATE_TO_STRING": 1,
     "MEDIA_STATE": 1,
     "MEDIA_SOURCE_TYPE": 1,
-    "MICROPHONE_STATE": 1
+    "MICROPHONE_STATE": 1,
+    "AUDIO_STOP_OPTIONS": 1,
+    "VIDEO_SOUNDTRACK_TYPE": 1,
+    "TOUCH_LOCATION_STATE": 1,
+    "GESTURE_TYPE": 1,
+    "TOUCH_PANEL_CAPABILITIES": 1
   },
   "displayOrientationContract": {
     "flags": true,
@@ -648,6 +658,61 @@
       "swiftProjectionQualificationCountedAsXnaBehavior": false
     }
   },
+  "foundation17PureManagedBatchContracts": {
+    "Microsoft.Xna.Framework.Audio.AudioStopOptions": {
+      "kind": "enum",
+      "flags": false,
+      "underlyingType": "System.Int32",
+      "values": {
+        "AsAuthored": 0,
+        "Immediate": 1
+      },
+      "swiftProjectionQualificationCountedAsXnaBehavior": false
+    },
+    "Microsoft.Xna.Framework.Input.Touch.GestureType": {
+      "kind": "OptionSet",
+      "flags": true,
+      "underlyingType": "System.Int32",
+      "values": {
+        "None": 0,
+        "Tap": 1,
+        "DoubleTap": 2,
+        "Hold": 4,
+        "HorizontalDrag": 8,
+        "VerticalDrag": 16,
+        "FreeDrag": 32,
+        "Pinch": 64,
+        "Flick": 128,
+        "DragComplete": 256,
+        "PinchComplete": 512
+      },
+      "swiftProjectionQualificationCountedAsXnaBehavior": false
+    },
+    "Microsoft.Xna.Framework.Input.Touch.TouchLocationState": {
+      "kind": "enum",
+      "flags": false,
+      "underlyingType": "System.Int32",
+      "values": {
+        "Invalid": 0,
+        "Released": 1,
+        "Pressed": 2,
+        "Moved": 3
+      },
+      "swiftProjectionQualificationCountedAsXnaBehavior": false
+    },
+    "Microsoft.Xna.Framework.Media.VideoSoundtrackType": {
+      "kind": "enum",
+      "flags": false,
+      "underlyingType": "System.Int32",
+      "values": {
+        "Music": 0,
+        "Dialog": 1,
+        "MusicAndDialog": 2
+      },
+      "swiftProjectionQualificationCountedAsXnaBehavior": false
+    }
+  },
+  "foundation17ReferenceInputs": "AudioStopOptions from Microsoft.Xna.Framework.Xact.dll; GestureType and TouchLocationState from Microsoft.Xna.Framework.Input.Touch.dll; VideoSoundtrackType from Microsoft.Xna.Framework.Video.dll; TouchPanelCapabilities from Microsoft.Xna.Framework.Input.Touch.dll; IGameComponent and IGraphicsDeviceManager from Microsoft.Xna.Framework.Game.dll. All five assemblies were registered as authoritative reference inputs in Foundation 17; see docs/generated/pinned-assembly-audit.json",
   "mouseStateContract": {
     "kind": "struct",
     "sealed": true,

@@ -9,6 +9,7 @@
     "Microsoft.Xna.Framework.Graphics",
     "Microsoft.Xna.Framework.Graphics.PackedVector",
     "Microsoft.Xna.Framework.Input",
+    "Microsoft.Xna.Framework.Input.Touch",
     "Microsoft.Xna.Framework.Audio",
     "Microsoft.Xna.Framework.Content",
     "Microsoft.Xna.Framework.Media"
@@ -51,6 +52,7 @@
   ],
   "rawTypeChecks": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
+    "Microsoft.Xna.Framework.Audio.AudioStopOptions",
     "Microsoft.Xna.Framework.Audio.MicrophoneState",
     "Microsoft.Xna.Framework.Audio.SoundState",
     "Microsoft.Xna.Framework.DisplayOrientation",
@@ -80,8 +82,11 @@
     "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
     "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
     "Microsoft.Xna.Framework.Input.Buttons",
+    "Microsoft.Xna.Framework.Input.Touch.GestureType",
+    "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
     "Microsoft.Xna.Framework.Media.MediaSourceType",
-    "Microsoft.Xna.Framework.Media.MediaState"
+    "Microsoft.Xna.Framework.Media.MediaState",
+    "Microsoft.Xna.Framework.Media.VideoSoundtrackType"
   ],
   "typeMappings": {
     "System.Void": "Void",

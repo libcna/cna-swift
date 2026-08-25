@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 41,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 39,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.DisplayModeCollection",
@@ -151,31 +151,34 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.IGameComponent",
-      "dependencies": [],
+      "type": "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
+      "dependencies": [
+        "Microsoft.Xna.Framework.IGameComponent"
+      ],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.GameComponent",
-        "Microsoft.Xna.Framework.GameComponentCollection",
-        "Microsoft.Xna.Framework.GameComponentCollectionEventArgs"
+        "Microsoft.Xna.Framework.GameComponentCollection"
       ],
       "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 5,
+      "transitiveMissingReverseReach": 4,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
       ]
     },
     {
-      "type": "Microsoft.Xna.Framework.Audio.AudioStopOptions",
-      "dependencies": [],
+      "type": "Microsoft.Xna.Framework.Input.Touch.TouchLocation",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
+        "Microsoft.Xna.Framework.Vector2"
+      ],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.AudioCategory",
-        "Microsoft.Xna.Framework.Audio.Cue"
+        "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
+        "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator"
       ],
       "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 5,
+      "transitiveMissingReverseReach": 3,
       "transitivePartialReverseReach": []
     }
   ]
