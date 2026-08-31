@@ -1,8 +1,10 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 36 are
-complete, and the native migration off the historical `0.7.0` boundary is done.
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 38 are
+complete: the native migration off the historical `0.7.0` boundary, the
+projected CLR/XNA exception payloads, and the graphics resource hierarchy with
+`RenderTarget2D`.
 
 This file states what is true **now**. The milestone-by-milestone progression
 lives in `NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md`
@@ -78,27 +80,28 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=142               TARGET_MEMBERS=1767
-COMPLETE_TYPES=135             PARTIAL_TYPES=7      MISSING_TYPE=115
-MISSING_MEMBER=129             TOTAL_DIAGNOSTICS=269
+TARGET_TYPES=145               TARGET_MEMBERS=1785
+COMPLETE_TYPES=138             PARTIAL_TYPES=7      MISSING_TYPE=112
+MISSING_MEMBER=128             TOTAL_DIAGNOSTICS=262
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
-NONDERIVABLE_UNSEALED_CLASSES=5    PENDING_BCL_BASE_TYPES=4
+NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 ```
 
 Mismatch categories that are not zero, each a recorded decision rather than an
-oversight: `BASE_MAPPING_MISMATCH=2`, `INTERFACE_MAPPING_MISMATCH=1`,
-`PROPERTY_MAPPING_MISMATCH=4`, `OVERLOAD_MAPPING_MISMATCH=18`. Every other
-mismatch and leak category is 0, including `INTERNAL_TYPE_LEAK`,
-`RAW_HANDLE_LEAK` and `PUBLIC_NATIVE_FFI_LEAK`.
+oversight: `INTERFACE_MAPPING_MISMATCH=1`, `PROPERTY_MAPPING_MISMATCH=4`,
+`OVERLOAD_MAPPING_MISMATCH=17`. Every other mismatch and leak category is 0,
+including `BASE_MAPPING_MISMATCH`, `INHERITANCE_MAPPING_MISMATCH`,
+`INTERNAL_TYPE_LEAK`, `RAW_HANDLE_LEAK` and `PUBLIC_NATIVE_FFI_LEAK`.
 
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=29  ROUTE_PAIRINGS=29  PROTOTYPE_TYPE_POSITIONS=91
-CANONICAL_DECLARATION_CHECKS=91  C_SWIFT_MEASUREMENTS=91
-LAYOUTS=18  LAYOUT_FIELDS=129  CALLBACKS=2  CONSTANTS=212  SCALAR_FACTS=3
+BOUND_FUNCTIONS=36  ROUTE_PAIRINGS=36  PROTOTYPE_TYPE_POSITIONS=113
+CANONICAL_DECLARATION_CHECKS=113  C_SWIFT_MEASUREMENTS=113
+LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=3  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
+PROJECTION_MUTATIONS=15  CAUGHT=15  SURVIVORS=0
 ```
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964

@@ -11,25 +11,25 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 142,
-    "TARGET_MEMBERS": 1767,
-    "TOTAL_DIAGNOSTICS": 269,
-    "COMPLETE_TYPES": 135,
+    "TARGET_TYPES": 145,
+    "TARGET_MEMBERS": 1785,
+    "TOTAL_DIAGNOSTICS": 262,
+    "COMPLETE_TYPES": 138,
     "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 115,
-    "MISSING_TYPE": 115,
-    "MISSING_MEMBER": 129,
+    "MISSING_TYPES": 112,
+    "MISSING_TYPE": 112,
+    "MISSING_MEMBER": 128,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
-    "BASE_MAPPING_MISMATCH": 2,
+    "BASE_MAPPING_MISMATCH": 0,
     "INTERFACE_MAPPING_MISMATCH": 1,
     "FIELD_MAPPING_MISMATCH": 0,
     "PROPERTY_MAPPING_MISMATCH": 4,
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 18,
+    "OVERLOAD_MAPPING_MISMATCH": 17,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -44,11 +44,11 @@
     "UNMEASURED_STRUCTURAL_CATEGORY": 0,
     "ALLOWLIST_ENTRIES": 0,
     "APPLIED_ALLOWLIST_ENTRIES": 0,
-    "LANGUAGE_PROJECTION_EXCLUSIONS": 117,
+    "LANGUAGE_PROJECTION_EXCLUSIONS": 115,
     "ENUM_STORAGE_FIELD_EXCLUSIONS": 49,
     "FINALIZER_LANGUAGE_MAPPINGS": 28,
     "NAMESPACE_MARKERS": 11,
-    "INHERITED_MEMBER_PROJECTIONS": 3,
+    "INHERITED_MEMBER_PROJECTIONS": 1,
     "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 26,
     "ARRAY_MUTATION_MAPPINGS": 20,
     "COMPARABLE_INTERFACE_PROJECTIONS": 1,
@@ -66,16 +66,16 @@
     "MEASURED_ACCESSOR_PROJECTIONS": 19,
     "PENDING_ACCESSOR_PROJECTIONS": 94,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 8,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 10,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 18,
     "XNA_SEALED_CLASS_PROJECTIONS": 18,
-    "NONDERIVABLE_UNSEALED_CLASSES": 5,
+    "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 14,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 15,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 72,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 297,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 7
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 76,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 293,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 10
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -145,6 +145,7 @@
     "Microsoft.Xna.Framework.Graphics.FillMode",
     "Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus",
     "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
+    "Microsoft.Xna.Framework.Graphics.GraphicsResource",
     "Microsoft.Xna.Framework.Graphics.IEffectFog",
     "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
     "Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService",
@@ -172,6 +173,7 @@
     "Microsoft.Xna.Framework.Graphics.PresentInterval",
     "Microsoft.Xna.Framework.Graphics.PresentationParameters",
     "Microsoft.Xna.Framework.Graphics.PrimitiveType",
+    "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
     "Microsoft.Xna.Framework.Graphics.RenderTargetUsage",
     "Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs",
     "Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs",
@@ -180,6 +182,7 @@
     "Microsoft.Xna.Framework.Graphics.SpriteSortMode",
     "Microsoft.Xna.Framework.Graphics.StencilOperation",
     "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
+    "Microsoft.Xna.Framework.Graphics.Texture",
     "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
     "Microsoft.Xna.Framework.Graphics.TextureFilter",
     "Microsoft.Xna.Framework.Graphics.VertexElement",
@@ -295,7 +298,6 @@
     "Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection",
     "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
     "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
-    "Microsoft.Xna.Framework.Graphics.GraphicsResource",
     "Microsoft.Xna.Framework.Graphics.IEffectLights",
     "Microsoft.Xna.Framework.Graphics.IVertexType",
     "Microsoft.Xna.Framework.Graphics.IndexBuffer",
@@ -313,14 +315,12 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
     "Microsoft.Xna.Framework.Graphics.RasterizerState",
-    "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
     "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
     "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
     "Microsoft.Xna.Framework.Graphics.SamplerState",
     "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
     "Microsoft.Xna.Framework.Graphics.SpriteFont",
-    "Microsoft.Xna.Framework.Graphics.Texture",
     "Microsoft.Xna.Framework.Graphics.Texture3D",
     "Microsoft.Xna.Framework.Graphics.TextureCollection",
     "Microsoft.Xna.Framework.Graphics.TextureCube",
@@ -841,13 +841,13 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
       "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTarget2D)",
-      "detail": "mapped member is absent"
+      "category": "OVERLOAD_MAPPING_MISMATCH",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
+      "detail": "required overload is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -1021,11 +1021,6 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.IEffectLights",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
@@ -1111,11 +1106,6 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
@@ -1140,19 +1130,9 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "BASE_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-      "detail": "expected base Microsoft.Xna.Framework.Graphics.GraphicsResource, found None"
-    },
-    {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)",
-      "detail": "mapped overload is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)",
-      "detail": "required overload is absent"
+      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -1280,16 +1260,6 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "BASE_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "detail": "expected base Microsoft.Xna.Framework.Graphics.Texture, found None"
-    },
-    {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32)",
       "detail": "mapped member is absent"
@@ -1352,12 +1322,7 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)",
-      "detail": "mapped overload is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)",
-      "detail": "required overload is absent"
+      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -3209,6 +3174,13 @@
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
     },
     {
+      "type": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
+      "clrSealed": false,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
       "type": "Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs",
       "clrSealed": true,
       "referencePublicConstructors": 0,
@@ -3218,6 +3190,13 @@
     {
       "type": "Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs",
       "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.Texture",
+      "clrSealed": false,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
@@ -4145,6 +4124,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "InvalidEmitterDopplerScale",
+      "pinnedValue": "The doppler scale of an audio emitter must be greater than or equal to zero.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "NegativePlaneDistance",
       "pinnedValue": "You should specify positive value for {0}.",
       "reproducedInSwiftSource": true
@@ -4350,10 +4335,10 @@
     {
       "type": "Microsoft.Xna.Framework.GameTime",
       "clrSealed": false,
-      "swiftFinal": true,
-      "swiftAccess": "public",
+      "swiftFinal": false,
+      "swiftAccess": "open",
       "referencePublicConstructors": 3,
-      "derivableInReferenceButNotInSwift": true
+      "derivableInReferenceButNotInSwift": false
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.DeviceLostException",
@@ -4390,10 +4375,18 @@
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "clrSealed": false,
-      "swiftFinal": true,
-      "swiftAccess": "public",
+      "swiftFinal": false,
+      "swiftAccess": "open",
       "referencePublicConstructors": 1,
-      "derivableInReferenceButNotInSwift": true
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
@@ -4409,6 +4402,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 3,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -4430,26 +4431,34 @@
     {
       "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
       "clrSealed": false,
-      "swiftFinal": true,
-      "swiftAccess": "public",
+      "swiftFinal": false,
+      "swiftAccess": "open",
       "referencePublicConstructors": 1,
-      "derivableInReferenceButNotInSwift": true
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.Texture",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "clrSealed": false,
-      "swiftFinal": true,
-      "swiftAccess": "public",
+      "swiftFinal": false,
+      "swiftAccess": "open",
       "referencePublicConstructors": 2,
-      "derivableInReferenceButNotInSwift": true
+      "derivableInReferenceButNotInSwift": false
     },
     {
       "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "clrSealed": false,
-      "swiftFinal": true,
-      "swiftAccess": "public",
+      "swiftFinal": false,
+      "swiftAccess": "open",
       "referencePublicConstructors": 1,
-      "derivableInReferenceButNotInSwift": true
+      "derivableInReferenceButNotInSwift": false
     },
     {
       "type": "Microsoft.Xna.Framework.Input.GamePad",
@@ -4508,13 +4517,7 @@
       "derivableInReferenceButNotInSwift": false
     }
   ],
-  "nonDerivableUnsealedClasses": [
-    "Microsoft.Xna.Framework.GameTime",
-    "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-    "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-    "Microsoft.Xna.Framework.Graphics.Texture2D",
-    "Microsoft.Xna.Framework.GraphicsDeviceManager"
-  ],
+  "nonDerivableUnsealedClasses": [],
   "returnNullabilityProjections": [
     {
       "ownerType": "Microsoft.Xna.Framework.Audio.AudioCategory",
@@ -6929,56 +6932,56 @@
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
       "member": "Tag",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Object",
       "swiftReturnType": "Any?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Any?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
       "member": "Name",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
       "member": "GraphicsDevice",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.IEffectLights",
@@ -10957,7 +10960,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 2,
+      "targetMembers": 3,
       "diagnostics": [
         {
           "category": "PROPERTY_MAPPING_MISMATCH",
@@ -11066,13 +11069,13 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
           "detail": "mapped member is absent"
         },
         {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTarget2D)",
-          "detail": "mapped member is absent"
+          "category": "OVERLOAD_MAPPING_MISMATCH",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
+          "detail": "required overload is absent"
         },
         {
           "category": "MISSING_MEMBER",
@@ -11262,16 +11265,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 8,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 8,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IEffectFog",
@@ -11685,16 +11682,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
@@ -11793,22 +11784,12 @@
       "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
       "status": "PARTIAL",
       "expectedMembers": 21,
-      "targetMembers": 6,
+      "targetMembers": 5,
       "diagnostics": [
-        {
-          "category": "BASE_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-          "detail": "expected base Microsoft.Xna.Framework.Graphics.GraphicsResource, found None"
-        },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)",
-          "detail": "mapped overload is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)",
-          "detail": "required overload is absent"
+          "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
@@ -11975,28 +11956,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "status": "PARTIAL",
       "expectedMembers": 16,
-      "targetMembers": 5,
+      "targetMembers": 4,
       "diagnostics": [
-        {
-          "category": "BASE_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D",
-          "detail": "expected base Microsoft.Xna.Framework.Graphics.Texture, found None"
-        },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32)",
@@ -12060,12 +12030,7 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)",
-          "detail": "mapped overload is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)",
-          "detail": "required overload is absent"
+          "detail": "mapped member is absent"
         }
       ]
     },

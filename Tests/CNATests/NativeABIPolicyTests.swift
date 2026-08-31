@@ -70,7 +70,7 @@ final class NativeABIPolicyTests: XCTestCase {
     /// and a route type of its own, and each route type is the mechanical
     /// function of its symbol that `tools/native_abi/verify.py` re-derives.
     func testManifestRoutesAreDistinctAndDerivable() {
-        XCTAssertEqual(nativeManifest.count, 29)
+        XCTAssertEqual(nativeManifest.count, 36)
         XCTAssertEqual(Set(nativeManifest.map(\.symbol)).count, nativeManifest.count)
         XCTAssertEqual(Set(nativeManifest.map(\.swiftField)).count, nativeManifest.count)
         XCTAssertEqual(Set(nativeManifest.map(\.routeType)).count, nativeManifest.count)

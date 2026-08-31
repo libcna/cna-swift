@@ -55,9 +55,9 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=29  ROUTE_PAIRINGS=29  PROTOTYPE_TYPE_POSITIONS=91
-CANONICAL_DECLARATION_CHECKS=91  C_SWIFT_MEASUREMENTS=91
-LAYOUTS=18  LAYOUT_FIELDS=129  CALLBACKS=2  CONSTANTS=212  SCALAR_FACTS=3
+BOUND_FUNCTIONS=36  ROUTE_PAIRINGS=36  PROTOTYPE_TYPE_POSITIONS=113
+CANONICAL_DECLARATION_CHECKS=113  C_SWIFT_MEASUREMENTS=113
+LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=3  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
 
@@ -120,3 +120,15 @@ three exact copied-POD layouts, and 46 player/dead-zone/threshold/button/type
 constants. Every field offset and function position was compiler-measured; no
 adjacent CNA controller extension route was bound. All of it still holds on
 0.21.0, unchanged.
+
+## The render-target routes
+
+Foundation 38 added the first native surface since the migration: seven routes
+(`cna_texture_get_info`, `cna_render_target2d_create`,
+`cna_render_target_get_info`, `cna_render_target_destroy`,
+`cna_graphics_device_set_render_target2d` and the ContentLost
+subscribe/unsubscribe pair), three mirrored structures and one mirrored
+callback. Their first verification run failed on two positions the verifier
+could not yet spell — `CNA_RenderTargetEventRegistrationHandle` and `void*` —
+which is the canonical-declaration check working on the first surface added
+since it existed.

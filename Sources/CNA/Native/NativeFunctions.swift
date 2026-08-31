@@ -77,6 +77,13 @@ internal final class NativeFunctions {
     typealias GamepadGetStateWithDeadZoneRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<CNASwift_GamePadState>?) -> UInt32
     typealias GamepadGetCapabilitiesRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_GamePadCapabilities>?) -> UInt32
     typealias GamepadSetVibrationRoute = @convention(c) (UInt64, UInt32, Float, Float, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias TextureGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_TextureInfo>?) -> UInt32
+    typealias RenderTarget2dCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_RenderTarget2DCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias RenderTargetGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RenderTargetInfo>?) -> UInt32
+    typealias RenderTargetDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias RenderTargetSubscribeContentLostRoute = @convention(c) (UInt64, CNASwift_RenderTargetContentLostCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias RenderTargetUnsubscribeContentLostRoute = @convention(c) (UInt64) -> UInt32
 
     private static let lock = NSLock()
     private static var cached: Result<NativeFunctions, Error>?
@@ -114,6 +121,13 @@ internal final class NativeFunctions {
     let gamePadGetStateWithDeadZone: GamepadGetStateWithDeadZoneRoute
     let gamePadGetCapabilities: GamepadGetCapabilitiesRoute
     let gamePadSetVibration: GamepadSetVibrationRoute
+    let textureCommonGetInfo: TextureGetInfoRoute
+    let renderTarget2DCreate: RenderTarget2dCreateRoute
+    let renderTargetGetInfo: RenderTargetGetInfoRoute
+    let renderTargetDestroy: RenderTargetDestroyRoute
+    let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
+    let renderTargetSubscribeContentLost: RenderTargetSubscribeContentLostRoute
+    let renderTargetUnsubscribeContentLost: RenderTargetUnsubscribeContentLostRoute
 
     static func load() throws -> NativeFunctions {
         lock.lock()
@@ -171,6 +185,13 @@ internal final class NativeFunctions {
         gamePadGetStateWithDeadZone = try library.resolve("cna_gamepad_get_state_with_dead_zone", as: GamepadGetStateWithDeadZoneRoute.self)
         gamePadGetCapabilities = try library.resolve("cna_gamepad_get_capabilities", as: GamepadGetCapabilitiesRoute.self)
         gamePadSetVibration = try library.resolve("cna_gamepad_set_vibration", as: GamepadSetVibrationRoute.self)
+        textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
+        renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
+        renderTargetGetInfo = try library.resolve("cna_render_target_get_info", as: RenderTargetGetInfoRoute.self)
+        renderTargetDestroy = try library.resolve("cna_render_target_destroy", as: RenderTargetDestroyRoute.self)
+        graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)
+        renderTargetSubscribeContentLost = try library.resolve("cna_render_target_subscribe_content_lost", as: RenderTargetSubscribeContentLostRoute.self)
+        renderTargetUnsubscribeContentLost = try library.resolve("cna_render_target_unsubscribe_content_lost", as: RenderTargetUnsubscribeContentLostRoute.self)
     }
 
     func check(_ result: UInt32, operation: String) throws {

@@ -24,6 +24,9 @@ EXCEPTIONS = ROOT / "Sources/CNA/CNAExceptions.swift"
 COLLECTIONS = ROOT / "Sources/CNA/CNACollections.swift"
 DICTIONARY = ROOT / "Sources/CNA/CNADictionary.swift"
 SERVICES = ROOT / "Sources/CNA/Xna/Framework/GameServiceContainer.swift"
+RESOURCE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsResource.swift"
+TEXTURE2D = ROOT / "Sources/CNA/Xna/Graphics/Texture2D.swift"
+RENDER_TARGET = ROOT / "Sources/CNA/Xna/Graphics/RenderTarget2D.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -127,6 +130,41 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                    message: GameServiceContainer.serviceProviderCannotBeNullMessage)",
         "                throw CNAError.producerInvariant(\"provider\")",
     ),
+    # The Foundation 38 derivability and ownership decisions.
+    (
+        "texture2d-resealed", "Texture2D final again, as it was", TEXTURE2D,
+        "    open class Texture2D: Texture {",
+        "    public final class Texture2D: Texture {",
+    ),
+    (
+        "disposing-raised-before-release",
+        "Disposing raised before the native release", RESOURCE,
+        "            try storage.dispose(operation: \"\\(storage.typeName).Dispose\")\n"
+        "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)",
+        "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)\n"
+        "            try storage.dispose(operation: \"\\(storage.typeName).Dispose\")",
+    ),
+    (
+        "dispose-not-idempotent", "a second Dispose reaching the dead handle",
+        RESOURCE,
+        "            guard !storage.isDisposed else { return }\n"
+        "            try storage.dispose",
+        "            try storage.dispose",
+    ),
+    (
+        "derived-type-name-lost",
+        "the shared storage naming the base rather than the derived type",
+        RENDER_TARGET,
+        "                    typeName: \"RenderTarget2D\",",
+        "                    typeName: \"Texture2D\",",
+    ),
+    (
+        "content-lost-subscription-leaked",
+        "disposal leaving the native subscription alive", RENDER_TARGET,
+        "            unsubscribeFromNativeContentLost()\n"
+        "            try super.Dispose(disposing)",
+        "            try super.Dispose(disposing)",
+    ),
 ]
 
 
@@ -142,7 +180,8 @@ def main() -> int:
     args = parser.parse_args()
 
     originals = {path: path.read_text(encoding="utf-8")
-                 for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES}}
+                 for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
+                              RESOURCE, TEXTURE2D, RENDER_TARGET}}
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")

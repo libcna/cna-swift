@@ -18,6 +18,7 @@ MODES = [
     ("gamepad_routes", "NativeLifecycleTests.testGamePadNativeRoutesAndDisconnectedOrHardwareSnapshot"),
     ("gamepad_generation", "NativeLifecycleTests.testGamePadQueriesFollowCurrentGeneration"),
     ("gamepad_wrong_thread", "NativeLifecycleTests.testGamePadWrongThreadQueryRejectsBeforeNativeEntry"),
+    ("render_target_ownership", "Foundation38RenderTargetTests"),
 ]
 
 
@@ -58,6 +59,7 @@ def main() -> int:
         "GAMEPAD_GET_STATE_CYCLES": 50,
         "GAMEPAD_GET_STATE_CALLS": 200,
         "GAMEPAD_CAPABILITIES_CYCLES": 20,
+        "RENDER_TARGET_OWNERSHIP_CASES": 11,
         "GAMEPAD_VIBRATION_STRESS": "NOT_RUN_WITHOUT_HARDWARE",
         "NATIVE_CRASHES": crashes,
         "OBSERVED_UAF": 0 if failures == 0 else None,
@@ -76,7 +78,8 @@ def main() -> int:
     print(" ".join(f"{name}={report[name]}" for name in (
         "GAME_CYCLES", "GAME_RECREATION_CYCLES", "TEXTURE2D_CYCLES",
         "SPRITEBATCH_CYCLES", "CALLBACK_ERROR_CYCLES", "GAMEPAD_GET_STATE_CYCLES",
-        "GAMEPAD_CAPABILITIES_CYCLES", "NATIVE_CRASHES",
+        "GAMEPAD_CAPABILITIES_CYCLES", "RENDER_TARGET_OWNERSHIP_CASES",
+        "NATIVE_CRASHES",
         "OBSERVED_UAF", "OBSERVED_DOUBLE_FREE", "MODE_FAILURES"
     )))
     return 1 if failures else 0

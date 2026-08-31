@@ -8,25 +8,25 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=142
-TARGET_MEMBERS=1767
-TOTAL_DIAGNOSTICS=269
-COMPLETE_TYPES=135
+TARGET_TYPES=145
+TARGET_MEMBERS=1785
+TOTAL_DIAGNOSTICS=262
+COMPLETE_TYPES=138
 PARTIAL_TYPES=7
-MISSING_TYPES=115
-MISSING_TYPE=115
-MISSING_MEMBER=129
+MISSING_TYPES=112
+MISSING_TYPE=112
+MISSING_MEMBER=128
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
-BASE_MAPPING_MISMATCH=2
+BASE_MAPPING_MISMATCH=0
 INTERFACE_MAPPING_MISMATCH=1
 FIELD_MAPPING_MISMATCH=0
 PROPERTY_MAPPING_MISMATCH=4
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=18
+OVERLOAD_MAPPING_MISMATCH=17
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -41,11 +41,11 @@ INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=117
+LANGUAGE_PROJECTION_EXCLUSIONS=115
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=11
-INHERITED_MEMBER_PROJECTIONS=3
+INHERITED_MEMBER_PROJECTIONS=1
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
 ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
@@ -63,16 +63,16 @@ WRITE_ONLY_PROJECTIONS=0
 MEASURED_ACCESSOR_PROJECTIONS=19
 PENDING_ACCESSOR_PROJECTIONS=94
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=8
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=10
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=18
 XNA_SEALED_CLASS_PROJECTIONS=18
-NONDERIVABLE_UNSEALED_CLASSES=5
+NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=14
+XNA_RESOURCE_STRING_PROJECTIONS=15
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=72
-PENDING_RETURN_NULLABILITY_PROJECTIONS=297
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=7
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=76
+PENDING_RETURN_NULLABILITY_PROJECTIONS=293
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=10
 ```
 
 ## Complete types
@@ -144,6 +144,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=7
 - `Microsoft.Xna.Framework.Graphics.FillMode`
 - `Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus`
 - `Microsoft.Xna.Framework.Graphics.GraphicsProfile`
+- `Microsoft.Xna.Framework.Graphics.GraphicsResource`
 - `Microsoft.Xna.Framework.Graphics.IEffectFog`
 - `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
 - `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
@@ -171,6 +172,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=7
 - `Microsoft.Xna.Framework.Graphics.PresentInterval`
 - `Microsoft.Xna.Framework.Graphics.PresentationParameters`
 - `Microsoft.Xna.Framework.Graphics.PrimitiveType`
+- `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetUsage`
 - `Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs`
@@ -179,6 +181,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=7
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
 - `Microsoft.Xna.Framework.Graphics.StencilOperation`
 - `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
+- `Microsoft.Xna.Framework.Graphics.Texture`
 - `Microsoft.Xna.Framework.Graphics.TextureAddressMode`
 - `Microsoft.Xna.Framework.Graphics.TextureFilter`
 - `Microsoft.Xna.Framework.Graphics.VertexElement`
@@ -267,7 +270,7 @@ Expected members: 37; emitted members: 19.
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
-Expected members: 56; emitted members: 2.
+Expected members: 56; emitted members: 3.
 
 - `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()`: the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
@@ -290,8 +293,8 @@ Expected members: 56; emitted members: 2.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTargets(_:[Microsoft.Xna.Framework.Graphics.RenderTargetBinding])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTarget2D)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)`: mapped member is absent
+- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetRenderTargets()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
@@ -329,11 +332,9 @@ Expected members: 56; emitted members: 2.
 
 ### `Microsoft.Xna.Framework.Graphics.SpriteBatch`
 
-Expected members: 21; emitted members: 6.
+Expected members: 21; emitted members: 5.
 
-- `BASE_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch`: expected base Microsoft.Xna.Framework.Graphics.GraphicsResource, found None
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)`: mapped overload is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)`: required overload is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState)`: mapped member is absent
@@ -361,9 +362,8 @@ Expected members: 21; emitted members: 6.
 
 ### `Microsoft.Xna.Framework.Graphics.Texture2D`
 
-Expected members: 16; emitted members: 5.
+Expected members: 16; emitted members: 4.
 
-- `BASE_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D`: expected base Microsoft.Xna.Framework.Graphics.Texture, found None
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32,mipMap:Bool,format:Microsoft.Xna.Framework.Graphics.SurfaceFormat)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(_:Microsoft.Xna.Framework.Graphics.GraphicsDevice,stream:Foundation.InputStream,width:Int32,height:Int32,zoom:Bool)`: mapped member is absent
@@ -376,8 +376,7 @@ Expected members: 16; emitted members: 5.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0])`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: mapped overload is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: required overload is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 
@@ -477,7 +476,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection`
 - `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
-- `Microsoft.Xna.Framework.Graphics.GraphicsResource`
 - `Microsoft.Xna.Framework.Graphics.IEffectLights`
 - `Microsoft.Xna.Framework.Graphics.IVertexType`
 - `Microsoft.Xna.Framework.Graphics.IndexBuffer`
@@ -495,14 +493,12 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
 - `Microsoft.Xna.Framework.Graphics.RasterizerState`
-- `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetBinding`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetCube`
 - `Microsoft.Xna.Framework.Graphics.SamplerState`
 - `Microsoft.Xna.Framework.Graphics.SamplerStateCollection`
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`
-- `Microsoft.Xna.Framework.Graphics.Texture`
 - `Microsoft.Xna.Framework.Graphics.Texture3D`
 - `Microsoft.Xna.Framework.Graphics.TextureCollection`
 - `Microsoft.Xna.Framework.Graphics.TextureCube`

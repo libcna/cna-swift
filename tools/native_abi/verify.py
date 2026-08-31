@@ -46,11 +46,15 @@ MIRRORED_STRUCTS = [
     "GameCallbacks", "GameFrameHooks", "GameCreateInfo", "Viewport",
     "Texture2DInfo", "Texture2DDecodeInfo", "SpriteBatchBeginInfo",
     "SpriteScaledCommand", "KeyboardState", "GamePadAnalogState",
-    "GamePadState", "GamePadCapabilities",
+    "GamePadState", "GamePadCapabilities", "TextureInfo",
+    "RenderTarget2DCreateInfo", "RenderTargetInfo",
 ]
 
 # The shim mirrors exactly these canonical callback types.
-MIRRORED_CALLBACKS = ["GameLifecycleCallback", "GameBeginDrawCallback"]
+MIRRORED_CALLBACKS = [
+    "GameLifecycleCallback", "GameBeginDrawCallback",
+    "RenderTargetContentLostCallback",
+]
 
 # The scalar typedefs a mirrored declaration may name on either side. The
 # callback wall proves each pair is the same underlying type, which is what
@@ -128,6 +132,8 @@ def canonical_type(value: str) -> str:
         "CNA_Result": "uint32_t", "CNA_Bool": "uint8_t", "CNA_Handle": "uint64_t",
         "CNA_GraphicsDeviceManagerHandle": "uint64_t", "CNA_PlayerIndex": "uint32_t",
         "CNA_GamePadDeadZone": "uint32_t",
+        "CNA_RenderTargetEventRegistrationHandle": "uint64_t",
+        "CNA_GraphicsResourceEventRegistrationHandle": "uint64_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)
@@ -145,6 +151,7 @@ def swift_type(value: str) -> str:
     mapping = {
         "UInt8": "uint8_t", "UInt32": "uint32_t", "UInt64": "uint64_t", "Int32": "int32_t",
         "Int64": "int64_t", "Float": "float", "Double": "double", "CChar": "char",
+        "UnsafeMutableRawPointer": "void*", "UnsafeRawPointer": "const void*",
     }
     if text.startswith("CNASwift_"):
         return "CNA_" + text[len("CNASwift_"):]

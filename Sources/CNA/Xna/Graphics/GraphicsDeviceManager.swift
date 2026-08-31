@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 extension Microsoft.Xna.Framework {
-    public final class GraphicsDeviceManager: RuntimeOwnedChild {
+    /// `open`, not `final`: XNA leaves the class derivable and its public
+    /// `GraphicsDeviceManager(Game)` constructor is projected, so a consumer
+    /// can genuinely derive from this one.
+    open class GraphicsDeviceManager: RuntimeOwnedChild {
         private weak var game: Microsoft.Xna.Framework.Game?
         private let storage: NativeHandleStorage
 

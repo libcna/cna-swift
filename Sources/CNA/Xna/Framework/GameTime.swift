@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: MIT
 
 extension Microsoft.Xna.Framework {
-    public final class GameTime {
+    /// `open`, not `final`: XNA leaves `GameTime` derivable, and nothing
+    /// about it is native — it is three stored values with three public
+    /// constructors, so a subclass costs the projection nothing and refusing
+    /// one would strengthen a contract XNA left open.
+    open class GameTime {
         public let TotalGameTime: Duration
         public let ElapsedGameTime: Duration
         public let IsRunningSlowly: Bool

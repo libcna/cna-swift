@@ -20,9 +20,14 @@ extension Microsoft.Xna.Framework.Graphics {
         public static let FlipVertically = SpriteEffects(rawValue: 2)
     }
 
-    public final class SpriteBatch: RuntimeOwnedChild {
-        private let storage: NativeHandleStorage
-
+    /// The `Microsoft.Xna.Framework.Graphics.SpriteBatch` projection.
+    ///
+    /// `open`, not `final`: XNA leaves it derivable, and its own
+    /// `Dispose(bool)` override is the extension point a subclass would use.
+    /// Its base is `GraphicsResource`, which is where the handle, the
+    /// disposal, `IsDisposed`, `Name`, `Tag`, `GraphicsDevice` and `Disposing`
+    /// now live.
+    open class SpriteBatch: GraphicsResource {
         public init(graphicsDevice: GraphicsDevice) throws {
             let deviceHandle = try graphicsDevice.validatedHandle("SpriteBatch.init")
             let runtime = graphicsDevice.runtimeState
@@ -31,12 +36,15 @@ extension Microsoft.Xna.Framework.Graphics {
                 runtime.functions.spriteBatchCreate(deviceHandle, &handle),
                 operation: "cna_sprite_batch_create"
             )
-            storage = NativeHandleStorage(
-                handle: handle,
-                typeName: "SpriteBatch",
-                ownership: .owned,
-                runtime: runtime,
-                destroy: runtime.functions.spriteBatchDestroy
+            super.init(
+                storage: NativeHandleStorage(
+                    handle: handle,
+                    typeName: "SpriteBatch",
+                    ownership: .owned,
+                    runtime: runtime,
+                    destroy: runtime.functions.spriteBatchDestroy
+                ),
+                device: graphicsDevice
             )
             runtime.register(self)
         }
@@ -120,9 +128,5 @@ extension Microsoft.Xna.Framework.Graphics {
             )
         }
 
-        public func Dispose() throws { try storage.dispose(operation: "SpriteBatch.Dispose") }
-
-        internal var runtimeObjectIsDisposed: Bool { storage.isDisposed }
-        internal func disposeFromParent() throws { try Dispose() }
     }
 }

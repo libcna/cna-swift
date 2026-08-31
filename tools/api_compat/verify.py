@@ -4180,18 +4180,41 @@ def self_test() -> None:
             "a CLR sealed class projected without `final` was not detected")
     event_self_tests += 1
 
-    # The converse is recorded, never diagnosed: sealing a class XNA leaves
-    # derivable is a public-API decision, so it must show up in the evidence
-    # and must NOT become a diagnostic on its own.
+    # The converse is now BOTH recorded and diagnosed. It was recorded only
+    # for as long as five real types were final where XNA is open; Foundation
+    # 38 unsealed all five, so the record became a rule and the self-test that
+    # required it to stay a mere record is inverted here rather than deleted.
     over_sealed = sealed_class_evidence(
         sealed_contract, rules, sealed_models(True, True))
-    if over_sealed[1]:
+    if "INHERITANCE_MAPPING_MISMATCH" not in {
+        item["category"] for item in over_sealed[1]
+    }:
         failures.append(
-            "sealing a derivable class was diagnosed rather than recorded")
+            "sealing a class XNA leaves derivable was not detected")
     event_self_tests += 1
     if sum(item["derivableInReferenceButNotInSwift"] for item in over_sealed[0]) != 1:
         failures.append(
             "sealing a derivable class was not recorded in the evidence")
+    event_self_tests += 1
+
+    # A class XNA leaves derivable but gives no accessible constructor is NOT
+    # diagnosed: nothing outside its own assembly could derive from it anyway,
+    # so a final projection strengthens nothing.
+    inaccessible_contract = {
+        "types": [
+            {
+                "name": "Microsoft.Xna.Framework.Open", "kind": "class",
+                "sealed": False,
+                "members": [{"kind": "constructor", "name": ".ctor",
+                             "access": "assembly", "parameters": []}],
+            },
+        ]
+    }
+    inaccessible = sealed_class_evidence(
+        inaccessible_contract, rules, sealed_models(True, True))
+    if inaccessible[1]:
+        failures.append(
+            "a derivable-but-unconstructible class was diagnosed as sealed")
     event_self_tests += 1
 
     # The pinned manifest itself is the reference model here. Restating the
@@ -5068,12 +5091,19 @@ def sealed_class_evidence(
     support checks call an unsealed `virtual final` member. It is measured
     generally for every implemented reference class, never per named type.
 
-    The converse direction -- a CLR class that is NOT sealed must not be a
-    Swift `final` class -- is deliberately NOT a diagnostic here. It does not
-    hold today, and the types where it fails are named in the report rather
-    than suppressed, because making them derivable is a public-API decision of
-    its own, not a side effect of this rule. `XNA_SEALED_CLASS_PROJECTIONS` and
-    `NONDERIVABLE_UNSEALED_CLASSES` are the two halves of that record.
+    The converse direction -- a CLR class that XNA leaves derivable must not
+    be a Swift `final` class -- **is** a diagnostic now. It was recorded
+    without being diagnosed for as long as it did not hold: five types were
+    final where XNA is open, and unsealing a public class is an API decision of
+    its own rather than a side effect of this rule. Foundation 38 took that
+    decision for all five, so `NONDERIVABLE_UNSEALED_CLASSES` reached zero and
+    the record becomes a rule. Diagnosing it is what stops the next
+    runtime-partial type reintroducing the gap by habit.
+
+    The condition is narrow on purpose: only a class with a **public**
+    reference constructor is derivable in XNA at all, so only that case is
+    diagnosed. A class XNA gives no accessible constructor stays out of it, and
+    is still counted.
     """
     evidence: list[dict[str, Any]] = []
     diagnostics: list[dict[str, str]] = []
@@ -5095,6 +5125,14 @@ def sealed_class_evidence(
                 "INHERITANCE_MAPPING_MISMATCH", name,
                 "the CLR seals this class, so the Swift projection must be a "
                 f"final class; found {model.declaration!r}",
+            ))
+        if not sealed and public_constructors > 0 and final:
+            diagnostics.append(diagnostic(
+                "INHERITANCE_MAPPING_MISMATCH", name,
+                "XNA leaves this class derivable and gives it "
+                f"{public_constructors} public constructor(s), so the Swift "
+                "projection must not be a final class; found "
+                f"{model.declaration!r}",
             ))
         evidence.append({
             "type": name,

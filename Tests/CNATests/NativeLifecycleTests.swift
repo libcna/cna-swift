@@ -290,7 +290,7 @@ final class NativeLifecycleTests: XCTestCase {
     }
 
     internal func requireNative() throws {
-        if !nativeConfigured { throw XCTSkip("set CNA_NATIVE_LIBRARY to an exact ABI-0.7 library") }
+        if !nativeConfigured { throw XCTSkip("set CNA_NATIVE_LIBRARY to a CNA C ABI 0.21 or later library") }
     }
 
     func testNativeGameSixtyFramesAndGraphicsCanary() throws {

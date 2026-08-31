@@ -1041,6 +1041,12 @@
       "owner": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException",
       "member": ".ctor",
       "parameter": "innerException"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "member": "SetRenderTarget",
+      "parameter": "renderTarget",
+      "reason": "The IL null-tests renderTarget with brfalse.s and the null branch reaches a normal ret after calling SetRenderTargets(null, 0) -- restoring the backbuffer, which is a different and meaningful operation and not an immediate invalid argument. That is exactly the selected-operation half of the Foundation-23 parameter rule."
     }
   ],
   "globalOperatorProjections": [

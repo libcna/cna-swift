@@ -4,7 +4,13 @@ import CNAShim
 
 extension Microsoft.Xna.Framework.Graphics {
     /// Callback-scoped facade over the Game-owned graphics device.
-    public final class GraphicsDevice {
+    ///
+    /// `open`, not `final`: XNA leaves the class derivable. Construction stays
+    /// `private`, exactly as XNA's own accessible constructor is not yet
+    /// projected, so the class is formally derivable and not yet constructible
+    /// from outside — which is the honest state of a runtime-partial type
+    /// rather than a strengthened one.
+    open class GraphicsDevice {
         private let handle: UInt64
         private let runtime: RuntimeState
         private let generation: UInt64
@@ -51,6 +57,24 @@ extension Microsoft.Xna.Framework.Graphics {
                     Float(color.A) * scale
                 ),
                 operation: "cna_graphics_device_clear_rgba"
+            )
+        }
+
+        /// `GraphicsDevice.SetRenderTarget(RenderTarget2D renderTarget)`.
+        ///
+        /// A nil target restores the backbuffer, which is what XNA's null
+        /// argument does and what `CNA_INVALID_HANDLE` means to
+        /// `cna_graphics_device_set_render_target2d`.
+        public func SetRenderTarget(
+            _ renderTarget: RenderTarget2D?
+        ) throws {
+            let deviceHandle = try validatedHandle("GraphicsDevice.SetRenderTarget")
+            let targetHandle = try renderTarget.map {
+                try $0.validatedHandle("GraphicsDevice.SetRenderTarget")
+            } ?? 0
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetRenderTarget2D(deviceHandle, targetHandle),
+                operation: "cna_graphics_device_set_render_target2d"
             )
         }
 

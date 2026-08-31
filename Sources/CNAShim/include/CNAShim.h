@@ -117,6 +117,47 @@ typedef struct CNASwift_Texture2DInfo {
     uint32_t format;
 } CNASwift_Texture2DInfo;
 
+typedef struct CNASwift_TextureInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t level_count;
+    uint32_t format;
+} CNASwift_TextureInfo;
+
+typedef struct CNASwift_RenderTarget2DCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t width;
+    uint32_t height;
+    CNASwift_Bool mip_map;
+    uint8_t reserved0[3];
+    uint32_t format;
+    uint32_t depth_format;
+    int32_t multi_sample_count;
+    uint32_t usage;
+    uint32_t reserved1;
+} CNASwift_RenderTarget2DCreateInfo;
+
+typedef struct CNASwift_RenderTargetInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t kind;
+    uint32_t width;
+    uint32_t height;
+    uint32_t level_count;
+    uint32_t format;
+    uint32_t depth_format;
+    int32_t multi_sample_count;
+    uint32_t usage;
+    CNASwift_Bool is_content_lost;
+    CNASwift_Bool renderer_available;
+    uint8_t reserved[2];
+} CNASwift_RenderTargetInfo;
+
+typedef void (*CNASwift_RenderTargetContentLostCallback)(
+    CNASwift_Handle render_target,
+    void* context);
+
 typedef struct CNASwift_Texture2DDecodeInfo {
     uint32_t struct_size;
     uint32_t struct_version;

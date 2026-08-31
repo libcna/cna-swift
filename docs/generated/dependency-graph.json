@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 16,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 22,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
@@ -23,7 +23,145 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 50,
+      "transitiveMissingReverseReach": 47,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsResource",
+        "Microsoft.Xna.Framework.Graphics.VertexElement"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.DynamicVertexBuffer",
+        "Microsoft.Xna.Framework.Graphics.IVertexType",
+        "Microsoft.Xna.Framework.Graphics.VertexBuffer",
+        "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
+        "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
+        "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
+        "Microsoft.Xna.Framework.Graphics.VertexPositionTexture"
+      ],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
+      ],
+      "transitiveMissingReverseReach": 44,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.SamplerState",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsResource",
+        "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
+        "Microsoft.Xna.Framework.Graphics.TextureFilter"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.SamplerStateCollection"
+      ],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch"
+      ],
+      "transitiveMissingReverseReach": 44,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.BlendState",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Color",
+        "Microsoft.Xna.Framework.Graphics.Blend",
+        "Microsoft.Xna.Framework.Graphics.BlendFunction",
+        "Microsoft.Xna.Framework.Graphics.ColorWriteChannels",
+        "Microsoft.Xna.Framework.Graphics.GraphicsResource"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch"
+      ],
+      "transitiveMissingReverseReach": 44,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.DepthStencilState",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.CompareFunction",
+        "Microsoft.Xna.Framework.Graphics.GraphicsResource",
+        "Microsoft.Xna.Framework.Graphics.StencilOperation"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch"
+      ],
+      "transitiveMissingReverseReach": 44,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.RasterizerState",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.CullMode",
+        "Microsoft.Xna.Framework.Graphics.FillMode",
+        "Microsoft.Xna.Framework.Graphics.GraphicsResource"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch"
+      ],
+      "transitiveMissingReverseReach": 44,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.Texture"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
+      ],
+      "transitiveMissingReverseReach": 44,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -90,91 +228,6 @@
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
       ]
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.AudioCategory",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Audio.AudioStopOptions"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.AudioEngine"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 3,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.RendererDetail",
-      "dependencies": [],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.AudioEngine"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 3,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Audio.AudioEmitter",
-        "Microsoft.Xna.Framework.Audio.AudioListener",
-        "Microsoft.Xna.Framework.Audio.SoundState"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
-        "Microsoft.Xna.Framework.Audio.SoundEffect"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 2,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GameWindow",
-      "dependencies": [
-        "Microsoft.Xna.Framework.DisplayOrientation",
-        "Microsoft.Xna.Framework.Rectangle"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.Game"
-      ],
-      "transitiveMissingReverseReach": 2,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.Cue",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Audio.AudioEmitter",
-        "Microsoft.Xna.Framework.Audio.AudioListener",
-        "Microsoft.Xna.Framework.Audio.AudioStopOptions"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.SoundBank"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Media.MediaSource",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Media.MediaSourceType"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Media.MediaLibrary"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": []
     }
   ]
 }

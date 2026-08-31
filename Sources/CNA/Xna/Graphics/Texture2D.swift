@@ -4,8 +4,14 @@ import CNAShim
 import Foundation
 
 extension Microsoft.Xna.Framework.Graphics {
-    public final class Texture2D: RuntimeOwnedChild {
-        private let storage: NativeHandleStorage
+    /// The `Microsoft.Xna.Framework.Graphics.Texture2D` projection.
+    ///
+    /// `open`, not `final`: XNA leaves the class derivable and
+    /// `RenderTarget2D` is the derived class that proves it. Its native
+    /// storage, its disposal and its whole `GraphicsResource` surface come
+    /// from the base, so a subclass inherits one handle with one owner and one
+    /// destruction path rather than acquiring a second of each.
+    open class Texture2D: Texture {
         public let Width: Int32
         public let Height: Int32
 
@@ -22,16 +28,37 @@ extension Microsoft.Xna.Framework.Graphics {
             Microsoft.Xna.Framework.Rectangle(0, 0, Width, Height)
         }
 
-        private init(handle: UInt64, runtime: RuntimeState, width: Int32, height: Int32) {
-            storage = NativeHandleStorage(
-                handle: handle,
-                typeName: "Texture2D",
-                ownership: .owned,
-                runtime: runtime,
-                destroy: runtime.functions.textureDestroy
-            )
+        /// The designated initializer every concrete 2D texture uses.
+        ///
+        /// The destroy route is a parameter rather than a constant, because a
+        /// `RenderTarget2D` is released through `cna_render_target_destroy`
+        /// and an ordinary texture through `cna_texture2d_destroy`. One
+        /// storage, one owner, one route — chosen by the concrete class.
+        internal init(
+            handle: UInt64,
+            runtime: RuntimeState,
+            device: GraphicsDevice?,
+            typeName: String,
+            destroy: @escaping NativeDestroyRoute,
+            width: Int32,
+            height: Int32,
+            levelCount: Int32,
+            format: SurfaceFormat
+        ) {
             Width = width
             Height = height
+            super.init(
+                storage: NativeHandleStorage(
+                    handle: handle,
+                    typeName: typeName,
+                    ownership: .owned,
+                    runtime: runtime,
+                    destroy: destroy
+                ),
+                device: device,
+                levelCount: levelCount,
+                format: format
+            )
             runtime.register(self)
         }
 
@@ -82,22 +109,24 @@ extension Microsoft.Xna.Framework.Graphics {
                 _ = runtime.functions.textureDestroy(handle)
                 throw CNAError.nativeFailure(operation: "Texture2D dimensions", result: 10, message: "dimensions exceed XNA Int32 range")
             }
+            let common: (levelCount: Int32, format: SurfaceFormat)
+            do {
+                common = try Texture.readCommonInfo(handle: handle, runtime: runtime)
+            } catch {
+                _ = runtime.functions.textureDestroy(handle)
+                throw error
+            }
             return Texture2D(
                 handle: handle,
                 runtime: runtime,
+                device: graphicsDevice,
+                typeName: "Texture2D",
+                destroy: runtime.functions.textureDestroy,
                 width: Int32(info.width),
-                height: Int32(info.height)
+                height: Int32(info.height),
+                levelCount: common.levelCount,
+                format: common.format
             )
         }
-
-        public func Dispose() throws { try storage.dispose(operation: "Texture2D.Dispose") }
-
-        internal func validatedHandle(_ operation: String) throws -> UInt64 {
-            try storage.validatedHandle(operation)
-        }
-
-        internal var runtimeState: RuntimeState { storage.runtime }
-        internal var runtimeObjectIsDisposed: Bool { storage.isDisposed }
-        internal func disposeFromParent() throws { try Dispose() }
     }
 }
