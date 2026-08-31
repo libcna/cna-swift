@@ -86,6 +86,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation29ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation30XnaExceptionTests.swift",
     ROOT / "Tests/CNATests/Foundation31XnaLaunchParametersTests.swift",
+    ROOT / "Tests/CNATests/Foundation32AttributeTests.swift",
 ]
 
 # Observations whose authority is the admitted Microsoft .NET Framework 4.0

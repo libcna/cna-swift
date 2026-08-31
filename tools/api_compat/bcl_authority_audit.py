@@ -384,6 +384,7 @@ DICT_ENUMERATOR = "System.Collections.Generic.Dictionary`2+Enumerator"
 KEY_VALUE_PAIR = "System.Collections.Generic.KeyValuePair`2"
 IEQUALITY_COMPARER = "System.Collections.Generic.IEqualityComparer`1"
 IDICTIONARY = "System.Collections.Generic.IDictionary`2"
+ATTRIBUTE = "System.Attribute"
 EXCEPTION = "System.Exception"
 SYSTEM_EXCEPTION = "System.SystemException"
 EXTERNAL_EXCEPTION = "System.Runtime.InteropServices.ExternalException"
@@ -1066,6 +1067,48 @@ def sentinel_checks(
                 require(member["type"] == clr_type,
                         f"KeyValuePair<K,V>.{name} is not {clr_type}")
 
+    # ------------------------------------------------------------------
+    # System.Attribute.
+    # ------------------------------------------------------------------
+    attribute = by_type.get(ATTRIBUTE)
+    require(ATTRIBUTE in by_type, "System.Attribute was not extracted at all")
+    if attribute is not None:
+        require(attribute["kind"] == "class", "Attribute is not a class")
+        require(attribute["abstract"],
+                "Attribute is not abstract; the CLR forbids constructing one")
+        require(not attribute["sealed"], "Attribute is sealed")
+        require(attribute["baseType"] == "System.Object",
+                "Attribute does not derive directly from System.Object")
+        require(attribute["genericArity"] == 0, "Attribute is generic")
+        constructors = members_of(ATTRIBUTE, "constructor", ".ctor")
+        require(len(constructors) == 1,
+                f"Attribute should declare exactly one constructor, found "
+                f"{len(constructors)}")
+        for member in constructors:
+            require(member["access"] == "protected",
+                    "Attribute's constructor is not protected")
+            require(not member["parameters"],
+                    "Attribute's constructor takes parameters")
+        default_attribute = members_of(ATTRIBUTE, "method", "IsDefaultAttribute")
+        require(len(default_attribute) == 1,
+                "Attribute.IsDefaultAttribute is missing")
+        for member in default_attribute:
+            require(member["returnType"] == "System.Boolean",
+                    "Attribute.IsDefaultAttribute does not return Boolean")
+            require(member["overridable"],
+                    "Attribute.IsDefaultAttribute is not overridable")
+            require(not member["parameters"],
+                    "Attribute.IsDefaultAttribute takes parameters")
+        # The reflection surface must stay in the pinned shape, so that not
+        # projecting it stays a recorded decision rather than an extraction
+        # accident.
+        for reflective in ("GetCustomAttribute", "GetCustomAttributes",
+                           "IsDefined", "Match", "Equals", "GetHashCode"):
+            require(bool(members_of(ATTRIBUTE, "method", reflective)),
+                    f"Attribute.{reflective} vanished from the extraction")
+        require(len(members_of(ATTRIBUTE, "property", "TypeId")) == 1,
+                "Attribute.TypeId vanished from the extraction")
+
     comparer = by_type.get(IEQUALITY_COMPARER)
     if comparer is not None:
         require(comparer["kind"] == "interface",
@@ -1219,10 +1262,10 @@ def mutation_self_tests(
                                   SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION,
                                   DICTIONARY, KEY_COLLECTION, VALUE_COLLECTION,
                                   DICT_ENUMERATOR, KEY_VALUE_PAIR,
-                                  IEQUALITY_COMPARER, IDICTIONARY)
+                                  IEQUALITY_COMPARER, IDICTIONARY, ATTRIBUTE)
                 if name in by_name]
     checks += 1
-    if len(subjects) < 14:
+    if len(subjects) < 15:
         failures.append("mutation self-test subjects are missing")
 
     def first_of(record: dict[str, Any], kind: str) -> dict[str, Any] | None:
@@ -1290,6 +1333,25 @@ def mutation_self_tests(
             return False
         return mutate
 
+    def seal_method(method_name: str) -> Any:
+        """Make one NAMED method non-overridable.
+
+        `flip_virtual` takes whichever member sorts first, so it cannot prove a
+        specific override point is protected.
+        """
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if (
+                    member["kind"] == "method" and
+                    member["name"] == method_name and
+                    member.get("overridable")
+                ):
+                    member["overridable"] = False
+                    member["final"] = True
+                    return True
+            return False
+        return mutate
+
     def rebase_onto(base: str) -> Any:
         def mutate(record: dict[str, Any]) -> bool:
             if record["baseType"] == base:
@@ -1352,10 +1414,14 @@ def mutation_self_tests(
         return False
 
     def change_parameter_type(record: dict[str, Any]) -> bool:
+        # Skip a parameter that is ALREADY the substitute: rewriting
+        # `System.Object` to `System.Object` changes nothing, and a mutation
+        # that does not mutate cannot prove the comparison detects anything.
         for member in record["members"]:
-            if member.get("parameters"):
-                member["parameters"][0]["type"] = "System.Object"
-                return True
+            for parameter in member.get("parameters", []):
+                if parameter.get("type") != "System.Object":
+                    parameter["type"] = "System.Object"
+                    return True
         return False
 
     def change_return_type(record: dict[str, Any]) -> bool:
@@ -1367,7 +1433,7 @@ def mutation_self_tests(
 
     def change_property_type(record: dict[str, Any]) -> bool:
         for member in record["members"]:
-            if member["kind"] == "property":
+            if member["kind"] == "property" and member.get("type") != "System.Object":
                 member["type"] = "System.Object"
                 return True
         return False
@@ -1512,6 +1578,17 @@ def mutation_self_tests(
          change_kind),
         ("IEqualityComparer<T>.GetHashCode dropped", IEQUALITY_COMPARER,
          drop_member("method")),
+        # System.Attribute.
+        ("Attribute made concrete", ATTRIBUTE,
+         lambda record: (record.__setitem__("abstract", False), True)[1]),
+        ("Attribute made sealed", ATTRIBUTE, flip_sealed),
+        ("Attribute rebased", ATTRIBUTE, rebase_onto(EXCEPTION)),
+        ("Attribute's protected constructor widened", ATTRIBUTE,
+         change_visibility),
+        ("Attribute's constructor dropped", ATTRIBUTE,
+         drop_member("constructor")),
+        ("IsDefaultAttribute made non-overridable", ATTRIBUTE,
+         seal_method("IsDefaultAttribute")),
     ]
     for label, subject, mutate in sentinel_mutations:
         if subject not in by_name:
@@ -1528,7 +1605,8 @@ def mutation_self_tests(
     for subject in (COLLECTION, READONLY, LIST, ILIST, EXCEPTION,
                     SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION, DICTIONARY,
                     KEY_COLLECTION, VALUE_COLLECTION, DICT_ENUMERATOR,
-                    KEY_VALUE_PAIR, IEQUALITY_COMPARER, IDICTIONARY):
+                    KEY_VALUE_PAIR, IEQUALITY_COMPARER, IDICTIONARY,
+                    ATTRIBUTE):
         if subject not in by_name:
             continue
         reduced = {

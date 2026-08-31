@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 135,
-    "TARGET_MEMBERS": 1731,
-    "TOTAL_DIAGNOSTICS": 279,
-    "COMPLETE_TYPES": 128,
+    "TARGET_TYPES": 140,
+    "TARGET_MEMBERS": 1747,
+    "TOTAL_DIAGNOSTICS": 274,
+    "COMPLETE_TYPES": 133,
     "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 122,
-    "MISSING_TYPE": 122,
+    "MISSING_TYPES": 117,
+    "MISSING_TYPE": 117,
     "MISSING_MEMBER": 132,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -63,22 +63,23 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 18,
-    "PENDING_ACCESSOR_PROJECTIONS": 95,
+    "MEASURED_ACCESSOR_PROJECTIONS": 19,
+    "PENDING_ACCESSOR_PROJECTIONS": 94,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 8,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
-    "BCL_SUPPORT_TYPE_MEASUREMENTS": 9,
-    "XNA_SEALED_CLASS_PROJECTIONS": 13,
+    "BCL_SUPPORT_TYPE_MEASUREMENTS": 10,
+    "XNA_SEALED_CLASS_PROJECTIONS": 18,
     "NONDERIVABLE_UNSEALED_CLASSES": 5,
     "BCL_RESOURCE_STRING_PROJECTIONS": 7,
+    "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "MEASURED_SUPPORT_BASE_PROJECTIONS": 18,
-    "BCL_BASE_PROJECTIONS": 14,
-    "PROJECTED_BCL_BASE_TYPES": 10,
+    "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
+    "BCL_BASE_PROJECTIONS": 19,
+    "PROJECTED_BCL_BASE_TYPES": 15,
     "PENDING_BCL_BASE_TYPES": 4,
-    "BCL_INHERITED_MEMBER_PROJECTIONS": 72,
+    "BCL_INHERITED_MEMBER_PROJECTIONS": 77,
     "REFERENCE_RETURN_PROJECTIONS": 369,
     "OPTIONAL_RETURN_PROJECTIONS": 151,
     "NONOPTIONAL_RETURN_PROJECTIONS": 218,
@@ -89,9 +90,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 62,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 307,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 5
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 67,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 302,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 6
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -108,6 +109,11 @@
     "Microsoft.Xna.Framework.BoundingSphere",
     "Microsoft.Xna.Framework.Color",
     "Microsoft.Xna.Framework.ContainmentType",
+    "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
+    "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
+    "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
+    "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
+    "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
     "Microsoft.Xna.Framework.Curve",
     "Microsoft.Xna.Framework.CurveContinuity",
     "Microsoft.Xna.Framework.CurveKey",
@@ -245,11 +251,6 @@
     "Microsoft.Xna.Framework.Audio.WaveBank",
     "Microsoft.Xna.Framework.Content.ContentManager",
     "Microsoft.Xna.Framework.Content.ContentReader",
-    "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
-    "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
-    "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
-    "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
-    "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
     "Microsoft.Xna.Framework.Content.ContentTypeReader",
     "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
     "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
@@ -425,31 +426,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Content.ContentReader",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2047,6 +2023,20 @@
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
+      "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
+      "sourceProperty": "CollectionItemName",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute.CollectionItemName()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute.SetCollectionItemName(_:String)",
+      "writerName": "SetCollectionItemName",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
       "ownerType": "Microsoft.Xna.Framework.CurveKeyCollection",
       "sourceProperty": "Item",
       "indexed": true,
@@ -2402,16 +2392,6 @@
       "typeState": "missing",
       "readerThrows": false,
       "writerName": "SetRootDirectory",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
-      "sourceProperty": "CollectionItemName",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetCollectionItemName",
       "writerThrows": true,
       "indexed": false,
       "static": false
@@ -3371,6 +3351,38 @@
   ],
   "bclSupportProjections": [
     {
+      "supportType": "CNAAttribute",
+      "clrFamily": "System.Attribute",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": null,
+      "conformances": [],
+      "clrAbstract": true,
+      "swiftConstructionWidened": true,
+      "requiredConformances": [],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor",
+        "IsDefaultAttribute"
+      ],
+      "openHooks": [
+        "IsDefaultAttribute"
+      ],
+      "forbiddenMembersAbsent": [
+        "Equals",
+        "GetHashCode",
+        "Match",
+        "TypeId",
+        "GetCustomAttribute",
+        "GetCustomAttributes",
+        "IsDefined",
+        "ToString",
+        "GetType"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNACollection",
       "clrFamily": "System.Collections.ObjectModel.Collection`1",
       "kind": "class",
@@ -3380,6 +3392,8 @@
       ],
       "base": null,
       "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [],
       "finalMembers": [],
       "publicMembers": [
@@ -3426,6 +3440,8 @@
       ],
       "base": null,
       "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [],
       "finalMembers": [
         "Count",
@@ -3480,6 +3496,8 @@
       ],
       "base": null,
       "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [],
       "finalMembers": [],
       "publicMembers": [
@@ -3504,6 +3522,8 @@
         "Error",
         "Sendable"
       ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [
         "Swift.Error"
       ],
@@ -3546,6 +3566,8 @@
         "Error",
         "Sendable"
       ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [
         "Swift.Error"
       ],
@@ -3579,6 +3601,8 @@
       ],
       "base": null,
       "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [],
       "finalMembers": [],
       "publicMembers": [
@@ -3604,6 +3628,8 @@
       ],
       "base": null,
       "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [],
       "finalMembers": [],
       "publicMembers": [
@@ -3640,6 +3666,8 @@
       ],
       "base": null,
       "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [],
       "finalMembers": [],
       "publicMembers": [
@@ -3677,6 +3705,8 @@
         "Error",
         "Sendable"
       ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
       "requiredConformances": [
         "Swift.Error"
       ],
@@ -3807,6 +3837,46 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 3,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 1,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -4381,70 +4451,70 @@
       "member": "Clone",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
       "swiftReturnType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
       "member": "ElementName",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
       "member": "CollectionItemName",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
       "member": "CollectionItemName",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
       "member": "RuntimeType",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentTypeReader",
@@ -9593,68 +9663,38 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentTypeReader",

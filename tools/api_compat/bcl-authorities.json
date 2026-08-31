@@ -105,6 +105,11 @@
           "registered": "Foundation 31"
         },
         {
+          "type": "System.Attribute",
+          "reason": "The direct CLR base of all five Microsoft.Xna.Framework.Content.ContentSerializer* attribute types. It is what makes them attributes rather than plain classes, and it is where their one inherited member, IsDefaultAttribute, is declared. Projected as CNAAttribute.",
+          "registered": "Foundation 32"
+        },
+        {
           "type": "System.Collections.Generic.IDictionary`2",
           "reason": "The declared parameter type of two Dictionary<TKey,TValue> constructors and the interface whose members the class implements as sealed virtual finals; it is what establishes that nothing on the public surface is an override point.",
           "registered": "Foundation 31"

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1923,
-  "ASSERTIONS": 1923,
+  "OBSERVATIONS": 1968,
+  "ASSERTIONS": 1968,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -192,7 +192,16 @@
     "testLaunchParametersStartsEmpty",
     "testLaunchParametersHasReferenceIdentity",
     "testTheInheritedDictionarySurfaceWorksThroughTheXnaType",
-    "testLaunchParametersIsDerivable"
+    "testLaunchParametersIsDerivable",
+    "testEveryContentSerializerAttributeIsAnAttribute",
+    "testContentSerializerAttributeDefaults",
+    "testContentSerializerAttributeSettersRoundTrip",
+    "testCollectionItemNameSubstitutesRefusesAndReportsSeparately",
+    "testCloneCopiesTheFieldsAndNotTheSubstitutedDefaults",
+    "testCollectionItemNameAttributeRefusesAnEmptyName",
+    "testRuntimeTypeAttributeRefusesAnEmptyTypeName",
+    "testTypeVersionAttributeValidatesNothing",
+    "testCNAAttributeIsConstructibleWhichTheCLRForbids"
   ],
   "BCL_AUTHORITY": "PURE_BCL_DERIVED",
   "BCL_OBSERVATIONS": 208,

@@ -5,6 +5,991 @@
   "types": [
     {
       "assembly": "mscorlib.dll",
+      "type": "System.Attribute",
+      "kind": "class",
+      "sealed": false,
+      "abstract": true,
+      "baseType": "System.Object",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [
+        "System.Runtime.InteropServices._Attribute"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Equals",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "obj",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttribute",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "type",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "type",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCustomAttributes",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Attribute[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetHashCode",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "IsDefaultAttribute",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.MemberInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.Module",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "inherit",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsDefined",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "element",
+              "type": "System.Reflection.ParameterInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributeType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Match",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "obj",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "TypeId",
+          "type": "System.Object",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.Collections.Generic.Dictionary`2",
       "kind": "class",
       "sealed": false,

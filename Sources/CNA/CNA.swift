@@ -50,6 +50,7 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
     case callbackOutsideGameLifecycle
     case streamFailure(String)
     case argument(String)
+    case argumentNull(String)
     case argumentOutOfRange(String)
     case indexOutOfRange(String)
     case nullReference(String)
@@ -83,6 +84,13 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
             return "InputStream failed: \(message)"
         case .argument(let message):
             return message
+        case .argumentNull(let parameter):
+            // The CLR raises ArgumentNullException, whose Message composes
+            // two resource strings around Environment.NewLine. Only the
+            // parameter name is reported here: composing that message would
+            // mean asserting the reference platform's newline, and the
+            // exception CLASS is what the payload milestone will project.
+            return "Argument must not be null or empty: \(parameter)"
         case .argumentOutOfRange(let parameter):
             return "Argument is outside the XNA range: \(parameter)"
         case .indexOutOfRange(let parameter):

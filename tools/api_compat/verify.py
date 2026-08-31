@@ -1247,7 +1247,7 @@ def comparable_kind(expected: Member, actual: Member) -> bool:
 MEASURED_SUPPORT_BASES = (
     "CNAEventArgs", "CNACollection", "CNAReadOnlyCollection",
     "CNAException", "CNASystemException", "CNAExternalException",
-    "CNADictionary",
+    "CNADictionary", "CNAAttribute",
 )
 
 # The support bases that are GENERIC. For these the Swift superclass identity
@@ -5559,6 +5559,10 @@ def bcl_support_evidence(
             "genericParameters": list(model.generic_parameters),
             "base": model.base,
             "conformances": sorted(observed_conformances),
+            # Swift cannot express `abstract`, so a CLR abstract base becomes
+            # constructible here. Recorded, never silently dropped.
+            "clrAbstract": bool(specification.get("clrAbstract")),
+            "swiftConstructionWidened": bool(specification.get("clrAbstract")),
             "requiredConformances": list(specification.get("conformances", [])),
             "finalMembers": [
                 item for item in specification.get("finalMembers", [])
@@ -5941,6 +5945,9 @@ def make_report(
     # Each pinned static data table the Swift source reproduces element for
     # element, so no sizing decision of this projection's own enters the
     # algorithm it feeds.
+    # CLR abstract support bases, whose construction Swift cannot forbid.
+    summary["BCL_ABSTRACT_BASE_WIDENINGS"] = sum(
+        item.get("swiftConstructionWidened", False) for item in bcl_evidence)
     summary["BCL_STATIC_TABLE_PROJECTIONS"] = sum(
         item["reproducedInSwiftSource"] for item in resource_evidence
         if "clrField" in item)
