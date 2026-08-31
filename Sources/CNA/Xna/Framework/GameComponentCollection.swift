@@ -123,8 +123,8 @@ extension Microsoft.Xna.Framework {
             _ index: Int32, item: any Microsoft.Xna.Framework.IGameComponent
         ) throws {
             throw CNAError.notSupported(
-                "setting a value using operator[] on GameComponentCollection. "
-                + "Use Add/Remove instead.")
+                "Cannot set a value using operator[] on "
+                + "GameComponentCollection.  Use Add/Remove instead.")
         }
 
         /// `protected override void ClearItems()`.

@@ -37,6 +37,9 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = ROOT / "tools/api_compat/reference/xna40-windows-runtime-contract.json"
+REGISTRY = ROOT / "tools/api_compat/registered-assemblies.json"
+RESOURCE_REFERENCE = (
+    ROOT / "tools/api_compat/reference/xna40-selected-resource-strings.json")
 
 PRIMITIVES = {
     "void": "System.Void",
@@ -310,6 +313,740 @@ def parse_literal(text: str) -> str | None:
         digits = 7 if found.group(1) == "float32" else 15
         return f"{number:.{digits}G}"
     return value or None
+
+
+# ----------------------------------------------------------------------------
+# Embedded managed resources
+#
+# A .NET assembly's user-visible messages are not IL literals: the code loads a
+# resource KEY and the runtime resolves it against an embedded string table. A
+# message this binding reproduces is therefore a fact about that table, and it
+# is read out of the binary here rather than transcribed. Both the XNA audit
+# and the BCL authority audit use these readers, so the two agree by
+# construction about what an assembly says.
+# ----------------------------------------------------------------------------
+
+RESOURCE_MAGIC = 0xBEEFCACE
+
+
+def _rva_to_offset(data: bytes, sections: list[tuple[int, int, int]], rva: int) -> int:
+    for virtual_address, virtual_size, raw_pointer in sections:
+        if virtual_address <= rva < virtual_address + virtual_size:
+            return raw_pointer + (rva - virtual_address)
+    raise ValueError(f"RVA 0x{rva:08x} is in no section")
+
+
+def embedded_resource(data: bytes, name: str) -> bytes | None:
+    """One embedded managed resource, located through the PE and CLI headers.
+
+    Nothing is written to disk and no external tool is invoked: the resource is
+    reached by walking the PE optional header's CLI data directory to the CLI
+    header's own `Resources` directory, which is exactly how the runtime
+    reaches it. The blob is length-prefixed there.
+
+    Only `mscorlib`'s single `System.Resources.ResourceReader` set is needed,
+    so the lookup is by reader identity rather than by a metadata name: the
+    resource whose header names that reader IS the string table, and an
+    assembly carrying none returns `None` rather than a guess.
+    """
+    if data[:2] != b"MZ":
+        return None
+    pe = int.from_bytes(data[0x3C:0x40], "little")
+    if data[pe:pe + 4] != b"PE\0\0":
+        return None
+    coff = pe + 4
+    section_count = int.from_bytes(data[coff + 2:coff + 4], "little")
+    optional_size = int.from_bytes(data[coff + 16:coff + 18], "little")
+    optional = coff + 20
+    magic = int.from_bytes(data[optional:optional + 2], "little")
+    directories = optional + (112 if magic == 0x20B else 96)
+    section_table = optional + optional_size
+    sections: list[tuple[int, int, int]] = []
+    for index in range(section_count):
+        entry = section_table + index * 40
+        sections.append((
+            int.from_bytes(data[entry + 12:entry + 16], "little"),
+            max(
+                int.from_bytes(data[entry + 8:entry + 12], "little"),
+                int.from_bytes(data[entry + 16:entry + 20], "little"),
+            ),
+            int.from_bytes(data[entry + 20:entry + 24], "little"),
+        ))
+    cli_rva = int.from_bytes(
+        data[directories + 14 * 8:directories + 14 * 8 + 4], "little")
+    if not cli_rva:
+        return None
+    cli = _rva_to_offset(data, sections, cli_rva)
+    resources_rva = int.from_bytes(data[cli + 24:cli + 28], "little")
+    resources_size = int.from_bytes(data[cli + 28:cli + 32], "little")
+    if not resources_rva or not resources_size:
+        return None
+    base = _rva_to_offset(data, sections, resources_rva)
+    offset = 0
+    while offset + 4 <= resources_size:
+        length = int.from_bytes(data[base + offset:base + offset + 4], "little")
+        blob = data[base + offset + 4:base + offset + 4 + length]
+        if (
+            len(blob) >= 4 and
+            int.from_bytes(blob[:4], "little") == RESOURCE_MAGIC and
+            b"System.Resources.ResourceReader" in blob[:512]
+        ):
+            return blob
+        offset += 4 + length
+    return None
+
+
+def resource_strings(blob: bytes) -> dict[str, str]:
+    """Every string entry of a v2 `System.Resources.ResourceReader` set.
+
+    The format is fixed: a magic, a reader-header block, the format version,
+    the entry and type counts, the type names, an eight-byte alignment, the
+    name hashes, the name offsets, the data-section offset, then a name table
+    of UTF-16 names each followed by its data offset. A string value is the
+    7-bit-length-prefixed UTF-8 written by `BinaryWriter.Write(string)` under
+    type index 1.
+    """
+    position = 0
+
+    def uint32() -> int:
+        nonlocal position
+        value = int.from_bytes(blob[position:position + 4], "little")
+        position += 4
+        return value
+
+    def seven_bit() -> int:
+        nonlocal position
+        value = shift = 0
+        while True:
+            byte = blob[position]
+            position += 1
+            value |= (byte & 0x7F) << shift
+            if not byte & 0x80:
+                return value
+            shift += 7
+
+    def prefixed() -> str:
+        nonlocal position
+        count = seven_bit()
+        text = blob[position:position + count].decode("utf-8", "replace")
+        position += count
+        return text
+
+    if uint32() != RESOURCE_MAGIC:
+        return {}
+    uint32()                                   # reader-header version
+    header_size = uint32()
+    position += header_size                    # reader and set type names
+    uint32()                                   # resource-set format version
+    entries = uint32()
+    type_count = uint32()
+    for _ in range(type_count):
+        prefixed()
+    while position & 7:
+        position += 1
+    position += 4 * entries                    # name hashes
+    offsets = [uint32() for _ in range(entries)]
+    data_section = uint32()
+    name_section = position
+    found: dict[str, str] = {}
+    for offset in offsets:
+        position = name_section + offset
+        count = seven_bit()
+        name = blob[position:position + count].decode("utf-16-le", "replace")
+        position += count
+        value_offset = uint32()
+        position = data_section + value_offset
+        if seven_bit() == 1:                   # ResourceTypeCode.String
+            found[name] = prefixed()
+    return found
+
+
+def sentinel_checks(
+    by_type: dict[str, dict[str, Any]],
+) -> tuple[int, list[str]]:
+    """Independently-expected facts about the selected families.
+
+    These are written from the documented .NET Framework 4.0 contract, not read
+    back from the extraction, so an extractor that produced an empty, truncated
+    or systematically wrong shape fails here even though it would happily agree
+    with a manifest it had itself generated. This is the check that stops the
+    calibration being vacuous.
+    """
+    failures: list[str] = []
+    checks = 0
+
+    def require(condition: bool, message: str) -> None:
+        nonlocal checks
+        checks += 1
+        if not condition:
+            failures.append(message)
+
+    def members_of(type_name: str, kind: str, member_name: str) -> list[dict[str, Any]]:
+        record = by_type.get(type_name)
+        if record is None:
+            return []
+        return [
+            item for item in record["members"]
+            if item["kind"] == kind and item["name"] == member_name
+        ]
+
+    for name in (COLLECTION, READONLY, LIST, ILIST):
+        require(name in by_type, f"{name} was not extracted at all")
+
+    collection = by_type.get(COLLECTION)
+    readonly = by_type.get(READONLY)
+    if collection is None or readonly is None:
+        return checks, failures
+
+    # -- shape of the two base families ------------------------------------
+    require(collection["kind"] == "class", "Collection<T> is not a class")
+    require(not collection["sealed"], "Collection<T> is sealed")
+    require(not collection["abstract"], "Collection<T> is abstract")
+    require(collection["baseType"] == "System.Object",
+            "Collection<T> does not derive directly from System.Object")
+    require(collection["genericArity"] == 1,
+            "Collection<T> is not of generic arity 1")
+    require(readonly["kind"] == "class", "ReadOnlyCollection<T> is not a class")
+    require(readonly["baseType"] == "System.Object",
+            "ReadOnlyCollection<T> does not derive directly from System.Object")
+    require(readonly["genericArity"] == 1,
+            "ReadOnlyCollection<T> is not of generic arity 1")
+
+    # The CLR hierarchy is two siblings, NOT an inheritance chain. Getting this
+    # backwards would produce a Swift hierarchy in which a mutable collection
+    # inherits a read-only one.
+    require(collection["baseType"] != READONLY,
+            "Collection<T> was extracted as deriving from ReadOnlyCollection<T>")
+    require(readonly["baseType"] != COLLECTION,
+            "ReadOnlyCollection<T> was extracted as deriving from Collection<T>")
+
+    for name, record in ((COLLECTION, collection), (READONLY, readonly)):
+        for interface in (
+            "System.Collections.Generic.IList`1[!T]",
+            "System.Collections.Generic.ICollection`1[!T]",
+            "System.Collections.Generic.IEnumerable`1[!T]",
+            "System.Collections.IList",
+            "System.Collections.ICollection",
+            "System.Collections.IEnumerable",
+        ):
+            require(interface in record["directInterfaces"],
+                    f"{name} does not declare {interface}")
+
+    # -- constructors -------------------------------------------------------
+    collection_ctors = members_of(COLLECTION, "constructor", ".ctor")
+    require(len(collection_ctors) == 2,
+            f"Collection<T> should declare exactly 2 public constructors, "
+            f"found {len(collection_ctors)}")
+    require(any(not item["parameters"] for item in collection_ctors),
+            "Collection<T> has no parameterless constructor")
+    require(any(
+        len(item["parameters"]) == 1 and
+        item["parameters"][0]["type"] == "System.Collections.Generic.IList`1[!0]"
+        for item in collection_ctors),
+        "Collection<T> has no IList<T> wrapping constructor")
+
+    readonly_ctors = members_of(READONLY, "constructor", ".ctor")
+    require(len(readonly_ctors) == 1,
+            f"ReadOnlyCollection<T> should declare exactly 1 public "
+            f"constructor, found {len(readonly_ctors)}")
+    require(bool(readonly_ctors) and
+            len(readonly_ctors[0]["parameters"]) == 1 and
+            readonly_ctors[0]["parameters"][0]["type"] ==
+            "System.Collections.Generic.IList`1[!0]",
+            "ReadOnlyCollection<T>'s only constructor does not take IList<T>")
+    # There is deliberately no parameterless constructor: a read-only view must
+    # always be a view OF something.
+    require(all(item["parameters"] for item in readonly_ctors),
+            "ReadOnlyCollection<T> declares a parameterless constructor")
+
+    # -- the four protected virtual hooks ----------------------------------
+    for hook, arity in (("ClearItems", 0), ("InsertItem", 2),
+                        ("RemoveItem", 1), ("SetItem", 2)):
+        candidates = members_of(COLLECTION, "method", hook)
+        require(len(candidates) == 1,
+                f"Collection<T>.{hook} should be declared exactly once, "
+                f"found {len(candidates)}")
+        if not candidates:
+            continue
+        member = candidates[0]
+        require(member["access"] == "protected",
+                f"Collection<T>.{hook} is not protected")
+        require(member["overridable"],
+                f"Collection<T>.{hook} is not an overridable virtual hook")
+        require(not member["abstract"],
+                f"Collection<T>.{hook} is abstract")
+        require(len(member["parameters"]) == arity,
+                f"Collection<T>.{hook} should take {arity} parameters")
+        require(member["returnType"] == "System.Void",
+                f"Collection<T>.{hook} does not return void")
+
+    # ReadOnlyCollection<T> deliberately has none of them: it is not a
+    # mutation point, so there is nothing to hook.
+    for hook in ("ClearItems", "InsertItem", "RemoveItem", "SetItem"):
+        require(not members_of(READONLY, "method", hook),
+                f"ReadOnlyCollection<T> unexpectedly declares {hook}")
+
+    # -- the public surface is sealed against overriding --------------------
+    # Every public member of Collection<T> is `virtual final` -- a sealed
+    # interface implementation. A subclass changes behaviour ONLY through the
+    # four hooks, and a projection that made the public methods overridable
+    # would invent an extension point the CLR does not have.
+    for method in ("Add", "Clear", "Contains", "CopyTo", "GetEnumerator",
+                   "IndexOf", "Insert", "Remove", "RemoveAt"):
+        candidates = members_of(COLLECTION, "method", method)
+        require(len(candidates) == 1,
+                f"Collection<T>.{method} should be declared exactly once")
+        for member in candidates:
+            require(member["access"] == "public",
+                    f"Collection<T>.{method} is not public")
+            require(not member["overridable"],
+                    f"Collection<T>.{method} is overridable; the CLR seals it")
+
+    # ReadOnlyCollection<T> exposes no mutator at all.
+    for method in ("Add", "Clear", "Insert", "Remove", "RemoveAt"):
+        require(not members_of(READONLY, "method", method),
+                f"ReadOnlyCollection<T> unexpectedly exposes the mutator {method}")
+    for method in ("Contains", "CopyTo", "GetEnumerator", "IndexOf"):
+        require(len(members_of(READONLY, "method", method)) == 1,
+                f"ReadOnlyCollection<T>.{method} is missing")
+
+    # -- Count, Item and the protected Items view --------------------------
+    for name, record_name in ((COLLECTION, "Collection<T>"),
+                              (READONLY, "ReadOnlyCollection<T>")):
+        count = members_of(name, "property", "Count")
+        require(len(count) == 1, f"{record_name}.Count is missing")
+        for member in count:
+            require(member["type"] == "System.Int32",
+                    f"{record_name}.Count is not Int32")
+            require(member["getAccess"] == "public" and
+                    member["setAccess"] is None,
+                    f"{record_name}.Count is not a public get-only property")
+        items = members_of(name, "property", "Items")
+        require(len(items) == 1, f"{record_name}.Items is missing")
+        for member in items:
+            require(member["getAccess"] == "protected",
+                    f"{record_name}.Items is not a protected getter")
+            require(member["setAccess"] is None,
+                    f"{record_name}.Items has a setter")
+            require(member["type"] == "System.Collections.Generic.IList`1[!0]",
+                    f"{record_name}.Items is not IList<T>")
+
+    # The read/write asymmetry between the two families is the whole point of
+    # having two of them.
+    collection_item = members_of(COLLECTION, "property", "Item")
+    require(len(collection_item) == 1, "Collection<T>.Item is missing")
+    for member in collection_item:
+        require(member["getAccess"] == "public" and
+                member["setAccess"] == "public",
+                "Collection<T>.Item is not a public read/write indexer")
+        require(len(member["parameters"]) == 1 and
+                member["parameters"][0]["type"] == "System.Int32",
+                "Collection<T>.Item is not indexed by Int32")
+        require(member["type"] == "!0",
+                "Collection<T>.Item is not typed by the generic parameter")
+    readonly_item = members_of(READONLY, "property", "Item")
+    require(len(readonly_item) == 1, "ReadOnlyCollection<T>.Item is missing")
+    for member in readonly_item:
+        require(member["getAccess"] == "public",
+                "ReadOnlyCollection<T>.Item has no public getter")
+        require(member["setAccess"] is None,
+                "ReadOnlyCollection<T>.Item has a setter; it must be read-only")
+
+    # -- the backing store --------------------------------------------------
+    backing = by_type.get(LIST)
+    if backing is not None:
+        require(backing["kind"] == "class", "List<T> is not a class")
+        require(backing["genericArity"] == 1, "List<T> is not of generic arity 1")
+        require("System.Collections.Generic.IList`1[!T]" in
+                backing["directInterfaces"],
+                "List<T> does not implement IList<T>, so it cannot be the "
+                "backing store Collection<T>..ctor() allocates")
+        require(any(
+            not item["parameters"]
+            for item in members_of(LIST, "constructor", ".ctor")),
+            "List<T> has no parameterless constructor")
+    contract = by_type.get(ILIST)
+    if contract is not None:
+        require(contract["kind"] == "interface", "IList<T> is not an interface")
+        for method in ("IndexOf", "Insert", "RemoveAt"):
+            require(len(members_of(ILIST, "method", method)) == 1,
+                    f"IList<T>.{method} is missing")
+
+    # ------------------------------------------------------------------
+    # The exception families.
+    #
+    # These decide whether eight XNA types get the right base, the right
+    # constructors and the right observable state. Every fact below is stated
+    # from the documented .NET Framework 4.0 contract, independently of the
+    # extractor, exactly as the collection facts above are.
+    # ------------------------------------------------------------------
+    exception = by_type.get(EXCEPTION)
+    system_exception = by_type.get(SYSTEM_EXCEPTION)
+    external = by_type.get(EXTERNAL_EXCEPTION)
+    for name in (EXCEPTION, SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION):
+        require(name in by_type, f"{name} was not extracted at all")
+    if exception is None or system_exception is None or external is None:
+        return checks, failures
+
+    for name, record in ((EXCEPTION, exception),
+                         (SYSTEM_EXCEPTION, system_exception),
+                         (EXTERNAL_EXCEPTION, external)):
+        require(record["kind"] == "class", f"{name} is not a class")
+        require(not record["sealed"], f"{name} is sealed")
+        require(not record["abstract"], f"{name} is abstract")
+        require(record["genericArity"] == 0, f"{name} is generic")
+
+    # The chain is exactly three links, and the middle one is real. Collapsing
+    # ExternalException straight onto Exception would drop SystemException's
+    # substituted message and its HResult.
+    require(exception["baseType"] == "System.Object",
+            "Exception does not derive directly from System.Object")
+    require(system_exception["baseType"] == EXCEPTION,
+            "SystemException does not derive directly from Exception")
+    require(external["baseType"] == SYSTEM_EXCEPTION,
+            "ExternalException's direct base is not SystemException")
+    require(external["baseType"] != EXCEPTION,
+            "ExternalException was extracted as deriving from Exception "
+            "directly, which would erase SystemException")
+
+    for interface in ("System.Runtime.Serialization.ISerializable",
+                      "System.Runtime.InteropServices._Exception"):
+        require(interface in exception["directInterfaces"],
+                f"Exception does not declare {interface}")
+
+    # Constructors: three public plus one protected serialization constructor
+    # on Exception and SystemException; ExternalException adds the errorCode
+    # overload.
+    for name, public_count in ((EXCEPTION, 3), (SYSTEM_EXCEPTION, 3),
+                               (EXTERNAL_EXCEPTION, 4)):
+        constructors = members_of(name, "constructor", ".ctor")
+        public = [item for item in constructors if item["access"] == "public"]
+        protected = [
+            item for item in constructors if item["access"] == "protected"]
+        require(len(public) == public_count,
+                f"{name} should declare {public_count} public constructors, "
+                f"found {len(public)}")
+        require(len(protected) == 1,
+                f"{name} should declare exactly one protected serialization "
+                f"constructor, found {len(protected)}")
+        require(any(not item["parameters"] for item in public),
+                f"{name} has no public parameterless constructor")
+        require(any(
+            [entry["type"] for entry in item["parameters"]] ==
+            ["System.String"] for item in public),
+            f"{name} has no (String) constructor")
+        require(any(
+            [entry["type"] for entry in item["parameters"]] ==
+            ["System.String", EXCEPTION] for item in public),
+            f"{name} has no (String, Exception) constructor")
+        require(all(
+            [entry["type"] for entry in item["parameters"]] == [
+                "System.Runtime.Serialization.SerializationInfo",
+                "System.Runtime.Serialization.StreamingContext",
+            ] for item in protected),
+            f"{name}'s protected constructor is not "
+            "(SerializationInfo, StreamingContext)")
+    require(any(
+        [entry["type"] for entry in item["parameters"]] ==
+        ["System.String", "System.Int32"]
+        for item in members_of(EXTERNAL_EXCEPTION, "constructor", ".ctor")),
+        "ExternalException has no (String, Int32 errorCode) constructor")
+
+    # Message is overridable; InnerException is `virtual final` and is NOT an
+    # override point. Projecting either the wrong way round changes what an
+    # XNA subclass can do.
+    message = members_of(EXCEPTION, "property", "Message")
+    require(len(message) == 1, "Exception.Message is missing")
+    for member in message:
+        require(member["type"] == "System.String",
+                "Exception.Message is not a String")
+        require(member["getAccess"] == "public" and
+                member["setAccess"] is None,
+                "Exception.Message is not a public get-only property")
+        require(member["getOverridable"],
+                "Exception.Message is not overridable")
+    inner = members_of(EXCEPTION, "property", "InnerException")
+    require(len(inner) == 1, "Exception.InnerException is missing")
+    for member in inner:
+        require(member["type"] == EXCEPTION,
+                "Exception.InnerException is not an Exception")
+        require(member["getAccess"] == "public" and
+                member["setAccess"] is None,
+                "Exception.InnerException is not a public get-only property")
+        require(not member["getOverridable"],
+                "Exception.InnerException is overridable; the CLR seals it")
+
+    # HResult is the protected state SystemException and ExternalException
+    # write and ErrorCode reads.
+    hresult = members_of(EXCEPTION, "property", "HResult")
+    require(len(hresult) == 1, "Exception.HResult is missing")
+    for member in hresult:
+        require(member["type"] == "System.Int32",
+                "Exception.HResult is not an Int32")
+        require(member["getAccess"] == "protected" and
+                member["setAccess"] == "protected",
+                "Exception.HResult is not a protected read/write property")
+
+    help_link = members_of(EXCEPTION, "property", "HelpLink")
+    require(len(help_link) == 1, "Exception.HelpLink is missing")
+    for member in help_link:
+        require(member["getAccess"] == "public" and
+                member["setAccess"] == "public",
+                "Exception.HelpLink is not a public read/write property")
+        require(member["getOverridable"] and member["setOverridable"],
+                "Exception.HelpLink is not overridable in both directions")
+
+    base_exception = members_of(EXCEPTION, "method", "GetBaseException")
+    require(len(base_exception) == 1, "Exception.GetBaseException is missing")
+    for member in base_exception:
+        require(member["returnType"] == EXCEPTION,
+                "Exception.GetBaseException does not return an Exception")
+        require(not member["parameters"],
+                "Exception.GetBaseException takes parameters")
+
+    error_code = members_of(EXTERNAL_EXCEPTION, "property", "ErrorCode")
+    require(len(error_code) == 1, "ExternalException.ErrorCode is missing")
+    for member in error_code:
+        require(member["type"] == "System.Int32",
+                "ExternalException.ErrorCode is not an Int32")
+        require(member["getAccess"] == "public" and
+                member["setAccess"] is None,
+                "ExternalException.ErrorCode is not a public get-only property")
+        require(member["getOverridable"],
+                "ExternalException.ErrorCode is not overridable")
+
+    # SystemException adds no member of its own. If it ever appears to, the
+    # projection would owe a member it has no evidence for.
+    require(not [
+        item for item in system_exception["members"]
+        if item["kind"] != "constructor"
+    ], "SystemException declares a non-constructor member")
+
+    # The CLR runtime services that are deliberately NOT projected must still
+    # be present in the pinned shape, so that dropping them from the Swift
+    # surface stays a recorded decision rather than an extraction accident.
+    for absent in ("StackTrace", "Source", "TargetSite", "Data"):
+        require(len(members_of(EXCEPTION, "property", absent)) == 1,
+                f"Exception.{absent} vanished from the extraction")
+    for absent in ("ToString", "GetObjectData", "GetType"):
+        require(len(members_of(EXCEPTION, "method", absent)) == 1,
+                f"Exception.{absent} vanished from the extraction")
+
+    # ------------------------------------------------------------------
+    # The dictionary family.
+    # ------------------------------------------------------------------
+    dictionary = by_type.get(DICTIONARY)
+    for name in (DICTIONARY, KEY_COLLECTION, VALUE_COLLECTION,
+                 DICT_ENUMERATOR, KEY_VALUE_PAIR, IEQUALITY_COMPARER,
+                 IDICTIONARY):
+        require(name in by_type, f"{name} was not extracted at all")
+    if dictionary is None:
+        return checks, failures
+
+    require(dictionary["kind"] == "class", "Dictionary<K,V> is not a class")
+    require(not dictionary["sealed"],
+            "Dictionary<K,V> is sealed, so LaunchParameters could not derive "
+            "from it")
+    require(dictionary["baseType"] == "System.Object",
+            "Dictionary<K,V> does not derive directly from System.Object")
+    require(dictionary["genericArity"] == 2,
+            "Dictionary<K,V> is not of generic arity 2")
+    for interface in (
+        "System.Collections.Generic.ICollection`1"
+        "[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.Generic.IDictionary`2[!TKey,!TValue]",
+        "System.Collections.Generic.IEnumerable`1"
+        "[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.ICollection",
+        "System.Collections.IDictionary",
+        "System.Collections.IEnumerable",
+        "System.Runtime.Serialization.IDeserializationCallback",
+        "System.Runtime.Serialization.ISerializable",
+    ):
+        require(interface in dictionary["directInterfaces"],
+                f"Dictionary<K,V> does not declare {interface}")
+
+    # NOTHING on the public surface is an override point. `GetObjectData` and
+    # `OnDeserialization` are the only overridable members, and neither is
+    # projected, so a Swift projection whose methods were `open` would invent
+    # extension points the CLR does not have.
+    for method in ("Add", "Clear", "ContainsKey", "ContainsValue", "Remove",
+                   "TryGetValue", "GetEnumerator"):
+        candidates = members_of(DICTIONARY, "method", method)
+        require(len(candidates) == 1,
+                f"Dictionary<K,V>.{method} should be declared exactly once, "
+                f"found {len(candidates)}")
+        for member in candidates:
+            require(member["access"] == "public",
+                    f"Dictionary<K,V>.{method} is not public")
+            require(not member["overridable"],
+                    f"Dictionary<K,V>.{method} is overridable; the CLR does "
+                    "not make it an override point")
+    for method in ("GetObjectData", "OnDeserialization"):
+        candidates = members_of(DICTIONARY, "method", method)
+        require(len(candidates) == 1,
+                f"Dictionary<K,V>.{method} is missing")
+        for member in candidates:
+            require(member["overridable"],
+                    f"Dictionary<K,V>.{method} should be the one kind of "
+                    "overridable member this class has")
+
+    # Six public constructors plus the protected serialization one.
+    constructors = members_of(DICTIONARY, "constructor", ".ctor")
+    public_constructors = [
+        item for item in constructors if item["access"] == "public"]
+    require(len(public_constructors) == 6,
+            f"Dictionary<K,V> should declare 6 public constructors, found "
+            f"{len(public_constructors)}")
+    require(len([
+        item for item in constructors if item["access"] == "protected"]) == 1,
+        "Dictionary<K,V> should declare one protected serialization "
+        "constructor")
+    for signature in (
+        [],
+        ["System.Int32"],
+        [f"{IEQUALITY_COMPARER}[!0]"],
+        ["System.Int32", f"{IEQUALITY_COMPARER}[!0]"],
+        [f"{IDICTIONARY}[!0,!1]"],
+        [f"{IDICTIONARY}[!0,!1]", f"{IEQUALITY_COMPARER}[!0]"],
+    ):
+        require(any(
+            [entry["type"] for entry in item["parameters"]] == signature
+            for item in public_constructors),
+            f"Dictionary<K,V> has no constructor taking {signature}")
+
+    # The indexer is read/write while Keys, Values, Count and Comparer are
+    # get-only. Getting the indexer wrong is the difference between Add
+    # refusing a duplicate and the setter overwriting it.
+    indexer = members_of(DICTIONARY, "property", "Item")
+    require(len(indexer) == 1, "Dictionary<K,V>.Item is missing")
+    for member in indexer:
+        require(member["getAccess"] == "public" and
+                member["setAccess"] == "public",
+                "Dictionary<K,V>.Item is not a public read/write indexer")
+        require(len(member["parameters"]) == 1 and
+                member["parameters"][0]["type"] == "!0",
+                "Dictionary<K,V>.Item is not indexed by the key type")
+        require(member["type"] == "!1",
+                "Dictionary<K,V>.Item does not yield the value type")
+    for name, clr_type in (
+        ("Count", "System.Int32"),
+        ("Comparer", f"{IEQUALITY_COMPARER}[!0]"),
+        ("Keys", f"{KEY_COLLECTION}[!0,!1]"),
+        ("Values", f"{VALUE_COLLECTION}[!0,!1]"),
+    ):
+        candidates = members_of(DICTIONARY, "property", name)
+        require(len(candidates) == 1, f"Dictionary<K,V>.{name} is missing")
+        for member in candidates:
+            require(member["getAccess"] == "public" and
+                    member["setAccess"] is None,
+                    f"Dictionary<K,V>.{name} is not a public get-only property")
+            require(member["type"] == clr_type,
+                    f"Dictionary<K,V>.{name} is {member['type']}, not "
+                    f"{clr_type}")
+
+    # `GetEnumerator` returns the nested struct, not the interface, and that
+    # struct carries nothing beyond the enumeration contract.
+    for member in members_of(DICTIONARY, "method", "GetEnumerator"):
+        require(member["returnType"] == f"{DICT_ENUMERATOR}[!0,!1]",
+                "Dictionary<K,V>.GetEnumerator does not return its own "
+                "nested Enumerator")
+    enumerator = by_type.get(DICT_ENUMERATOR)
+    if enumerator is not None:
+        require(enumerator["kind"] == "struct",
+                "Dictionary<K,V>.Enumerator is not a struct")
+        require({item["name"] for item in enumerator["members"]} ==
+                {"Current", "MoveNext", "Dispose"},
+                "Dictionary<K,V>.Enumerator carries more than the enumeration "
+                "contract, so projecting it as CNAEnumerator would drop "
+                "something")
+
+    # The two collection views are sealed live views, and neither exposes a
+    # mutator or a public Contains.
+    for name in (KEY_COLLECTION, VALUE_COLLECTION):
+        view = by_type.get(name)
+        if view is None:
+            continue
+        require(view["kind"] == "class", f"{name} is not a class")
+        require(view["sealed"], f"{name} is not sealed")
+        require(len(members_of(name, "constructor", ".ctor")) == 1,
+                f"{name} should declare exactly one constructor")
+        for method in ("Add", "Clear", "Remove", "Contains"):
+            require(not members_of(name, "method", method),
+                    f"{name} unexpectedly exposes {method}")
+        require(len(members_of(name, "method", "CopyTo")) == 1,
+                f"{name}.CopyTo is missing")
+        require(len(members_of(name, "property", "Count")) == 1,
+                f"{name}.Count is missing")
+
+    pair = by_type.get(KEY_VALUE_PAIR)
+    if pair is not None:
+        require(pair["kind"] == "struct", "KeyValuePair<K,V> is not a struct")
+        for name, clr_type in (("Key", "!0"), ("Value", "!1")):
+            candidates = members_of(KEY_VALUE_PAIR, "property", name)
+            require(len(candidates) == 1, f"KeyValuePair<K,V>.{name} is missing")
+            for member in candidates:
+                require(member["setAccess"] is None,
+                        f"KeyValuePair<K,V>.{name} has a setter")
+                require(member["type"] == clr_type,
+                        f"KeyValuePair<K,V>.{name} is not {clr_type}")
+
+    # ------------------------------------------------------------------
+    # System.Attribute.
+    # ------------------------------------------------------------------
+    attribute = by_type.get(ATTRIBUTE)
+    require(ATTRIBUTE in by_type, "System.Attribute was not extracted at all")
+    if attribute is not None:
+        require(attribute["kind"] == "class", "Attribute is not a class")
+        require(attribute["abstract"],
+                "Attribute is not abstract; the CLR forbids constructing one")
+        require(not attribute["sealed"], "Attribute is sealed")
+        require(attribute["baseType"] == "System.Object",
+                "Attribute does not derive directly from System.Object")
+        require(attribute["genericArity"] == 0, "Attribute is generic")
+        constructors = members_of(ATTRIBUTE, "constructor", ".ctor")
+        require(len(constructors) == 1,
+                f"Attribute should declare exactly one constructor, found "
+                f"{len(constructors)}")
+        for member in constructors:
+            require(member["access"] == "protected",
+                    "Attribute's constructor is not protected")
+            require(not member["parameters"],
+                    "Attribute's constructor takes parameters")
+        default_attribute = members_of(ATTRIBUTE, "method", "IsDefaultAttribute")
+        require(len(default_attribute) == 1,
+                "Attribute.IsDefaultAttribute is missing")
+        for member in default_attribute:
+            require(member["returnType"] == "System.Boolean",
+                    "Attribute.IsDefaultAttribute does not return Boolean")
+            require(member["overridable"],
+                    "Attribute.IsDefaultAttribute is not overridable")
+            require(not member["parameters"],
+                    "Attribute.IsDefaultAttribute takes parameters")
+        # The reflection surface must stay in the pinned shape, so that not
+        # projecting it stays a recorded decision rather than an extraction
+        # accident.
+        for reflective in ("GetCustomAttribute", "GetCustomAttributes",
+                           "IsDefined", "Match", "Equals", "GetHashCode"):
+            require(bool(members_of(ATTRIBUTE, "method", reflective)),
+                    f"Attribute.{reflective} vanished from the extraction")
+        require(len(members_of(ATTRIBUTE, "property", "TypeId")) == 1,
+                "Attribute.TypeId vanished from the extraction")
+
+    comparer = by_type.get(IEQUALITY_COMPARER)
+    if comparer is not None:
+        require(comparer["kind"] == "interface",
+                "IEqualityComparer<T> is not an interface")
+        require(comparer["genericArity"] == 1,
+                "IEqualityComparer<T> is not of generic arity 1")
+        require({item["name"] for item in comparer["members"]} ==
+                {"Equals", "GetHashCode"},
+                "IEqualityComparer<T> is not exactly Equals and GetHashCode")
+        for member in members_of(IEQUALITY_COMPARER, "method", "GetHashCode"):
+            require(member["returnType"] == "System.Int32",
+                    "IEqualityComparer<T>.GetHashCode does not return Int32")
+    return checks, failures
+
 
 
 class Parser:
@@ -935,6 +1672,10 @@ def main() -> int:
     parser.add_argument("--require-exact", action="append", default=[])
     parser.add_argument("--il-cache", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--write-resources", action="store_true",
+        help="regenerate the pinned selected resource strings from the "
+             "registered binaries")
     args = parser.parse_args()
 
     contract = json.loads(REFERENCE.read_text(encoding="utf-8"))
@@ -990,6 +1731,88 @@ def main() -> int:
             "mismatches": mismatches,
         })
 
+    # ------------------------------------------------------------------
+    # The selected resource strings.
+    #
+    # A user-visible XNA message is a resource lookup, not an IL literal, so
+    # every message this binding reproduces is read out of the registered
+    # binary's own embedded string table rather than transcribed.
+    # ------------------------------------------------------------------
+    registry = json.loads(REGISTRY.read_text(encoding="utf-8"))
+    selected_resources = registry.get("selectedResourceStrings", [])
+    resource_tables: dict[str, dict[str, str]] = {}
+    resource_records: list[dict[str, Any]] = []
+    resource_failures: list[str] = []
+    resource_checks = 0
+    for entry in selected_resources:
+        resource_checks += 1
+        assembly = entry["assembly"]
+        if assembly not in resource_tables:
+            candidates = [item for item in assemblies if item.name == assembly]
+            if not candidates:
+                resource_failures.append(
+                    f"{assembly}: not supplied, so its resource strings could "
+                    "not be read")
+                resource_tables[assembly] = {}
+            else:
+                blob = embedded_resource(candidates[0].read_bytes(), "resources")
+                if blob is None:
+                    resource_failures.append(
+                        f"{assembly}: no embedded ResourceReader string table")
+                    resource_tables[assembly] = {}
+                else:
+                    resource_tables[assembly] = resource_strings(blob)
+        value = resource_tables[assembly].get(entry["key"])
+        if value is None:
+            resource_failures.append(
+                f"{assembly}: resource key {entry['key']!r} is absent")
+            continue
+        resource_records.append({
+            "assembly": assembly, "key": entry["key"], "value": value,
+        })
+
+    resource_document = {
+        "schemaVersion": 1,
+        "profile": "XNA 4.0 Windows runtime selected resource strings",
+        "note": (
+            "The user-visible messages this binding reproduces, read "
+            "mechanically out of the embedded string tables of the "
+            "hash-registered XNA assemblies named in "
+            "registered-assemblies.json. Only keys and values are retained; "
+            "no Microsoft binary is stored in the repository."),
+        "resourceStrings": sorted(
+            resource_records, key=lambda item: (item["assembly"], item["key"])),
+    }
+    if args.write_resources:
+        RESOURCE_REFERENCE.parent.mkdir(parents=True, exist_ok=True)
+        RESOURCE_REFERENCE.write_text(
+            json.dumps(resource_document, indent=2) + "\n", encoding="utf-8")
+    if RESOURCE_REFERENCE.exists():
+        pinned_resources = json.loads(
+            RESOURCE_REFERENCE.read_text(encoding="utf-8"))
+        pinned_by_key = {
+            (item["assembly"], item["key"]): item["value"]
+            for item in pinned_resources.get("resourceStrings", [])
+        }
+        found_by_key = {
+            (item["assembly"], item["key"]): item["value"]
+            for item in resource_records
+        }
+        for key in sorted(set(pinned_by_key) | set(found_by_key)):
+            resource_checks += 1
+            if key not in found_by_key:
+                resource_failures.append(
+                    f"{key[1]}: pinned but not extracted")
+            elif key not in pinned_by_key:
+                resource_failures.append(
+                    f"{key[1]}: extracted but not pinned")
+            elif pinned_by_key[key] != found_by_key[key]:
+                resource_failures.append(
+                    f"{key[1]}: {found_by_key[key]!r} != pinned "
+                    f"{pinned_by_key[key]!r}")
+    elif not args.write_resources:
+        resource_failures.append(f"{RESOURCE_REFERENCE.name} does not exist")
+
     merged: dict[str, dict[str, Any]] = {}
     for types in extracted.values():
         merged.update(types)
@@ -1010,7 +1833,11 @@ def main() -> int:
         "referenceSha256": hashlib.sha256(REFERENCE.read_bytes()).hexdigest(),
         "calibrationAssemblies": sorted(args.require_exact),
         "CALIBRATION_STATUS":
-            "FAIL" if (calibration_failed or self_test_failures) else "PASS",
+            "FAIL" if (calibration_failed or self_test_failures or
+                       resource_failures) else "PASS",
+        "RESOURCE_STRING_CHECKS": resource_checks,
+        "RESOURCE_STRINGS_REPRODUCED": len(resource_records),
+        "resourceStringFailures": resource_failures,
         "AUDIT_SELF_TESTS": checks,
         "AUDIT_SELF_TEST_STATUS": "FAIL" if self_test_failures else "PASS",
         "auditSelfTestFailures": self_test_failures,
@@ -1040,10 +1867,14 @@ def main() -> int:
     print(
         f"AUDIT_SELF_TESTS={checks} "
         f"AUDIT_SELF_TEST_STATUS={report['AUDIT_SELF_TEST_STATUS']}")
+    print(
+        f"RESOURCE_STRING_CHECKS={resource_checks} "
+        f"RESOURCE_STRINGS_REPRODUCED={len(resource_records)}")
     print(f"CALIBRATION_STATUS={report['CALIBRATION_STATUS']}")
-    for line in calibration_failed + self_test_failures:
+    for line in calibration_failed + self_test_failures + resource_failures:
         print(f"  {line}", file=sys.stderr)
-    return 1 if (calibration_failed or self_test_failures) else 0
+    return 1 if (calibration_failed or self_test_failures or
+                 resource_failures) else 0
 
 
 if __name__ == "__main__":

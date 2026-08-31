@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "profile": "XNA 4.0 Windows runtime selected resource strings",
+  "note": "The user-visible messages this binding reproduces, read mechanically out of the embedded string tables of the hash-registered XNA assemblies named in registered-assemblies.json. Only keys and values are retained; no Microsoft binary is stored in the repository.",
+  "resourceStrings": [
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "CannotAddSameComponentMultipleTimes",
+      "value": "Cannot add the same game component to a game component collection multiple times."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "CannotSetItemsIntoGameComponentCollection",
+      "value": "Cannot set a value using operator[] on GameComponentCollection.  Use Add/Remove instead."
+    }
+  ]
+}

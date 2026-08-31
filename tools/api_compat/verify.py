@@ -17,6 +17,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = ROOT / "tools/api_compat/reference/xna40-windows-runtime-contract.json"
 BCL_SELECTED_SHAPE = ROOT / "tools/api_compat/reference/bcl40-selected-shape.json"
+XNA_RESOURCE_STRINGS = (
+    ROOT / "tools/api_compat/reference/xna40-selected-resource-strings.json")
 RULES = ROOT / "tools/api_compat/mapping-rules.json"
 ACCESSOR_FALLIBILITY = ROOT / "tools/api_compat/reference/xna40-accessor-fallibility.json"
 RETURN_NULLABILITY = (
@@ -4257,6 +4259,53 @@ def self_test() -> None:
         failures.append(
             "an unreadable BCL manifest was not reported unmeasured")
     event_self_tests += 1
+
+    # The XNA half of the same rule, held to the same standard: the pinned
+    # values are the reference model, a mutated one must be caught, and an
+    # unreadable input must be reported unmeasured rather than assumed away.
+    xna_resources = (
+        load_json(XNA_RESOURCE_STRINGS) if XNA_RESOURCE_STRINGS.exists()
+        else {"resourceStrings": []})
+    xna_clean = xna_resource_string_evidence(
+        ROOT / "Sources/CNA/Xna", xna_resources)
+    if xna_clean[1]:
+        failures.append(
+            "the XNA Swift sources do not reproduce the pinned XNA messages")
+    event_self_tests += 1
+    if len(xna_clean[0]) != len(xna_resources.get("resourceStrings", [])):
+        failures.append("the XNA resource-string evidence is incomplete")
+    event_self_tests += 1
+
+    if xna_resources.get("resourceStrings"):
+        mutated_xna = copy.deepcopy(xna_resources)
+        mutated_xna["resourceStrings"][0]["value"] = "Something else entirely."
+        if "LANGUAGE_MAPPING_MISMATCH" not in {
+            item["category"]
+            for item in xna_resource_string_evidence(
+                ROOT / "Sources/CNA/Xna", mutated_xna)[1]
+        }:
+            failures.append(
+                "an XNA message the Swift sources do not reproduce was not "
+                "detected")
+        event_self_tests += 1
+
+    for unreadable in (None,):
+        if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
+            item["category"]
+            for item in xna_resource_string_evidence(
+                ROOT / "Sources/CNA/Xna", unreadable)[1]
+        }:
+            failures.append(
+                "unreadable pinned XNA messages were not reported unmeasured")
+        event_self_tests += 1
+    if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
+        item["category"]
+        for item in xna_resource_string_evidence(
+            ROOT / "no-such-directory", xna_resources)[1]
+    }:
+        failures.append(
+            "unreadable XNA sources were not reported unmeasured")
+    event_self_tests += 1
     if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
         item["category"]
         for item in bcl_resource_string_evidence(
@@ -5096,6 +5145,80 @@ def source_bcl_resource_strings(source_root: Path) -> list[str] | None:
         body = re.sub(r'"\s*\+\s*"', "", body)
         literals.extend(re.findall(r'"((?:[^"\\]|\\.)*)"', body))
     return literals
+
+
+def source_string_literals(paths: list[Path]) -> list[str] | None:
+    """Every Swift string literal in `paths`, comments removed.
+
+    Adjacent literals joined by `+` are collapsed first, so a message too long
+    for one line is matched against what the program produces rather than
+    against however the source happened to wrap it.
+    """
+    if not paths:
+        return None
+    literals: list[str] = []
+    for path in paths:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            return None
+        body = "\n".join(
+            line for line in text.splitlines()
+            if not line.strip().startswith("//")
+        )
+        body = re.sub(r'"\s*\+\s*"', "", body)
+        literals.extend(re.findall(r'"((?:[^"\\]|\\.)*)"', body))
+    return literals
+
+
+def xna_resource_string_evidence(
+    source_root: Path, pinned: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Each pinned XNA message must appear verbatim in the XNA Swift sources.
+
+    The companion to the BCL check, over the other half of the projection. A
+    user-visible XNA message is a resource lookup rather than an IL literal, so
+    the only way to be sure the binding says what XNA says is to compare the
+    Swift literal against the value the audit read out of the registered
+    assembly. One message already differed by a whole clause and a double
+    space, which is exactly the failure this catches.
+    """
+    evidence: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, str]] = []
+    if pinned is None:
+        diagnostics.append(diagnostic(
+            "UNMEASURED_STRUCTURAL_CATEGORY", "xnaResourceStrings",
+            "the pinned XNA resource strings could not be read, so the "
+            "messages this binding reproduces are unmeasured",
+        ))
+        return evidence, diagnostics
+    literals = source_string_literals(sorted(source_root.rglob("*.swift")))
+    if literals is None:
+        diagnostics.append(diagnostic(
+            "UNMEASURED_STRUCTURAL_CATEGORY", "xnaResourceStrings",
+            "the XNA Swift sources could not be read, so the messages this "
+            "binding reproduces are unmeasured",
+        ))
+        return evidence, diagnostics
+    for entry in pinned.get("resourceStrings", []):
+        value = entry["value"]
+        # A format string is reproduced with its placeholders substituted at
+        # runtime, so the literal in the source is the template itself.
+        reproduced = value in literals
+        if not reproduced:
+            diagnostics.append(diagnostic(
+                "LANGUAGE_MAPPING_MISMATCH",
+                f"resourceString.{entry['key']}",
+                f"the XNA Swift sources do not reproduce the pinned value "
+                f"{value!r} read from {entry['assembly']}",
+            ))
+        evidence.append({
+            "assembly": entry["assembly"],
+            "resourceKey": entry["key"],
+            "pinnedValue": value,
+            "reproducedInSwiftSource": reproduced,
+        })
+    return evidence, diagnostics
 
 
 def source_bcl_static_tables(source_root: Path) -> dict[str, list[int]] | None:
@@ -5941,7 +6064,7 @@ def make_report(
     # reproduces verbatim from the admitted assembly's own resource table.
     summary["BCL_RESOURCE_STRING_PROJECTIONS"] = sum(
         item["reproducedInSwiftSource"] for item in resource_evidence
-        if "resourceKey" in item)
+        if "resourceKey" in item and "assembly" not in item)
     # Each pinned static data table the Swift source reproduces element for
     # element, so no sizing decision of this projection's own enters the
     # algorithm it feeds.
@@ -5951,6 +6074,11 @@ def make_report(
     summary["BCL_STATIC_TABLE_PROJECTIONS"] = sum(
         item["reproducedInSwiftSource"] for item in resource_evidence
         if "clrField" in item)
+    # Each pinned XNA message the Swift sources reproduce verbatim, read out of
+    # the registered assembly's own embedded string table.
+    summary["XNA_RESOURCE_STRING_PROJECTIONS"] = sum(
+        item["reproducedInSwiftSource"] for item in resource_evidence
+        if "assembly" in item)
     # Every contract type whose CLR base has a decided Swift support
     # projection. The head is what is counted, because a generic support base
     # arrives here specialized -- `CNACollection<...>` -- and is the same
@@ -6107,10 +6235,14 @@ def make_report(
         "eventSupportProjections": support_evidence,
         "bclSupportProjections": bcl_evidence,
         "bclResourceStringProjections": [
-            item for item in resource_evidence if "resourceKey" in item
+            item for item in resource_evidence
+            if "resourceKey" in item and "assembly" not in item
         ],
         "bclStaticTableProjections": [
             item for item in resource_evidence if "clrField" in item
+        ],
+        "xnaResourceStringProjections": [
+            item for item in resource_evidence if "assembly" in item
         ],
         "sealedClassProjections": sealed_evidence,
         "nonDerivableUnsealedClasses": [
@@ -6210,6 +6342,14 @@ def main() -> int:
         rules, ROOT / "Sources/CNA", bcl_manifest)
     table_evidence, table_diagnostics = bcl_static_table_evidence(
         rules, ROOT / "Sources/CNA", bcl_manifest)
+    xna_resource_evidence, xna_resource_diagnostics = (
+        xna_resource_string_evidence(
+            ROOT / "Sources/CNA/Xna",
+            load_json(XNA_RESOURCE_STRINGS)
+            if XNA_RESOURCE_STRINGS.exists() else None)
+    )
+    table_evidence = table_evidence + xna_resource_evidence
+    table_diagnostics = table_diagnostics + xna_resource_diagnostics
     resource_evidence = resource_evidence + table_evidence
     resource_diagnostics = resource_diagnostics + table_diagnostics
     witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(

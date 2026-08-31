@@ -72,9 +72,10 @@
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 10,
     "XNA_SEALED_CLASS_PROJECTIONS": 18,
     "NONDERIVABLE_UNSEALED_CLASSES": 5,
-    "BCL_RESOURCE_STRING_PROJECTIONS": 7,
+    "BCL_RESOURCE_STRING_PROJECTIONS": 8,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 2,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -3755,6 +3756,12 @@
       "pinnedValue": "Destination array is not long enough to copy all the items in the collection. Check array index and length.",
       "reproducedInSwiftSource": true,
       "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that is too short."
+    },
+    {
+      "resourceKey": "Arg_NotSupportedException",
+      "pinnedValue": "Specified method is not supported.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message a parameterless NotSupportedException carries, raised by Collection<T>'s read-only guard and by every TouchCollection mutator."
     }
   ],
   "bclStaticTableProjections": [
@@ -3765,6 +3772,20 @@
       "entries": 72,
       "reproducedInSwiftSource": true,
       "reason": "Dictionary<TKey,TValue>::Initialize and ::Resize size their arrays through HashHelpers.GetPrime, which reads this table."
+    }
+  ],
+  "xnaResourceStringProjections": [
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "CannotAddSameComponentMultipleTimes",
+      "pinnedValue": "Cannot add the same game component to a game component collection multiple times.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "CannotSetItemsIntoGameComponentCollection",
+      "pinnedValue": "Cannot set a value using operator[] on GameComponentCollection.  Use Add/Remove instead.",
+      "reproducedInSwiftSource": true
     }
   ],
   "sealedClassProjections": [

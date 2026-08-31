@@ -278,11 +278,13 @@
     {"key": "Argument_AddingDuplicate", "reason": "Dictionary<TKey,TValue>.Add raises this when the key is already present."},
     {"key": "Arg_KeyNotFound", "reason": "Dictionary<TKey,TValue>'s indexer getter raises this for an absent key."},
     {"key": "ArgumentOutOfRange_NeedNonNegNum", "reason": "The message a negative capacity produces on the Dictionary<TKey,TValue> capacity constructors."},
-    {"key": "Arg_ArrayPlusOffTooSmall", "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that is too short."}
+    {"key": "Arg_ArrayPlusOffTooSmall", "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that is too short."},
+    {"key": "Arg_NotSupportedException", "reason": "The message a parameterless NotSupportedException carries, raised by Collection<T>'s read-only guard and by every TouchCollection mutator."}
   ],
+  "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "29a04f69a7b3c0bbc1dfff2cf1a4684548fc5d274f403953724540525bcb4568",
+  "bclSelectedShapeSha256": "52b98a96a506b1320fe8cc78fa96acb736352cdd584c2ea709b9a3341b6635da",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class", "inheritance": "open", "generics": [], "base": null,

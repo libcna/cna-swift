@@ -4478,6 +4478,11 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "Arg_NotSupportedException",
+      "value": "Specified method is not supported."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "Arg_SystemException",
       "value": "System error."
     },

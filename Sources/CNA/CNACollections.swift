@@ -403,7 +403,7 @@ open class CNACollection<Element> {
     /// backing store, it has no reachable path today.
     private func requireMutable() throws {
         guard !items.IsReadOnly else {
-            throw CNAError.notSupported("mutating a read-only collection")
+            throw CNAError.notSupported("Specified method is not supported.")
         }
     }
 }

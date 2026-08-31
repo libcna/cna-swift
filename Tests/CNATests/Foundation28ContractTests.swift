@@ -274,10 +274,14 @@ extension PureValueTests {
             guard case .notSupported(let message)? = error as? CNAError else {
                 return XCTFail("expected a not-supported error, got \(error)")
             }
+            // The exact `CannotSetItemsIntoGameComponentCollection` string,
+            // read out of the registered assembly's own resource table and
+            // pinned in reference/xna40-selected-resource-strings.json --
+            // including the double space, which is XNA's.
             XCTAssertEqual(
                 message,
-                "setting a value using operator[] on GameComponentCollection. "
-                + "Use Add/Remove instead.")
+                "Cannot set a value using operator[] on "
+                + "GameComponentCollection.  Use Add/Remove instead.")
         }
         XCTAssertEqual(collection.Count, 1)
         XCTAssertTrue(try collection.Item(0) as AnyObject === original)

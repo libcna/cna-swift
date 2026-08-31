@@ -6,6 +6,9 @@
     "Microsoft.Xna.Framework.dll"
   ],
   "CALIBRATION_STATUS": "PASS",
+  "RESOURCE_STRING_CHECKS": 4,
+  "RESOURCE_STRINGS_REPRODUCED": 2,
+  "resourceStringFailures": [],
   "AUDIT_SELF_TESTS": 64,
   "AUDIT_SELF_TEST_STATUS": "PASS",
   "auditSelfTestFailures": [],

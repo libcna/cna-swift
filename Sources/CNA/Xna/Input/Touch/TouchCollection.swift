@@ -93,7 +93,7 @@ extension Microsoft.Xna.Framework.Input.Touch {
             _ index: Int32,
             _ value: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws {
-            throw CNAError.notSupported("TouchCollection.Item")
+            throw CNAError.notSupported("Specified method is not supported.")
         }
 
         // Scans by `Id` and, on a match, writes that location out and returns
@@ -157,28 +157,28 @@ extension Microsoft.Xna.Framework.Input.Touch {
         public func Add(
             _ item: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws {
-            throw CNAError.notSupported("TouchCollection.Add")
+            throw CNAError.notSupported("Specified method is not supported.")
         }
 
         public func Insert(
             _ index: Int32,
             item: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws {
-            throw CNAError.notSupported("TouchCollection.Insert")
+            throw CNAError.notSupported("Specified method is not supported.")
         }
 
         public func RemoveAt(_ index: Int32) throws {
-            throw CNAError.notSupported("TouchCollection.RemoveAt")
+            throw CNAError.notSupported("Specified method is not supported.")
         }
 
         public func Remove(
             _ item: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws -> Bool {
-            throw CNAError.notSupported("TouchCollection.Remove")
+            throw CNAError.notSupported("Specified method is not supported.")
         }
 
         public func Clear() throws {
-            throw CNAError.notSupported("TouchCollection.Clear")
+            throw CNAError.notSupported("Specified method is not supported.")
         }
 
         // `GetEnumerator` copies the whole collection into the enumerator by

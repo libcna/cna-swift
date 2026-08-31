@@ -152,6 +152,11 @@
           "reason": "The message a negative capacity produces on the Dictionary<TKey,TValue> capacity constructors."
         },
         {
+          "key": "Arg_NotSupportedException",
+          "value": "Specified method is not supported.",
+          "reason": "The message a parameterless NotSupportedException carries. Collection<T>'s mutators raise it when the backing list is read-only, and every TouchCollection mutator raises exactly it."
+        },
+        {
           "key": "Arg_ArrayPlusOffTooSmall",
           "value": "Destination array is not long enough to copy all the items in the collection. Check array index and length.",
           "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that cannot hold the collection from the supplied index."

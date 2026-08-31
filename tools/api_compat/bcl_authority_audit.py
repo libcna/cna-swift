@@ -64,7 +64,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from pinned_assembly_audit import (  # noqa: E402
     Parser,
+    embedded_resource,
     finalize,
+    resource_strings,
     split_call,
     split_generic_suffix,
     strip_directives,
@@ -401,141 +403,6 @@ EXTERNAL_EXCEPTION = "System.Runtime.InteropServices.ExternalException"
 # `mscorlib.resources`, not about its code, and it is read from the binary here
 # rather than transcribed from documentation or memory.
 # ----------------------------------------------------------------------------
-
-RESOURCE_MAGIC = 0xBEEFCACE
-
-
-def _rva_to_offset(data: bytes, sections: list[tuple[int, int, int]], rva: int) -> int:
-    for virtual_address, virtual_size, raw_pointer in sections:
-        if virtual_address <= rva < virtual_address + virtual_size:
-            return raw_pointer + (rva - virtual_address)
-    raise ValueError(f"RVA 0x{rva:08x} is in no section")
-
-
-def embedded_resource(data: bytes, name: str) -> bytes | None:
-    """One embedded managed resource, located through the PE and CLI headers.
-
-    Nothing is written to disk and no external tool is invoked: the resource is
-    reached by walking the PE optional header's CLI data directory to the CLI
-    header's own `Resources` directory, which is exactly how the runtime
-    reaches it. The blob is length-prefixed there.
-
-    Only `mscorlib`'s single `System.Resources.ResourceReader` set is needed,
-    so the lookup is by reader identity rather than by a metadata name: the
-    resource whose header names that reader IS the string table, and an
-    assembly carrying none returns `None` rather than a guess.
-    """
-    if data[:2] != b"MZ":
-        return None
-    pe = int.from_bytes(data[0x3C:0x40], "little")
-    if data[pe:pe + 4] != b"PE\0\0":
-        return None
-    coff = pe + 4
-    section_count = int.from_bytes(data[coff + 2:coff + 4], "little")
-    optional_size = int.from_bytes(data[coff + 16:coff + 18], "little")
-    optional = coff + 20
-    magic = int.from_bytes(data[optional:optional + 2], "little")
-    directories = optional + (112 if magic == 0x20B else 96)
-    section_table = optional + optional_size
-    sections: list[tuple[int, int, int]] = []
-    for index in range(section_count):
-        entry = section_table + index * 40
-        sections.append((
-            int.from_bytes(data[entry + 12:entry + 16], "little"),
-            max(
-                int.from_bytes(data[entry + 8:entry + 12], "little"),
-                int.from_bytes(data[entry + 16:entry + 20], "little"),
-            ),
-            int.from_bytes(data[entry + 20:entry + 24], "little"),
-        ))
-    cli_rva = int.from_bytes(
-        data[directories + 14 * 8:directories + 14 * 8 + 4], "little")
-    if not cli_rva:
-        return None
-    cli = _rva_to_offset(data, sections, cli_rva)
-    resources_rva = int.from_bytes(data[cli + 24:cli + 28], "little")
-    resources_size = int.from_bytes(data[cli + 28:cli + 32], "little")
-    if not resources_rva or not resources_size:
-        return None
-    base = _rva_to_offset(data, sections, resources_rva)
-    offset = 0
-    while offset + 4 <= resources_size:
-        length = int.from_bytes(data[base + offset:base + offset + 4], "little")
-        blob = data[base + offset + 4:base + offset + 4 + length]
-        if (
-            len(blob) >= 4 and
-            int.from_bytes(blob[:4], "little") == RESOURCE_MAGIC and
-            b"System.Resources.ResourceReader" in blob[:512]
-        ):
-            return blob
-        offset += 4 + length
-    return None
-
-
-def resource_strings(blob: bytes) -> dict[str, str]:
-    """Every string entry of a v2 `System.Resources.ResourceReader` set.
-
-    The format is fixed: a magic, a reader-header block, the format version,
-    the entry and type counts, the type names, an eight-byte alignment, the
-    name hashes, the name offsets, the data-section offset, then a name table
-    of UTF-16 names each followed by its data offset. A string value is the
-    7-bit-length-prefixed UTF-8 written by `BinaryWriter.Write(string)` under
-    type index 1.
-    """
-    position = 0
-
-    def uint32() -> int:
-        nonlocal position
-        value = int.from_bytes(blob[position:position + 4], "little")
-        position += 4
-        return value
-
-    def seven_bit() -> int:
-        nonlocal position
-        value = shift = 0
-        while True:
-            byte = blob[position]
-            position += 1
-            value |= (byte & 0x7F) << shift
-            if not byte & 0x80:
-                return value
-            shift += 7
-
-    def prefixed() -> str:
-        nonlocal position
-        count = seven_bit()
-        text = blob[position:position + count].decode("utf-8", "replace")
-        position += count
-        return text
-
-    if uint32() != RESOURCE_MAGIC:
-        return {}
-    uint32()                                   # reader-header version
-    header_size = uint32()
-    position += header_size                    # reader and set type names
-    uint32()                                   # resource-set format version
-    entries = uint32()
-    type_count = uint32()
-    for _ in range(type_count):
-        prefixed()
-    while position & 7:
-        position += 1
-    position += 4 * entries                    # name hashes
-    offsets = [uint32() for _ in range(entries)]
-    data_section = uint32()
-    name_section = position
-    found: dict[str, str] = {}
-    for offset in offsets:
-        position = name_section + offset
-        count = seven_bit()
-        name = blob[position:position + count].decode("utf-16-le", "replace")
-        position += count
-        value_offset = uint32()
-        position = data_section + value_offset
-        if seven_bit() == 1:                   # ResourceTypeCode.String
-            found[name] = prefixed()
-    return found
-
 
 def sentinel_checks(
     by_type: dict[str, dict[str, Any]],
@@ -1122,6 +989,96 @@ def sentinel_checks(
             require(member["returnType"] == "System.Int32",
                     "IEqualityComparer<T>.GetHashCode does not return Int32")
     return checks, failures
+
+
+def static_int32_table(il: str, type_name: str, field_name: str) -> list[int] | None:
+    """One `static readonly int[]` initialised from a static-array RVA blob.
+
+    The C# compiler lowers such a table to a `<PrivateImplementationDetails>`
+    field placed at a data address, filled by `RuntimeHelpers.InitializeArray`.
+    The chain followed here is exactly that one: the type's `.cctor` names the
+    initializer field, the field declaration names its data address, and the
+    address names a `.data ... = bytearray (...)` blob. Reading it means a
+    table this binding reproduces is a fact about the assembly rather than
+    something transcribed by hand.
+
+    `None` when any link is absent, which is reported rather than assumed away.
+    """
+    opening = re.search(
+        rf"^\.class\s+.*?\b{re.escape(type_name)}\s*$", il, re.M)
+    if opening is None:
+        return None
+    closing = re.search(
+        rf"^\}}\s*//\s*end of class\s+{re.escape(type_name)}\s*$",
+        il[opening.start():], re.M)
+    if closing is None:
+        return None
+    block = il[opening.start():opening.start() + closing.end()]
+
+    # The `.cctor` stores into the named field; the `ldtoken` immediately
+    # before that store names the initializer field.
+    store = re.search(
+        rf"ldtoken\s+field[^\n]*?'(\$\$method[0-9a-zA-Z-]+)'[\s\S]{{0,400}}?"
+        rf"stsfld\s+int32\[\]\s+{re.escape(type_name)}::{re.escape(field_name)}",
+        block)
+    if store is None:
+        return None
+    initializer = store.group(1)
+
+    placement = re.search(
+        rf"'{re.escape(initializer)}'\s+at\s+(I_[0-9A-Fa-f]+)", il)
+    if placement is None:
+        return None
+    blob = re.search(
+        rf"^\.data\s+cil\s+{placement.group(1)}\s*=\s*bytearray\s*\("
+        rf"([\s\S]*?)\)\s*$", il, re.M)
+    if blob is None:
+        return None
+    # `ikdasm` appends an ASCII rendering after `//` on most rows, and a
+    # rendering can contain two characters that look like a hex byte. The
+    # comment is removed per line before any byte is read, so nothing outside
+    # the blob can be mistaken for data.
+    hex_only = "\n".join(
+        line.split("//", 1)[0] for line in blob.group(1).splitlines())
+    payload = bytes(
+        int(item, 16) for item in re.findall(r"\b([0-9A-Fa-f]{2})\b", hex_only))
+
+    # The declared element count comes from the `newarr` the `.cctor` performs,
+    # so a blob that is longer than the array cannot silently add entries.
+    size = re.search(
+        r"ldc\.i4(?:\.s)?\s+(\d+)\s*\n\s*IL_[0-9a-f]+:\s+newarr\s+System\.Int32",
+        block)
+    count = int(size.group(1)) if size else len(payload) // 4
+    if len(payload) < count * 4:
+        return None
+    return [
+        int.from_bytes(payload[index * 4:index * 4 + 4], "little", signed=True)
+        for index in range(count)
+    ]
+
+
+def static_table_checks(
+    il: str, selected: list[dict[str, Any]],
+) -> tuple[int, list[str], list[dict[str, Any]]]:
+    """Extract every registered static table, or say why it could not be."""
+    failures: list[str] = []
+    records: list[dict[str, Any]] = []
+    checks = 0
+    for entry in selected:
+        checks += 1
+        values = static_int32_table(il, entry["type"], entry["field"])
+        if values is None:
+            failures.append(
+                f"static table {entry['type']}::{entry['field']} could not be "
+                "read from the assembly")
+            continue
+        records.append({
+            "type": entry["type"],
+            "field": entry["field"],
+            "swiftSymbol": entry.get("swiftSymbol"),
+            "values": values,
+        })
+    return checks, failures, records
 
 
 def static_int32_table(il: str, type_name: str, field_name: str) -> list[int] | None:

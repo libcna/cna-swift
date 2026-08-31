@@ -101,8 +101,11 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
             return "Collection was modified after the enumerator was created"
         case .keyNotFound(let message):
             return message
-        case .notSupported(let operation):
-            return "XNA does not support \(operation)"
+        case .notSupported(let message):
+            // The message is the CLR's own, read out of the assembly that
+            // raises it, so it is reported verbatim rather than wrapped in a
+            // sentence of this binding's own devising.
+            return message
         }
     }
 }
