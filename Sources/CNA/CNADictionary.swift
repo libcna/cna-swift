@@ -310,8 +310,14 @@ open class CNADictionary<Key, Value> {
     /// An existing key is overwritten rather than refused, and **the version
     /// still advances**, so a live enumerator is invalidated by an overwrite
     /// just as it is by an insertion.
-    public final func SetItem(_ key: Key, _ value: Value) throws {
-        try insert(key, value, add: false)
+    ///
+    /// It does **not** throw. `Insert`'s only failures are
+    /// `ArgumentNullException` for a null key -- unreachable through a
+    /// non-Optional Swift parameter -- and the duplicate-key
+    /// `ArgumentException`, which `Insert` raises only when `add` is true. The
+    /// setter passes false, so no value a caller can supply reaches a failure.
+    public final func SetItem(_ key: Key, _ value: Value) {
+        insert(key, value, add: false)
     }
 
     /// `Dictionary<TKey,TValue>.ContainsKey`.
@@ -359,7 +365,9 @@ open class CNADictionary<Key, Value> {
     /// A duplicate key raises `ArgumentException` with the assembly's own
     /// `Argument_AddingDuplicate` string, and nothing is stored.
     public final func Add(_ key: Key, value: Value) throws {
-        try insert(key, value, add: true)
+        guard insert(key, value, add: true) else {
+            throw CNAError.argument(CNADictionary.addingDuplicateMessage)
+        }
     }
 
     /// `Dictionary<TKey,TValue>.Remove`.
@@ -569,7 +577,13 @@ open class CNADictionary<Key, Value> {
     }
 
     /// `Dictionary`2::Insert(!TKey key, !TValue value, bool add)`.
-    private func insert(_ key: Key, _ value: Value, add: Bool) throws {
+    ///
+    /// Returns `false` for the one failure a Swift caller can reach: an `Add`
+    /// whose key is already present. Reporting it rather than throwing from
+    /// here is what lets `SetItem` -- which passes `add: false` and therefore
+    /// cannot fail -- keep the non-throwing signature the CLR gives it.
+    @discardableResult
+    private func insert(_ key: Key, _ value: Value, add: Bool) -> Bool {
         if buckets == nil { initialize(capacity: 0) }
         let hashCode = hash(of: key)
         var targetBucket = Int(hashCode % Int32(buckets!.count))
@@ -578,13 +592,10 @@ open class CNADictionary<Key, Value> {
         while index >= 0 {
             let entry = entries[Int(index)]
             if entry.hashCode == hashCode, keyComparer.Equals(entry.key!, key) {
-                if add {
-                    throw CNAError.argument(
-                        CNADictionary.addingDuplicateMessage)
-                }
+                if add { return false }
                 entries[Int(index)].value = value
                 version &+= 1
-                return
+                return true
             }
             index = entry.next
         }
@@ -608,6 +619,7 @@ open class CNADictionary<Key, Value> {
             key: key, value: value)
         buckets![targetBucket] = slot
         version &+= 1
+        return true
     }
 
     /// `Dictionary`2::Resize()`.

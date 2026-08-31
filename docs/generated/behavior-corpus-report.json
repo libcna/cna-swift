@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1968,
-  "ASSERTIONS": 1968,
+  "OBSERVATIONS": 1980,
+  "ASSERTIONS": 1980,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -189,7 +189,8 @@
     "testTheTwoUnsealedXnaExceptionsAreDerivable",
     "testALocallyDeclaredSubclassGetsAMangledClassNameInItsDefaultMessage",
     "testLaunchParametersDerivesFromTheDictionarySpecialization",
-    "testLaunchParametersStartsEmpty",
+    "testTheConstructorParsesThisProcessesArguments",
+    "testCommandLineParsing",
     "testLaunchParametersHasReferenceIdentity",
     "testTheInheritedDictionarySurfaceWorksThroughTheXnaType",
     "testLaunchParametersIsDerivable",
@@ -204,8 +205,8 @@
     "testCNAAttributeIsConstructibleWhichTheCLRForbids"
   ],
   "BCL_AUTHORITY": "PURE_BCL_DERIVED",
-  "BCL_OBSERVATIONS": 208,
-  "BCL_ASSERTIONS": 208,
+  "BCL_OBSERVATIONS": 210,
+  "BCL_ASSERTIONS": 210,
   "bclTestCases": [
     "testCollectionDefaultConstructorAllocatesItsOwnBackingStore",
     "testCollectionWrappingConstructorObservesLaterMutationsOfTheSuppliedList",
@@ -244,6 +245,7 @@
     "testDictionaryCopyConstructorCopiesAndIsNotALiveView",
     "testAddRefusesADuplicateKeyWhileTheIndexerOverwritesIt",
     "testIndexerGetterRaisesKeyNotFoundForAnAbsentKey",
+    "testTheIndexerSetterCannotFailWhileAddCan",
     "testTryGetValueClearsTheOutParameterOnFailure",
     "testContainsKeyAndContainsValue",
     "testEnumerationIsInsertionOrderAndSurvivesResize",

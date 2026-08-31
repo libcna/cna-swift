@@ -206,17 +206,73 @@ nothing else. A sentinel asserts exactly that member set, so the claim "the
 struct adds nothing the established `CNAEnumerator` projection would drop" is
 checked rather than assumed.
 
-## `LaunchParameters` — what is complete and what is not
+## `LaunchParameters` — the constructor parses the command line
 
-The type is complete: its one declared constructor is projected and every
-inherited member works through it. What is **absent** is a producer.
+**Corrected after this document was first written.** The first version of this
+milestone implemented the constructor as a bare `base..ctor()` and recorded
+"nothing here fabricates launch data" as a virtue. That was wrong: the IL is
 
-XNA fills this collection from the process command line and hands it out
-through `Game.LaunchParameters`, which is still missing. **Nothing here
-fabricates launch data.** A consumer can construct a `LaunchParameters`, fill
-it and read it; what they cannot yet get is the one the runtime built. That is
-recorded as a producer gap rather than papered over with an invented parse of
-`CommandLine`.
+```text
+LaunchParameters..ctor()
+    base..ctor()
+    ParseCommandLineArguments(Environment.GetCommandLineArgs())
+```
+
+so a `LaunchParameters` populates itself from the process it is running in, and
+an implementation that left it empty was the fabrication — it would have
+reported "no launch parameters" to a game that had been given some. The error
+was caught while deriving `Game`'s own constructor, which is where the type is
+allocated.
+
+The parse, exactly:
+
+```text
+ParseCommandLineArguments(args)
+    separators = { '/', '-' }
+    if (args.Length <= 1) return              // element 0 is the executable
+    for (i = 1; i < args.Length; i++) {
+        argument = args[i].TrimStart(separators)
+        ParseKeyValuePair(argument, out key, out value)
+        if (!ContainsKey(key) && key != "") Add(key, value)
+    }
+
+ParseKeyValuePair(argument, out key, out value)
+    key = argument; value = ""
+    colon = argument.IndexOf(':')
+    if (colon == -1) return
+    key = argument.Substring(0, colon); value = argument.Substring(colon + 1)
+```
+
+`CommandLine.arguments` is the exact analogue of `GetCommandLineArgs()` —
+element zero is the executable and the rest are the arguments — which is why
+the parse starts at index one. Five details have tests, because each is a way a
+plausible reimplementation differs:
+
+- the executable is **skipped**, so a vector of length one produces nothing;
+- `TrimStart` removes **every** leading `/` or `-`, in any mix, so `--x` and
+  `//y` are the keys `x` and `y`;
+- an argument with no colon is a key with an **empty value**, not a missing one;
+- only the **first** colon splits, so `/path:c:/tmp` is `path` → `c:/tmp`;
+- the **first** occurrence of a repeated key wins, because the guard is
+  `!ContainsKey(key)` — a later one is discarded rather than overwriting.
+
+An argument that trims away to nothing produces an empty key and is dropped.
+
+`Game.LaunchParameters` is still missing, so what a consumer cannot yet get is
+the instance the `Game` allocated — but constructing one now gives the same
+contents XNA would, because both read the same process.
+
+### `SetItem` does not throw
+
+Corrected with it. `set_Item` is `Insert(key, value, add: false)`, and
+`Insert`'s only failures are `ArgumentNullException` for a null key —
+unreachable through a non-Optional Swift parameter — and the duplicate-key
+`ArgumentException`, which it raises **only when `add` is true**. So the
+indexer setter cannot fail for any value a caller can supply, and it is no
+longer `throws`; `Add`, which passes `add: true`, is the one that can. `Insert`
+now reports the duplicate as a `Bool` so the two members can differ, which is
+also what lets `LaunchParameters` insert under the CLR's own `ContainsKey`
+guard without a `try` that could never fire.
 
 ## Exception identity is the next milestone, and it is stated rather than hidden
 
@@ -303,7 +359,7 @@ own axis, in `BCL_INHERITED_MEMBER_PROJECTIONS`.
 ## Behaviour
 
 ```text
-PURE_XNA_DERIVED  1923/1923/0    (1900 -> 1923)
+PURE_XNA_DERIVED  1923/1923/0    (1900 -> 1923; see the LaunchParameters correction above, which raised it further)
 PURE_BCL_DERIVED   208/208/0     (126 -> 208)
 DEBUG_TESTS=366 PASS             (340 -> 366)
 API_COMPAT_SELF_TESTS=2378       (2344 -> 2378)

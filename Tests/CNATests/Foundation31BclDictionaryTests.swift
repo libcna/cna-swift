@@ -119,7 +119,7 @@ extension PureValueTests {
                        "a refused Add must leave the entry untouched")
         XCTAssertEqual(dictionary.Count, 1)
 
-        try dictionary.SetItem("a", "2")
+        dictionary.SetItem("a", "2")
         XCTAssertEqual(try dictionary.Item("a"), "2")
         XCTAssertEqual(dictionary.Count, 1, "an overwrite is not an insertion")
     }
@@ -136,9 +136,22 @@ extension PureValueTests {
                 message, "The given key was not present in the dictionary.")
         }
         // The indexer SETTER inserts where the getter would have failed.
-        try dictionary.SetItem("missing", "2")
+        dictionary.SetItem("missing", "2")
         XCTAssertEqual(try dictionary.Item("missing"), "2")
         XCTAssertEqual(dictionary.Count, 2)
+    }
+
+    // The indexer setter passes `add: false` to `Insert`, whose only other
+    // failure is a null key -- unreachable through a non-Optional Swift
+    // parameter. So `set_Item` cannot fail for any value a caller can supply,
+    // and the projection is deliberately NOT `throws`. `Add`, which passes
+    // `add: true`, is the one that can.
+    func testTheIndexerSetterCannotFailWhileAddCan() throws {
+        let dictionary = try makeDictionary([("a", "1")])
+        dictionary.SetItem("a", "2")
+        dictionary.SetItem("b", "3")
+        XCTAssertEqual(dictionary.Count, 2)
+        XCTAssertThrowsError(try dictionary.Add("a", value: "4"))
     }
 
     // `TryGetValue` writes `default(TValue)` on failure, which for a reference
@@ -227,7 +240,7 @@ extension PureValueTests {
         for mutate in [
             { (dictionary: CNADictionary<String, String>) in
                 try dictionary.Add("z", value: "9") },
-            { dictionary in try dictionary.SetItem("a", "9") },
+            { dictionary in dictionary.SetItem("a", "9") },
             { dictionary in _ = dictionary.Remove("a") },
             { dictionary in dictionary.Clear() },
         ] {
@@ -250,7 +263,7 @@ extension PureValueTests {
     func testAnOverwriteInvalidatesALiveEnumerator() throws {
         let dictionary = try makeDictionary([("a", "1")])
         let enumerator = dictionary.GetEnumerator()
-        try dictionary.SetItem("a", "2")
+        dictionary.SetItem("a", "2")
         XCTAssertThrowsError(try enumerator.Next())
     }
 
