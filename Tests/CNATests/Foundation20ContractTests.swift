@@ -166,9 +166,17 @@ extension PureValueTests {
 
         func expectNotSupported(_ body: () throws -> Void, _ what: String) {
             XCTAssertThrowsError(try body(), what) { error in
-                guard case CNAError.notSupported = error else {
+                guard let failure = error as? CNANotSupportedException else {
                     return XCTFail("\(what) did not report NotSupported: \(error)")
                 }
+                // The parameterless constructor, so the message is the
+                // substituted Arg_NotSupportedException -- NOT the
+                // NotSupported_ReadOnlyCollection that Collection<T>'s own
+                // read-only guard raises.
+                XCTAssertEqual(
+                    failure.Message, "Specified method is not supported.", what)
+                XCTAssertEqual(
+                    failure.HResult, Int32(bitPattern: 0x8013_1515), what)
             }
         }
 

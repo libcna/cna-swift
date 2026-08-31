@@ -25,9 +25,16 @@ extension Microsoft.Xna.Framework {
             ]
         }
 
+    /// The exact `NotEnoughCorners` message, read out of
+        /// `Microsoft.Xna.Framework.dll`'s own resource table.
+        internal static let notEnoughCornersMessage =
+            "You have to have at least 8 elements to copy corners."
+
         public func GetCorners(_ corners: inout [Vector3]) throws {
             guard corners.count >= Int(Self.CornerCount) else {
-                throw CNAError.argumentOutOfRange("corners")
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "corners",
+                    message: BoundingBox.notEnoughCornersMessage)
             }
             let values = GetCorners()
             for index in 0..<Int(Self.CornerCount) { corners[index] = values[index] }
@@ -57,7 +64,10 @@ extension Microsoft.Xna.Framework {
 
         public static func CreateFromPoints(_ points: [Vector3]) throws -> BoundingBox {
             guard !points.isEmpty else {
-                throw CNAError.argument("The point sequence must contain at least one point.")
+                // `BoundingBoxZeroPoints`, which — unlike the BoundingSphere
+                // message it otherwise resembles — has no trailing period.
+                throw CNAArgumentException(
+                    message: "You should have at least one point in points")
             }
             var minimum = Vector3(Float.greatestFiniteMagnitude)
             var maximum = Vector3(-Float.greatestFiniteMagnitude)

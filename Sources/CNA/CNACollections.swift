@@ -104,10 +104,47 @@ private func cnaOpenedEquals<T: Equatable>(_ first: T, _ second: Any) -> Bool {
 /// store's behaviour a fixed measured contract rather than one a subclass could
 /// change underneath a `CNACollection` that has already wrapped it.
 public final class CNAList<Element> {
+    /// `ArgumentOutOfRange_Index`, ExceptionResource 22.
+    ///
+    /// `List<T>.get_Item`, `set_Item` and `RemoveAt` call the *no-argument*
+    /// `ThrowHelper.ThrowArgumentOutOfRangeException()`, whose body pairs
+    /// ExceptionArgument 13 (`index`) with this resource — so the paramName is
+    /// `"index"` on all three, including the setter whose CLR parameter list
+    /// also names a value.
+    internal static var indexOutOfRangeMessage: String {
+        "Index was out of range. Must be non-negative and less than the size "
+        + "of the collection."
+    }
+
+    /// `ArgumentOutOfRange_ListInsert`, ExceptionResource 27.
+    ///
+    /// `Insert` passes a **different** resource from the one above, which is
+    /// why an insert past the end and a read past the end do not report the
+    /// same message even though both are `ArgumentOutOfRangeException("index")`.
+    internal static var listInsertMessage: String {
+        "Index must be within the bounds of the List."
+    }
+
+    /// `InvalidOperation_EnumFailedVersion`, ExceptionResource 32.
+    internal static var enumFailedVersionMessage: String {
+        "Collection was modified; enumeration operation may not execute."
+    }
+
+    /// `NotSupported_ReadOnlyCollection`, ExceptionResource 28.
+    ///
+    /// This is what every `Collection<T>` mutator raises for a read-only
+    /// backing list. It is **not** `Arg_NotSupportedException` ("Specified
+    /// method is not supported."), which is what a parameterless
+    /// `NotSupportedException` carries.
+    internal static var readOnlyCollectionMessage: String {
+        "Collection is read-only."
+    }
+
     private var storage: [Element] = []
     // `List<T>` bumps `_version` on every mutation and its enumerator throws
     // `InvalidOperationException` once the version it captured no longer
-    // matches. `CNAEnumerator` projects that as `CNAError.collectionModified`.
+    // matches. `CNAEnumerator` projects that as the exact
+    // `InvalidOperationException` the CLR raises.
     private var version: UInt64 = 0
 
     /// `List<T>..ctor()` — an empty list.
@@ -152,15 +189,26 @@ public final class CNAList<Element> {
     /// `ICollection<T>.CopyTo`.
     ///
     /// `List<T>.CopyTo` performs no validation of its own; it calls
-    /// `Array.Copy(_items, 0, array, arrayIndex, _size)`, which raises
-    /// `ArgumentOutOfRangeException` for a negative index and
-    /// `ArgumentException` when the destination is too short. The destination
-    /// is caller-owned storage, so it is `inout`.
+    /// `Array.Copy(_items, 0, array, arrayIndex, _size)`. The destination is
+    /// caller-owned storage, so it is `inout`.
+    ///
+    /// **The two failure messages here are the only ones in this layer that
+    /// are not the CLR's, and the reason is recorded rather than papered
+    /// over.** `Array.Copy`'s five-argument public overload forwards to an
+    /// `internalcall` six-argument one, so the validation that raises for a
+    /// negative index or a short destination lives in CLR *native* code and is
+    /// not in the admitted IL at all. The exception CLASSES are the documented
+    /// ones and are projected; the messages are not reconstructible, so
+    /// neither constructor is given one and `Message` reports each class's own
+    /// substituted default. Inventing a sentence and presenting it as the
+    /// CLR's would be the fabrication this projection exists to avoid.
     public func CopyTo(_ array: inout [Element], arrayIndex: Int32) throws {
-        guard arrayIndex >= 0 else { throw CNAError.argumentOutOfRange("arrayIndex") }
+        guard arrayIndex >= 0 else {
+            throw CNAArgumentOutOfRangeException(paramName: "arrayIndex")
+        }
         let start = Int(arrayIndex)
         guard start <= array.count, storage.count <= array.count - start else {
-            throw CNAError.argument("Destination array was not long enough.")
+            throw CNAArgumentException()
         }
         for index in storage.indices { array[start + index] = storage[index] }
     }
@@ -172,7 +220,10 @@ public final class CNAList<Element> {
     /// raises `InvalidOperationException`.
     public func GetEnumerator() -> CNAEnumerator<Element> {
         CNAEnumerator(expectedVersion: version) { [self] index, expected in
-            guard version == expected else { throw CNAError.collectionModified }
+            guard version == expected else {
+                throw CNAInvalidOperationException(
+                    message: CNAList.enumFailedVersionMessage)
+            }
             guard index < storage.count else { return nil }
             return storage[index]
         }
@@ -195,7 +246,8 @@ public final class CNAList<Element> {
     /// negative one — raises `ArgumentOutOfRangeException`.
     public func Insert(_ index: Int32, item: Element) throws {
         guard index >= 0, Int(index) <= storage.count else {
-            throw CNAError.argumentOutOfRange("index")
+            throw CNAArgumentOutOfRangeException(
+                paramName: "index", message: CNAList.listInsertMessage)
         }
         storage.insert(item, at: Int(index))
         version &+= 1
@@ -211,7 +263,8 @@ public final class CNAList<Element> {
 
     private func checkedIndex(_ index: Int32) throws -> Int {
         guard index >= 0, Int(index) < storage.count else {
-            throw CNAError.argumentOutOfRange("index")
+            throw CNAArgumentOutOfRangeException(
+                paramName: "index", message: CNAList.indexOutOfRangeMessage)
         }
         return Int(index)
     }
@@ -286,7 +339,8 @@ open class CNACollection<Element> {
     public final func SetItem(_ index: Int32, _ value: Element) throws {
         try requireMutable()
         guard index >= 0, index < Count else {
-            throw CNAError.argumentOutOfRange("index")
+            throw CNAArgumentOutOfRangeException(
+                paramName: "index", message: CNAList<Element>.indexOutOfRangeMessage)
         }
         try SetItem(index, item: value)
     }
@@ -336,7 +390,8 @@ open class CNACollection<Element> {
     public final func Insert(_ index: Int32, item: Element) throws {
         try requireMutable()
         guard index >= 0, index <= Count else {
-            throw CNAError.argumentOutOfRange("index")
+            throw CNAArgumentOutOfRangeException(
+                paramName: "index", message: CNAList<Element>.listInsertMessage)
         }
         try InsertItem(index, item: item)
     }
@@ -359,7 +414,8 @@ open class CNACollection<Element> {
     public final func RemoveAt(_ index: Int32) throws {
         try requireMutable()
         guard index >= 0, index < Count else {
-            throw CNAError.argumentOutOfRange("index")
+            throw CNAArgumentOutOfRangeException(
+                paramName: "index", message: CNAList<Element>.indexOutOfRangeMessage)
         }
         try RemoveItem(index)
     }
@@ -400,10 +456,14 @@ open class CNACollection<Element> {
     /// anything else. The guard is transcribed because it is part of the
     /// member's observable order; with `CNAList` — whose `IsReadOnly` is the
     /// constant `false` that `mscorlib`'s `List<T>` declares — as the only
-    /// backing store, it has no reachable path today.
+    /// backing store, it has no reachable path today. The message is
+    /// `NotSupported_ReadOnlyCollection` and not the parameterless
+    /// constructor's `Arg_NotSupportedException`; the two differ and the
+    /// ThrowHelper resource identity settles which.
     private func requireMutable() throws {
         guard !items.IsReadOnly else {
-            throw CNAError.notSupported("Specified method is not supported.")
+            throw CNANotSupportedException(
+                message: CNAList<Element>.readOnlyCollectionMessage)
         }
     }
 }

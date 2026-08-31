@@ -94,11 +94,13 @@ extension PureValueTests {
         XCTAssertEqual(attribute.CollectionItemName, "Item")
         XCTAssertFalse(attribute.HasCollectionItemName)
 
-        XCTAssertThrowsError(try attribute.SetCollectionItemName("")) {
-            guard case CNAError.argumentNull(let parameter) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(parameter, "value")
+        assertProjected(
+            CNAArgumentNullException.self,
+            message: composedArgumentMessage("Value cannot be null.", paramName: "value"),
+            paramName: "value",
+            hResult: Int32(bitPattern: 0x8000_4003)
+        ) {
+            try attribute.SetCollectionItemName("")
         }
         XCTAssertFalse(
             attribute.HasCollectionItemName,
@@ -158,15 +160,16 @@ extension PureValueTests {
                 collectionItemName: "Entry")
         XCTAssertEqual(attribute.CollectionItemName, "Entry")
 
-        XCTAssertThrowsError(
-            try Microsoft.Xna.Framework.Content
+        assertProjected(
+            CNAArgumentNullException.self,
+            message: composedArgumentMessage(
+                "Value cannot be null.", paramName: "collectionItemName"),
+            paramName: "collectionItemName",
+            hResult: Int32(bitPattern: 0x8000_4003)
+        ) {
+            _ = try Microsoft.Xna.Framework.Content
                 .ContentSerializerCollectionItemNameAttribute(
                     collectionItemName: "")
-        ) {
-            guard case CNAError.argumentNull(let parameter) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(parameter, "collectionItemName")
         }
     }
 
@@ -178,14 +181,15 @@ extension PureValueTests {
             attribute.RuntimeType, "System.Collections.Generic.List`1",
             "the name is carried verbatim; nothing here resolves it")
 
-        XCTAssertThrowsError(
-            try Microsoft.Xna.Framework.Content
-                .ContentSerializerRuntimeTypeAttribute(runtimeType: "")
+        assertProjected(
+            CNAArgumentNullException.self,
+            message: composedArgumentMessage(
+                "Value cannot be null.", paramName: "runtimeType"),
+            paramName: "runtimeType",
+            hResult: Int32(bitPattern: 0x8000_4003)
         ) {
-            guard case CNAError.argumentNull(let parameter) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(parameter, "runtimeType")
+            _ = try Microsoft.Xna.Framework.Content
+                .ContentSerializerRuntimeTypeAttribute(runtimeType: "")
         }
     }
 

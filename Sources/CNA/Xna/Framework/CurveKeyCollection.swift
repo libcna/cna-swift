@@ -71,10 +71,16 @@ extension Microsoft.Xna.Framework {
         public func Contains(_ item: CurveKey?) -> Bool { IndexOf(item) >= 0 }
 
         public func CopyTo(_ array: inout [CurveKey], arrayIndex: Int32) throws {
-            guard arrayIndex >= 0 else { throw CNAError.argumentOutOfRange("arrayIndex") }
+            // CopyTo delegates straight to List<CurveKey>.CopyTo, which
+            // delegates to the `internalcall` Array.Copy; neither failure
+            // message is in the admitted IL, so the documented classes are
+            // raised without one. See CNAList.CopyTo.
+            guard arrayIndex >= 0 else {
+                throw CNAArgumentOutOfRangeException(paramName: "arrayIndex")
+            }
             let start = Int(arrayIndex)
             guard start <= array.count, storage.count <= array.count - start else {
-                throw CNAError.argument("Destination array was not long enough.")
+                throw CNAArgumentException()
             }
             for index in storage.indices { array[start + index] = storage[index] }
             isCacheAvailable = false
@@ -92,7 +98,12 @@ extension Microsoft.Xna.Framework {
         public func GetEnumerator() -> CNAEnumerator<CurveKey> {
             let expectedVersion = version
             return CNAEnumerator(expectedVersion: expectedVersion) { [self] index, expected in
-                guard version == expected else { throw CNAError.collectionModified }
+                // GetEnumerator returns the backing List<CurveKey>'s own
+                // enumerator, so this is List<T>.Enumerator's message.
+                guard version == expected else {
+                    throw CNAInvalidOperationException(
+                        message: CNAList<CurveKey>.enumFailedVersionMessage)
+                }
                 guard index < storage.count else { return nil }
                 return storage[index]
             }
@@ -139,8 +150,12 @@ extension Microsoft.Xna.Framework {
         }
 
         private func checkedIndex(_ index: Int32) throws -> Int {
+            // The indexer delegates to List<CurveKey>.get_Item, so this is
+            // the no-argument ThrowHelper overload's payload.
             guard index >= 0 && Int(index) < storage.count else {
-                throw CNAError.argumentOutOfRange("index")
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "index",
+                    message: CNAList<CurveKey>.indexOutOfRangeMessage)
             }
             return Int(index)
         }

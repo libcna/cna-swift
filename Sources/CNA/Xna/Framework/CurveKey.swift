@@ -69,8 +69,16 @@ extension Microsoft.Xna.Framework {
                 &+ Continuity.rawValue
         }
 
+        /// `CompareTo(CurveKey other)`.
+        ///
+        /// The IL performs no null check: its first instructions are
+        /// `ldarg.1; ldfld position`, and `ldfld` through a null reference is
+        /// specified by ECMA-335 to raise `NullReferenceException`. The class
+        /// is therefore certain, while the message is produced by the CLR's
+        /// own native code and is not in any admitted IL — so none is claimed,
+        /// and `Message` reports the class's substituted default.
         public func CompareTo(_ other: CurveKey?) throws -> Int32 {
-            guard let other else { throw CNAError.nullReference("CurveKey.CompareTo") }
+            guard let other else { throw CNANullReferenceException() }
             return xnaPositionCompare(to: other)
         }
 

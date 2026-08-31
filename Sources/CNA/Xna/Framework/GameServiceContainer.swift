@@ -87,23 +87,26 @@ extension Microsoft.Xna.Framework {
         /// CLR internal type name into a Swift message would be meaningless.
         public func AddService(_ type: Any.Type, provider: Any?) throws {
             guard let provider else {
-                // XNA raises the two-argument ArgumentNullException, whose
-                // Message is the ServiceProviderCannotBeNull resource string
-                // composed with the parameter name around Environment.NewLine.
-                // Only the parameter name is carried here, as at every other
-                // ArgumentNullException site: composing that message would
-                // mean asserting the reference platform's newline, and the
-                // exception CLASS is what the named payload milestone will
-                // project. The key is therefore deliberately NOT registered as
-                // a reproduced resource string.
-                throw CNAError.argumentNull("provider")
+                // `ArgumentNullException::.ctor(string paramName, string
+                // message)` -- the transposed two-argument overload, so the
+                // resource string is the MESSAGE and "provider" is the
+                // parameter name. Message therefore composes both around
+                // Environment.NewLine, which the admitted assembly declares as
+                // the IL literal "\r\n".
+                throw CNAArgumentNullException(
+                    paramName: "provider",
+                    message: GameServiceContainer.serviceProviderCannotBeNullMessage)
             }
             guard !services.ContainsKey(type) else {
-                throw CNAError.argument(
-                    "Container already contains a service of this type.")
+                // `ArgumentException::.ctor(string message, string paramName)`
+                // -- message first, then "type".
+                throw CNAArgumentException(
+                    message: "Container already contains a service of this type.",
+                    paramName: "type")
             }
             guard GameServiceContainer.isInstance(provider, of: type) else {
-                throw CNAError.argument(
+                throw CNAArgumentException(
+                    message:
                     GameServiceContainer.serviceMustBeAssignableFormat
                         .replacingOccurrences(
                             of: "{0}", with: String(reflecting: Swift.type(of: provider)))
@@ -133,6 +136,11 @@ extension Microsoft.Xna.Framework {
             _ = services.TryGetValue(type, value: &found)
             return found
         }
+
+        /// The exact `ServiceProviderCannotBeNull` message, read out of
+        /// `Microsoft.Xna.Framework.Game.dll`'s own resource table.
+        internal static let serviceProviderCannotBeNullMessage =
+            "The service provider instance cannot be null."
 
         /// The exact `ServiceMustBeAssignable` template, read out of
         /// `Microsoft.Xna.Framework.Game.dll`'s own resource table.

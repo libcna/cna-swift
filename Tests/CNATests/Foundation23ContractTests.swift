@@ -82,9 +82,11 @@ extension PureValueTests {
         } catch {
             thrown = error
         }
-        guard case .some(CNAError.argumentOutOfRange) = thrown as? CNAError else {
+        guard let failure = thrown as? CNAArgumentOutOfRangeException else {
             return XCTFail("the out-of-range index did not produce an XNA failure")
         }
+        XCTAssertEqual(failure.ParamName, "index")
+        XCTAssertEqual(failure.HResult, Int32(bitPattern: 0x8013_1502))
 
         // The two outcomes are not interchangeable: the miss carried a normal
         // result and raised nothing, and the out-of-range index raised and

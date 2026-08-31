@@ -61,16 +61,23 @@ internal func xnaValidateTransformArrayRanges(
 ) throws {
     let sourceEnd = Int64(sourceIndex) + Int64(length)
     let destinationEnd = Int64(destinationIndex) + Int64(length)
+    // `ArgumentException(FrameworkResources.NotEnoughSourceSize)` and
+    // `...NotEnoughTargetSize`, both message-only, in exactly this order.
     if Int64(sourceCount) < sourceEnd {
-        throw CNAError.argument("The source array is too small.")
+        throw CNAArgumentException(
+            message: "Source array must be equal or bigger than requested length.")
     }
     if Int64(destinationCount) < destinationEnd {
-        throw CNAError.argument("The destination array is too small.")
+        throw CNAArgumentException(
+            message: "Target array size must be equal or bigger than source array size.")
     }
+    // XNA validates the two LENGTHS and never the indices, so a negative index
+    // reaches `ldelema`, which ECMA-335 specifies raises
+    // IndexOutOfRangeException. The runtime, not the IL, produces its message.
     if length > 0 && sourceIndex < 0 {
-        throw CNAError.indexOutOfRange("sourceIndex")
+        throw CNAIndexOutOfRangeException()
     }
     if length > 0 && destinationIndex < 0 {
-        throw CNAError.indexOutOfRange("destinationIndex")
+        throw CNAIndexOutOfRangeException()
     }
 }

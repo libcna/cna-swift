@@ -263,6 +263,14 @@ open class CNAException: Error {
         "CNAException": "System.Exception",
         "CNASystemException": "System.SystemException",
         "CNAExternalException": "System.Runtime.InteropServices.ExternalException",
+        "CNAArgumentException": "System.ArgumentException",
+        "CNAArgumentNullException": "System.ArgumentNullException",
+        "CNAArgumentOutOfRangeException": "System.ArgumentOutOfRangeException",
+        "CNANotSupportedException": "System.NotSupportedException",
+        "CNAInvalidOperationException": "System.InvalidOperationException",
+        "CNAKeyNotFoundException": "System.Collections.Generic.KeyNotFoundException",
+        "CNANullReferenceException": "System.NullReferenceException",
+        "CNAIndexOutOfRangeException": "System.IndexOutOfRangeException",
     ]
 }
 
@@ -350,4 +358,401 @@ open class CNAExternalException: CNASystemException {
     /// `get_ErrorCode` is `ldarg.0; call get_HResult; ret` — the same value,
     /// exposed publicly and get-only. `virtual` and not `final`, so `open`.
     open var ErrorCode: Int32 { HResult }
+}
+
+// ---------------------------------------------------------------------------
+// The six raised exception families.
+//
+// Foundation 30 projected the three exception BASES eight XNA types inherit
+// from. These six are the classes the support layer actually THROWS, and until
+// this milestone every one of those failures came out of `CNAError` with the
+// right message and the wrong class — so `catch is CNAArgumentException` could
+// not work and `ParamName` did not exist.
+//
+// Every fact below is read out of the admitted `mscorlib`:
+//
+//   * the base of each class, which decides which `catch` clause sees it;
+//   * the HResult each constructor assigns;
+//   * the resource message each parameterless constructor substitutes;
+//   * `ArgumentException.get_Message`'s composition, including the newline —
+//     `System.Environment::get_NewLine`'s entire body in the admitted assembly
+//     is `ldstr "\r\n"; ret`, so the separator is a pinned IL literal and not
+//     an assertion about the platform this binding runs on. That literal is
+//     registered in `bcl-authorities.json` under `selectedIlLiterals` and the
+//     BCL authority audit compares it.
+//
+// `CNAError` remains the separate CNA runtime channel and is untouched by
+// this: a native library failure, an owner-thread violation and a stale
+// runtime generation are not CLR argument failures and do not become one.
+// ---------------------------------------------------------------------------
+
+/// The `System.ArgumentException` projection.
+///
+/// The one class in this family that carries state of its own: `m_paramName`,
+/// the public `ParamName` that reads it, and a `Message` override that appends
+/// the parameter name to the base message. That override is why an argument
+/// exception's `Message` is not the string its constructor was given.
+open class CNAArgumentException: CNASystemException {
+    /// `Arg_ArgumentException`.
+    internal static let argArgumentExceptionMessage =
+        "Value does not fall within the expected range."
+
+    /// `Arg_ParamName_Name`, the template `get_Message` formats.
+    internal static let argParamNameNameFormat = "Parameter name: {0}"
+
+    /// `System.Environment.NewLine`, whose whole body in the admitted
+    /// assembly is `ldstr "\r\n"; ret`.
+    internal static let environmentNewLine = "\r\n"
+
+    /// `COR_E_ARGUMENT`, the HResult every constructor assigns.
+    internal static let corArgumentHResult = Int32(bitPattern: 0x8007_0057)
+
+    // `ArgumentException.m_paramName`, stored unvalidated.
+    private let storedParamName: String?
+
+    /// `ArgumentException..ctor()` — substitutes `Arg_ArgumentException`.
+    public override init() {
+        storedParamName = nil
+        super.init(message: CNAArgumentException.argArgumentExceptionMessage)
+        HResult = CNAArgumentException.corArgumentHResult
+    }
+
+    /// `ArgumentException..ctor(String message)`.
+    public override init(message: String?) {
+        storedParamName = nil
+        super.init(message: message)
+        HResult = CNAArgumentException.corArgumentHResult
+    }
+
+    /// `ArgumentException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        storedParamName = nil
+        super.init(message: message, innerException: innerException)
+        HResult = CNAArgumentException.corArgumentHResult
+    }
+
+    /// `ArgumentException..ctor(String message, String paramName)`.
+    ///
+    /// The message comes first. `ArgumentNullException` and
+    /// `ArgumentOutOfRangeException` both declare a two-argument constructor
+    /// whose parameters are the other way round, which is exactly the mistake
+    /// this family invites; the labels here keep the CLR's own names so a
+    /// transposition cannot be silent.
+    public init(message: String?, paramName: String?) {
+        storedParamName = paramName
+        super.init(message: message)
+        HResult = CNAArgumentException.corArgumentHResult
+    }
+
+    /// `ArgumentException..ctor(String message, String paramName, Exception innerException)`.
+    public init(message: String?, paramName: String?, innerException: CNAException?) {
+        storedParamName = paramName
+        super.init(message: message, innerException: innerException)
+        HResult = CNAArgumentException.corArgumentHResult
+    }
+
+    /// `ArgumentException.ParamName`.
+    ///
+    /// `virtual` and not `final` in the metadata, so `open`. It returns the
+    /// field, which is nil unless a paramName-taking constructor supplied one.
+    open var ParamName: String? { storedParamName }
+
+    /// `ArgumentException.Message`.
+    ///
+    /// The IL reads `base.Message`, and when `ParamName` is neither null nor
+    /// empty concatenates it with `Environment.NewLine` and the formatted
+    /// `Arg_ParamName_Name`. `String.IsNullOrEmpty` is the test, so an empty
+    /// parameter name adds nothing — which is not the same as a nil one and is
+    /// reproduced rather than collapsed.
+    open override var Message: String {
+        let base = super.Message
+        guard let name = storedParamName, !name.isEmpty else { return base }
+        let clause = CNAArgumentException.argParamNameNameFormat
+            .replacingOccurrences(of: "{0}", with: name)
+        return base + CNAArgumentException.environmentNewLine + clause
+    }
+}
+
+/// The `System.ArgumentNullException` projection.
+///
+/// Declares no member of its own. Its two contributions are its identity —
+/// `catch is CNAArgumentNullException` is narrower than
+/// `catch is CNAArgumentException` — and the HResult `0x80004003`, which is
+/// `E_POINTER` and not the `COR_E_ARGUMENT` its base has just assigned.
+open class CNAArgumentNullException: CNAArgumentException {
+    /// `ArgumentNull_Generic`.
+    internal static let argumentNullGenericMessage = "Value cannot be null."
+
+    /// `E_POINTER`.
+    internal static let argumentNullHResult = Int32(bitPattern: 0x8000_4003)
+
+    /// `ArgumentNullException..ctor()`.
+    public override init() {
+        super.init(message: CNAArgumentNullException.argumentNullGenericMessage)
+        HResult = CNAArgumentNullException.argumentNullHResult
+    }
+
+    /// `ArgumentNullException..ctor(String paramName)`.
+    ///
+    /// The single-argument constructor of this class takes a **parameter
+    /// name**, not a message: the IL passes `ArgumentNull_Generic` as the
+    /// message and the argument as the paramName. Its label says so.
+    public init(paramName: String?) {
+        super.init(
+            message: CNAArgumentNullException.argumentNullGenericMessage,
+            paramName: paramName)
+        HResult = CNAArgumentNullException.argumentNullHResult
+    }
+
+    /// `ArgumentNullException..ctor(String message, Exception innerException)`.
+    ///
+    /// This one *does* take a message, which is why it is not merged with the
+    /// constructor above.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAArgumentNullException.argumentNullHResult
+    }
+
+    /// `ArgumentNullException..ctor(String paramName, String message)`.
+    ///
+    /// The parameters are transposed with respect to
+    /// `ArgumentException..ctor(message, paramName)`: the IL loads `ldarg.2`
+    /// then `ldarg.1`. This is the overload XNA's `GameServiceContainer`
+    /// selects, and getting the order wrong would put the parameter name in
+    /// the message and the message in the parameter name.
+    public init(paramName: String?, message: String?) {
+        super.init(message: message, paramName: paramName)
+        HResult = CNAArgumentNullException.argumentNullHResult
+    }
+
+    /// `ArgumentNullException..ctor(String message)` is **not** declared by
+    /// `mscorlib` and is not projected. Swift would otherwise inherit
+    /// `CNAArgumentException.init(message:)`, which takes a message where this
+    /// class's own one-argument constructor takes a parameter name, so it is
+    /// overridden to keep the two distinguishable and to assign this class's
+    /// HResult.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAArgumentNullException.argumentNullHResult
+    }
+}
+
+/// The `System.ArgumentOutOfRangeException` projection.
+///
+/// `mscorlib` gives it an `ActualValue` of type `System.Object` and a `Message`
+/// override that appends `ArgumentOutOfRange_ActualValue` formatted with
+/// `actualValue.ToString()`. Neither is projected, and the reason is the
+/// `ToString()`: `System.Object.ToString()` is a virtual call whose result for
+/// an arbitrary object is not reconstructible from IL, and a Swift
+/// `String(describing:)` in its place would be this projection's formatting
+/// rather than the CLR's. The constructor that would store one is therefore
+/// also absent, which keeps the omission consistent: `ActualValue` is nil on
+/// every instance this projection can build, and the `Message` branch that
+/// reads it is unreachable rather than wrong.
+open class CNAArgumentOutOfRangeException: CNAArgumentException {
+    /// `Arg_ArgumentOutOfRangeException`, through the cached `RangeMessage`.
+    internal static let argArgumentOutOfRangeMessage =
+        "Specified argument was out of the range of valid values."
+
+    /// `COR_E_ARGUMENTOUTOFRANGE`.
+    internal static let corArgumentOutOfRangeHResult = Int32(bitPattern: 0x8013_1502)
+
+    /// `ArgumentOutOfRangeException..ctor()`.
+    public override init() {
+        super.init(message: CNAArgumentOutOfRangeException.argArgumentOutOfRangeMessage)
+        HResult = CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+    }
+
+    /// `ArgumentOutOfRangeException..ctor(String paramName)`.
+    ///
+    /// Like `ArgumentNullException`, the single argument is a parameter name
+    /// and the message is the substituted range message.
+    public init(paramName: String?) {
+        super.init(
+            message: CNAArgumentOutOfRangeException.argArgumentOutOfRangeMessage,
+            paramName: paramName)
+        HResult = CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+    }
+
+    /// `ArgumentOutOfRangeException..ctor(String paramName, String message)`.
+    ///
+    /// Transposed with respect to `ArgumentException..ctor(message, paramName)`,
+    /// exactly as `ArgumentNullException`'s is. This is the overload every
+    /// `ThrowHelper` range failure selects.
+    public init(paramName: String?, message: String?) {
+        super.init(message: message, paramName: paramName)
+        HResult = CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+    }
+
+    /// `ArgumentOutOfRangeException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+    }
+
+    /// Inherited `(String message)`, overridden only to assign this class's
+    /// HResult.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+    }
+}
+
+/// The `System.NotSupportedException` projection.
+///
+/// Declares no member; its whole contribution is the class identity and the
+/// HResult `0x80131515`.
+open class CNANotSupportedException: CNASystemException {
+    /// `Arg_NotSupportedException`.
+    internal static let argNotSupportedMessage = "Specified method is not supported."
+
+    /// `COR_E_NOTSUPPORTED`.
+    internal static let corNotSupportedHResult = Int32(bitPattern: 0x8013_1515)
+
+    /// `NotSupportedException..ctor()`.
+    public override init() {
+        super.init(message: CNANotSupportedException.argNotSupportedMessage)
+        HResult = CNANotSupportedException.corNotSupportedHResult
+    }
+
+    /// `NotSupportedException..ctor(String message)`.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNANotSupportedException.corNotSupportedHResult
+    }
+
+    /// `NotSupportedException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNANotSupportedException.corNotSupportedHResult
+    }
+}
+
+/// The `System.InvalidOperationException` projection.
+open class CNAInvalidOperationException: CNASystemException {
+    /// `Arg_InvalidOperationException`.
+    internal static let argInvalidOperationMessage =
+        "Operation is not valid due to the current state of the object."
+
+    /// `COR_E_INVALIDOPERATION`.
+    internal static let corInvalidOperationHResult = Int32(bitPattern: 0x8013_1509)
+
+    /// `InvalidOperationException..ctor()`.
+    public override init() {
+        super.init(message: CNAInvalidOperationException.argInvalidOperationMessage)
+        HResult = CNAInvalidOperationException.corInvalidOperationHResult
+    }
+
+    /// `InvalidOperationException..ctor(String message)`.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAInvalidOperationException.corInvalidOperationHResult
+    }
+
+    /// `InvalidOperationException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAInvalidOperationException.corInvalidOperationHResult
+    }
+}
+
+/// The `System.Collections.Generic.KeyNotFoundException` projection.
+///
+/// Its base is `SystemException` directly — **not** `ArgumentException` — so a
+/// missing key is not an argument failure and `catch is CNAArgumentException`
+/// does not see it. `ThrowHelper.ThrowKeyNotFoundException`'s whole body is
+/// `new KeyNotFoundException()`, so every dictionary lookup failure carries the
+/// substituted `Arg_KeyNotFound` message.
+open class CNAKeyNotFoundException: CNASystemException {
+    /// `Arg_KeyNotFound`.
+    internal static let argKeyNotFoundMessage =
+        "The given key was not present in the dictionary."
+
+    /// `COR_E_KEYNOTFOUND`.
+    internal static let corKeyNotFoundHResult = Int32(bitPattern: 0x8013_1577)
+
+    /// `KeyNotFoundException..ctor()`.
+    public override init() {
+        super.init(message: CNAKeyNotFoundException.argKeyNotFoundMessage)
+        HResult = CNAKeyNotFoundException.corKeyNotFoundHResult
+    }
+
+    /// `KeyNotFoundException..ctor(String message)`.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAKeyNotFoundException.corKeyNotFoundHResult
+    }
+
+    /// `KeyNotFoundException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAKeyNotFoundException.corKeyNotFoundHResult
+    }
+}
+
+/// The `System.NullReferenceException` projection.
+///
+/// Raised where the CLR's own `ldfld` would raise it: `CurveKey.CompareTo`
+/// performs no null check, so ECMA-335 decides the class. The **message** the
+/// runtime attaches is produced by CLR native code and is in no admitted IL;
+/// what is projected is the substituted `Arg_NullReferenceException` that
+/// `mscorlib`'s own parameterless constructor carries.
+open class CNANullReferenceException: CNASystemException {
+    /// `Arg_NullReferenceException`.
+    internal static let argNullReferenceMessage =
+        "Object reference not set to an instance of an object."
+
+    /// `COR_E_NULLREFERENCE`, which is `E_POINTER`.
+    internal static let corNullReferenceHResult = Int32(bitPattern: 0x8000_4003)
+
+    /// `NullReferenceException..ctor()`.
+    public override init() {
+        super.init(message: CNANullReferenceException.argNullReferenceMessage)
+        HResult = CNANullReferenceException.corNullReferenceHResult
+    }
+
+    /// `NullReferenceException..ctor(String message)`.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNANullReferenceException.corNullReferenceHResult
+    }
+
+    /// `NullReferenceException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNANullReferenceException.corNullReferenceHResult
+    }
+}
+
+/// The `System.IndexOutOfRangeException` projection.
+///
+/// The one **sealed** class in this family, so it is `public final` where the
+/// others are `open`; `mscorlib` sets the sealed bit and this projection does
+/// not weaken it. Raised where `ldelema` would raise it: the indexed vector
+/// transforms validate the two array lengths and never the indices.
+public final class CNAIndexOutOfRangeException: CNASystemException {
+    /// `Arg_IndexOutOfRangeException`.
+    internal static let argIndexOutOfRangeMessage =
+        "Index was outside the bounds of the array."
+
+    /// `COR_E_INDEXOUTOFRANGE`.
+    internal static let corIndexOutOfRangeHResult = Int32(bitPattern: 0x8013_1508)
+
+    /// `IndexOutOfRangeException..ctor()`.
+    public override init() {
+        super.init(message: CNAIndexOutOfRangeException.argIndexOutOfRangeMessage)
+        HResult = CNAIndexOutOfRangeException.corIndexOutOfRangeHResult
+    }
+
+    /// `IndexOutOfRangeException..ctor(String message)`.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAIndexOutOfRangeException.corIndexOutOfRangeHResult
+    }
+
+    /// `IndexOutOfRangeException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAIndexOutOfRangeException.corIndexOutOfRangeHResult
+    }
 }

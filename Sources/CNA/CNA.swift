@@ -35,8 +35,18 @@ open class CNAEventArgs {
     public init() {}
 }
 
-/// Errors raised by CNA-Swift support code. This type is intentionally outside
-/// the strict `Microsoft.Xna.Framework` projection.
+/// Errors raised by CNA-Swift's own runtime, and **only** by it.
+///
+/// This type is intentionally outside the strict `Microsoft.Xna.Framework`
+/// projection and is deliberately not in the `CNAException` hierarchy. It
+/// reports a native library that will not load, an admitted-ABI refusal, a
+/// missing symbol, a native call failure, an owner-thread violation, a stale
+/// runtime generation, an unsupported platform, callback-lifecycle misuse, a
+/// stream failure and one producer invariant — none of which corresponds to a
+/// CLR or XNA exception identity. Every CLR-shaped failure the projection
+/// raises is a real projected exception class instead, so `catch is
+/// CNAException` cannot swallow a native runtime error and `catch is CNAError`
+/// cannot swallow a projected one.
 public enum CNAError: Error, Equatable, CustomStringConvertible {
     case nativeLibraryNotFound(candidates: [String])
     case nativeLibraryLoadFailed(path: String, message: String)
@@ -49,14 +59,16 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
     case staleRuntimeGeneration(expected: UInt64, actual: UInt64?)
     case callbackOutsideGameLifecycle
     case streamFailure(String)
-    case argument(String)
-    case argumentNull(String)
-    case argumentOutOfRange(String)
-    case indexOutOfRange(String)
-    case nullReference(String)
-    case collectionModified
-    case keyNotFound(String)
-    case notSupported(String)
+    /// A CNA-Swift producer invariant, and deliberately not a CLR argument
+    /// failure. After the exception-payload conversion, no case of this enum
+    /// is a CLR-shaped identity: every projected `ArgumentException`,
+    /// `ArgumentNullException`, `ArgumentOutOfRangeException`,
+    /// `NotSupportedException`, `InvalidOperationException`,
+    /// `KeyNotFoundException`, `NullReferenceException` and
+    /// `IndexOutOfRangeException` is now the real class, so a name here that
+    /// merely looked like one would invite the confusion this channel exists
+    /// to prevent.
+    case producerInvariant(String)
 
     public var description: String {
         switch self {
@@ -89,29 +101,7 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
             return "The native operation requires an active Game lifecycle callback"
         case .streamFailure(let message):
             return "InputStream failed: \(message)"
-        case .argument(let message):
-            return message
-        case .argumentNull(let parameter):
-            // The CLR raises ArgumentNullException, whose Message composes
-            // two resource strings around Environment.NewLine. Only the
-            // parameter name is reported here: composing that message would
-            // mean asserting the reference platform's newline, and the
-            // exception CLASS is what the payload milestone will project.
-            return "Argument must not be null or empty: \(parameter)"
-        case .argumentOutOfRange(let parameter):
-            return "Argument is outside the XNA range: \(parameter)"
-        case .indexOutOfRange(let parameter):
-            return "Index is outside the XNA array range: \(parameter)"
-        case .nullReference(let operation):
-            return "XNA null reference in \(operation)"
-        case .collectionModified:
-            return "Collection was modified after the enumerator was created"
-        case .keyNotFound(let message):
-            return message
-        case .notSupported(let message):
-            // The message is the CLR's own, read out of the assembly that
-            // raises it, so it is reported verbatim rather than wrapped in a
-            // sentence of this binding's own devising.
+        case .producerInvariant(let message):
             return message
         }
     }

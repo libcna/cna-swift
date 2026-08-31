@@ -35,7 +35,7 @@ extension Microsoft.Xna.Framework.Input.Touch {
         // counterpart and the ArgumentNullException path is unreachable here.
         public init(_ touches: [Microsoft.Xna.Framework.Input.Touch.TouchLocation]) throws {
             guard touches.count <= 8 else {
-                throw CNAError.argumentOutOfRange("touches")
+                throw CNAArgumentOutOfRangeException(paramName: "touches")
             }
             isConnected = true
             var rebuilt: [Microsoft.Xna.Framework.Input.Touch.TouchLocation] = []
@@ -79,7 +79,7 @@ extension Microsoft.Xna.Framework.Input.Touch {
         // only be reached with a valid index.
         public func Item(_ index: Int32) throws -> Microsoft.Xna.Framework.Input.Touch.TouchLocation {
             guard index >= 0 && index < Count else {
-                throw CNAError.argumentOutOfRange("index")
+                throw CNAArgumentOutOfRangeException(paramName: "index")
             }
             return locations[Int(index)]
         }
@@ -93,7 +93,7 @@ extension Microsoft.Xna.Framework.Input.Touch {
             _ index: Int32,
             _ value: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws {
-            throw CNAError.notSupported("Specified method is not supported.")
+            throw CNANotSupportedException()
         }
 
         // Scans by `Id` and, on a match, writes that location out and returns
@@ -141,10 +141,10 @@ extension Microsoft.Xna.Framework.Input.Touch {
             arrayIndex: Int32
         ) throws {
             guard arrayIndex >= 0 else {
-                throw CNAError.argumentOutOfRange("arrayIndex")
+                throw CNAArgumentOutOfRangeException(paramName: "arrayIndex")
             }
             guard Int64(array.count) >= Int64(arrayIndex) + Int64(Count) else {
-                throw CNAError.argumentOutOfRange("arrayIndex")
+                throw CNAArgumentOutOfRangeException(paramName: "arrayIndex")
             }
             for index in 0..<locations.count {
                 array[Int(arrayIndex) + index] = locations[index]
@@ -152,33 +152,36 @@ extension Microsoft.Xna.Framework.Input.Touch {
         }
 
         // Every mutating member of the pinned IList implementation is exactly
-        // `throw new NotSupportedException()` with no message and no
-        // validation, so none of them inspects its arguments first.
+        // `newobj NotSupportedException::.ctor(); throw` with no message and
+        // no validation, so none of them inspects its arguments first. The
+        // parameterless constructor substitutes Arg_NotSupportedException,
+        // which is a different message from the NotSupported_ReadOnlyCollection
+        // that Collection<T>'s own read-only guard raises.
         public func Add(
             _ item: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws {
-            throw CNAError.notSupported("Specified method is not supported.")
+            throw CNANotSupportedException()
         }
 
         public func Insert(
             _ index: Int32,
             item: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws {
-            throw CNAError.notSupported("Specified method is not supported.")
+            throw CNANotSupportedException()
         }
 
         public func RemoveAt(_ index: Int32) throws {
-            throw CNAError.notSupported("Specified method is not supported.")
+            throw CNANotSupportedException()
         }
 
         public func Remove(
             _ item: Microsoft.Xna.Framework.Input.Touch.TouchLocation
         ) throws -> Bool {
-            throw CNAError.notSupported("Specified method is not supported.")
+            throw CNANotSupportedException()
         }
 
         public func Clear() throws {
-            throw CNAError.notSupported("Specified method is not supported.")
+            throw CNANotSupportedException()
         }
 
         // `GetEnumerator` copies the whole collection into the enumerator by

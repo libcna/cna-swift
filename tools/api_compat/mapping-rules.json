@@ -27,8 +27,16 @@
     "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT"
   },
   "memberOmissions": [
-    {"kind": "field", "name": "value__", "reason": "Swift raw-value/OptionSet storage is LANGUAGE_MAPPING"},
-    {"kind": "method", "name": "Finalize", "reason": "Swift deinit is non-public lifetime syntax and not a callable member"}
+    {
+      "kind": "field",
+      "name": "value__",
+      "reason": "Swift raw-value/OptionSet storage is LANGUAGE_MAPPING"
+    },
+    {
+      "kind": "method",
+      "name": "Finalize",
+      "reason": "Swift deinit is non-public lifetime syntax and not a callable member"
+    }
   ],
   "operators": {
     "op_UnaryNegation": "prefix -",
@@ -145,12 +153,19 @@
   ],
   "protocolWitnessMapping": "A public Swift conformance witness forced by a CLR explicit interface implementation is compiler-measured through sourceOrigin and excluded from the concrete type member count",
   "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots",
-  "arrayMutationParameterNames": ["destinationArray", "corners"],
+  "arrayMutationParameterNames": [
+    "destinationArray",
+    "corners"
+  ],
   "collectionCopyToArrayMutationMapping": "A CopyTo array parameter on a type whose direct CLR interface is ICollection<T> or IList<T> is caller-owned mutable destination storage. IList<T> inherits ICollection<T>, so the destination and the inout projection are the same",
   "enumerableMapping": "System.Collections.Generic.IEnumerable<T> parameters map to Swift Array<T>",
   "enumeratorReturnMapping": "System.Collections.Generic.IEnumerator<T> returns map to CNAEnumerator<T>, whose throwing Next preserves live order and mutation invalidation without a fake Microsoft collection type",
   "eventMapping": "A CLR event whose type is System.EventHandler<TArgs> maps to exactly one get-only Swift property preserving the XNA event name, of type CNAEvent<TArgs>. The add_/remove_/raise_ accessors are CLR encoding, not XNA identities, and must not appear in the Swift surface. CNAEvent exposes only Add and Remove; the raise capability lives on the separate CNAEventSource, which is composed with CNAEvent over private storage and must never subclass it, so a consumer holding a CNAEvent cannot downcast its way to Raise. Add returns an opaque CNAEventSubscription token: CLR Delegate.Remove matches on delegate identity, which Swift closures do not have, so token-based removal is the LANGUAGE_PROJECTION of that rule and differs from CLR in that duplicate registrations of one closure are independently removable.",
-  "eventAccessorPrefixes": ["add_", "remove_", "raise_"],
+  "eventAccessorPrefixes": [
+    "add_",
+    "remove_",
+    "raise_"
+  ],
   "existentialSpelling": "Swift emits a CLR interface-typed member as the existential `any P`, which is the same type as `P`, so the spelling normalizes away. The opaque `some P` is a different type and is not normalized.",
   "measuredSupportBaseProjections": {
     "System.EventArgs": "CNAEventArgs",
@@ -173,179 +188,860 @@
     "System.Collections.Generic.Dictionary`2": "CNADictionary",
     "System.Collections.Generic.KeyValuePair`2": "CNAKeyValuePair",
     "System.Collections.Generic.IEqualityComparer`1": "CNAEqualityComparer",
-    "System.Attribute": "CNAAttribute"
+    "System.Attribute": "CNAAttribute",
+    "System.ArgumentException": "CNAArgumentException",
+    "System.ArgumentNullException": "CNAArgumentNullException",
+    "System.ArgumentOutOfRangeException": "CNAArgumentOutOfRangeException",
+    "System.NotSupportedException": "CNANotSupportedException",
+    "System.InvalidOperationException": "CNAInvalidOperationException",
+    "System.Collections.Generic.KeyNotFoundException": "CNAKeyNotFoundException",
+    "System.NullReferenceException": "CNANullReferenceException",
+    "System.IndexOutOfRangeException": "CNAIndexOutOfRangeException"
   },
   "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
   "bclSupportContract": {
     "CNACollection": {
-      "kind": "class", "inheritance": "open", "generics": ["Element"], "base": null,
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [
+        "Element"
+      ],
+      "base": null,
       "clrFamily": "System.Collections.ObjectModel.Collection`1",
-      "requiredMembers": ["Count", "Items", "Item", "SetItem", "Add", "Clear", "Contains", "CopyTo", "GetEnumerator", "IndexOf", "Insert", "Remove", "RemoveAt", "ClearItems", "InsertItem", "RemoveItem"],
-      "openMembers": ["ClearItems", "InsertItem", "RemoveItem", "SetItem"],
-      "forbiddenMembers": ["Sort", "Reverse", "AddRange", "RemoveRange"]
+      "requiredMembers": [
+        "Count",
+        "Items",
+        "Item",
+        "SetItem",
+        "Add",
+        "Clear",
+        "Contains",
+        "CopyTo",
+        "GetEnumerator",
+        "IndexOf",
+        "Insert",
+        "Remove",
+        "RemoveAt",
+        "ClearItems",
+        "InsertItem",
+        "RemoveItem"
+      ],
+      "openMembers": [
+        "ClearItems",
+        "InsertItem",
+        "RemoveItem",
+        "SetItem"
+      ],
+      "forbiddenMembers": [
+        "Sort",
+        "Reverse",
+        "AddRange",
+        "RemoveRange"
+      ]
     },
     "CNAReadOnlyCollection": {
-      "kind": "class", "inheritance": "open", "generics": ["Element"], "base": null,
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [
+        "Element"
+      ],
+      "base": null,
       "clrFamily": "System.Collections.ObjectModel.ReadOnlyCollection`1",
-      "requiredMembers": ["Count", "Items", "Item", "Contains", "CopyTo", "GetEnumerator", "IndexOf"],
+      "requiredMembers": [
+        "Count",
+        "Items",
+        "Item",
+        "Contains",
+        "CopyTo",
+        "GetEnumerator",
+        "IndexOf"
+      ],
       "openMembers": [],
-      "forbiddenMembers": ["Add", "Clear", "Insert", "Remove", "RemoveAt", "SetItem", "ClearItems", "InsertItem", "RemoveItem"]
+      "forbiddenMembers": [
+        "Add",
+        "Clear",
+        "Insert",
+        "Remove",
+        "RemoveAt",
+        "SetItem",
+        "ClearItems",
+        "InsertItem",
+        "RemoveItem"
+      ]
     },
     "CNAList": {
-      "kind": "class", "inheritance": "final", "generics": ["Element"], "base": null,
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [
+        "Element"
+      ],
+      "base": null,
       "clrFamily": "System.Collections.Generic.List`1",
-      "requiredMembers": ["Count", "IsReadOnly", "Item", "SetItem", "Add", "Clear", "Contains", "CopyTo", "GetEnumerator", "IndexOf", "Insert", "RemoveAt"],
+      "requiredMembers": [
+        "Count",
+        "IsReadOnly",
+        "Item",
+        "SetItem",
+        "Add",
+        "Clear",
+        "Contains",
+        "CopyTo",
+        "GetEnumerator",
+        "IndexOf",
+        "Insert",
+        "RemoveAt"
+      ],
       "openMembers": [],
-      "forbiddenMembers": ["Sort", "Reverse", "AddRange", "ConvertAll"]
+      "forbiddenMembers": [
+        "Sort",
+        "Reverse",
+        "AddRange",
+        "ConvertAll"
+      ]
     },
     "CNAException": {
-      "kind": "class", "inheritance": "open", "generics": [], "base": null,
-      "conformances": ["Swift.Error"],
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [
+        "Swift.Error"
+      ],
       "clrFamily": "System.Exception",
-      "requiredMembers": ["Message", "InnerException", "HResult", "HelpLink", "GetBaseException"],
-      "openMembers": ["Message", "HelpLink", "GetBaseException"],
-      "finalMembers": ["InnerException"],
-      "forbiddenMembers": ["StackTrace", "Source", "TargetSite", "Data", "GetObjectData", "GetType", "ToString", "SerializeObjectState"]
+      "requiredMembers": [
+        "Message",
+        "InnerException",
+        "HResult",
+        "HelpLink",
+        "GetBaseException"
+      ],
+      "openMembers": [
+        "Message",
+        "HelpLink",
+        "GetBaseException"
+      ],
+      "finalMembers": [
+        "InnerException"
+      ],
+      "forbiddenMembers": [
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString",
+        "SerializeObjectState"
+      ]
     },
     "CNASystemException": {
-      "kind": "class", "inheritance": "open", "generics": [], "base": "CNAException",
-      "conformances": ["Swift.Error"],
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNAException",
+      "conformances": [
+        "Swift.Error"
+      ],
       "clrFamily": "System.SystemException",
       "requiredMembers": [],
       "openMembers": [],
       "finalMembers": [],
-      "forbiddenMembers": ["ErrorCode", "StackTrace", "Source", "TargetSite", "Data", "GetObjectData", "GetType", "ToString"]
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
     },
     "CNAExternalException": {
-      "kind": "class", "inheritance": "open", "generics": [], "base": "CNASystemException",
-      "conformances": ["Swift.Error"],
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
       "clrFamily": "System.Runtime.InteropServices.ExternalException",
-      "requiredMembers": ["ErrorCode"],
-      "openMembers": ["ErrorCode"],
+      "requiredMembers": [
+        "ErrorCode"
+      ],
+      "openMembers": [
+        "ErrorCode"
+      ],
       "finalMembers": [],
-      "forbiddenMembers": ["StackTrace", "Source", "TargetSite", "Data", "GetObjectData", "GetType", "ToString"]
+      "forbiddenMembers": [
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
     },
     "CNADictionary": {
-      "kind": "class", "inheritance": "open", "generics": ["Key", "Value"], "base": null,
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [
+        "Key",
+        "Value"
+      ],
+      "base": null,
       "conformances": [],
       "clrFamily": "System.Collections.Generic.Dictionary`2",
-      "requiredMembers": ["Count", "Comparer", "Item", "SetItem", "Add", "Clear", "ContainsKey", "ContainsValue", "Remove", "TryGetValue", "GetEnumerator", "Keys", "Values"],
+      "requiredMembers": [
+        "Count",
+        "Comparer",
+        "Item",
+        "SetItem",
+        "Add",
+        "Clear",
+        "ContainsKey",
+        "ContainsValue",
+        "Remove",
+        "TryGetValue",
+        "GetEnumerator",
+        "Keys",
+        "Values"
+      ],
       "openMembers": [],
-      "finalMembers": ["Count", "Comparer", "Item", "SetItem", "Add", "Clear", "ContainsKey", "ContainsValue", "Remove", "TryGetValue", "GetEnumerator", "Keys", "Values"],
-      "forbiddenMembers": ["GetObjectData", "OnDeserialization", "Sort", "AddRange", "Capacity", "TrimExcess", "EnsureCapacity"]
+      "finalMembers": [
+        "Count",
+        "Comparer",
+        "Item",
+        "SetItem",
+        "Add",
+        "Clear",
+        "ContainsKey",
+        "ContainsValue",
+        "Remove",
+        "TryGetValue",
+        "GetEnumerator",
+        "Keys",
+        "Values"
+      ],
+      "forbiddenMembers": [
+        "GetObjectData",
+        "OnDeserialization",
+        "Sort",
+        "AddRange",
+        "Capacity",
+        "TrimExcess",
+        "EnsureCapacity"
+      ]
     },
     "CNAKeyValuePair": {
-      "kind": "struct", "inheritance": "final", "generics": ["Key", "Value"], "base": null,
+      "kind": "struct",
+      "inheritance": "final",
+      "generics": [
+        "Key",
+        "Value"
+      ],
+      "base": null,
       "conformances": [],
       "clrFamily": "System.Collections.Generic.KeyValuePair`2",
-      "requiredMembers": ["Key", "Value"],
+      "requiredMembers": [
+        "Key",
+        "Value"
+      ],
       "openMembers": [],
       "finalMembers": [],
-      "forbiddenMembers": ["ToString", "SetKey", "SetValue"]
+      "forbiddenMembers": [
+        "ToString",
+        "SetKey",
+        "SetValue"
+      ]
     },
     "CNAAttribute": {
-      "kind": "class", "inheritance": "open", "generics": [], "base": null,
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
       "conformances": [],
       "clrFamily": "System.Attribute",
       "clrAbstract": true,
-      "requiredMembers": ["IsDefaultAttribute"],
-      "openMembers": ["IsDefaultAttribute"],
+      "requiredMembers": [
+        "IsDefaultAttribute"
+      ],
+      "openMembers": [
+        "IsDefaultAttribute"
+      ],
       "finalMembers": [],
-      "forbiddenMembers": ["Equals", "GetHashCode", "Match", "TypeId", "GetCustomAttribute", "GetCustomAttributes", "IsDefined", "ToString", "GetType"]
+      "forbiddenMembers": [
+        "Equals",
+        "GetHashCode",
+        "Match",
+        "TypeId",
+        "GetCustomAttribute",
+        "GetCustomAttributes",
+        "IsDefined",
+        "ToString",
+        "GetType"
+      ]
     },
     "CNAEqualityComparer": {
-      "kind": "protocol", "inheritance": "public", "generics": ["Element"], "base": null,
+      "kind": "protocol",
+      "inheritance": "public",
+      "generics": [
+        "Element"
+      ],
+      "base": null,
       "conformances": [],
       "clrFamily": "System.Collections.Generic.IEqualityComparer`1",
-      "requiredMembers": ["Equals", "GetHashCode"],
+      "requiredMembers": [
+        "Equals",
+        "GetHashCode"
+      ],
       "openMembers": [],
       "finalMembers": [],
-      "forbiddenMembers": ["Default", "Compare"]
+      "forbiddenMembers": [
+        "Default",
+        "Compare"
+      ]
+    },
+    "CNAArgumentException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.ArgumentException",
+      "requiredMembers": [
+        "ParamName"
+      ],
+      "openMembers": [
+        "ParamName",
+        "Message"
+      ],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNAArgumentNullException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNAArgumentException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.ArgumentNullException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNAArgumentOutOfRangeException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNAArgumentException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.ArgumentOutOfRangeException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "ActualValue",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNANotSupportedException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.NotSupportedException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNAInvalidOperationException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.InvalidOperationException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNAKeyNotFoundException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.Collections.Generic.KeyNotFoundException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNANullReferenceException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.NullReferenceException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNAIndexOutOfRangeException": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.IndexOutOfRangeException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
     }
   },
   "bclSupportMapping": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",
   "bclExceptionSupportMapping": "A CLR exception class projects to a real Swift CLASS conforming to Swift Error, so a projected XNA exception is a genuine throwable Swift error and the CLR inheritance chain survives as a Swift inheritance chain. The chain is exact and unabbreviated: System.Exception -> CNAException, System.SystemException -> CNASystemException, System.Runtime.InteropServices.ExternalException -> CNAExternalException. Collapsing ExternalException straight onto CNAException would erase SystemException's substituted default message and its 0x80131501 HResult, both of which are observable, and is a BASE_MAPPING_MISMATCH. A struct, an enum, an alias to CNAError, a non-throwable NSObject, or a missing Error conformance are each a mismatch and not a shortcut. CNAError is a SEPARATE channel and is deliberately NOT in this hierarchy: it reports CNA-Swift runtime and language-support failures -- native library failure, owner-thread violation, stale runtime generation, unsupported platform, callback lifecycle misuse -- which correspond to no selected XNA exception identity. CNAError is not a CNAException and CNAException does not wrap CNAError.",
-  "bclExceptionSelectedSurfaceMapping": "The projected members of the exception support family are exactly those whose CLR behaviour is reconstructible from managed state alone: Message, InnerException, HResult, HelpLink, GetBaseException and ExternalException.ErrorCode. Every remaining declared member requires a CLR RUNTIME SERVICE this projection does not have -- StackTrace and Source need the runtime's captured managed stack, TargetSite needs System.Reflection.MethodBase, GetType needs System.Type, Data needs System.Collections.IDictionary and an internal dictionary implementation, GetObjectData and the SerializeObjectState event need the serialization runtime, and ToString appends the stack trace -- so each is FORBIDDEN rather than absent: a member that answered with an empty string, a nil or a fabricated stack would be a lie, and the verifier fails if one appears. The same rule keeps the protected (SerializationInfo, StreamingContext) constructors of ContentLoadException and StorageDeviceNotConnectedException unimplemented and counted as MISSING_MEMBER rather than faked.",
+  "bclExceptionSelectedSurfaceMapping": "The projected members of the exception support family are exactly those whose CLR behaviour is reconstructible from managed state alone: Message, InnerException, HResult, HelpLink, GetBaseException and ExternalException.ErrorCode. Every remaining declared member requires a CLR RUNTIME SERVICE this projection does not have -- StackTrace and Source need the runtime's captured managed stack, TargetSite needs System.Reflection.MethodBase, GetType needs System.Type, Data needs System.Collections.IDictionary and an internal dictionary implementation, GetObjectData and the SerializeObjectState event need the serialization runtime, and ToString appends the stack trace -- so each is FORBIDDEN rather than absent: a member that answered with an empty string, a nil or a fabricated stack would be a lie, and the verifier fails if one appears. The same rule keeps the protected (SerializationInfo, StreamingContext) constructors of ContentLoadException and StorageDeviceNotConnectedException unimplemented and counted as MISSING_MEMBER rather than faked. Foundation 37 adds the eight classes the support layer RAISES rather than inherits from. Their projected surface is ParamName on ArgumentException and the Message override that composes it; everything else they declare is a constructor. ArgumentOutOfRangeException.ActualValue and the (paramName, actualValue, message) constructor that stores one are FORBIDDEN rather than absent, because the Message branch that reads it calls System.Object.ToString() on an arbitrary object, which is a virtual call whose result is not reconstructible from IL; a Swift String(describing:) in its place would be this projection's formatting and not the CLR's. IndexOutOfRangeException is the one SEALED member of the family and is projected final; the other seven are open, as mscorlib leaves them.",
   "bclAbstractClassProjectionMapping": "Swift has no abstract class, so a CLR abstract class with a protected constructor projects to an `open` Swift class with a public initializer. That WIDENS construction -- CNAAttribute() compiles where `new Attribute()` does not -- and the widening is recorded on the support type's measured shape as clrAbstract rather than hidden behind an invented runtime trap. It is the same kind of widening the protected-to-public accessor mapping already makes, and it is the only one an abstract base with no abstract members produces.",
   "bclStaticTableProjections": [
-    {"type": "System.Collections.HashHelpers", "field": "primes", "swiftSymbol": "CNAHashHelpers.hashPrimes", "reason": "Dictionary<TKey,TValue>::Initialize and ::Resize size their arrays through HashHelpers.GetPrime, which reads this table."}
+    {
+      "type": "System.Collections.HashHelpers",
+      "field": "primes",
+      "swiftSymbol": "CNAHashHelpers.hashPrimes",
+      "reason": "Dictionary<TKey,TValue>::Initialize and ::Resize size their arrays through HashHelpers.GetPrime, which reads this table."
+    }
   ],
   "bclStaticTableMapping": "A static data table this binding reproduces is read out of the admitted assembly's own static-array initializer by tools/api_compat/bcl_authority_audit.py and pinned in reference/bcl40-selected-shape.json under staticTables. The verifier reads the Swift literal back out of the compiled source and compares it element for element; a table transcribed by hand is a BASE_MAPPING_MISMATCH even when nothing observable depends on its values, because a sizing decision of this projection's own is exactly what the pinning exists to exclude.",
   "bclResourceStringProjections": [
-    {"key": "Exception_WasThrown", "reason": "System.Exception.get_Message returns this formatted with the CLR class name whenever the stored message is null."},
-    {"key": "Arg_SystemException", "reason": "The message System.SystemException..ctor() passes to its base."},
-    {"key": "Arg_ExternalException", "reason": "The message System.Runtime.InteropServices.ExternalException..ctor() passes to its base."},
-    {"key": "Argument_AddingDuplicate", "reason": "Dictionary<TKey,TValue>.Add raises this when the key is already present."},
-    {"key": "Arg_KeyNotFound", "reason": "Dictionary<TKey,TValue>'s indexer getter raises this for an absent key."},
-    {"key": "ArgumentOutOfRange_NeedNonNegNum", "reason": "The message a negative capacity produces on the Dictionary<TKey,TValue> capacity constructors."},
-    {"key": "Arg_ArrayPlusOffTooSmall", "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that is too short."},
-    {"key": "Arg_NotSupportedException", "reason": "The message a parameterless NotSupportedException carries, raised by Collection<T>'s read-only guard and by every TouchCollection mutator."}
+    {
+      "key": "Exception_WasThrown",
+      "reason": "System.Exception.get_Message returns this formatted with the CLR class name whenever the stored message is null."
+    },
+    {
+      "key": "Arg_SystemException",
+      "reason": "The message System.SystemException..ctor() passes to its base."
+    },
+    {
+      "key": "Arg_ExternalException",
+      "reason": "The message System.Runtime.InteropServices.ExternalException..ctor() passes to its base."
+    },
+    {
+      "key": "Argument_AddingDuplicate",
+      "reason": "Dictionary<TKey,TValue>.Add raises this when the key is already present."
+    },
+    {
+      "key": "Arg_KeyNotFound",
+      "reason": "Dictionary<TKey,TValue>'s indexer getter raises this for an absent key."
+    },
+    {
+      "key": "ArgumentOutOfRange_NeedNonNegNum",
+      "reason": "The message a negative capacity produces on the Dictionary<TKey,TValue> capacity constructors."
+    },
+    {
+      "key": "Arg_ArrayPlusOffTooSmall",
+      "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that is too short."
+    },
+    {
+      "key": "Arg_NotSupportedException",
+      "reason": "The message a parameterless NotSupportedException carries, which is what every TouchCollection mutator raises. It is NOT what Collection<T>'s read-only guard raises -- that one passes NotSupported_ReadOnlyCollection."
+    },
+    {
+      "key": "Arg_ArgumentException",
+      "reason": "The message a parameterless ArgumentException carries."
+    },
+    {
+      "key": "Arg_ParamName_Name",
+      "reason": "The template ArgumentException.get_Message appends around Environment.NewLine whenever ParamName is neither null nor empty."
+    },
+    {
+      "key": "ArgumentNull_Generic",
+      "reason": "The message both ArgumentNullException constructors that take no message pass to their base."
+    },
+    {
+      "key": "Arg_ArgumentOutOfRangeException",
+      "reason": "The message ArgumentOutOfRangeException's parameterless and paramName-only constructors pass to their base."
+    },
+    {
+      "key": "Arg_InvalidOperationException",
+      "reason": "The message a parameterless InvalidOperationException carries."
+    },
+    {
+      "key": "Arg_NullReferenceException",
+      "reason": "The message a parameterless NullReferenceException carries."
+    },
+    {
+      "key": "Arg_IndexOutOfRangeException",
+      "reason": "The message a parameterless IndexOutOfRangeException carries."
+    },
+    {
+      "key": "ArgumentOutOfRange_Index",
+      "reason": "ExceptionResource 22, which the no-argument ThrowHelper overload pairs with ExceptionArgument 13; List<T>'s indexer and RemoveAt and Collection<T>'s indexed setter and RemoveAt all reach it."
+    },
+    {
+      "key": "ArgumentOutOfRange_ListInsert",
+      "reason": "ExceptionResource 27, which List<T>.Insert and Collection<T>.Insert pass instead -- a different message for a neighbouring failure."
+    },
+    {
+      "key": "InvalidOperation_EnumFailedVersion",
+      "reason": "ExceptionResource 32, raised by List<T>.Enumerator and Dictionary<TKey,TValue>.Enumerator once the captured version no longer matches."
+    },
+    {
+      "key": "NotSupported_ReadOnlyCollection",
+      "reason": "ExceptionResource 28, raised by every Collection<T> mutator for a read-only backing list."
+    }
   ],
   "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "52b98a96a506b1320fe8cc78fa96acb736352cdd584c2ea709b9a3341b6635da",
+  "bclSelectedShapeSha256": "ce1404cf6f8922310a2bc4878f25abe594678de498787fad08139e9968472250",
   "eventSupportContract": {
     "CNAEventArgs": {
-      "kind": "class", "inheritance": "open", "generics": [], "base": null,
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
       "members": {
-        ".ctor": {"kind": "constructor", "static": false, "parameters": [], "labels": [], "returns": "Void"},
-        "Empty": {"kind": "property", "static": true, "parameters": [], "labels": [], "returns": "CNAEventArgs", "mutable": false}
+        ".ctor": {
+          "kind": "constructor",
+          "static": false,
+          "parameters": [],
+          "labels": [],
+          "returns": "Void"
+        },
+        "Empty": {
+          "kind": "property",
+          "static": true,
+          "parameters": [],
+          "labels": [],
+          "returns": "CNAEventArgs",
+          "mutable": false
+        }
       },
-      "forbiddenMembers": ["Add", "Remove", "Raise", "Event"]
+      "forbiddenMembers": [
+        "Add",
+        "Remove",
+        "Raise",
+        "Event"
+      ]
     },
     "CNAEvent": {
-      "kind": "class", "inheritance": "final", "generics": ["TArgs"], "base": null,
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [
+        "TArgs"
+      ],
+      "base": null,
       "members": {
-        "Add": {"kind": "method", "static": false, "parameters": ["(Any?, TArgs) throws -> Void"], "labels": ["_"], "returns": "CNAEventSubscription"},
-        "Remove": {"kind": "method", "static": false, "parameters": ["CNAEventSubscription"], "labels": ["_"], "returns": "Void"}
+        "Add": {
+          "kind": "method",
+          "static": false,
+          "parameters": [
+            "(Any?, TArgs) throws -> Void"
+          ],
+          "labels": [
+            "_"
+          ],
+          "returns": "CNAEventSubscription"
+        },
+        "Remove": {
+          "kind": "method",
+          "static": false,
+          "parameters": [
+            "CNAEventSubscription"
+          ],
+          "labels": [
+            "_"
+          ],
+          "returns": "Void"
+        }
       },
-      "forbiddenMembers": [".ctor", "Raise", "Event"]
+      "forbiddenMembers": [
+        ".ctor",
+        "Raise",
+        "Event"
+      ]
     },
     "CNAEventSource": {
-      "kind": "class", "inheritance": "final", "generics": ["TArgs"], "base": null,
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [
+        "TArgs"
+      ],
+      "base": null,
       "members": {
-        ".ctor": {"kind": "constructor", "static": false, "parameters": [], "labels": [], "returns": "Void"},
-        "Event": {"kind": "property", "static": false, "parameters": [], "labels": [], "returns": "CNAEvent<TArgs>", "mutable": false},
-        "Raise": {"kind": "method", "static": false, "parameters": ["Any?", "TArgs"], "labels": ["_", "args"], "returns": "Void"}
+        ".ctor": {
+          "kind": "constructor",
+          "static": false,
+          "parameters": [],
+          "labels": [],
+          "returns": "Void"
+        },
+        "Event": {
+          "kind": "property",
+          "static": false,
+          "parameters": [],
+          "labels": [],
+          "returns": "CNAEvent<TArgs>",
+          "mutable": false
+        },
+        "Raise": {
+          "kind": "method",
+          "static": false,
+          "parameters": [
+            "Any?",
+            "TArgs"
+          ],
+          "labels": [
+            "_",
+            "args"
+          ],
+          "returns": "Void"
+        }
       },
-      "forbiddenMembers": ["Add", "Remove"]
+      "forbiddenMembers": [
+        "Add",
+        "Remove"
+      ]
     },
     "CNAEventSubscription": {
-      "kind": "class", "inheritance": "final", "generics": [], "base": null,
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
       "members": {},
-      "forbiddenMembers": [".ctor", "Add", "Remove", "Raise", "Event"]
+      "forbiddenMembers": [
+        ".ctor",
+        "Add",
+        "Remove",
+        "Raise",
+        "Event"
+      ]
     }
   },
   "eventSupportMapping": "The event support types live outside Microsoft.Xna.Framework and are language-support API, not XNA types or XNA identities, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a base where composition is required, a missing required member, or a forbidden member is an EVENT_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",
   "nullableMapping": "System.Nullable<T> maps to Swift T?; ref/out direction remains independently mapped to inout",
   "optionalReferenceParameters": [
-    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "Equals", "parameter": "other"},
-    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "CompareTo", "parameter": "other"},
-    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Equality", "parameter": "a"},
-    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Equality", "parameter": "b"},
-    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Inequality", "parameter": "a"},
-    {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Inequality", "parameter": "b"},
-    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "IndexOf", "parameter": "item"},
-    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "Contains", "parameter": "item"},
-    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "Remove", "parameter": "item"},
-    {"owner": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException", "member": ".ctor", "parameter": "inner"},
-    {"owner": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException", "member": ".ctor", "parameter": "inner"},
-    {"owner": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException", "member": ".ctor", "parameter": "inner"},
-    {"owner": "Microsoft.Xna.Framework.Content.ContentLoadException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Content.ContentLoadException", "member": ".ctor", "parameter": "innerException"},
-    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceLostException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceLostException", "member": ".ctor", "parameter": "inner"},
-    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceNotResetException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceNotResetException", "member": ".ctor", "parameter": "inner"},
-    {"owner": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException", "member": ".ctor", "parameter": "inner"},
-    {"owner": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException", "member": ".ctor", "parameter": "message"},
-    {"owner": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException", "member": ".ctor", "parameter": "innerException"}
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKey",
+      "member": "Equals",
+      "parameter": "other"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKey",
+      "member": "CompareTo",
+      "parameter": "other"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKey",
+      "member": "op_Equality",
+      "parameter": "a"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKey",
+      "member": "op_Equality",
+      "parameter": "b"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKey",
+      "member": "op_Inequality",
+      "parameter": "a"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKey",
+      "member": "op_Inequality",
+      "parameter": "b"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKeyCollection",
+      "member": "IndexOf",
+      "parameter": "item"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKeyCollection",
+      "member": "Contains",
+      "parameter": "item"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.CurveKeyCollection",
+      "member": "Remove",
+      "parameter": "item"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException",
+      "member": ".ctor",
+      "parameter": "inner"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException",
+      "member": ".ctor",
+      "parameter": "inner"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException",
+      "member": ".ctor",
+      "parameter": "inner"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ContentLoadException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ContentLoadException",
+      "member": ".ctor",
+      "parameter": "innerException"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.DeviceLostException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.DeviceLostException",
+      "member": ".ctor",
+      "parameter": "inner"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.DeviceNotResetException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.DeviceNotResetException",
+      "member": ".ctor",
+      "parameter": "inner"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
+      "member": ".ctor",
+      "parameter": "inner"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException",
+      "member": ".ctor",
+      "parameter": "message"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException",
+      "member": ".ctor",
+      "parameter": "innerException"
+    }
   ],
   "globalOperatorProjections": [
     "Microsoft.Xna.Framework.CurveKey.op_Equality",

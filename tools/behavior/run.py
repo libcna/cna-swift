@@ -98,7 +98,21 @@ BCL_TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation27ContractTests.swift",
     ROOT / "Tests/CNATests/Foundation30BclExceptionTests.swift",
     ROOT / "Tests/CNATests/Foundation31BclDictionaryTests.swift",
+    ROOT / "Tests/CNATests/Foundation37ExceptionPayloadTests.swift",
 ]
+
+# `assertProjected` asserts FOUR separately observable facts about one
+# projected exception -- its class, its composed Message, its ParamName and its
+# HResult -- so a call site is four assertions and not one. Counting it as one
+# would have made this corpus appear to shrink while it grew, which is exactly
+# what happened the first time these conversions landed.
+PROJECTED_ASSERTION_FACTS = 4
+
+
+def count_assertions(source: str) -> int:
+    direct = len(re.findall(r"\bXCTAssert\w*\s*\(", source))
+    projected = len(re.findall(r"\bassertProjected\s*\(", source))
+    return direct + projected * PROJECTED_ASSERTION_FACTS
 
 
 def main() -> int:
@@ -115,11 +129,11 @@ def main() -> int:
         stderr=subprocess.STDOUT,
     )
     source = "\n".join(path.read_text(encoding="utf-8") for path in TEST_SOURCES)
-    assertions = len(re.findall(r"\bXCTAssert\w*\s*\(", source))
+    assertions = count_assertions(source)
     tests = re.findall(r"\bfunc\s+(test\w+)\s*\(", source)
     bcl_source = "\n".join(
         path.read_text(encoding="utf-8") for path in BCL_TEST_SOURCES)
-    bcl_assertions = len(re.findall(r"\bXCTAssert\w*\s*\(", bcl_source))
+    bcl_assertions = count_assertions(bcl_source)
     bcl_tests = re.findall(r"\bfunc\s+(test\w+)\s*\(", bcl_source)
     failures = 0 if completed.returncode == 0 else 1
     contract = json.loads(REFERENCE.read_text(encoding="utf-8"))

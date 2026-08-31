@@ -161,7 +161,12 @@ extension Microsoft.Xna.Framework.Matrix {
         _ fieldOfView: Float, aspectRatio: Float, nearPlaneDistance: Float, farPlaneDistance: Float
     ) throws -> Self {
         if fieldOfView <= 0 || fieldOfView >= Microsoft.Xna.Framework.MathHelper.Pi {
-            throw CNAError.argumentOutOfRange("fieldOfView")
+            // ArgumentOutOfRangeException("fieldOfView",
+            //   String.Format(CurrentCulture, OutRangeFieldOfView, "fieldOfView"))
+            throw CNAArgumentOutOfRangeException(
+                paramName: "fieldOfView",
+                message: Microsoft.Xna.Framework.Matrix.outRangeFieldOfViewFormat
+                    .replacingOccurrences(of: "{0}", with: "fieldOfView"))
         }
         try validatePerspectivePlanes(nearPlaneDistance, farPlaneDistance: farPlaneDistance)
         let yScale: Float = 1 / xnaTan(fieldOfView * 0.5)
@@ -317,9 +322,44 @@ extension Microsoft.Xna.Framework.Matrix {
                     doubledX * value.D, doubledY * value.D, doubledZ * value.D, 1)
     }
 
+    /// The three plane checks every perspective factory performs, in order.
+    ///
+    /// The first two format `NegativePlaneDistance` with the offending
+    /// parameter's own name; the third reports `nearPlaneDistance` with the
+    /// fixed `OppositePlanes` sentence, so a caller whose far plane is the
+    /// problem still sees the near plane named — which is XNA's own choice and
+    /// is reproduced rather than corrected.
     private static func validatePerspectivePlanes(_ nearPlaneDistance: Float, farPlaneDistance: Float) throws {
-        if nearPlaneDistance <= 0 { throw CNAError.argumentOutOfRange("nearPlaneDistance") }
-        if farPlaneDistance <= 0 { throw CNAError.argumentOutOfRange("farPlaneDistance") }
-        if nearPlaneDistance >= farPlaneDistance { throw CNAError.argumentOutOfRange("nearPlaneDistance") }
+        if nearPlaneDistance <= 0 {
+            throw CNAArgumentOutOfRangeException(
+                paramName: "nearPlaneDistance",
+                message: Microsoft.Xna.Framework.Matrix.negativePlaneDistanceFormat
+                    .replacingOccurrences(of: "{0}", with: "nearPlaneDistance"))
+        }
+        if farPlaneDistance <= 0 {
+            throw CNAArgumentOutOfRangeException(
+                paramName: "farPlaneDistance",
+                message: Microsoft.Xna.Framework.Matrix.negativePlaneDistanceFormat
+                    .replacingOccurrences(of: "{0}", with: "farPlaneDistance"))
+        }
+        if nearPlaneDistance >= farPlaneDistance {
+            throw CNAArgumentOutOfRangeException(
+                paramName: "nearPlaneDistance",
+                message: Microsoft.Xna.Framework.Matrix.oppositePlanesMessage)
+        }
     }
+
+    /// The exact `OutRangeFieldOfView` template, read out of
+    /// `Microsoft.Xna.Framework.dll`'s own resource table.
+    internal static let outRangeFieldOfViewFormat =
+        "{0} takes a value between 0 and Pi (180 degrees) in radians."
+
+    /// The exact `NegativePlaneDistance` template.
+    internal static let negativePlaneDistanceFormat =
+        "You should specify positive value for {0}."
+
+    /// The exact `OppositePlanes` message.
+    internal static let oppositePlanesMessage =
+        "Near plane distance is larger than Far plane distance. Near plane "
+        + "distance must be smaller than Far plane distance."
 }

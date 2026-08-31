@@ -390,6 +390,12 @@ ATTRIBUTE = "System.Attribute"
 EXCEPTION = "System.Exception"
 SYSTEM_EXCEPTION = "System.SystemException"
 EXTERNAL_EXCEPTION = "System.Runtime.InteropServices.ExternalException"
+ARGUMENT_EXCEPTION = "System.ArgumentException"
+ARGUMENT_NULL_EXCEPTION = "System.ArgumentNullException"
+ARGUMENT_RANGE_EXCEPTION = "System.ArgumentOutOfRangeException"
+NOT_SUPPORTED_EXCEPTION = "System.NotSupportedException"
+INVALID_OPERATION_EXCEPTION = "System.InvalidOperationException"
+KEY_NOT_FOUND_EXCEPTION = "System.Collections.Generic.KeyNotFoundException"
 
 
 # ----------------------------------------------------------------------------
@@ -776,6 +782,156 @@ def sentinel_checks(
                 f"Exception.{absent} vanished from the extraction")
 
     # ------------------------------------------------------------------
+    # The six raised exception families.
+    #
+    # These are the classes the support layer actually THROWS, so what matters
+    # is the base each sits on, the constructor overloads a raise site selects,
+    # and the extra observable state two of them add. Every fact is stated from
+    # the documented .NET Framework 4.0 contract, not read back from the
+    # extraction.
+    # ------------------------------------------------------------------
+    for name in (ARGUMENT_EXCEPTION, ARGUMENT_NULL_EXCEPTION,
+                 ARGUMENT_RANGE_EXCEPTION, NOT_SUPPORTED_EXCEPTION,
+                 INVALID_OPERATION_EXCEPTION, KEY_NOT_FOUND_EXCEPTION):
+        require(name in by_type, f"{name} was not extracted at all")
+    raised = {name: by_type.get(name) for name in (
+        ARGUMENT_EXCEPTION, ARGUMENT_NULL_EXCEPTION, ARGUMENT_RANGE_EXCEPTION,
+        NOT_SUPPORTED_EXCEPTION, INVALID_OPERATION_EXCEPTION,
+        KEY_NOT_FOUND_EXCEPTION)}
+    if any(record is None for record in raised.values()):
+        return checks, failures
+
+    for name, record in raised.items():
+        require(record["kind"] == "class", f"{name} is not a class")
+        require(not record["sealed"], f"{name} is sealed")
+        require(not record["abstract"], f"{name} is abstract")
+        require(record["genericArity"] == 0, f"{name} is generic")
+
+    # The bases decide which `catch` clauses see which failure. Three of the
+    # six sit on SystemException; the two argument specializations sit on
+    # ArgumentException, which is what makes `catch (ArgumentException)` see a
+    # null argument and an out-of-range one alike.
+    require(raised[ARGUMENT_EXCEPTION]["baseType"] == SYSTEM_EXCEPTION,
+            "ArgumentException does not derive from SystemException")
+    require(raised[ARGUMENT_NULL_EXCEPTION]["baseType"] == ARGUMENT_EXCEPTION,
+            "ArgumentNullException does not derive from ArgumentException")
+    require(raised[ARGUMENT_RANGE_EXCEPTION]["baseType"] == ARGUMENT_EXCEPTION,
+            "ArgumentOutOfRangeException does not derive from ArgumentException")
+    for name in (NOT_SUPPORTED_EXCEPTION, INVALID_OPERATION_EXCEPTION,
+                 KEY_NOT_FOUND_EXCEPTION):
+        require(raised[name]["baseType"] == SYSTEM_EXCEPTION,
+                f"{name} does not derive directly from SystemException")
+
+    # ArgumentException carries the parameter name and overrides Message to
+    # append it; that override is the whole reason the payload differs from
+    # the constructor argument.
+    param_name = members_of(ARGUMENT_EXCEPTION, "property", "ParamName")
+    require(len(param_name) == 1, "ArgumentException.ParamName is missing")
+    for member in param_name:
+        require(member["type"] == "System.String",
+                "ArgumentException.ParamName is not a String")
+        require(member["getAccess"] == "public" and member["setAccess"] is None,
+                "ArgumentException.ParamName is not a public get-only property")
+        require(member["getOverridable"],
+                "ArgumentException.ParamName is not overridable")
+    for name in (ARGUMENT_EXCEPTION, ARGUMENT_RANGE_EXCEPTION):
+        overridden = members_of(name, "property", "Message")
+        require(len(overridden) == 1, f"{name} does not override Message")
+        for member in overridden:
+            require(member["type"] == "System.String",
+                    f"{name}.Message is not a String")
+            require(member["getAccess"] == "public" and
+                    member["setAccess"] is None,
+                    f"{name}.Message is not a public get-only property")
+            require(member["getOverridable"],
+                    f"{name}.Message is not overridable")
+    for name in (ARGUMENT_NULL_EXCEPTION, NOT_SUPPORTED_EXCEPTION,
+                 INVALID_OPERATION_EXCEPTION, KEY_NOT_FOUND_EXCEPTION):
+        require(not members_of(name, "property", "Message"),
+                f"{name} overrides Message; it should inherit one")
+
+    actual_value = members_of(ARGUMENT_RANGE_EXCEPTION, "property", "ActualValue")
+    require(len(actual_value) == 1,
+            "ArgumentOutOfRangeException.ActualValue is missing")
+    for member in actual_value:
+        require(member["type"] == "System.Object",
+                "ArgumentOutOfRangeException.ActualValue is not an Object")
+        require(member["getAccess"] == "public" and member["setAccess"] is None,
+                "ArgumentOutOfRangeException.ActualValue is not public get-only")
+        require(member["getOverridable"],
+                "ArgumentOutOfRangeException.ActualValue is not overridable")
+
+    # NotSupportedException, InvalidOperationException and
+    # KeyNotFoundException add no member at all: their entire contribution is a
+    # distinct class identity and a distinct HResult.
+    for name in (NOT_SUPPORTED_EXCEPTION, INVALID_OPERATION_EXCEPTION,
+                 KEY_NOT_FOUND_EXCEPTION, ARGUMENT_NULL_EXCEPTION):
+        require(not [
+            item for item in raised[name]["members"]
+            if item["kind"] != "constructor"
+        ], f"{name} declares a non-constructor member")
+
+    # The constructor overloads each raise site selects. A missing overload
+    # here means a projected payload that could not have been built.
+    def signature_present(name: str, types: list[str]) -> bool:
+        return any(
+            [entry["type"] for entry in item["parameters"]] == types
+            for item in members_of(name, "constructor", ".ctor")
+            if item["access"] == "public")
+
+    # The exact public constructor count of each family, so dropping any one
+    # of them is a failure and not merely a missing overload nobody named.
+    for name, public_count in ((ARGUMENT_EXCEPTION, 5),
+                               (ARGUMENT_NULL_EXCEPTION, 4),
+                               (ARGUMENT_RANGE_EXCEPTION, 5),
+                               (NOT_SUPPORTED_EXCEPTION, 3),
+                               (INVALID_OPERATION_EXCEPTION, 3),
+                               (KEY_NOT_FOUND_EXCEPTION, 3)):
+        constructors = members_of(name, "constructor", ".ctor")
+        public = [item for item in constructors if item["access"] == "public"]
+        protected = [item for item in constructors if item["access"] == "protected"]
+        require(len(public) == public_count,
+                f"{name} should declare {public_count} public constructors, "
+                f"found {len(public)}")
+        require(len(protected) == 1,
+                f"{name} should declare exactly one protected serialization "
+                f"constructor, found {len(protected)}")
+        require(signature_present(name, []),
+                f"{name} has no public parameterless constructor")
+    for name in (ARGUMENT_EXCEPTION, ARGUMENT_NULL_EXCEPTION,
+                 ARGUMENT_RANGE_EXCEPTION):
+        require(signature_present(name, ["System.String"]),
+                f"{name} has no single-String constructor")
+        require(signature_present(name, ["System.String", EXCEPTION]),
+                f"{name} has no (String, Exception) constructor")
+
+    require(signature_present(ARGUMENT_EXCEPTION, ["System.String", "System.String"]),
+            "ArgumentException has no (message, paramName) constructor")
+    require(signature_present(
+        ARGUMENT_EXCEPTION, ["System.String", "System.String", EXCEPTION]),
+        "ArgumentException has no (message, paramName, innerException) constructor")
+    require(signature_present(ARGUMENT_NULL_EXCEPTION, ["System.String", "System.String"]),
+            "ArgumentNullException has no (paramName, message) constructor")
+    require(signature_present(ARGUMENT_RANGE_EXCEPTION, ["System.String", "System.String"]),
+            "ArgumentOutOfRangeException has no (paramName, message) constructor")
+    require(signature_present(
+        ARGUMENT_RANGE_EXCEPTION, ["System.String", "System.Object", "System.String"]),
+        "ArgumentOutOfRangeException has no (paramName, actualValue, message) constructor")
+    for name in (NOT_SUPPORTED_EXCEPTION, INVALID_OPERATION_EXCEPTION,
+                 KEY_NOT_FOUND_EXCEPTION):
+        require(signature_present(name, []), f"{name} has no parameterless constructor")
+        require(signature_present(name, ["System.String"]),
+                f"{name} has no (message) constructor")
+        require(signature_present(name, ["System.String", EXCEPTION]),
+                f"{name} has no (message, innerException) constructor")
+
+    # ArgumentNullException's two two-argument overloads are transposed with
+    # respect to each other, and confusing them would silently swap a message
+    # with a parameter name at every raise site.
+    require(signature_present(ARGUMENT_NULL_EXCEPTION, ["System.String", EXCEPTION]),
+            "ArgumentNullException has no (message, innerException) constructor")
+
+    # ------------------------------------------------------------------
     # The dictionary family.
     # ------------------------------------------------------------------
     dictionary = by_type.get(DICTIONARY)
@@ -1081,92 +1237,81 @@ def static_table_checks(
     return checks, failures, records
 
 
-def static_int32_table(il: str, type_name: str, field_name: str) -> list[int] | None:
-    """One `static readonly int[]` initialised from a static-array RVA blob.
+IL_ESCAPES = {"r": "\r", "n": "\n", "t": "\t", "0": "\0", "\\": "\\", '"': '"'}
 
-    The C# compiler lowers such a table to a `<PrivateImplementationDetails>`
-    field placed at a data address, filled by `RuntimeHelpers.InitializeArray`.
-    The chain followed here is exactly that one: the type's `.cctor` names the
-    initializer field, the field declaration names its data address, and the
-    address names a `.data ... = bytearray (...)` blob. Reading it means a
-    table this binding reproduces is a fact about the assembly rather than
-    something transcribed by hand.
 
-    `None` when any link is absent, which is reported rather than assumed away.
+def decode_il_string(text: str) -> str:
+    """Decode the escapes ikdasm writes inside an `ldstr` operand."""
+    out: list[str] = []
+    index = 0
+    while index < len(text):
+        char = text[index]
+        if char == "\\" and index + 1 < len(text):
+            following = text[index + 1]
+            if following in IL_ESCAPES:
+                out.append(IL_ESCAPES[following])
+                index += 2
+                continue
+        out.append(char)
+        index += 1
+    return "".join(out)
+
+
+def il_string_literal(il: str, type_name: str, member: str) -> str | None:
+    """The single `ldstr` a one-line getter returns, or None.
+
+    A registered literal must be the method's WHOLE body: `ldstr "..."` then
+    `ret`, nothing else. A getter that branched, cached, or consulted the
+    platform would not be a literal fact about the assembly, and reading one
+    out of a longer body would be exactly the vacuous measurement this audit
+    exists to prevent.
     """
-    opening = re.search(
-        rf"^\.class\s+.*?\b{re.escape(type_name)}\s*$", il, re.M)
-    if opening is None:
+    start = il.find(f"beforefieldinit {type_name}\n")
+    if start < 0:
+        start = il.find(f" {type_name}\n")
+    if start < 0:
         return None
-    closing = re.search(
-        rf"^\}}\s*//\s*end of class\s+{re.escape(type_name)}\s*$",
-        il[opening.start():], re.M)
-    if closing is None:
+    end = il.find("} // end of class " + type_name.rsplit(".", 1)[-1], start)
+    body = il[start:end if end > 0 else len(il)]
+    site = body.find(f" {member}() cil managed")
+    if site < 0:
         return None
-    block = il[opening.start():opening.start() + closing.end()]
-
-    # The `.cctor` stores into the named field; the `ldtoken` immediately
-    # before that store names the initializer field.
-    store = re.search(
-        rf"ldtoken\s+field[^\n]*?'(\$\$method[0-9a-zA-Z-]+)'[\s\S]{{0,400}}?"
-        rf"stsfld\s+int32\[\]\s+{re.escape(type_name)}::{re.escape(field_name)}",
-        block)
-    if store is None:
+    close = body.find("} // end of method", site)
+    method = body[site:close if close > 0 else len(body)]
+    instructions = re.findall(r"IL_[0-9a-fA-F]+:\s+(\S+)(?:\s+(.*))?", method)
+    if len(instructions) != 2 or instructions[0][0] != "ldstr" or instructions[1][0] != "ret":
         return None
-    initializer = store.group(1)
-
-    placement = re.search(
-        rf"'{re.escape(initializer)}'\s+at\s+(I_[0-9A-Fa-f]+)", il)
-    if placement is None:
+    operand = instructions[0][1].strip()
+    if not (operand.startswith('"') and operand.endswith('"')):
         return None
-    blob = re.search(
-        rf"^\.data\s+cil\s+{placement.group(1)}\s*=\s*bytearray\s*\("
-        rf"([\s\S]*?)\)\s*$", il, re.M)
-    if blob is None:
-        return None
-    # `ikdasm` appends an ASCII rendering after `//` on most rows, and a
-    # rendering can contain two characters that look like a hex byte. The
-    # comment is removed per line before any byte is read, so nothing outside
-    # the blob can be mistaken for data.
-    hex_only = "\n".join(
-        line.split("//", 1)[0] for line in blob.group(1).splitlines())
-    payload = bytes(
-        int(item, 16) for item in re.findall(r"\b([0-9A-Fa-f]{2})\b", hex_only))
-
-    # The declared element count comes from the `newarr` the `.cctor` performs,
-    # so a blob that is longer than the array cannot silently add entries.
-    size = re.search(
-        r"ldc\.i4(?:\.s)?\s+(\d+)\s*\n\s*IL_[0-9a-f]+:\s+newarr\s+System\.Int32",
-        block)
-    count = int(size.group(1)) if size else len(payload) // 4
-    if len(payload) < count * 4:
-        return None
-    return [
-        int.from_bytes(payload[index * 4:index * 4 + 4], "little", signed=True)
-        for index in range(count)
-    ]
+    return decode_il_string(operand[1:-1])
 
 
-def static_table_checks(
+def il_literal_checks(
     il: str, selected: list[dict[str, Any]],
 ) -> tuple[int, list[str], list[dict[str, Any]]]:
-    """Extract every registered static table, or say why it could not be."""
+    """Every registered IL string literal, read from the body that returns it."""
     failures: list[str] = []
     records: list[dict[str, Any]] = []
     checks = 0
     for entry in selected:
         checks += 1
-        values = static_int32_table(il, entry["type"], entry["field"])
-        if values is None:
+        found = il_string_literal(il, entry["type"], entry["member"])
+        if found is None:
             failures.append(
-                f"static table {entry['type']}::{entry['field']} could not be "
-                "read from the assembly")
+                f"IL literal {entry['type']}::{entry['member']} is not a "
+                "single ldstr/ret body in the assembly")
+            continue
+        if found != entry["value"]:
+            failures.append(
+                f"IL literal {entry['type']}::{entry['member']} is {found!r} "
+                f"in the assembly, registered as {entry['value']!r}")
             continue
         records.append({
             "type": entry["type"],
-            "field": entry["field"],
+            "member": entry["member"],
             "swiftSymbol": entry.get("swiftSymbol"),
-            "values": values,
+            "value": found,
         })
     return checks, failures, records
 
@@ -1219,7 +1364,12 @@ def mutation_self_tests(
                                   SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION,
                                   DICTIONARY, KEY_COLLECTION, VALUE_COLLECTION,
                                   DICT_ENUMERATOR, KEY_VALUE_PAIR,
-                                  IEQUALITY_COMPARER, IDICTIONARY, ATTRIBUTE)
+                                  IEQUALITY_COMPARER, IDICTIONARY, ATTRIBUTE,
+                                  ARGUMENT_EXCEPTION, ARGUMENT_NULL_EXCEPTION,
+                                  ARGUMENT_RANGE_EXCEPTION,
+                                  NOT_SUPPORTED_EXCEPTION,
+                                  INVALID_OPERATION_EXCEPTION,
+                                  KEY_NOT_FOUND_EXCEPTION)
                 if name in by_name]
     checks += 1
     if len(subjects) < 15:
@@ -1502,6 +1652,46 @@ def mutation_self_tests(
         ("an ExternalException constructor dropped", EXTERNAL_EXCEPTION,
          drop_member("constructor")),
         ("ErrorCode given a setter", EXTERNAL_EXCEPTION, add_setter),
+        # The six raised families. Each mutation is a way a projected payload
+        # could have been quietly wrong: the wrong base changes which `catch`
+        # sees it, a dropped constructor removes the overload a raise site
+        # selects, and a dropped ParamName or Message override changes the
+        # composed message itself.
+        ("ArgumentException collapsed onto Exception", ARGUMENT_EXCEPTION,
+         rebase_onto(EXCEPTION)),
+        ("ArgumentException made sealed", ARGUMENT_EXCEPTION, flip_sealed),
+        ("ParamName dropped", ARGUMENT_EXCEPTION, drop_member("property")),
+        ("ParamName given a setter", ARGUMENT_EXCEPTION, add_setter),
+        ("an ArgumentException constructor dropped", ARGUMENT_EXCEPTION,
+         drop_member("constructor")),
+        ("ArgumentNullException rebased onto SystemException",
+         ARGUMENT_NULL_EXCEPTION, rebase_onto(SYSTEM_EXCEPTION)),
+        ("an ArgumentNullException constructor dropped",
+         ARGUMENT_NULL_EXCEPTION, drop_member("constructor")),
+        ("ArgumentNullException given a member of its own",
+         ARGUMENT_NULL_EXCEPTION, add_member),
+        ("ArgumentOutOfRangeException rebased onto SystemException",
+         ARGUMENT_RANGE_EXCEPTION, rebase_onto(SYSTEM_EXCEPTION)),
+        ("ActualValue dropped", ARGUMENT_RANGE_EXCEPTION,
+         drop_member("property")),
+        ("an ArgumentOutOfRangeException constructor dropped",
+         ARGUMENT_RANGE_EXCEPTION, drop_member("constructor")),
+        ("NotSupportedException rebased onto ArgumentException",
+         NOT_SUPPORTED_EXCEPTION, rebase_onto(ARGUMENT_EXCEPTION)),
+        ("NotSupportedException given a member of its own",
+         NOT_SUPPORTED_EXCEPTION, add_member),
+        ("a NotSupportedException constructor dropped",
+         NOT_SUPPORTED_EXCEPTION, drop_member("constructor")),
+        ("InvalidOperationException rebased onto Exception",
+         INVALID_OPERATION_EXCEPTION, rebase_onto(EXCEPTION)),
+        ("InvalidOperationException given a member of its own",
+         INVALID_OPERATION_EXCEPTION, add_member),
+        ("KeyNotFoundException rebased onto ArgumentException",
+         KEY_NOT_FOUND_EXCEPTION, rebase_onto(ARGUMENT_EXCEPTION)),
+        ("KeyNotFoundException given a member of its own",
+         KEY_NOT_FOUND_EXCEPTION, add_member),
+        ("a KeyNotFoundException constructor dropped",
+         KEY_NOT_FOUND_EXCEPTION, drop_member("constructor")),
         # The dictionary family. Each of these is a way the projection could
         # have been quietly wrong.
         ("Dictionary<K,V> made sealed", DICTIONARY, flip_sealed),
@@ -1934,6 +2124,8 @@ def main() -> int:
     admitted: list[dict[str, Any]] = []
     manifest_records: list[dict[str, Any]] = []
     manifest_resources: list[dict[str, Any]] = []
+    manifest_literals: list[dict[str, Any]] = []
+    literal_check_count = 0
     manifest_tables: list[dict[str, Any]] = []
     resource_failures: list[str] = []
     resource_check_count = 0
@@ -2005,6 +2197,16 @@ def main() -> int:
             manifest_tables.extend(
                 dict(record, assembly=name) for record in table_records)
 
+        # IL string literals the projection reproduces, each required to be
+        # the whole body of the method that returns it.
+        selected_literals = entry.get("selectedIlLiterals", [])
+        if selected_literals:
+            made, issues, literal_records = il_literal_checks(il, selected_literals)
+            literal_check_count += made
+            resource_failures.extend(f"{name}: {item}" for item in issues)
+            manifest_literals.extend(
+                dict(record, assembly=name) for record in literal_records)
+
         admitted.append({
             "assembly": name,
             "assemblyName": entry["assemblyName"],
@@ -2038,6 +2240,8 @@ def main() -> int:
         "types": manifest_records,
         "resourceStrings": sorted(
             manifest_resources, key=lambda item: (item["assembly"], item["key"])),
+        "ilLiterals": sorted(
+            manifest_literals, key=lambda item: (item["assembly"], item["type"], item["member"])),
         "staticTables": sorted(
             manifest_tables,
             key=lambda item: (item["assembly"], item["type"], item["field"])),
@@ -2092,6 +2296,27 @@ def main() -> int:
                 manifest_failures.append(
                     f"{key[1]}: resource string {found_resources[key]!r} != "
                     f"pinned {pinned_resources[key]!r}")
+        pinned_literals = {
+            (item["assembly"], item["type"], item["member"]): item.get("value")
+            for item in pinned.get("ilLiterals", [])
+        }
+        found_literals = {
+            (item["assembly"], item["type"], item["member"]): item.get("value")
+            for item in manifest_literals
+        }
+        for key in sorted(set(pinned_literals) | set(found_literals)):
+            manifest_checks += 1
+            if key not in found_literals:
+                manifest_failures.append(
+                    f"{key[1]}::{key[2]}: pinned IL literal not extracted")
+            elif key not in pinned_literals:
+                manifest_failures.append(
+                    f"{key[1]}::{key[2]}: extracted IL literal absent from the "
+                    "pinned manifest")
+            elif pinned_literals[key] != found_literals[key]:
+                manifest_failures.append(
+                    f"{key[1]}::{key[2]}: IL literal {found_literals[key]!r} != "
+                    f"pinned {pinned_literals[key]!r}")
         pinned_tables = {
             (item["assembly"], item["type"], item["field"]): item.get("values")
             for item in pinned.get("staticTables", [])
@@ -2146,6 +2371,7 @@ def main() -> int:
         "BCL_MUTATION_SELF_TESTS": mutation_count,
         "BCL_CROSS_CHECKS": cross_check_checks,
         "BCL_RESOURCE_CHECKS": resource_check_count,
+        "BCL_IL_LITERAL_CHECKS": literal_check_count,
         "BCL_STATIC_TABLE_CHECKS": table_check_count,
         "BCL_NEGATIVE_CONTROLS": control_checks,
         "BCL_CROSS_CHECK_TOOL": "monodis" if cross_check_ran else "not run",
@@ -2182,6 +2408,7 @@ def main() -> int:
         f"BCL_CROSS_CHECKS={cross_check_checks} "
         f"({report['BCL_CROSS_CHECK_TOOL']}) "
         f"BCL_RESOURCE_CHECKS={resource_check_count} "
+        f"BCL_IL_LITERAL_CHECKS={literal_check_count} "
         f"BCL_STATIC_TABLE_CHECKS={table_check_count} "
         f"BCL_NEGATIVE_CONTROLS={control_checks}")
     for record in controls:

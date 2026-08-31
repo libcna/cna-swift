@@ -121,9 +121,16 @@ extension PureValueTests {
             -Float.greatestFiniteMagnitude,
             -Float.infinity,
         ] {
-            XCTAssertThrowsError(try emitter.SetDopplerScale(rejected)) { error in
-                // ArgumentOutOfRangeException("value", InvalidEmitterDopplerScale)
-                XCTAssertEqual(error as? CNAError, CNAError.argumentOutOfRange("value"))
+            // ArgumentOutOfRangeException("value", InvalidEmitterDopplerScale)
+            assertProjected(
+                CNAArgumentOutOfRangeException.self,
+                message: composedArgumentMessage(
+                    "The doppler scale of an audio emitter must be greater "
+                    + "than or equal to zero.", paramName: "value"),
+                paramName: "value",
+                hResult: Int32(bitPattern: 0x8013_1502)
+            ) {
+                try emitter.SetDopplerScale(rejected)
             }
             XCTAssertEqual(emitter.DopplerScale.bitPattern, Float(3).bitPattern)
         }

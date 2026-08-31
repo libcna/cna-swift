@@ -32,7 +32,9 @@ extension Microsoft.Xna.Framework {
 
         public func GetCorners(_ corners: inout [Vector3]) throws {
             guard corners.count >= Int(Self.CornerCount) else {
-                throw CNAError.argumentOutOfRange("corners")
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "corners",
+                    message: Microsoft.Xna.Framework.BoundingBox.notEnoughCornersMessage)
             }
             for index in 0..<Int(Self.CornerCount) { corners[index] = self.corners[index] }
         }

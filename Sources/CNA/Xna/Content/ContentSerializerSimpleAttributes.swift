@@ -33,7 +33,7 @@ extension Microsoft.Xna.Framework.Content {
         /// substitutes a default for an unset one.
         public init(collectionItemName: String) throws {
             guard !collectionItemName.isEmpty else {
-                throw CNAError.argumentNull("collectionItemName")
+                throw CNAArgumentNullException(paramName: "collectionItemName")
             }
             self.collectionItemName = collectionItemName
             super.init()
@@ -63,7 +63,7 @@ extension Microsoft.Xna.Framework.Content {
         /// carrying the string XNA carries.
         public init(runtimeType: String) throws {
             guard !runtimeType.isEmpty else {
-                throw CNAError.argumentNull("runtimeType")
+                throw CNAArgumentNullException(paramName: "runtimeType")
             }
             self.runtimeType = runtimeType
             super.init()

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 2002,
-  "ASSERTIONS": 2002,
+  "OBSERVATIONS": 2036,
+  "ASSERTIONS": 2036,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -212,8 +212,8 @@
     "testDistinctTypesAreDistinctKeys"
   ],
   "BCL_AUTHORITY": "PURE_BCL_DERIVED",
-  "BCL_OBSERVATIONS": 210,
-  "BCL_ASSERTIONS": 210,
+  "BCL_OBSERVATIONS": 292,
+  "BCL_ASSERTIONS": 292,
   "bclTestCases": [
     "testCollectionDefaultConstructorAllocatesItsOwnBackingStore",
     "testCollectionWrappingConstructorObservesLaterMutationsOfTheSuppliedList",
@@ -268,7 +268,22 @@
     "testASuppliedComparerDecidesKeyIdentityAndIsHandedBack",
     "testAComparerWhoseHashDisagreesWithEqualsCannotFindItsEntries",
     "testGetPrimeMatchesTheAdmittedTable",
-    "testKeyValuePairCarriesBothHalves"
+    "testKeyValuePairCarriesBothHalves",
+    "testTheInheritanceChainIsMscorlibsOwn",
+    "testEveryParameterlessConstructorSubstitutesItsOwnResourceAndHResult",
+    "testASubclassOverwritesTheHResultItsBaseAssigned",
+    "testMessageComposesTheParameterNameAroundTheIlNewline",
+    "testTheNewlineIsTheIlLiteralAndNotThePlatformsOwn",
+    "testTheTransposedTwoArgumentConstructorsAreNotInterchangeable",
+    "testArgumentNullExceptionsOneArgumentConstructorTakesAParameterName",
+    "testArgumentOutOfRangeExceptionsOneArgumentConstructorTakesAParameterName",
+    "testEveryNewSupportClassReportsItsCLRName",
+    "testTheInnerExceptionChainSurvivesTheNewSubclasses",
+    "testTheProjectedExceptionsAreNotCNAErrorsAndViceVersa",
+    "testCNAErrorCarriesNoCLRShapedIdentity",
+    "testTheArrayCopyFailuresCarryTheClassButClaimNoMessage",
+    "testInsertAndIndexReportDifferentRangeMessages",
+    "testTheReadOnlyGuardAndTheXnaRefusalCarryDifferentMessages"
   ],
   "groupCounts": {
     "Vector2": 2,

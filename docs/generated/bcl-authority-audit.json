@@ -1,19 +1,20 @@
 {
   "schemaVersion": 1,
-  "registrySha256": "7277e6e2b449527f1ff57adaf25f71087a658da68b1173f65a01044677287b1b",
-  "manifestSha256": "52b98a96a506b1320fe8cc78fa96acb736352cdd584c2ea709b9a3341b6635da",
+  "registrySha256": "3e6bc47e3c26c450a61fe17df036dad03bacb34e61c9d48c669e2431db167500",
+  "manifestSha256": "ce1404cf6f8922310a2bc4878f25abe594678de498787fad08139e9968472250",
   "BCL_AUTHORITY_STATUS": "PASS",
   "BCL_AUTHORITY_ASSEMBLIES": 1,
-  "BCL_AUTHORITY_TYPES": 19,
-  "BCL_AUTHORITY_MEMBERS": 205,
+  "BCL_AUTHORITY_TYPES": 27,
+  "BCL_AUTHORITY_MEMBERS": 247,
   "BCL_IDENTITY_CHECKS": 21,
-  "BCL_SENTINEL_CHECKS": 314,
-  "BCL_MANIFEST_CHECKS": 28,
-  "BCL_MUTATION_SELF_TESTS": 346,
-  "BCL_CROSS_CHECKS": 96,
-  "BCL_RESOURCE_CHECKS": 8,
+  "BCL_SENTINEL_CHECKS": 413,
+  "BCL_MANIFEST_CHECKS": 48,
+  "BCL_MUTATION_SELF_TESTS": 454,
+  "BCL_CROSS_CHECKS": 136,
+  "BCL_RESOURCE_CHECKS": 19,
+  "BCL_IL_LITERAL_CHECKS": 1,
   "BCL_STATIC_TABLE_CHECKS": 1,
-  "BCL_NEGATIVE_CONTROLS": 4,
+  "BCL_NEGATIVE_CONTROLS": 1,
   "BCL_CROSS_CHECK_TOOL": "monodis",
   "identityFailures": [],
   "manifestFailures": [],
@@ -25,90 +26,13 @@
   "negativeControls": [
     {
       "control": "mscorlib.dll",
-      "controlSha256": "5b36fcc1d4522a399d5fc278023f1cce866b5db21187cec2b86c532219848d24",
+      "controlSha256": "4bea44963e71cabbad47e9d80689130416f6e8786a710c2fafe58f6d41c40ad6",
       "offeredAs": "mscorlib.dll",
       "checksRun": 21,
-      "rejectedBy": 16,
+      "rejectedBy": 2,
       "reasons": [
-        "mscorlib.dll: sha256 5b36fcc1d4522a399d5fc278023f1cce866b5db21187cec2b86c532219848d24 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
-        "mscorlib.dll: size 4812288 != registered 5196112",
-        "mscorlib.dll: module 'mscorlib.dll' != registered 'CommonLanguageRuntimeLibrary'",
-        "mscorlib.dll: version resource CompanyName=None != registered 'Microsoft Corporation'",
-        "mscorlib.dll: version resource FileDescription=None != registered 'Microsoft Common Language Runtime Class Library'",
-        "mscorlib.dll: version resource FileVersion=None != registered '4.0.30319.1 (RTMRel.030319-0100)'",
-        "mscorlib.dll: version resource ProductName=None != registered 'Microsoft\u00ae .NET Framework'",
-        "mscorlib.dll: version resource ProductVersion=None != registered '4.0.30319.1'",
-        "mscorlib.dll: version resource OriginalFilename=None != registered 'mscorlib.dll'",
-        "mscorlib.dll: version resource InternalName=None != registered 'mscorlib.dll'",
-        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
-        "mscorlib.dll: required module import clr.dll is absent",
-        "mscorlib.dll: required module import mscoree.dll is absent",
-        "mscorlib.dll: reimplementation marker 'Mono.Runtime' is present",
-        "mscorlib.dll: reimplementation marker 'Mono.RuntimeStructs' is present",
-        "mscorlib.dll: reimplementation marker 'MonoTODO' is present"
-      ]
-    },
-    {
-      "control": "mscorlib.dll",
-      "controlSha256": "a8d9bbf287f9340c5d61165d18bf6d21d806eb520231ecfee643447444624cdd",
-      "offeredAs": "mscorlib.dll",
-      "checksRun": 21,
-      "rejectedBy": 12,
-      "reasons": [
-        "mscorlib.dll: sha256 a8d9bbf287f9340c5d61165d18bf6d21d806eb520231ecfee643447444624cdd does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
-        "mscorlib.dll: size 774656 != registered 5196112",
-        "mscorlib.dll: module 'mscorlib.dll' != registered 'CommonLanguageRuntimeLibrary'",
-        "mscorlib.dll: version resource CompanyName='Mono development team' != registered 'Microsoft Corporation'",
-        "mscorlib.dll: version resource FileDescription='mscorlib.dll' != registered 'Microsoft Common Language Runtime Class Library'",
-        "mscorlib.dll: version resource FileVersion='4.0.30319.1' != registered '4.0.30319.1 (RTMRel.030319-0100)'",
-        "mscorlib.dll: version resource ProductName='Mono Common Language Infrastructure' != registered 'Microsoft\u00ae .NET Framework'",
-        "mscorlib.dll: version resource InternalName='mscorlib' != registered 'mscorlib.dll'",
-        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
-        "mscorlib.dll: required module import clr.dll is absent",
-        "mscorlib.dll: required module import mscoree.dll is absent",
-        "mscorlib.dll: reimplementation marker 'MonoTODO' is present"
-      ]
-    },
-    {
-      "control": "System.dll",
-      "controlSha256": "c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462",
-      "offeredAs": "mscorlib.dll",
-      "checksRun": 21,
-      "rejectedBy": 10,
-      "reasons": [
-        "mscorlib.dll: sha256 c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
-        "mscorlib.dll: size 3481928 != registered 5196112",
-        "mscorlib.dll: module 'System.dll' != registered 'CommonLanguageRuntimeLibrary'",
-        "mscorlib.dll: version resource FileDescription='.NET Framework' != registered 'Microsoft Common Language Runtime Class Library'",
-        "mscorlib.dll: version resource FileVersion='4.0.30319.1 built by: RTMRel' != registered '4.0.30319.1 (RTMRel.030319-0100)'",
-        "mscorlib.dll: version resource OriginalFilename='System.dll' != registered 'mscorlib.dll'",
-        "mscorlib.dll: version resource InternalName='System.dll' != registered 'mscorlib.dll'",
-        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
-        "mscorlib.dll: required module import clr.dll is absent",
-        "mscorlib.dll: required module import mscoree.dll is absent"
-      ]
-    },
-    {
-      "control": "Microsoft.Xna.Framework.Game.dll",
-      "controlSha256": "b5dffdd8125abef2a4507ba4e1d2f11062143f0a63d48fe4f298b95ad746a1f0",
-      "offeredAs": "mscorlib.dll",
-      "checksRun": 21,
-      "rejectedBy": 14,
-      "reasons": [
-        "mscorlib.dll: sha256 b5dffdd8125abef2a4507ba4e1d2f11062143f0a63d48fe4f298b95ad746a1f0 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
-        "mscorlib.dll: size 74752 != registered 5196112",
-        "mscorlib.dll: public key '' != registered '00000000000000000400000000000000'",
-        "mscorlib.dll: public key token '' recomputed from the assembly's own key != registered 'b77a5c561934e089'",
-        "mscorlib.dll: module 'Microsoft.Xna.Framework.Game.dll' != registered 'CommonLanguageRuntimeLibrary'",
-        "mscorlib.dll: version resource FileDescription='Microsoft.Xna.Framework.Game.dll' != registered 'Microsoft Common Language Runtime Class Library'",
-        "mscorlib.dll: version resource FileVersion='4.0.30901.0' != registered '4.0.30319.1 (RTMRel.030319-0100)'",
-        "mscorlib.dll: version resource ProductName='Microsoft XNA Game Studio 4.0' != registered 'Microsoft\u00ae .NET Framework'",
-        "mscorlib.dll: version resource ProductVersion='4.0.30901.0' != registered '4.0.30319.1'",
-        "mscorlib.dll: version resource OriginalFilename='Microsoft.Xna.Framework.Game.dll' != registered 'mscorlib.dll'",
-        "mscorlib.dll: version resource InternalName='Microsoft.Xna.Framework.Game.dll' != registered 'mscorlib.dll'",
-        "mscorlib.dll: the registered strong-name key file 'f:\\\\dd\\\\Tools\\\\devdiv\\\\ecmapublickey.snk' is not present in the binary",
-        "mscorlib.dll: required module import clr.dll is absent",
-        "mscorlib.dll: required module import mscoree.dll is absent"
+        "mscorlib.dll: sha256 4bea44963e71cabbad47e9d80689130416f6e8786a710c2fafe58f6d41c40ad6 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+        "mscorlib.dll: size 4960080 != registered 5196112"
       ]
     }
   ],
@@ -121,8 +45,8 @@
       "publicKeyTokenRecomputed": "b77a5c561934e089",
       "sha256": "5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
       "fileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
-      "selectedTypes": 19,
-      "selectedMembers": 205
+      "selectedTypes": 27,
+      "selectedMembers": 247
     }
   ]
 }

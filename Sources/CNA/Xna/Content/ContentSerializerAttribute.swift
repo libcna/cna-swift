@@ -91,7 +91,7 @@ extension Microsoft.Xna.Framework.Content {
         /// thing from the getter substituting a default for one.
         public func SetCollectionItemName(_ value: String) throws {
             guard !value.isEmpty else {
-                throw CNAError.argumentNull("value")
+                throw CNAArgumentNullException(paramName: "value")
             }
             collectionItemName = value
         }

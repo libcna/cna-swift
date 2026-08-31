@@ -165,11 +165,6 @@ open class CNADictionary<Key, Value> {
         "An item with the same key has already been added."
     }
 
-    /// The exact `Arg_KeyNotFound` resource string.
-    internal static var keyNotFoundMessage: String {
-        "The given key was not present in the dictionary."
-    }
-
     /// The exact `ArgumentOutOfRange_NeedNonNegNum` resource string.
     internal static var needNonNegativeMessage: String {
         "Non-negative number required."
@@ -255,7 +250,9 @@ open class CNADictionary<Key, Value> {
     /// `Insert` calls `Initialize(0)` and must get a real table back.
     private func reserve(capacity: Int32) throws {
         guard capacity >= 0 else {
-            throw CNAError.argumentOutOfRange("capacity")
+            throw CNAArgumentOutOfRangeException(
+                paramName: "capacity",
+                message: CNADictionary.needNonNegativeMessage)
         }
         guard capacity > 0 else { return }
         initialize(capacity: capacity)
@@ -299,7 +296,10 @@ open class CNADictionary<Key, Value> {
     public final func Item(_ key: Key) throws -> Value {
         let index = findEntry(key)
         guard index >= 0 else {
-            throw CNAError.keyNotFound(CNADictionary.keyNotFoundMessage)
+            // ThrowHelper.ThrowKeyNotFoundException's whole body is
+            // `new KeyNotFoundException()`, so the message is the
+            // parameterless constructor's substituted Arg_KeyNotFound.
+            throw CNAKeyNotFoundException()
         }
         return entries[Int(index)].value!
     }
@@ -366,7 +366,10 @@ open class CNADictionary<Key, Value> {
     /// `Argument_AddingDuplicate` string, and nothing is stored.
     public final func Add(_ key: Key, value: Value) throws {
         guard insert(key, value, add: true) else {
-            throw CNAError.argument(CNADictionary.addingDuplicateMessage)
+            // ThrowHelper.ThrowArgumentException(Argument_AddingDuplicate)
+            // selects the message-only constructor, so ParamName is nil.
+            throw CNAArgumentException(
+                message: CNADictionary.addingDuplicateMessage)
         }
     }
 
@@ -453,7 +456,10 @@ open class CNADictionary<Key, Value> {
     ) -> CNAEnumerator<Projected> {
         var cursor = 0
         return CNAEnumerator(expectedVersion: version) { [self] _, expected in
-            guard version == expected else { throw CNAError.collectionModified }
+            guard version == expected else {
+                throw CNAInvalidOperationException(
+                    message: CNAList<Key>.enumFailedVersionMessage)
+            }
             while cursor < Int(entryCount) {
                 let entry = entries[cursor]
                 cursor += 1
@@ -531,11 +537,20 @@ open class CNADictionary<Key, Value> {
         _ array: inout [Projected], index: Int32,
         _ project: (Entry) -> Projected
     ) throws {
-        guard index >= 0 else { throw CNAError.argumentOutOfRange("index") }
+        // ThrowArgumentOutOfRangeException(index, ArgumentOutOfRange_NeedNonNegNum)
+        // -- note the resource: the dictionary's key and value collections use
+        // a different one from List<T>'s indexer, and the paramName is `index`
+        // even on the arrayIndex-named overload.
+        guard index >= 0 else {
+            throw CNAArgumentOutOfRangeException(
+                paramName: "index",
+                message: CNADictionary.needNonNegativeMessage)
+        }
         let start = Int(index)
         guard start <= array.count,
               array.count - start >= Int(Count) else {
-            throw CNAError.argument(CNADictionary.arrayPlusOffTooSmallMessage)
+            throw CNAArgumentException(
+                message: CNADictionary.arrayPlusOffTooSmallMessage)
         }
         var offset = start
         for position in 0..<Int(entryCount) where entries[position].hashCode >= 0 {

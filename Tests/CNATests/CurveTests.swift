@@ -158,8 +158,14 @@ extension PureValueTests {
         XCTAssertEqual(try nan.CompareTo(finite), 1)
         XCTAssertEqual(try finite.CompareTo(nan), 1)
         XCTAssertEqual(try nan.CompareTo(F.CurveKey(position: .nan, value: 0)), 1)
-        XCTAssertThrowsError(try finite.CompareTo(nil)) { error in
-            XCTAssertEqual(error as? CNAError, .nullReference("CurveKey.CompareTo"))
+        // The IL has no null check at all: `ldfld` through a null reference
+        // is what raises, and ECMA-335 names the class.
+        assertProjected(
+            CNANullReferenceException.self,
+            message: "Object reference not set to an instance of an object.",
+            hResult: Int32(bitPattern: 0x8000_4003)
+        ) {
+            _ = try finite.CompareTo(nil)
         }
     }
 
@@ -234,11 +240,19 @@ extension PureValueTests {
         try replacements.SetItem(Int32(replacements.Count - 1), replacementMovesFirst)
         XCTAssertTrue(try replacements.Item(0) === replacementMovesFirst)
 
-        XCTAssertThrowsError(try keys.Item(-1)) { error in
-            XCTAssertEqual(error as? CNAError, .argumentOutOfRange("index"))
-        }
-        XCTAssertThrowsError(try keys.Item(keys.Count)) { error in
-            XCTAssertEqual(error as? CNAError, .argumentOutOfRange("index"))
+        // The indexer delegates to List<CurveKey>.get_Item, so both ends of
+        // the range report ArgumentOutOfRange_Index with paramName "index".
+        for index in [Int32(-1), keys.Count] {
+            assertProjected(
+                CNAArgumentOutOfRangeException.self,
+                message: composedArgumentMessage(
+                    "Index was out of range. Must be non-negative and less "
+                    + "than the size of the collection.", paramName: "index"),
+                paramName: "index",
+                hResult: Int32(bitPattern: 0x8013_1502)
+            ) {
+                _ = try keys.Item(index)
+            }
         }
         XCTAssertThrowsError(try keys.SetItem(-1, one))
         XCTAssertThrowsError(try keys.SetItem(keys.Count, one))
@@ -318,8 +332,13 @@ extension PureValueTests {
         let add = makeCollection()
         let addEnumerator = add.GetEnumerator()
         add.Add(F.CurveKey(position: 4, value: 40))
-        XCTAssertThrowsError(try addEnumerator.Next()) { error in
-            XCTAssertEqual(error as? CNAError, .collectionModified)
+        assertProjected(
+            CNAInvalidOperationException.self,
+            message: "Collection was modified; enumeration operation may not "
+                + "execute.",
+            hResult: Int32(bitPattern: 0x8013_1509)
+        ) {
+            _ = try addEnumerator.Next()
         }
 
         let successfulRemove = makeCollection()
@@ -462,8 +481,17 @@ extension PureValueTests {
         try duplicate.ComputeTangent(0, tangentType: .Smooth)
         XCTAssertTrue(try duplicate.Keys.Item(0).TangentOut.isNaN)
 
-        XCTAssertThrowsError(try curve.ComputeTangent(-1, tangentType: .Flat)) { error in
-            XCTAssertEqual(error as? CNAError, .argumentOutOfRange("keyIndex"))
+        // The paramName-ONLY constructor: the message is the substituted
+        // Arg_ArgumentOutOfRangeException, composed with the parameter name.
+        assertProjected(
+            CNAArgumentOutOfRangeException.self,
+            message: composedArgumentMessage(
+                "Specified argument was out of the range of valid values.",
+                paramName: "keyIndex"),
+            paramName: "keyIndex",
+            hResult: Int32(bitPattern: 0x8013_1502)
+        ) {
+            try curve.ComputeTangent(-1, tangentType: .Flat)
         }
         XCTAssertThrowsError(try curve.ComputeTangent(curve.Keys.Count, tangentType: .Flat))
 

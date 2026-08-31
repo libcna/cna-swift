@@ -75,11 +75,14 @@ extension PureValueTests {
     func testDictionaryCapacityConstructorRejectsANegativeCapacity() throws {
         XCTAssertNoThrow(try CNADictionary<String, String>(capacity: 0))
         XCTAssertNoThrow(try CNADictionary<String, String>(capacity: 17))
-        XCTAssertThrowsError(try CNADictionary<String, String>(capacity: -1)) {
-            guard case CNAError.argumentOutOfRange(let parameter) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(parameter, "capacity")
+        assertProjected(
+            CNAArgumentOutOfRangeException.self,
+            message: composedArgumentMessage(
+                "Non-negative number required.", paramName: "capacity"),
+            paramName: "capacity",
+            hResult: Int32(bitPattern: 0x8013_1502)
+        ) {
+            _ = try CNADictionary<String, String>(capacity: -1)
         }
     }
 
@@ -108,12 +111,14 @@ extension PureValueTests {
     func testAddRefusesADuplicateKeyWhileTheIndexerOverwritesIt() throws {
         let dictionary = try makeDictionary([("a", "1")])
 
-        XCTAssertThrowsError(try dictionary.Add("a", value: "2")) {
-            guard case CNAError.argument(let message) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(
-                message, "An item with the same key has already been added.")
+        // ThrowArgumentException(Argument_AddingDuplicate) selects the
+        // message-only overload, so there is no parameter name to compose in.
+        assertProjected(
+            CNAArgumentException.self,
+            message: "An item with the same key has already been added.",
+            hResult: Int32(bitPattern: 0x8007_0057)
+        ) {
+            try dictionary.Add("a", value: "2")
         }
         XCTAssertEqual(try dictionary.Item("a"), "1",
                        "a refused Add must leave the entry untouched")
@@ -128,13 +133,18 @@ extension PureValueTests {
     // assembly's own `Arg_KeyNotFound`.
     func testIndexerGetterRaisesKeyNotFoundForAnAbsentKey() throws {
         let dictionary = try makeDictionary([("a", "1")])
-        XCTAssertThrowsError(try dictionary.Item("missing")) {
-            guard case CNAError.keyNotFound(let message) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(
-                message, "The given key was not present in the dictionary.")
+        // KeyNotFoundException derives from SystemException directly, so it
+        // is NOT an ArgumentException and carries no parameter name.
+        assertProjected(
+            CNAKeyNotFoundException.self,
+            message: "The given key was not present in the dictionary.",
+            hResult: Int32(bitPattern: 0x8013_1577)
+        ) {
+            _ = try dictionary.Item("missing")
         }
+        XCTAssertFalse(
+            (try? dictionary.Item("missing")) != nil,
+            "the getter must not have inserted anything")
         // The indexer SETTER inserts where the getter would have failed.
         dictionary.SetItem("missing", "2")
         XCTAssertEqual(try dictionary.Item("missing"), "2")
@@ -248,10 +258,13 @@ extension PureValueTests {
             let enumerator = dictionary.GetEnumerator()
             XCTAssertEqual(try enumerator.Next()?.Key, "a")
             try mutate(dictionary)
-            XCTAssertThrowsError(try enumerator.Next()) {
-                guard case CNAError.collectionModified = $0 else {
-                    return XCTFail("wrong error: \($0)")
-                }
+            assertProjected(
+                CNAInvalidOperationException.self,
+                message: "Collection was modified; enumeration operation may "
+                    + "not execute.",
+                hResult: Int32(bitPattern: 0x8013_1509)
+            ) {
+                _ = try enumerator.Next()
             }
         }
     }
@@ -319,20 +332,26 @@ extension PureValueTests {
         XCTAssertEqual(destination, ["", "a", "b"])
 
         var negative = ["", ""]
-        XCTAssertThrowsError(try dictionary.Keys.CopyTo(&negative, index: -1)) {
-            guard case CNAError.argumentOutOfRange = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
+        // The key/value collections pass ArgumentOutOfRange_NeedNonNegNum,
+        // NOT List<T>'s ArgumentOutOfRange_Index, and name "index" even on the
+        // overload whose CLR parameter is called `index`.
+        assertProjected(
+            CNAArgumentOutOfRangeException.self,
+            message: composedArgumentMessage(
+                "Non-negative number required.", paramName: "index"),
+            paramName: "index",
+            hResult: Int32(bitPattern: 0x8013_1502)
+        ) {
+            try dictionary.Keys.CopyTo(&negative, index: -1)
         }
         var tooShort = [""]
-        XCTAssertThrowsError(try dictionary.Values.CopyTo(&tooShort, index: 0)) {
-            guard case CNAError.argument(let message) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(
-                message,
-                "Destination array is not long enough to copy all the items "
-                + "in the collection. Check array index and length.")
+        assertProjected(
+            CNAArgumentException.self,
+            message: "Destination array is not long enough to copy all the "
+                + "items in the collection. Check array index and length.",
+            hResult: Int32(bitPattern: 0x8007_0057)
+        ) {
+            try dictionary.Values.CopyTo(&tooShort, index: 0)
         }
     }
 

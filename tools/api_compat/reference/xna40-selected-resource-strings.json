@@ -22,6 +22,61 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "ServiceMustBeAssignable",
       "value": "Service provider object of type {0} must be assignable to service type {1}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "ServiceProviderCannotBeNull",
+      "value": "The service provider instance cannot be null."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BoundingBoxZeroPoints",
+      "value": "You should have at least one point in points"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BoundingSphereZeroPoints",
+      "value": "You should have at least one point in points."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidEmitterDopplerScale",
+      "value": "The doppler scale of an audio emitter must be greater than or equal to zero."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NegativePlaneDistance",
+      "value": "You should specify positive value for {0}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NegativeRadius",
+      "value": "Radius must be greater than 0."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NotEnoughCorners",
+      "value": "You have to have at least 8 elements to copy corners."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NotEnoughSourceSize",
+      "value": "Source array must be equal or bigger than requested length."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NotEnoughTargetSize",
+      "value": "Target array size must be equal or bigger than source array size."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OppositePlanes",
+      "value": "Near plane distance is larger than Far plane distance. Near plane distance must be smaller than Far plane distance."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OutRangeFieldOfView",
+      "value": "{0} takes a value between 0 and Pi (180 degrees) in radians."
     }
   ]
 }

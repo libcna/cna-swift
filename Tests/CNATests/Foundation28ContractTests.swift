@@ -73,14 +73,15 @@ extension PureValueTests {
         let component = TestComponent("only")
         try collection.Add(component)
 
-        XCTAssertThrowsError(try collection.Add(component)) { error in
-            guard case .argument(let message)? = error as? CNAError else {
-                return XCTFail("expected an argument error, got \(error)")
-            }
-            XCTAssertEqual(
-                message,
-                "Cannot add the same game component to a game component "
-                + "collection multiple times.")
+        // `newobj ArgumentException::.ctor(string)` -- message only, so no
+        // parameter name is composed into the message.
+        assertProjected(
+            CNAArgumentException.self,
+            message: "Cannot add the same game component to a game component "
+                + "collection multiple times.",
+            hResult: Int32(bitPattern: 0x8007_0057)
+        ) {
+            try collection.Add(component)
         }
         XCTAssertEqual(collection.Count, 1, "the refused insert must not store")
     }
@@ -269,19 +270,17 @@ extension PureValueTests {
         collection.ComponentAdded.Add { _, _ in events += 1 }
         collection.ComponentRemoved.Add { _, _ in events += 1 }
 
-        XCTAssertThrowsError(try collection.SetItem(0, TestComponent("replacement"))) {
-            error in
-            guard case .notSupported(let message)? = error as? CNAError else {
-                return XCTFail("expected a not-supported error, got \(error)")
-            }
-            // The exact `CannotSetItemsIntoGameComponentCollection` string,
-            // read out of the registered assembly's own resource table and
-            // pinned in reference/xna40-selected-resource-strings.json --
-            // including the double space, which is XNA's.
-            XCTAssertEqual(
-                message,
-                "Cannot set a value using operator[] on "
-                + "GameComponentCollection.  Use Add/Remove instead.")
+        // The exact `CannotSetItemsIntoGameComponentCollection` string, read
+        // out of the registered assembly's own resource table and pinned in
+        // reference/xna40-selected-resource-strings.json -- including the
+        // double space, which is XNA's.
+        assertProjected(
+            CNANotSupportedException.self,
+            message: "Cannot set a value using operator[] on "
+                + "GameComponentCollection.  Use Add/Remove instead.",
+            hResult: Int32(bitPattern: 0x8013_1515)
+        ) {
+            try collection.SetItem(0, TestComponent("replacement"))
         }
         XCTAssertEqual(collection.Count, 1)
         XCTAssertTrue(try collection.Item(0) as AnyObject === original)
@@ -295,10 +294,18 @@ extension PureValueTests {
         let collection = Microsoft.Xna.Framework.GameComponentCollection()
         try collection.Add(TestComponent("only"))
 
-        XCTAssertThrowsError(try collection.SetItem(5, TestComponent("x"))) { error in
-            guard case .argumentOutOfRange? = error as? CNAError else {
-                return XCTFail("expected an out-of-range error, got \(error)")
-            }
+        // `Collection<T>.set_Item` uses the NO-ARGUMENT ThrowHelper overload,
+        // which pairs ExceptionArgument `index` with ArgumentOutOfRange_Index
+        // -- a different resource from the one `Insert` uses.
+        assertProjected(
+            CNAArgumentOutOfRangeException.self,
+            message: composedArgumentMessage(
+                "Index was out of range. Must be non-negative and less than "
+                + "the size of the collection.", paramName: "index"),
+            paramName: "index",
+            hResult: Int32(bitPattern: 0x8013_1502)
+        ) {
+            try collection.SetItem(5, TestComponent("x"))
         }
     }
 
@@ -341,8 +348,13 @@ extension PureValueTests {
         let enumerator = collection.GetEnumerator()
         XCTAssertNotNil(try enumerator.Next())
         try collection.Add(TestComponent("c"))
-        XCTAssertThrowsError(try enumerator.Next()) { error in
-            XCTAssertEqual(error as? CNAError, .collectionModified)
+        assertProjected(
+            CNAInvalidOperationException.self,
+            message: "Collection was modified; enumeration operation may not "
+                + "execute.",
+            hResult: Int32(bitPattern: 0x8013_1509)
+        ) {
+            _ = try enumerator.Next()
         }
     }
 

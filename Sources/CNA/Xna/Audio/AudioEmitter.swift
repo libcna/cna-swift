@@ -100,7 +100,12 @@ extension Microsoft.Xna.Framework.Audio {
         // unchecked write path would accept values XNA rejects.
         public func SetDopplerScale(_ value: Float) throws {
             guard !(value < 0) else {
-                throw CNAError.argumentOutOfRange("value")
+                // `ArgumentOutOfRangeException::.ctor(string paramName,
+                // string message)` -- paramName first, then the resource.
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "value",
+                    message: "The doppler scale of an audio emitter must be greater "
+                    + "than or equal to zero.")
             }
             dopplerScale = value
         }

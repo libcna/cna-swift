@@ -69,13 +69,13 @@
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 8,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
-    "BCL_SUPPORT_TYPE_MEASUREMENTS": 10,
+    "BCL_SUPPORT_TYPE_MEASUREMENTS": 18,
     "XNA_SEALED_CLASS_PROJECTIONS": 18,
     "NONDERIVABLE_UNSEALED_CLASSES": 5,
-    "BCL_RESOURCE_STRING_PROJECTIONS": 8,
+    "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 4,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 14,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -3327,6 +3327,111 @@
   ],
   "bclSupportProjections": [
     {
+      "supportType": "CNAArgumentException",
+      "clrFamily": "System.ArgumentException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor",
+        "Message",
+        "ParamName"
+      ],
+      "openHooks": [
+        "ParamName",
+        "Message"
+      ],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAArgumentNullException",
+      "clrFamily": "System.ArgumentNullException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNAArgumentException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAArgumentOutOfRangeException",
+      "clrFamily": "System.ArgumentOutOfRangeException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNAArgumentException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "ActualValue",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNAAttribute",
       "clrFamily": "System.Attribute",
       "kind": "class",
@@ -3567,6 +3672,105 @@
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
     {
+      "supportType": "CNAIndexOutOfRangeException",
+      "clrFamily": "System.IndexOutOfRangeException",
+      "kind": "class",
+      "inheritance": "final",
+      "genericParameters": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAInvalidOperationException",
+      "clrFamily": "System.InvalidOperationException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAKeyNotFoundException",
+      "clrFamily": "System.Collections.Generic.KeyNotFoundException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNAKeyValuePair",
       "clrFamily": "System.Collections.Generic.KeyValuePair`2",
       "kind": "struct",
@@ -3629,6 +3833,72 @@
         "Reverse",
         "AddRange",
         "ConvertAll"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNANotSupportedException",
+      "clrFamily": "System.NotSupportedException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNANullReferenceException",
+      "clrFamily": "System.NullReferenceException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ErrorCode",
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
       ],
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
@@ -3751,7 +4021,73 @@
       "resourceKey": "Arg_NotSupportedException",
       "pinnedValue": "Specified method is not supported.",
       "reproducedInSwiftSource": true,
-      "reason": "The message a parameterless NotSupportedException carries, raised by Collection<T>'s read-only guard and by every TouchCollection mutator."
+      "reason": "The message a parameterless NotSupportedException carries, which is what every TouchCollection mutator raises. It is NOT what Collection<T>'s read-only guard raises -- that one passes NotSupported_ReadOnlyCollection."
+    },
+    {
+      "resourceKey": "Arg_ArgumentException",
+      "pinnedValue": "Value does not fall within the expected range.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message a parameterless ArgumentException carries."
+    },
+    {
+      "resourceKey": "Arg_ParamName_Name",
+      "pinnedValue": "Parameter name: {0}",
+      "reproducedInSwiftSource": true,
+      "reason": "The template ArgumentException.get_Message appends around Environment.NewLine whenever ParamName is neither null nor empty."
+    },
+    {
+      "resourceKey": "ArgumentNull_Generic",
+      "pinnedValue": "Value cannot be null.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message both ArgumentNullException constructors that take no message pass to their base."
+    },
+    {
+      "resourceKey": "Arg_ArgumentOutOfRangeException",
+      "pinnedValue": "Specified argument was out of the range of valid values.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message ArgumentOutOfRangeException's parameterless and paramName-only constructors pass to their base."
+    },
+    {
+      "resourceKey": "Arg_InvalidOperationException",
+      "pinnedValue": "Operation is not valid due to the current state of the object.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message a parameterless InvalidOperationException carries."
+    },
+    {
+      "resourceKey": "Arg_NullReferenceException",
+      "pinnedValue": "Object reference not set to an instance of an object.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message a parameterless NullReferenceException carries."
+    },
+    {
+      "resourceKey": "Arg_IndexOutOfRangeException",
+      "pinnedValue": "Index was outside the bounds of the array.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message a parameterless IndexOutOfRangeException carries."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_Index",
+      "pinnedValue": "Index was out of range. Must be non-negative and less than the size of the collection.",
+      "reproducedInSwiftSource": true,
+      "reason": "ExceptionResource 22, which the no-argument ThrowHelper overload pairs with ExceptionArgument 13; List<T>'s indexer and RemoveAt and Collection<T>'s indexed setter and RemoveAt all reach it."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_ListInsert",
+      "pinnedValue": "Index must be within the bounds of the List.",
+      "reproducedInSwiftSource": true,
+      "reason": "ExceptionResource 27, which List<T>.Insert and Collection<T>.Insert pass instead -- a different message for a neighbouring failure."
+    },
+    {
+      "resourceKey": "InvalidOperation_EnumFailedVersion",
+      "pinnedValue": "Collection was modified; enumeration operation may not execute.",
+      "reproducedInSwiftSource": true,
+      "reason": "ExceptionResource 32, raised by List<T>.Enumerator and Dictionary<TKey,TValue>.Enumerator once the captured version no longer matches."
+    },
+    {
+      "resourceKey": "NotSupported_ReadOnlyCollection",
+      "pinnedValue": "Collection is read-only.",
+      "reproducedInSwiftSource": true,
+      "reason": "ExceptionResource 28, raised by every Collection<T> mutator for a read-only backing list."
     }
   ],
   "bclStaticTableProjections": [
@@ -3787,6 +4123,66 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "resourceKey": "ServiceMustBeAssignable",
       "pinnedValue": "Service provider object of type {0} must be assignable to service type {1}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "ServiceProviderCannotBeNull",
+      "pinnedValue": "The service provider instance cannot be null.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BoundingBoxZeroPoints",
+      "pinnedValue": "You should have at least one point in points",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BoundingSphereZeroPoints",
+      "pinnedValue": "You should have at least one point in points.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NegativePlaneDistance",
+      "pinnedValue": "You should specify positive value for {0}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NegativeRadius",
+      "pinnedValue": "Radius must be greater than 0.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NotEnoughCorners",
+      "pinnedValue": "You have to have at least 8 elements to copy corners.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NotEnoughSourceSize",
+      "pinnedValue": "Source array must be equal or bigger than requested length.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NotEnoughTargetSize",
+      "pinnedValue": "Target array size must be equal or bigger than source array size.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "OppositePlanes",
+      "pinnedValue": "Near plane distance is larger than Far plane distance. Near plane distance must be smaller than Far plane distance.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "OutRangeFieldOfView",
+      "pinnedValue": "{0} takes a value between 0 and Pi (180 degrees) in radians.",
       "reproducedInSwiftSource": true
     }
   ],

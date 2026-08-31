@@ -130,13 +130,19 @@ extension PureValueTests {
     // A hook that does not call `super` mutates nothing: the base class never
     // writes to `items` on any public path.
     func testAnOverrideThatRefusesLeavesTheCollectionUnchanged() throws {
+        // A subclass's own failure, deliberately neither a projected CLR
+        // exception nor a CNAError: an override may throw anything, and the
+        // base class must propagate it unchanged and mutate nothing.
+        struct RefusedByOverride: Error {}
         final class Refusing: CNACollection<Int> {
             override func InsertItem(_ index: Int32, item: Int) throws {
-                throw CNAError.notSupported("insertion")
+                throw RefusedByOverride()
             }
         }
         let collection = Refusing()
-        XCTAssertThrowsError(try collection.Add(1))
+        XCTAssertThrowsError(try collection.Add(1)) { error in
+            XCTAssertTrue(error is RefusedByOverride, "\(error)")
+        }
         XCTAssertEqual(collection.Count, 0)
         XCTAssertEqual(collection.Items.Count, 0)
     }
@@ -267,8 +273,13 @@ extension PureValueTests {
         let enumerator = collection.GetEnumerator()
         XCTAssertEqual(try enumerator.Next(), 1)
         try collection.Add(4)
-        XCTAssertThrowsError(try enumerator.Next()) { error in
-            XCTAssertEqual(error as? CNAError, .collectionModified)
+        assertProjected(
+            CNAInvalidOperationException.self,
+            message: "Collection was modified; enumeration operation may not "
+                + "execute.",
+            hResult: Int32(bitPattern: 0x8013_1509)
+        ) {
+            _ = try enumerator.Next()
         }
     }
 

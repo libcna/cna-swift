@@ -235,14 +235,14 @@ final class Foundation19EventProjectionTests: XCTestCase {
         var calls: [String] = []
         source.Event.Add { _, _ in
             calls.append("first")
-            throw CNAError.argument("handler failed")
+            throw CNAError.producerInvariant("handler failed")
         }
         source.Event.Add { _, _ in calls.append("second") }
 
         XCTAssertThrowsError(try source.Raise(nil, args: Args.Empty)) { error in
             // The handler's own error reaches the raiser unchanged. Nothing is
             // swallowed and nothing is wrapped.
-            XCTAssertEqual(error as? CNAError, CNAError.argument("handler failed"))
+            XCTAssertEqual(error as? CNAError, CNAError.producerInvariant("handler failed"))
         }
         XCTAssertEqual(calls, ["first"])
     }
@@ -253,23 +253,23 @@ final class Foundation19EventProjectionTests: XCTestCase {
         source.Event.Add { _, _ in calls.append("first") }
         source.Event.Add { _, _ in
             calls.append("second")
-            throw CNAError.collectionModified
+            throw CNAError.callbackOutsideGameLifecycle
         }
         source.Event.Add { _, _ in calls.append("third") }
 
         XCTAssertThrowsError(try source.Raise(nil, args: Args.Empty)) { error in
-            XCTAssertEqual(error as? CNAError, CNAError.collectionModified)
+            XCTAssertEqual(error as? CNAError, CNAError.callbackOutsideGameLifecycle)
         }
         XCTAssertEqual(calls, ["first", "second"])
     }
 
     func testOnlyTheFirstErrorPropagates() {
         let source = Source()
-        source.Event.Add { _, _ in throw CNAError.argument("first") }
-        source.Event.Add { _, _ in throw CNAError.argument("second") }
+        source.Event.Add { _, _ in throw CNAError.producerInvariant("first") }
+        source.Event.Add { _, _ in throw CNAError.producerInvariant("second") }
 
         XCTAssertThrowsError(try source.Raise(nil, args: Args.Empty)) { error in
-            XCTAssertEqual(error as? CNAError, CNAError.argument("first"))
+            XCTAssertEqual(error as? CNAError, CNAError.producerInvariant("first"))
         }
     }
 
@@ -279,7 +279,7 @@ final class Foundation19EventProjectionTests: XCTestCase {
         var shouldThrow = true
         source.Event.Add { _, _ in
             calls.append("first")
-            if shouldThrow { throw CNAError.argument("once") }
+            if shouldThrow { throw CNAError.producerInvariant("once") }
         }
         source.Event.Add { _, _ in calls.append("second") }
 

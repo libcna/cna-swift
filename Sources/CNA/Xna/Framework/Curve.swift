@@ -32,7 +32,10 @@ extension Microsoft.Xna.Framework {
             tangentOutType: CurveTangent
         ) throws {
             guard keyIndex >= 0 && keyIndex < Keys.Count else {
-                throw CNAError.argumentOutOfRange("keyIndex")
+                // `ArgumentOutOfRangeException::.ctor(string paramName)` -- the
+                // paramName-only overload, so the message is the substituted
+                // Arg_ArgumentOutOfRangeException.
+                throw CNAArgumentOutOfRangeException(paramName: "keyIndex")
             }
             computeTangent(
                 at: Int(keyIndex),

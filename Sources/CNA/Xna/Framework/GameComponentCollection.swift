@@ -81,9 +81,11 @@ extension Microsoft.Xna.Framework {
             _ index: Int32, item: any Microsoft.Xna.Framework.IGameComponent
         ) throws {
             guard IndexOf(item) == -1 else {
-                throw CNAError.argument(
-                    "Cannot add the same game component to a game component "
-                    + "collection multiple times.")
+                // `newobj ArgumentException::.ctor(string)` -- the message-only
+                // overload, so ParamName is nil.
+                throw CNAArgumentException(
+                    message: "Cannot add the same game component to a game "
+                    + "component collection multiple times.")
             }
             try super.InsertItem(index, item: item)
             try componentAddedSource.Raise(
@@ -122,8 +124,8 @@ extension Microsoft.Xna.Framework {
         public override func SetItem(
             _ index: Int32, item: any Microsoft.Xna.Framework.IGameComponent
         ) throws {
-            throw CNAError.notSupported(
-                "Cannot set a value using operator[] on "
+            throw CNANotSupportedException(
+                message: "Cannot set a value using operator[] on "
                 + "GameComponentCollection.  Use Add/Remove instead.")
         }
 

@@ -6,7 +6,9 @@ extension Microsoft.Xna.Framework {
         public var Radius: Float
 
         public init(_ center: Vector3, _ radius: Float) throws {
-            if radius < 0 { throw CNAError.argument("The sphere radius must be greater than or equal to zero.") }
+            // `ArgumentException(FrameworkResources.NegativeRadius)` --
+            // the message-only overload, so ParamName is nil.
+            if radius < 0 { throw CNAArgumentException(message: "Radius must be greater than 0.") }
             Center = center
             Radius = radius
         }
@@ -54,7 +56,11 @@ extension Microsoft.Xna.Framework {
 
         public static func CreateFromPoints(_ points: [Vector3]) throws -> BoundingSphere {
             guard let first = points.first else {
-                throw CNAError.argument("The point sequence must contain at least one point.")
+                // `BoundingSphereZeroPoints`. It ends with a period and
+                // `BoundingBoxZeroPoints` does not; the two are separate
+                // resources and are not interchangeable.
+                throw CNAArgumentException(
+                    message: "You should have at least one point in points.")
             }
             var minimumX = first, maximumX = first
             var minimumY = first, maximumY = first

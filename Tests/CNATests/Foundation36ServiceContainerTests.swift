@@ -45,14 +45,17 @@ extension PureValueTests {
     func testAddingTheSameTypeTwiceIsRefused() throws {
         let container = makeContainer()
         try container.AddService(ProbeService.self, provider: ProbeDerived())
-        XCTAssertThrowsError(
-            try container.AddService(ProbeService.self, provider: ProbeDerived())
+        // `ArgumentException(message, paramName)`: the resource string is the
+        // message and "type" is the parameter name, so Message composes both.
+        assertProjected(
+            CNAArgumentException.self,
+            message: composedArgumentMessage(
+                "Container already contains a service of this type.",
+                paramName: "type"),
+            paramName: "type",
+            hResult: Int32(bitPattern: 0x8007_0057)
         ) {
-            guard case CNAError.argument(let message) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(
-                message, "Container already contains a service of this type.")
+            try container.AddService(ProbeService.self, provider: ProbeDerived())
         }
     }
 
@@ -61,13 +64,18 @@ extension PureValueTests {
     // metatype cannot be nil.
     func testANullProviderIsRefused() {
         let container = makeContainer()
-        XCTAssertThrowsError(
-            try container.AddService(ProbeService.self, provider: nil)
+        // `ArgumentNullException(paramName, message)`: transposed with
+        // respect to ArgumentException's, and getting the order wrong would
+        // swap the two halves of this Message.
+        assertProjected(
+            CNAArgumentNullException.self,
+            message: composedArgumentMessage(
+                "The service provider instance cannot be null.",
+                paramName: "provider"),
+            paramName: "provider",
+            hResult: Int32(bitPattern: 0x8000_4003)
         ) {
-            guard case CNAError.argumentNull(let parameter) = $0 else {
-                return XCTFail("wrong error: \($0)")
-            }
-            XCTAssertEqual(parameter, "provider")
+            try container.AddService(ProbeService.self, provider: nil)
         }
     }
 
@@ -90,9 +98,16 @@ extension PureValueTests {
         XCTAssertThrowsError(
             try refused.AddService(ProbeDerived.self, provider: ProbeBase())
         ) {
-            guard case CNAError.argument(let message) = $0 else {
+            guard let failure = $0 as? CNAArgumentException else {
                 return XCTFail("wrong error: \($0)")
             }
+            XCTAssertTrue(Swift.type(of: failure) == CNAArgumentException.self)
+            // The assignability failure selects the MESSAGE-ONLY constructor,
+            // so unlike the two above it carries no parameter name and its
+            // Message is not composed.
+            XCTAssertNil(failure.ParamName)
+            XCTAssertEqual(failure.HResult, Int32(bitPattern: 0x8007_0057))
+            let message = failure.Message
             // The template is XNA's own, read out of its resource table; the
             // substituted names are Swift's, because Type.FullName is not part
             // of the Any.Type projection.

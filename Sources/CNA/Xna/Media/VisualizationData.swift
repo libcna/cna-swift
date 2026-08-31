@@ -88,7 +88,12 @@ extension Microsoft.Xna.Framework.Media {
         internal func store(frequencies newFrequencies: [Float], samples newSamples: [Float]) throws {
             guard newFrequencies.count == Self.sampleCount,
                   newSamples.count == Self.sampleCount else {
-                throw CNAError.argument(
+                // Deliberately CNAError and not a projected CLR exception:
+                // `store` is internal, has no XNA counterpart, and guards this
+                // binding's own producer invariant rather than a caller's
+                // argument. Projecting it as ArgumentException would put a
+                // CLR identity on a failure the CLR has no member for.
+                throw CNAError.producerInvariant(
                     "VisualizationData carries exactly \(Self.sampleCount) values")
             }
             for index in 0..<Self.sampleCount {
