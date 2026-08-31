@@ -306,6 +306,16 @@
    "operation": "Game.Exiting versus CNA's teardown notification",
    "status": "VERIFIED_NATIVE_WITH_MEASURED_RAISE_SITE",
    "evidence": "measured apart with a pure-C probe: CNA_GameCallbacks.exiting fires at cna_game_request_exit AND again at cna_game_destroy for a game that never ran, while CNA_GAME_EVENT_EXITING fires only at cna_game_request_exit. XNA raises Exiting when the game is exiting and raises nothing when a game that never ran is disposed, so the event is the mapped one and the lifecycle callback maps to nothing"
+  },
+  {
+   "operation": "IGraphicsDeviceService producer and DrawableGameComponent",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "GraphicsDeviceManager registers itself in Game.Services under both IGraphicsDeviceManager and IGraphicsDeviceService, refusing a second manager with the assembly's own GraphicsDeviceManagerAlreadyPresent message; its device comes from cna_graphics_device_manager_get_graphics_device and its four IGraphicsDeviceService events are real cna_graphics_device_manager_subscribe registrations. Game.GraphicsDevice and DrawableGameComponent resolve that service out of the container exactly as XNA does. Registering into the managed container creates no second lifecycle: CNA's native game owns the device and reads nothing from GameServiceContainer"
+  },
+  {
+   "operation": "Callback scope of a manager-supplied graphics device",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "measured with a pure-C probe: cna_graphics_device_manager_get_graphics_device answers CNA_RESULT_INVALID_STATE with a zero handle before a game runs and after it exits, and succeeds with a real handle inside a lifecycle callback. The binding's own isInsideCallback guard is therefore defence in depth over a host that already refuses"
   }
  ]
 }

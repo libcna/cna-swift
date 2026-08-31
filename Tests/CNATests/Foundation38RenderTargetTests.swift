@@ -23,7 +23,11 @@ private final class RenderTargetProbeGame: Microsoft.Xna.Framework.Game {
 
     override func LoadContent() throws {
         do {
-            try body?(self, try GraphicsDevice)
+            guard let device = try GraphicsDevice else {
+                throw CNAError.producerInvariant(
+                    "the registered graphics device service produced no device")
+            }
+            try body?(self, device)
         } catch {
             failure = error
         }

@@ -301,9 +301,42 @@ extension Microsoft.Xna.Framework {
             callbackFailureWasSurfaced = false
         }
 
-        public var GraphicsDevice: Graphics.GraphicsDevice {
-            get throws { try Graphics.GraphicsDevice.borrow(from: runtime) }
+        /// `Game.GraphicsDevice`.
+        ///
+        /// The IL resolves `IGraphicsDeviceService` out of `Services` -- caching
+        /// it in a field on the first successful lookup -- raises
+        /// `InvalidOperationException(NoGraphicsDeviceService)` when there is
+        /// none, and otherwise returns `service.GraphicsDevice`, which is
+        /// itself nullable. So the getter is fallible AND its result is
+        /// Optional, and both halves are projected.
+        ///
+        /// Before Foundation 40 this borrowed the device straight from the
+        /// host, which skipped the container entirely; a game with no
+        /// `GraphicsDeviceManager` got a device where XNA raises.
+        public var GraphicsDevice: Graphics.GraphicsDevice? {
+            get throws {
+                if graphicsDeviceService == nil {
+                    graphicsDeviceService = Services.GetService(
+                        Graphics.IGraphicsDeviceService.self)
+                        as? Graphics.IGraphicsDeviceService
+                }
+                guard let graphicsDeviceService else {
+                    throw CNAInvalidOperationException(
+                        message: Game.noGraphicsDeviceServiceMessage)
+                }
+                return graphicsDeviceService.GraphicsDevice
+            }
         }
+
+        /// `Game.graphicsDeviceService`, cached on the first successful lookup
+        /// exactly as the CLR field is.
+        private var graphicsDeviceService: Graphics.IGraphicsDeviceService?
+
+        /// The exact `NoGraphicsDeviceService` message, read out of
+        /// `Microsoft.Xna.Framework.Game.dll`'s own resource table.
+        internal static let noGraphicsDeviceServiceMessage =
+            "This property requires a graphics device service in the game "
+            + "service container."
 
         // ------------------------------------------------------------------
         // Timing and host state.

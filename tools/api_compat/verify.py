@@ -5753,36 +5753,67 @@ def protocol_witness_projection_evidence(
     source_types = {
         map_type_name(item["name"], rules): item for item in contract["types"]
     }
-    interface_name = "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector"
-    interface = source_types[interface_name]
     observed_identities = {
         f"{item['ownerType']}.{item['swiftMember']}" for item in observed
     }
+
+    # Interface lookup uses the RAW contract names, because the contract keeps
+    # `IPackedVector` and ``IPackedVector`1`` as two different types and the
+    # mapped names fold them together.
+    raw_types = {item["name"]: item for item in contract["types"]}
+
+    def open_name(direct: str) -> str:
+        """``IPackedVector`1[System.Byte]`` -> ``IPackedVector`1``."""
+        return direct.split("[", 1)[0]
+
+    def declares(interface: str, member_name: str, seen: set[str]) -> bool:
+        """Whether `interface` or any interface it inherits declares the member.
+
+        A CLR explicit implementation names the interface that DECLARES the
+        member, which for the packed-vector family is the non-generic
+        `IPackedVector` reached through ``IPackedVector`1``. Walking the
+        inheritance is what makes the rule general instead of hard-coded.
+        """
+        if interface in seen:
+            return False
+        seen.add(interface)
+        record = raw_types.get(interface)
+        if record is None:
+            return False
+        if any(item["name"] == member_name for item in record["members"]):
+            return True
+        return any(
+            declares(open_name(base), member_name, seen)
+            for base in record.get("directInterfaces", [])
+        )
+
     records: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
     for identity in rules.get("protocolWitnessMemberProjections", []):
         owner_name, member_name = identity.rsplit(".", 1)
         owner = source_types.get(owner_name)
-        requirement = next(
-            (item for item in interface["members"] if item["name"] == member_name),
-            None,
-        )
-        forcing_interfaces = [] if owner is None else [
-            item for item in owner.get("directInterfaces", [])
-            if item.startswith(
-                "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1["
-            )
+        # The forcing interface is whichever DIRECT CLR interface of the owner
+        # declares this member. The rule was written for `IPackedVector<T>` and
+        # is general: what makes a Swift witness necessary is that the CLR
+        # implemented the member explicitly -- so it is absent from the class's
+        # own public members and present on exactly one interface it declares.
+        forcing = [] if owner is None else [
+            direct for direct in owner.get("directInterfaces", [])
+            if declares(open_name(direct), member_name, set())
         ]
         declared = [] if owner is None else [
             item for item in owner["members"] if item["name"] == member_name
         ]
-        if owner is None or requirement is None or len(forcing_interfaces) != 1 or declared:
+        if owner is None or len(forcing) != 1 or declared:
             failures.append(diagnostic(
                 "UNMEASURED_STRUCTURAL_CATEGORY", identity,
-                "protocol-witness rule lacks a unique concrete owner/direct generic CLR interface, "
-                "a matching IPackedVector requirement, or absence from public declared CLR members",
+                "protocol-witness rule lacks a unique concrete owner, exactly one direct CLR "
+                "interface declaring the member, or absence from the owner's public declared "
+                "CLR members",
             ))
             continue
+        forcing_interfaces = forcing
+        interface_name = open_name(forcing[0])
         compiler_observed = identity in observed_identities
         if not compiler_observed:
             failures.append(diagnostic(

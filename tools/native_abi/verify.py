@@ -135,6 +135,7 @@ def canonical_type(value: str) -> str:
         "CNA_RenderTargetEventRegistrationHandle": "uint64_t",
         "CNA_GraphicsResourceEventRegistrationHandle": "uint64_t",
         "CNA_GameEventRegistrationHandle": "uint64_t", "CNA_GameEvent": "uint32_t",
+        "CNA_GraphicsDeviceManagerEvent": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

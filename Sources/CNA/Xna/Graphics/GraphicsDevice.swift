@@ -16,6 +16,14 @@ extension Microsoft.Xna.Framework.Graphics {
         private let generation: UInt64
         private let callbackEpoch: UInt64
 
+        /// Wraps a device handle the graphics device manager handed out.
+        ///
+        /// Both this and `borrow(from:)` produce the same callback-scoped
+        /// facade; they differ only in which route supplied the handle.
+        internal convenience init(borrowedHandle: UInt64, runtime: RuntimeState) {
+            self.init(handle: borrowedHandle, runtime: runtime)
+        }
+
         private init(handle: UInt64, runtime: RuntimeState) {
             self.handle = handle
             self.runtime = runtime

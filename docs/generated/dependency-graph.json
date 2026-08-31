@@ -23,7 +23,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 47,
+      "transitiveMissingReverseReach": 46,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -51,7 +51,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 44,
+      "transitiveMissingReverseReach": 43,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -74,7 +74,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.SpriteBatch"
       ],
-      "transitiveMissingReverseReach": 44,
+      "transitiveMissingReverseReach": 43,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -98,7 +98,7 @@
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
         "Microsoft.Xna.Framework.Graphics.SpriteBatch"
       ],
-      "transitiveMissingReverseReach": 44,
+      "transitiveMissingReverseReach": 43,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -120,7 +120,7 @@
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
         "Microsoft.Xna.Framework.Graphics.SpriteBatch"
       ],
-      "transitiveMissingReverseReach": 44,
+      "transitiveMissingReverseReach": 43,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -142,7 +142,7 @@
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
         "Microsoft.Xna.Framework.Graphics.SpriteBatch"
       ],
-      "transitiveMissingReverseReach": 44,
+      "transitiveMissingReverseReach": 43,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -161,7 +161,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 44,
+      "transitiveMissingReverseReach": 43,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -223,7 +223,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Game"
       ],
-      "transitiveMissingReverseReach": 7,
+      "transitiveMissingReverseReach": 6,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"

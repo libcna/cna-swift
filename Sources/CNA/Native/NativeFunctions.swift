@@ -98,6 +98,11 @@ internal final class NativeFunctions {
     typealias GameSetInactiveSleepTimeTicksRoute = @convention(c) (UInt64, Int64) -> UInt32
     typealias GameSubscribeRoute = @convention(c) (UInt64, UInt32, CNASwift_GameEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GameUnsubscribeRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsDeviceManagerCreateDeviceRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsDeviceManagerBeginDrawRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GraphicsDeviceManagerEndDrawRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsDeviceManagerGetGraphicsDeviceRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsDeviceManagerSubscribeRoute = @convention(c) (UInt64, UInt32, CNASwift_GameEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
 
     private static let lock = NSLock()
     private static var cached: Result<NativeFunctions, Error>?
@@ -156,6 +161,11 @@ internal final class NativeFunctions {
     let gameSetInactiveSleepTimeTicks: GameSetInactiveSleepTimeTicksRoute
     let gameSubscribe: GameSubscribeRoute
     let gameUnsubscribe: GameUnsubscribeRoute
+    let graphicsManagerCreateDevice: GraphicsDeviceManagerCreateDeviceRoute
+    let graphicsManagerBeginDraw: GraphicsDeviceManagerBeginDrawRoute
+    let graphicsManagerEndDraw: GraphicsDeviceManagerEndDrawRoute
+    let graphicsManagerGetGraphicsDevice: GraphicsDeviceManagerGetGraphicsDeviceRoute
+    let graphicsManagerSubscribe: GraphicsDeviceManagerSubscribeRoute
 
     static func load() throws -> NativeFunctions {
         lock.lock()
@@ -234,6 +244,11 @@ internal final class NativeFunctions {
         gameSetInactiveSleepTimeTicks = try library.resolve("cna_game_set_inactive_sleep_time_ticks", as: GameSetInactiveSleepTimeTicksRoute.self)
         gameSubscribe = try library.resolve("cna_game_subscribe", as: GameSubscribeRoute.self)
         gameUnsubscribe = try library.resolve("cna_game_unsubscribe", as: GameUnsubscribeRoute.self)
+        graphicsManagerCreateDevice = try library.resolve("cna_graphics_device_manager_create_device", as: GraphicsDeviceManagerCreateDeviceRoute.self)
+        graphicsManagerBeginDraw = try library.resolve("cna_graphics_device_manager_begin_draw", as: GraphicsDeviceManagerBeginDrawRoute.self)
+        graphicsManagerEndDraw = try library.resolve("cna_graphics_device_manager_end_draw", as: GraphicsDeviceManagerEndDrawRoute.self)
+        graphicsManagerGetGraphicsDevice = try library.resolve("cna_graphics_device_manager_get_graphics_device", as: GraphicsDeviceManagerGetGraphicsDeviceRoute.self)
+        graphicsManagerSubscribe = try library.resolve("cna_graphics_device_manager_subscribe", as: GraphicsDeviceManagerSubscribeRoute.self)
     }
 
     func check(_ result: UInt32, operation: String) throws {

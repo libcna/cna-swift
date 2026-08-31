@@ -116,10 +116,11 @@ final class Foundation17ProjectionTests: XCTestCase {
         XCTAssertThrowsError(try failing.BeginDraw())
         XCTAssertThrowsError(try failing.EndDraw())
 
-        // No XNA type in the binding conforms to either protocol; in
-        // particular GraphicsDeviceManager remains an untouched runtime
-        // partial and is deliberately not an IGraphicsDeviceManager.
-        XCTAssertFalse(
+        // Foundation 40 supplied the conformer XNA has:
+        // `GraphicsDeviceManager..ctor` registers itself into `Game.Services`
+        // under this very interface, so a projection where nothing conformed
+        // could not have answered `Game.GraphicsDevice`.
+        XCTAssertTrue(
             (Microsoft.Xna.Framework.GraphicsDeviceManager.self as Any)
                 is Microsoft.Xna.Framework.IGraphicsDeviceManager.Type)
     }

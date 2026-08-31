@@ -8,21 +8,21 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=145
-TARGET_MEMBERS=1801
-TOTAL_DIAGNOSTICS=245
-COMPLETE_TYPES=138
+TARGET_TYPES=146
+TARGET_MEMBERS=1818
+TOTAL_DIAGNOSTICS=236
+COMPLETE_TYPES=139
 PARTIAL_TYPES=7
-MISSING_TYPES=112
-MISSING_TYPE=112
-MISSING_MEMBER=112
+MISSING_TYPES=111
+MISSING_TYPE=111
+MISSING_MEMBER=108
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
 BASE_MAPPING_MISMATCH=0
-INTERFACE_MAPPING_MISMATCH=1
+INTERFACE_MAPPING_MISMATCH=0
 FIELD_MAPPING_MISMATCH=0
-PROPERTY_MAPPING_MISMATCH=4
+PROPERTY_MAPPING_MISMATCH=1
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
@@ -41,12 +41,12 @@ INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=115
+LANGUAGE_PROJECTION_EXCLUSIONS=118
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=11
 INHERITED_MEMBER_PROJECTIONS=1
-PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
+PROTOCOL_WITNESS_MEMBER_PROJECTIONS=29
 ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
 COLLECTION_INTERFACE_PROJECTIONS=1
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=76
-PENDING_RETURN_NULLABILITY_PROJECTIONS=293
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=10
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=77
+PENDING_RETURN_NULLABILITY_PROJECTIONS=292
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 ```
 
 ## Complete types
@@ -121,6 +121,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=10
 - `Microsoft.Xna.Framework.CurveLoopType`
 - `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.DisplayOrientation`
+- `Microsoft.Xna.Framework.DrawableGameComponent`
 - `Microsoft.Xna.Framework.GameComponent`
 - `Microsoft.Xna.Framework.GameComponentCollection`
 - `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
@@ -247,7 +248,6 @@ Expected members: 4; emitted members: 3.
 
 Expected members: 37; emitted members: 35.
 
-- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.GraphicsDevice()`: XNA can normally return null from Microsoft.Xna.Framework.Graphics.GraphicsDevice here, so the Swift return must be Optional; expected Microsoft.Xna.Framework.Graphics.GraphicsDevice?, found Microsoft.Xna.Framework.Graphics.GraphicsDevice; Swift `throws` is present instead, and a normal null result is not a failure, so throws must not stand in for it
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Window()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Content()`: mapped member is absent
 
@@ -363,11 +363,8 @@ Expected members: 16; emitted members: 4.
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 
-Expected members: 30; emitted members: 4.
+Expected members: 30; emitted members: 8.
 
-- `INTERFACE_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager`: missing protocols ['Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService', 'Microsoft.Xna.Framework.IGraphicsDeviceManager']
-- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()`: XNA can normally return null from Microsoft.Xna.Framework.Graphics.GraphicsDevice here, so the Swift return must be Optional; expected Microsoft.Xna.Framework.Graphics.GraphicsDevice?, found Microsoft.Xna.Framework.Graphics.GraphicsDevice; Swift `throws` is present instead, and a normal null result is not a failure, so throws must not stand in for it
-- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsDevice()`: CLR getter is infallible, so the Swift reader must not throw; found throws=True -- the CLR return is nullable and the getter is infallible, so the reader is `T? { get }`: a normal null must not arrive as an error
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.CanResetDevice(_:Microsoft.Xna.Framework.GraphicsDeviceInformation)`: mapped member is absent
@@ -388,10 +385,6 @@ Expected members: 30; emitted members: 4.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.SynchronizeWithVerticalRetrace()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.PreferMultiSampling()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.SupportedOrientations()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DeviceCreated()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DeviceResetting()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DeviceReset()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DeviceDisposing()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.Disposed()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DefaultBackBufferWidth()`: mapped member is absent
@@ -435,7 +428,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Design.Vector2Converter`
 - `Microsoft.Xna.Framework.Design.Vector3Converter`
 - `Microsoft.Xna.Framework.Design.Vector4Converter`
-- `Microsoft.Xna.Framework.DrawableGameComponent`
 - `Microsoft.Xna.Framework.FrameworkDispatcher`
 - `Microsoft.Xna.Framework.GameWindow`
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`

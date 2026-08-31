@@ -29,6 +29,8 @@ TEXTURE2D = ROOT / "Sources/CNA/Xna/Graphics/Texture2D.swift"
 RENDER_TARGET = ROOT / "Sources/CNA/Xna/Graphics/RenderTarget2D.swift"
 GAME = ROOT / "Sources/CNA/Xna/Framework/Game.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
+MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
+DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -222,6 +224,44 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            try game.OnExiting(game, args: CNAEventArgs.Empty)\n"
         "            // Deliberately NOT `OnExiting`.",
     ),
+    # The Foundation 40 service producer and DrawableGameComponent.
+    (
+        "manager-registers-only-one-service",
+        "the producer registered under one interface and not both", MANAGER,
+        "            try game.Services.AddService(\n"
+        "                Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService.self, provider: self)",
+        "",
+    ),
+    (
+        "duplicate-manager-accepted",
+        "a second manager admitted where XNA refuses one", MANAGER,
+        "            if game.Services.GetService(Microsoft.Xna.Framework.IGraphicsDeviceManager.self) != nil {",
+        "            if false {",
+    ),
+    (
+        "drawable-reload-guarded-by-the-one-time-flag",
+        "the device-reset reload suppressed by Initialize's guard", DRAWABLE,
+        "            deviceSubscriptions.append(deviceService.DeviceCreated.Add {\n"
+        "                [weak self] _, _ in try self?.LoadContent()\n"
+        "            })",
+        "            deviceSubscriptions.append(deviceService.DeviceCreated.Add { _, _ in })",
+    ),
+    (
+        "drawable-shares-the-game-message",
+        "the two different missing-service messages confused", DRAWABLE,
+        "        internal static let missingGraphicsDeviceServiceMessage =\n"
+        "            \"Drawable components require a graphics device service in the game \"\n"
+        "            + \"service container.\"",
+        "        internal static let missingGraphicsDeviceServiceMessage =\n"
+        "            Microsoft.Xna.Framework.Game.noGraphicsDeviceServiceMessage",
+    ),
+    (
+        "drawable-visible-raises-without-a-change",
+        "an unchanged write raising the change event", DRAWABLE,
+        "                guard visible != newValue else { return }\n"
+        "                visible = newValue",
+        "                visible = newValue",
+    ),
     (
         "host-subscriptions-leaked",
         "disposal leaving the four host subscriptions alive", GAME,
@@ -246,7 +286,7 @@ def main() -> int:
     originals = {path: path.read_text(encoding="utf-8")
                  for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
                               RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
-                              CALLBACK_STATE}}
+                              CALLBACK_STATE, MANAGER, DRAWABLE}}
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")

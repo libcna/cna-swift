@@ -78,11 +78,12 @@ final class Foundation24ProjectionTests: XCTestCase {
         XCTAssertNotNil(height)
     }
 
-    // GraphicsDeviceManager is deliberately not a conformer: its own reader is
-    // still `get throws` and non-Optional, which no `IGraphicsDeviceService`
-    // requirement can witness.
-    func testGraphicsDeviceManagerDoesNotConform() {
-        XCTAssertFalse(
+    // Foundation 40 made GraphicsDeviceManager the conformer XNA declares.
+    // Its reader is Optional and infallible now, which is what the
+    // `IGraphicsDeviceService.GraphicsDevice` requirement asks for and what the
+    // pinned evidence says the one registered implementor provides.
+    func testGraphicsDeviceManagerIsTheGraphicsDeviceServiceConformer() {
+        XCTAssertTrue(
             (Microsoft.Xna.Framework.GraphicsDeviceManager.self as Any) is Service.Type)
     }
 }

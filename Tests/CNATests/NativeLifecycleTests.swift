@@ -88,7 +88,14 @@ private final class LifecycleProbeGame: Microsoft.Xna.Framework.Game {
     override func LoadContent() throws {
         events.append("LoadContent")
         guard manager != nil else { return }
-        let device = try GraphicsDevice
+        // `Game.GraphicsDevice` resolves the graphics device SERVICE out of
+        // `Services` and returns its Optional device, exactly as XNA's getter
+        // does, so a game with no manager raises and a game with one may still
+        // report nil before the device exists.
+        guard let device = try GraphicsDevice else {
+            XCTFail("the registered graphics device service produced no device")
+            return
+        }
         viewport = try device.Viewport
         try device.Clear(.CornflowerBlue)
         observedPressedKeys = try Microsoft.Xna.Framework.Input.Keyboard.GetState().GetPressedKeys()
@@ -116,7 +123,7 @@ private final class LifecycleProbeGame: Microsoft.Xna.Framework.Game {
         drawTimings.append((gameTime.TotalGameTime, gameTime.ElapsedGameTime))
         Draws += 1
         guard let texture, let spriteBatch else { return }
-        try GraphicsDevice.Clear(.CornflowerBlue)
+        try GraphicsDevice?.Clear(.CornflowerBlue)
         try spriteBatch.Begin()
         try spriteBatch.Draw(
             texture,
@@ -151,7 +158,10 @@ private final class ResourceStressGame: Microsoft.Xna.Framework.Game {
     }
 
     override func LoadContent() throws {
-        let device = try GraphicsDevice
+        guard let device = try GraphicsDevice else {
+            XCTFail("the registered graphics device service produced no device")
+            return
+        }
         retainedBorrow = device
         for index in 0..<20 {
             let texture = try Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(
