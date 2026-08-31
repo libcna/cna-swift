@@ -1,379 +1,352 @@
 # CNA-Swift continuation handoff
 
-**Foundation Milestones 26, 27, 28 and 29 status:** COMPLETE.
+**Foundation Milestones 30 through 36: COMPLETE.** Eleven local commits, none
+pushed.
 
-The Foundation 26–29 implementation/evidence sequence consists of the six
-source/evidence commits listed below. Handoff-only correction commits may
-follow them, so this document records **no** count of unpublished commits and
-**no** current `HEAD`: any such number invalidates itself the moment the next
-documentation commit is made. Resolve both from live Git instead:
+Resolve HEAD and the unpublished count from live Git rather than from this
+file — any number written here invalidates itself the moment the next
+documentation commit is made:
 
 ```text
-git rev-list --count origin/develop..HEAD     # how many are unpublished
+git rev-list --count origin/develop..HEAD
 git log --oneline --decorate origin/develop..HEAD
 git status --short --branch
 ```
 
 | Commit | What it is |
 |---|---|
-| `f1c5370` | `BCL_AUTHORITY` — a separate, non-vacuous registry that admits the exact Microsoft `mscorlib`. Evidence: `docs/foundation-26-bcl-authority-evidence.md`. |
-| `eec4604` | The BCL base rule, `CNACollection`/`CNAReadOnlyCollection`/`CNAList`, and `GameComponentCollection` as its first XNA proof. Evidence: `docs/foundation-27-bcl-base-projection-evidence.md`. |
-| `bb10ba2` | `VisualizationData`, and the audited **stop** on `Game.Components`. Evidence: `docs/foundation-29-collection-consumer-evidence.md`. |
-| `b37911b` | The developer-path leak the package qualification caught in the generated BCL report. |
-| `abd4baf` | The README BCL section and these numbers. |
-| `d58b563` | The qualified source-archive digest, measured on the tree of `abd4baf`. |
+| `56a72e4` | The CLR exception families as real Swift `Error` classes, and eight XNA exception types. |
+| `8171fa7` | `Dictionary<K,V>` as a reference class, and `LaunchParameters`. |
+| `68527e7` | The generated report echoed the caller's absolute symbol-graph path. |
+| `31a787c` | The nullability analyser did not understand `String.IsNullOrEmpty`. |
+| `654ff5c` | `System.Attribute` and the five `ContentSerializer*` types. |
+| `eede22b` | `LaunchParameters` parses the command line; `SetItem` does not throw. |
+| `9e61538` | The managed `Game` component engine. |
+| `d9f2d93` | `GameComponent`. |
+| `1db5e83` | XNA's own resource strings pinned; eight messages corrected. |
+| `eea67d1` | `System.Type` as the Swift metatype, and `GameServiceContainer`. |
+| `8f248aa` | The support-hierarchy checks made runtime tests. |
 
-Everything at and before `b1abe20` is untouched.
+Everything at and before `7b59ceb` is untouched.
 
-## START
-
-```text
-BRANCH=develop
-HEAD == origin/develop == b1abe202a2eb239482d08a1a9f761f35e41cae4c
-WORKTREE_CLEAN=true
-TEMPLATE=86687f62c3a13ee2b59798f338fc083f7399f447
-```
-
-Verified live before any work. The starting scoreboard matched the stated
-baseline exactly (257/2964, 124 target types, 286 diagnostics, 133 missing).
-
-## The two decisions this session made
-
-### 1. BCL authority is a separate mechanism, not another registered assembly
-
-`pinned_assembly_audit.py` earns an XNA assembly its authority by reproducing
-**every contract entry it declares**. `mscorlib` declares **zero**, so that gate
-would have compared nothing and passed vacuously. It is untouched;
-`registered-assemblies.json` is unchanged and still reproduces 257 types and
-2,964 members exactly.
-
-The BCL gets `tools/api_compat/bcl-authorities.json`, audited by
-`tools/api_compat/bcl_authority_audit.py` against
-`tools/api_compat/reference/bcl40-selected-shape.json`. Admission requires all
-of:
+## START — the state this session began from, reproduced exactly
 
 ```text
-BCL_IDENTITY_CHECKS=21        exact name/version/key/token/size/sha256,
-                              the strong-name token RECOMPUTED from the
-                              assembly's own public key rather than read
-BCL_MANIFEST_CHECKS=8         reproduction of the pinned selected-shape manifest
-BCL_SENTINEL_CHECKS=125       facts stated independently of the extractor
-BCL_MUTATION_SELF_TESTS=97    mutations that must each be detected
-BCL_CROSS_CHECKS=41           monodis, an independent metadata reader
-BCL_NEGATIVE_CONTROLS=4       binaries that must be REFUSED
-BCL_AUTHORITY_STATUS=PASS
+BRANCH=develop   HEAD == origin/develop == 7b59ceb   WORKTREE_CLEAN=true
+TARGET 126/1706  TOTAL_DIAGNOSTICS 284  COMPLETE 121  MISSING_TYPE 131
+MISSING_MEMBER 130  PARTIAL 5  EXPECTED_SWIFT_MEMBERS 2887
+BCL_INHERITED_MEMBER_PROJECTIONS 16  PROPERTY_MAPPING_MISMATCH 4
+OVERLOAD_MAPPING_MISMATCH 16  NATIVE_ABI 29/91/91/18/2/214
 ```
 
-Admitted, and only because it earned it:
-
-```text
-mscorlib 4.0.0.0  token b77a5c561934e089 (recomputed)
-  sha256 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63
-  FileVersion 4.0.30319.1 (RTMRel.030319-0100), CompanyName Microsoft Corporation
-  strong-name key f:\dd\Tools\devdiv\ecmapublickey.snk, imports clr.dll + mscoree.dll
-  zero Mono./System.Private.CoreLib/MonoTODO markers
-BCL_AUTHORITY_ASSEMBLIES=1 BCL_AUTHORITY_TYPES=8 BCL_AUTHORITY_MEMBERS=94
-  bcl40-selected-shape.json
-  SHA256=ef5f2428a546b677d797b5def4c07c44e04419844418b13de9a20f61aa323f0e
-  regenerates BYTE-IDENTICALLY with and without an IL cache
-```
-
-Authority is demand-driven: `Collection\`1`, `ReadOnlyCollection\`1`, `List\`1`,
-`List\`1+Enumerator`, `IList\`1`, `ICollection\`1`, `IEnumerable\`1`,
-`IEnumerator\`1` — each with a recorded reason. `System.dll` is registered as
-**available but deliberately unadmitted**: nothing implemented consumes it.
-
-**The negative controls are what keep the gate honest.** The Mono 4.0-api
-facade is the instructive one: it is *named* `mscorlib`, declares version
-`4.0.0.0`, carries the ECMA key and token `b77a5c561934e089`, and even reports
-`FileVersion 4.0.30319.1`. It is refused by 12 of 21 checks — `CompanyName`
-`Mono development team`, no DevDiv key file, no `clr.dll`/`mscoree.dll`, and
-`MonoTODO` 352 times. "Do not use Mono as the authority" is now mechanical.
-
-### 2. A CLR BCL base class projects through real Swift inheritance
-
-```text
-System.Collections.ObjectModel.Collection`1          -> CNACollection<Element>
-System.Collections.ObjectModel.ReadOnlyCollection`1  -> CNAReadOnlyCollection<Element>
-System.Collections.Generic.List`1                    -> CNAList<Element>
-```
-
-```swift
-public final class GameComponentCollection:
-    CNACollection<any Microsoft.Xna.Framework.IGameComponent>
-```
-
-Not `Object`, not a flattened `Array`, not composition, and **not**
-`CNACollection<Any>`. The three support classes live outside
-`Microsoft.Xna.Framework`, are counted in no XNA scoreboard, and no `::System`
-namespace is fabricated.
-
-Both families are `open` classes over a reference-typed backing store, because
-both CLR wrapping constructors store the caller's list live. `CNACollection`'s
-public surface is `final` and only the four hooks are `open`, reproducing
-`mscorlib`'s `virtual final` split.
-
-## Four defects this session's own checks caught
-
-Each was found by a gate rather than by inspection, which is the point of
-having them:
-
-1. **The BCL extractor dropped every protected member.** It filtered on raw IL
-   access tokens (`family`) instead of `Parser`'s mapped spellings
-   (`protected`), so all four hooks and both `Items` properties vanished. Caught
-   by the sentinels — exactly the failure a self-agreeing manifest hides.
-2. **The shared IL cache was keyed by file stem.** Every candidate is named
-   `mscorlib.dll`, so a negative control was handed the *admitted* assembly's
-   disassembly and the Mono markers never fired. Now keyed by SHA-256, and
-   controls do not write to the cache at all.
-3. **The cross-check mis-parsed generic method names.** `monodis` renders
-   `ConvertAll<TOutput>`; the parser took the whole token. Caught by the
-   independent reader disagreeing with `ikdasm`.
-4. **The generated BCL report leaked machine-local paths.** Caught by the
-   package qualification's `DEVELOPER_PATH_LEAKS` check, which exits nonzero.
-   The audit now records only file names and digests. `1 -> 0`.
+Verified live before any work; every number matched.
 
 ## Structural scoreboard
 
 ```text
 REFERENCE_TYPES=257                  unchanged
 REFERENCE_MEMBERS=2964               unchanged
-EXPECTED_SWIFT_TYPES=257             unchanged
-EXPECTED_SWIFT_MEMBERS=2887          unchanged  (see below)
-TARGET_TYPES=126                     (124 -> 125 -> 126)
-TARGET_MEMBERS=1706                  (1696 -> 1703 -> 1706)
-TOTAL_DIAGNOSTICS=284                (286 -> 285 -> 284)
-COMPLETE_TYPES=121                   (119 -> 120 -> 121)
-MISSING_TYPE=131                     (133 -> 132 -> 131)
-MISSING_MEMBER=130                   unchanged
-PARTIAL_TYPES=5                      unchanged
+EXPECTED_SWIFT_MEMBERS=2887          unchanged
+TARGET_TYPES=142                     (126 -> 142)
+TARGET_MEMBERS=1767                  (1706 -> 1767)
+TOTAL_DIAGNOSTICS=269                (284 -> 269)
+COMPLETE_TYPES=135                   (121 -> 135)
+PARTIAL_TYPES=7                      (5 -> 7)
+MISSING_TYPE=115                     (131 -> 115)
+MISSING_MEMBER=129                   (130 -> 129)
 BASE_MAPPING_MISMATCH=2              unchanged
 INTERFACE_MAPPING_MISMATCH=1         unchanged
 PROPERTY_MAPPING_MISMATCH=4          unchanged
-OVERLOAD_MAPPING_MISMATCH=16         unchanged
+OVERLOAD_MAPPING_MISMATCH=18         (16 -> 18, the two deferred serialization ctors)
+INHERITANCE_MAPPING_MISMATCH=0       new rule, green
+LANGUAGE_MAPPING_MISMATCH=0          new check, green
 every other mismatch/leak category=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
-DEPENDENCY_COMPLETE_MISSING_TYPES=31 (32 -> 31)
 
-BCL_BASE_PROJECTIONS=5               contract types with a decided BCL base
-PROJECTED_BCL_BASE_TYPES=1           …implemented
-PENDING_BCL_BASE_TYPES=4             …still blocked, named not dropped
-BCL_INHERITED_MEMBER_PROJECTIONS=16  inherited, NOT declared, NOT an XNA identity
-BCL_SUPPORT_TYPE_MEASUREMENTS=3
-MEASURED_SUPPORT_BASE_PROJECTIONS=9  (4 -> 9)
+BCL_SUPPORT_TYPE_MEASUREMENTS=10     (3 -> 10)
+BCL_BASE_PROJECTIONS=19              (5 -> 19)
+PROJECTED_BCL_BASE_TYPES=15          (1 -> 15)
+PENDING_BCL_BASE_TYPES=4             unchanged
+BCL_INHERITED_MEMBER_PROJECTIONS=77  (16 -> 77)
+MEASURED_SUPPORT_BASE_PROJECTIONS=23 (9 -> 23)
+NAMESPACE_MARKERS=11                 (10 -> 11, Storage)
+
+BCL_RESOURCE_STRING_PROJECTIONS=8    new
+BCL_STATIC_TABLE_PROJECTIONS=1       new
+XNA_RESOURCE_STRING_PROJECTIONS=4    new
+XNA_SEALED_CLASS_PROJECTIONS=18      new
+BCL_ABSTRACT_BASE_WIDENINGS=1        new, recorded
+NONDERIVABLE_UNSEALED_CLASSES=5      new, RECORDED not diagnosed
 ```
 
-**`EXPECTED_SWIFT_MEMBERS` was not forced to 2887 — it derived to it.** The ten
-new `TARGET_MEMBERS` are the declared XNA identities of the two new types
-(`GameComponentCollection`: one constructor, four overrides, two events;
-`VisualizationData`: one constructor, two properties), every one of which was
-already in the pinned contract and already counted. The surface
-`GameComponentCollection` *inherits* is real and usable and is **not** an XNA
-identity, so it is counted once, on its own axis, as
-`BCL_INHERITED_MEMBER_PROJECTIONS=16`.
+**`EXPECTED_SWIFT_MEMBERS` did not move, and should not have.** Every new
+`TARGET_MEMBER` is a declared XNA identity that was already in the pinned
+contract and already counted. The surface those types *inherit* is real and
+usable and is not an XNA identity, so it is counted once on its own axis.
 
-## Types completed
+## Sixteen types completed
 
 ```text
-Microsoft.Xna.Framework.GameComponentCollection        7 declared + 16 inherited
-Microsoft.Xna.Framework.Media.VisualizationData        3
+Audio.InstancePlayLimitException              Content.ContentSerializerAttribute
+Audio.NoAudioHardwareException                Content.ContentSerializerCollectionItemNameAttribute
+Audio.NoMicrophoneConnectedException          Content.ContentSerializerIgnoreAttribute
+Graphics.DeviceLostException                  Content.ContentSerializerRuntimeTypeAttribute
+Graphics.DeviceNotResetException              Content.ContentSerializerTypeVersionAttribute
+Graphics.NoSuitableGraphicsDeviceException    LaunchParameters
+GameComponent                                 GameServiceContainer
 ```
+
+Two more are PARTIAL by exactly one member each —
+`Content.ContentLoadException` and `Storage.StorageDeviceNotConnectedException`
+— see the serialization note below. `Game` gained `Components`,
+`LaunchParameters` and `Services`.
+
+## The decisions this session made
+
+### 1. A CLR exception class is a Swift class conforming to `Error`
+
+```text
+System.Exception                                 ->  CNAException : Error
+System.SystemException                           ->  CNASystemException
+System.Runtime.InteropServices.ExternalException ->  CNAExternalException
+```
+
+The chain is **three links, not two**: `ExternalException`'s exact direct base
+is `SystemException`, whose constructors substitute their own message and set
+HResult `0x80131501` before `ExternalException` overwrites it with
+`0x80004005`. `CNAError` stays a separate channel, is not a `CNAException`, and
+a `catch is CNAException` does not swallow it.
+
+Selected surface: `Message`, `InnerException`, `HResult`, `HelpLink`,
+`GetBaseException`, `ExternalException.ErrorCode` — every member reconstructible
+from managed state. `StackTrace`, `Source`, `TargetSite`, `Data`,
+`GetObjectData`, `GetType` and `ToString` each need a CLR runtime service and
+are **forbidden** by the verifier rather than answered with something plausible.
+
+### 2. `Dictionary<K,V>` is a reference class with the CLR's own storage
+
+Buckets, an entry array, a free list and a version counter, so the observable
+behaviour follows from the algorithm: a removed slot is reused by the next
+insertion, the free list is last-freed-first, and clearing an already empty
+dictionary does not invalidate an enumerator.
+
+The fact that settles the hash question: **an entry's index comes from `count++`
+or the free list, never from its hash**, so enumeration order is reproducible
+without reproducing a single CLR hash code. A caller-supplied comparer is exact,
+including that one whose hash disagrees with its equality cannot find its own
+entries.
+
+### 3. `System.Attribute` — the base carries identity, not members
+
+Its public surface is overwhelmingly reflection and is forbidden. The one
+widening is recorded: Swift has neither `abstract` nor `protected`, so
+`CNAAttribute()` compiles where `new Attribute()` does not.
+
+### 4. `System.Type` is the Swift metatype
+
+The contract names it in **twenty-four positions and calls a member on it in
+none**, so the selected surface is identity and assignability — and
+`_openExistential` reproduces `Type.IsAssignableFrom` exactly, including
+protocol conformance and class inheritance. Probed before the decision, not
+after.
+
+### 5. The `Game` base bodies own the managed component semantics
+
+`Initialize`, `Update` and `Draw` are no longer empty. The `LoadContent`
+dispatch question was answered by **measuring the host**:
+
+```text
+RunOneFrame  Initialize, LoadContent, Update, Draw, UnloadContent
+Run          Initialize, LoadContent, BeginRun, Update, EndRun, UnloadContent
+```
+
+which is XNA's `RunGame` sequence exactly, so the native `load_content`
+callback **is** the projection of the `LoadContent()` call inside
+`Game.Initialize()`. One occurrence, one invocation. The measurement is a
+permanent test.
+
+## Defects this session's own gates caught
+
+1. **The IL parser silently merged two types.** `skip_block` stopped only on
+   `ikdasm`'s commented method close, but a `pinvokeimpl … preservesig` body
+   closes with a bare `}` — so `System.Exception` absorbed all of
+   `System.ValueType`. Now brace-depth aware, with a minimised fixture.
+   `AUDIT_SELF_TESTS` 60 → 64; the XNA contract still reproduces 257/2964.
+2. **The nullability analyser did not understand `String.IsNullOrEmpty`.** A
+   field read on the branch reachable only when the field is *not* null was
+   reported nullable. Six verdicts moved, every one checked against the CIL by
+   hand. `RETURN_NULLABILITY_SELF_TESTS` 115 → 118.
+3. **`LaunchParameters` did not parse the command line.** The first version of
+   Foundation 31 implemented `.ctor()` as a bare `base..ctor()` and recorded
+   "nothing here fabricates launch data" as a virtue — but an empty collection
+   *is* the fabrication. Caught by its own new test under the real runner.
+4. **Eight XNA messages were transcribed rather than read.** One differed by a
+   whole clause and a double space. XNA's resource strings are now pinned and
+   compared exactly as the BCL ones are.
+5. **A generated report echoed the caller's absolute path.** Normalised.
+6. **Two mutation helpers were no-ops on `System.Attribute`**, substituting
+   `System.Object` for `System.Object`. Fixed for every subject.
+7. **Nine `is` tests the compiler could answer statically**, caught by
+   warnings-as-errors. Now runtime checks through `Any`.
+
+## Deliberately deferred, with named blockers
+
+| What | Blocked by |
+|---|---|
+| `ContentLoadException` / `StorageDeviceNotConnectedException` protected `(SerializationInfo, StreamingContext)` ctor | `System.Type`, `IDictionary` and a deserialization runtime; Swift has no `protected`, so a projection would be publicly callable and would return an exception carrying none of the serialized state |
+| `DrawableGameComponent` | `IGraphicsDeviceService` resolved out of `Game.Services`; nothing fabricates a graphics service producer |
+| `Game.Content`, `Game.Window`, timing and activation members | `ContentManager`, `GameWindow`, unbound host state |
+| `Data`, `StackTrace`, `Source`, `TargetSite`, `ToString`, `GetObjectData` on the exception family | CLR runtime services; forbidden by the verifier, not merely absent |
+| XNA's `LoadContent` conditions | `IGraphicsDeviceService`; see below |
+
+### The `LoadContent` differences, and the guard that was removed
+
+Two remain, both needing `IGraphicsDeviceService`:
+
+- XNA calls `LoadContent` only when a graphics device service and device exist;
+  here the host decides, so a game with no `GraphicsDeviceManager` still gets it;
+- XNA's `LoadContent` fires from *inside* the base `Initialize`, so an override
+  that skips `super` never receives it; here it always does.
+
+A flag gating the callback on the base body having run **was implemented and
+then removed**. It fixes the second and would also suppress the device-reset
+reload XNA issues through the handlers `HookDeviceEvents` installs — behaviour
+this host has not been measured for. Trading a known divergence for an
+unmeasured one is not an improvement. Worth knowing: the flag *worked*, and
+broke the 60-frame canary, whose probe overrides `Initialize` without calling
+`super` — precisely the XNA footgun it reproduces.
+
+## Recommended next frontier, in value order
+
+### 1. The BCL exception payload conversion — named three times, still open
+
+`CNAList`, `CNACollection`, `CNADictionary`, `GameComponentCollection` and
+`GameServiceContainer` all report CLR-shaped failures through `CNAError`. The
+**messages** are now exact; the exception **classes** are not. Foundation 30
+made `ArgumentException`, `ArgumentNullException`,
+`ArgumentOutOfRangeException`, `NotSupportedException`,
+`InvalidOperationException` and `KeyNotFoundException` projectable, and
+converting one support type while leaving the others would make the layer
+inconsistent — so it is one milestone across all of them.
+
+`CNAError` has accreted `argumentNull` and `keyNotFound` in the meantime; that
+conversion is where they come back out.
+
+### 2. `NONDERIVABLE_UNSEALED_CLASSES=5`
+
+```text
+GameTime  GraphicsDevice  SpriteBatch  Texture2D  GraphicsDeviceManager
+```
+
+XNA leaves all five derivable and this projection has sealed them.
+**`Texture2D` is the one that matters: `RenderTarget2D` derives from it**, so
+that type is inexpressible while it is `final`. Unsealing a public class is an
+API decision of its own, which is why the rule records this direction rather
+than diagnosing it.
+
+### 3. `System.ComponentModel.TypeConverter` and the fourteen `Design` converters
+
+`System.Type` is now decided, which was half the blocker.
+`ExpandableObjectConverter` and `System.dll` — still registered as available
+but deliberately unadmitted — are the other half. `System.dll`'s admission
+needs the same non-vacuous standards `mscorlib` met.
+
+### 4. `Game`'s remaining partial members
+
+`Tick`, `SuppressDraw`, `ResetElapsedTime`, `IsFixedTimeStep`,
+`TargetElapsedTime`, `IsMouseVisible`, `InactiveSleepTime`, `IsActive`,
+`Dispose(bool)`, `ShowMissingRequirementMessage` and the four events. Several
+need host state that is not bound; several are pure managed state.
 
 ## Qualified environment and gates
 
 ```text
 SWIFT_VERSION=6.0.3   SWIFT_TARGET=x86_64-pc-linux-gnu   TOOLS_VERSION=5.9
 DEBUG_BUILD=PASS                RELEASE_BUILD=PASS
-DEBUG_TESTS=318 PASS            RELEASE_TESTS=318 PASS
-NATIVE_TESTS=318 PASS (0 skipped, CNA_NATIVE_LIBRARY set)
+DEBUG_TESTS=406 PASS            RELEASE_TESTS=406 PASS
+NATIVE_TESTS included (CNA_NATIVE_LIBRARY set); 0 skipped
 WARNINGS_AS_ERRORS=PASS_DEBUG_AND_RELEASE_INCLUDING_TESTS (forced full rebuild)
-SYMBOL_GRAPH=PASS
-API_SELF_TESTS=2288 PASS        (2197 -> 2288)
-SYMBOL_GRAPH_SELF_TESTS=17 PASS
-BCL_AUTHORITY_STATUS=PASS       21/125/8/97/41 checks, 4 controls refused
+SYMBOL_GRAPH=PASS               SYMBOL_GRAPH_SELF_TESTS=17 PASS
+API_SELF_TESTS=2390 PASS        (2288 -> 2390)
+AUDIT_SELF_TESTS=64 PASS        (60 -> 64)
+RETURN_NULLABILITY_SELF_TESTS=118 PASS   (115 -> 118)
+BCL_AUTHORITY_STATUS=PASS
+    21 identity / 314 sentinel / 28 manifest / 346 mutation / 91 cross-check
+    8 resource / 1 static table / 4 negative controls, all refused
+    19 types, 205 members   (8 types, 94 members)
 PINNED_ASSEMBLY_AUDIT=257_TYPES/2964_MEMBERS CALIBRATION=PASS
-AUDIT_SELF_TESTS=60 PASS
+    RESOURCE_STRING_CHECKS=8 RESOURCE_STRINGS_REPRODUCED=4
 NORMAL_STRICT=EXPECTED_RED_DEFERRED_PROFILE_ONLY
 LEAK_ONLY=PASS
-PURE_XNA_DERIVED=1861/1861/0    (1768 -> 1861)
-PURE_BCL_DERIVED=77/77/0        new, separate authority
-SWIFT_ASAN=PASS_318_TESTS_DETECT_LEAKS_DISABLED
-SWIFT_TSAN=8_RUNS_0_RACES_0_FAILURES   (see below)
+PURE_XNA_DERIVED=2002/2002/0    (1861 -> 2002)
+PURE_BCL_DERIVED=210/210/0      (77 -> 210)
+SWIFT_ASAN=PASS_406_TESTS_DETECT_LEAKS_DISABLED
+SWIFT_TSAN=3_RUNS_0_RACES_0_FAILURES   tsan-1..3.log captured unfiltered
 NATIVE_ABI=29/91/91/18/2/214 MISSING=0/0 MISMATCHES=0   unchanged
 NATIVE_STRESS=GAME_CYCLES=20 GAME_RECREATION_CYCLES=20 TEXTURE2D_CYCLES=20
     SPRITEBATCH_CYCLES=20 CALLBACK_ERROR_CYCLES=20 GAMEPAD_GET_STATE_CYCLES=50
     GAMEPAD_CAPABILITIES_CYCLES=20 NATIVE_CRASHES=0 OBSERVED_UAF=0
     OBSERVED_DOUBLE_FREE=0 MODE_FAILURES=0
 GAMEPAD_NATIVE=0 FAILURES HARDWARE_AVAILABLE=NO
-SOURCE_ARCHIVE=274 entries DETERMINISTIC=YES
-    SHA256=5c675df6bac26f7d186fccd9db727038bf6dcdc575dcb53b07b5a1badeb04b23
-    measured on the tree of commit abd4baf; handoff-only commits after it
-    change this file and therefore the digest, so re-measure rather than assume
+SOURCE_ARCHIVE=307 entries DETERMINISTIC=YES
+    SHA256=fdcfe7f4c280a0f9dc7021e9836660924747684ff99653c8a3e38e2ad4cb94b8
+    measured on the tree of 8f248aa; handoff-only commits after it change this
+    file and therefore the digest, so re-measure rather than assume
 ISOLATED_CONSUMER=DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS
-    REJECTED_NEGATIVE_CONSUMERS=11  (4 -> 11)
+    REJECTED_NEGATIVE_CONSUMERS=11
     FORBIDDEN_ENTRIES=0 NATIVE_LIBRARIES=0 MICROSOFT_REFERENCE_BINARIES=0
     DEVELOPER_PATH_LEAKS=0
-TEMPLATE=86687f62c3a13ee2b59798f338fc083f7399f447 UNCHANGED WORKTREE_CLEAN
-    debug 60 -> updates=60 draws=60 viewport=800x480 texture=128x128
-    release 600 -> updates=600 draws=600 viewport=800x480 texture=128x128
 GIT_DIFF_CHECK=CLEAN
 ```
 
-The native evidence library is the pinned
-`NATIVE_LIBRARY_SHA256=42e099146bf3b470f82fd963a516f8bdd7ff0406da8c37dd53747699117db086`.
-Its matching ABI 0.7.0 headers are `~/deps/cna-c-abi-0.7.0/include` — the
-`cnanext` working tree has moved past 0.7.0 and its header now fails the
-probe's `_Static_assert`. The Foundation 20 warnings-as-errors caveat still
-holds: the gate is meaningful only after
-`find Sources Tests -name '*.swift' -exec touch {} +`, and release additionally
-needs `-Xswiftc -enable-testing`.
-
-### TSan — the historical flake did NOT recur, and was hunted for
-
-Eight full-suite ThreadSanitizer executions, **all output captured unfiltered**
-to `tsan-1..8.log`. Every one: 318 tests, `0 failures`, and zero
-`WARNING: ThreadSanitizer` lines. Runs 5 and 6 were executed under **deliberate
-concurrent native load** — six back-to-back 600-frame release template canaries
-in a second process — which is the condition under which the previous session's
-single unidentified XCTest failure appeared. It did not reproduce. The previous
-session's caveat is not being rewritten: that run happened, its output was
-filtered, and its failing case was never captured. This session simply failed to
-reproduce it in eight tries, two of them adversarial.
-
-## What was audited and deliberately NOT done
-
-### `Game.Components` — authorized, audited, and stopped
-
-The limited authorization was taken up. `Game::get_Components` is a bare field
-read and the field is assigned once, in `Game..ctor` at `IL_009b`. That much is
-trivially safe. **Its reachable contract is not.**
-
-The same constructor immediately subscribes two private handlers to the
-collection's events, and those handlers are the machinery:
+### Pinned reference digests
 
 ```text
-GameComponentAdded    inRun ? component.Initialize() : notYetInitialized.Add(c)
-                      IUpdateable -> BinarySearch updateableComponents by
-                                     UpdateOrderComparer.Default, insert sorted,
-                                     subscribe UpdateableUpdateOrderChanged
-                      IDrawable   -> the same for drawableComponents
-GameComponentRemoved  reverses all three
+bcl40-selected-shape.json               52b98a96a506b132…
+xna40-selected-resource-strings.json    699aab9e8d3de992…   new this session
+xna40-reference-return-nullability.json 1b95bce92cd67e02…   regenerated
 ```
 
-and `updateableComponents` / `drawableComponents` are exactly what the **base
-bodies** of `Game.Update` and `Game.Draw` iterate, while `Game.Initialize`'s
-base body drains `notYetInitialized` and then calls `LoadContent()`.
+### The ASan leak observation, stated rather than buried
 
-In CNA-Swift those three members are **already implemented**, as
-`open func … throws {}` — empty — over a native-owned loop. So:
+Leak detection is disabled in the gate, as it was before. With it **enabled**,
+LeakSanitizer reports allocations from `libXCTest` and from the native library,
+scaling exactly with the test count (406 objects). **No leak trace enters a CNA
+source frame**, including the `GameComponent` parent cycle, which the tests
+break through `Dispose`. That is an observation, not a claim that the binding
+leaks nothing.
 
-- `Components` alone would let a consumer write `game.Components.Add(c)` and get
-  no `Initialize`, no `Update`, no `Draw` and no error. A silent lie, and the
-  same class of fabrication the Foundation 25 audit rejected 28 members for;
-- making it honest means changing the base bodies of three **already-implemented
-  public members**, which is outside the authorization and is a new public
-  decision of its own: `super.Update(gameTime)` would change meaning for every
-  existing CNA subclass;
-- `Game.Initialize`'s body ends in `LoadContent()`, which CNA's native host
-  already drives through its own callback — transcribing it would double-call.
-
-`inRun` is *not* the blocker: `begin_run`/`end_run` are wired, so the flag is
-observable. The blocker is the three empty base bodies and native loop
-ownership.
-
-`GameComponent` follows it unchanged: its own IL is pure managed, but
-`Dispose(bool)` unregisters from `Game.Components`. Neither was implemented,
-and `DrawableGameComponent` was not touched.
-
-### Undecided BCL families — deliberately still undecided
+### The native evidence library is NOT the previously pinned one
 
 ```text
-System.Exception / ExternalException    8 XNA exception types
-System.Attribute                        5 ContentSerializer* types
-System.Collections.Generic.Dictionary`2 LaunchParameters
-System.ComponentModel.ExpandableObjectConverter  MathTypeConverter
-System.IO.BinaryReader                  ContentReader
+used     ~/deps/cna-c-abi-0.7.0/libcna_c_api.so
+         c62949d23d3745964f5e557a06665875621ed4cb6e2930e3f282afd5911f2dcb
+pinned   42e099146bf3b470f82fd963a516f8bdd7ff0406da8c37dd53747699117db086
 ```
 
-Each still reports `UNMEASURED_STRUCTURAL_CATEGORY` if anything implements it,
-and a self-test enforces that every *measured* generic support base has an
-admitted BCL family behind it — so a base cannot be declared decided without an
-authority. Admitting the binary that declares `System.Exception` decided nothing
-about whether projected XNA exceptions conform to Swift `Error`, inherit from a
-support class, or interact with `CNAError`.
-
-### Re-audited collection consumers, still deferred
-
-| Type | Now blocked by |
-|---|---|
-| `Graphics.GraphicsAdapter` | display enumeration (hardware) |
-| `Audio.Microphone` | capture-device enumeration (hardware) |
-| `Graphics.SpriteFont` | loaded content |
-| `Audio.RendererDetail` | a `GetHashCode` the CLR leaves unspecified |
-| the four `Model*Collection` | element types bottoming out at `Effect`/`GraphicsResource`/`GraphicsDevice` |
-
-In each the BCL base is no longer the blocker. No producer was fabricated.
-
-## Recommended next frontier, in value order
-
-### 1. `System.Exception` — the largest remaining decision, 8 types
-
-The mechanism is built and general; this is purely a **public API decision**,
-and it is genuinely cross-cutting:
-
-- do projected XNA exception classes conform to Swift `Error`?
-- do they inherit from a `CNAException` support class the way collections
-  inherit `CNACollection`, and if so does that class conform to `Error`?
-- how do they interact with the existing `CNAError` enum, which is what every
-  implemented member throws today?
-- does anything already-implemented change its `throws` payload?
-
-The last question is the sharp one: making `DeviceLostException` a real thrown
-type would change what existing members throw. Register the family in
-`bcl-authorities.json` (the registry is designed to take it), then decide.
-
-### 2. `Dictionary<K,V>` — one type, but its own semantics
-
-`LaunchParameters` is the only consumer. Needs comparer, enumerator, nested
-collection and exception-behaviour decisions of its own.
-
-### 3. `Game.Components` + the component dispatch loop
-
-Not a BCL question any more — a **`Game` runtime** question. It needs explicit
-authorization to change the base bodies of `Game.Initialize`, `Game.Update` and
-`Game.Draw`, and a decision about `LoadContent` double-dispatch against the
-native host. `GameComponent` and `DrawableGameComponent` follow immediately
-once it is decided.
-
-### 4. CLR abstract class members
-
-`GameWindow` has nine `abstract` public members. Swift has no abstract member,
-and every one of them also needs a real window system. Doubly blocked.
+**The previously pinned binary no longer exists anywhere on this machine** — it
+lived under the system temporary directory and was lost. The library used is
+the shared reproduced build documented in
+`~/deps/cna-c-abi-0.7.0-pinned-foundation11/PROVENANCE.md` as ABI- and
+behaviour-equivalent on the exercised surface but **not** byte-identical to the
+admitted artifact. It reproduces the pinned ABI numbers exactly
+(29/91/91/18/2/214, zero missing, zero mismatches) and every stress and gamepad
+number. `docs/native-abi.md` still records the old digest and has not been
+rewritten, because that measurement did happen; this note is the correction.
 
 ## Registered inputs
 
 Unchanged. The seven XNA assemblies still reproduce 257 types / 2,964 members
-exactly and live in
-`/rv/tmp/samples/SAMPLE-017-CollisionSample_4_0/xna4-build/bin` (Framework,
-Graphics, Game, Input.Touch) and
-`/rv/tmp/samples/_tools/xna-game-studio-4-refresh/admin/Program Files/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86`
-(Xact, Video, Storage). The BCL binaries are in the `~/.wine-cna-xna40` prefix.
-`ikdasm`, `monodis`, `mono` and `swift` 6.0.3 (at
-`/tmp/cna-swift-toolchain-6.0.3`) are all present. **No required input or
-package is missing.**
+exactly. `mscorlib` `5634668d…acc63` is still the sole admitted BCL authority;
+`System.dll` is still available and deliberately unadmitted. `ikdasm`,
+`monodis`, `mono` and Swift 6.0.3 at `/tmp/cna-swift-toolchain-6.0.3` are all
+present. **No required input or package is missing.**
 
-`~/deps/xna-il-cache/` is shared with other sessions and is a convenience, never
-an authority: the BCL audit re-hashes what it is pointed at, keys its cache by
-digest, and the byte-identical manifest regeneration was also run with no cache.
-
-One archiving detail worth knowing, because it looks like non-determinism and
-is not: `swift package archive-source` names the archive's **root directory
-after the output file**, so `--output a1.zip` and `--output a2.zip` of the same
-tree differ in every entry path and therefore in digest. Archive to a fixed
-`CNA.zip` name (in different directories if you need two) and the bytes are
-identical — verified twice this session, same tree, same 274 entries, same
-digest.
+`~/deps/xna-il-cache/` now holds digest-keyed disassemblies alongside the older
+stem-keyed ones. Prefer the digest-keyed form: two different `mscorlib.dll`
+files have the same stem, and a name-keyed cache once handed a negative control
+the admitted assembly's IL.
 
 ```text
 SELECTED_ONLY=false
