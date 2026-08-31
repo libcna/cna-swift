@@ -477,3 +477,160 @@ private final class RemovingComponent:
         try game.Components.Remove(component)
     }
 }
+
+// ----------------------------------------------------------------------
+// `Microsoft.Xna.Framework.GameComponent` itself, transcribed from the same
+// assembly. It is the payoff of the engine above: an ordinary XNA component
+// added to `Game.Components` and driven by it.
+// ----------------------------------------------------------------------
+
+private final class CountingComponent: Microsoft.Xna.Framework.GameComponent {
+    private(set) var initializeCount = 0
+    private(set) var updateCount = 0
+    let name: String
+    let log: ProbeComponent.Log
+
+    init(_ name: String, log: ProbeComponent.Log,
+         game: Microsoft.Xna.Framework.Game) {
+        self.name = name
+        self.log = log
+        super.init(game: game)
+    }
+
+    override func Initialize() throws {
+        initializeCount += 1
+        log.entries.append("init:\(name)")
+    }
+
+    override func Update(_ gameTime: Microsoft.Xna.Framework.GameTime) throws {
+        updateCount += 1
+        log.entries.append("update:\(name)")
+    }
+}
+
+extension GameComponentEngineTests {
+    // `.ctor` sets `enabled = true` before the base call and leaves
+    // `updateOrder` at its zero value, and `get_Game` is a bare field read.
+    func testGameComponentDefaults() throws {
+        let game = try makeGame()
+        defer { try? game.Dispose() }
+        let component = Microsoft.Xna.Framework.GameComponent(game: game)
+        XCTAssertTrue(component.Enabled, "a component starts enabled")
+        XCTAssertEqual(component.UpdateOrder, 0)
+        XCTAssertTrue(component.Game === game)
+    }
+
+    // Both setters compare first: assigning the same value raises nothing, so
+    // a no-op assignment does not make the game re-sort its list.
+    func testGameComponentSettersRaiseOnlyOnARealChange() throws {
+        let game = try makeGame()
+        defer { try? game.Dispose() }
+        let component = Microsoft.Xna.Framework.GameComponent(game: game)
+        var enabledRaises = 0
+        var orderRaises = 0
+        _ = component.EnabledChanged.Add { _, _ in enabledRaises += 1 }
+        _ = component.UpdateOrderChanged.Add { _, _ in orderRaises += 1 }
+
+        component.Enabled = true
+        component.UpdateOrder = 0
+        XCTAssertEqual(enabledRaises, 0, "assigning the same value raises nothing")
+        XCTAssertEqual(orderRaises, 0)
+
+        component.Enabled = false
+        component.UpdateOrder = 7
+        XCTAssertEqual(enabledRaises, 1)
+        XCTAssertEqual(orderRaises, 1)
+
+        component.Enabled = false
+        XCTAssertEqual(enabledRaises, 1)
+    }
+
+    // `OnEnabledChanged` ignores the sender it is handed and raises with
+    // `this`. The parameter is part of the signature and not of the behaviour.
+    func testOnChangedHandlersRaiseWithTheComponentAsSender() throws {
+        let game = try makeGame()
+        defer { try? game.Dispose() }
+        let component = Microsoft.Xna.Framework.GameComponent(game: game)
+        var observed: AnyObject?
+        _ = component.EnabledChanged.Add { sender, _ in
+            observed = sender as AnyObject
+        }
+        try component.OnEnabledChanged("a different sender",
+                                       args: CNAEventArgs.Empty)
+        XCTAssertTrue(observed === component)
+    }
+
+    // The whole point: a GameComponent added to Components is driven by the
+    // engine, in UpdateOrder sequence and only while Enabled.
+    func testGameComponentsAreDrivenByTheEngine() throws {
+        let game = try makeGame()
+        defer { try? game.Dispose() }
+        let log = ProbeComponent.Log()
+        let second = CountingComponent("second", log: log, game: game)
+        second.UpdateOrder = 20
+        let first = CountingComponent("first", log: log, game: game)
+        first.UpdateOrder = 10
+
+        try game.Components.Add(second)
+        try game.Components.Add(first)
+        try game.Initialize()
+        XCTAssertEqual(log.entries, ["init:second", "init:first"])
+
+        log.entries = []
+        try game.Update(Microsoft.Xna.Framework.GameTime())
+        XCTAssertEqual(log.entries, ["update:first", "update:second"])
+
+        // Changing the order through the real property raises the real event,
+        // which is what the engine listens to.
+        log.entries = []
+        first.UpdateOrder = 30
+        try game.Update(Microsoft.Xna.Framework.GameTime())
+        XCTAssertEqual(log.entries, ["update:second", "update:first"])
+
+        log.entries = []
+        second.Enabled = false
+        try game.Update(Microsoft.Xna.Framework.GameTime())
+        XCTAssertEqual(log.entries, ["update:first"])
+    }
+
+    // `Dispose(true)` removes the component from `Game.Components` -- which
+    // drives `GameComponentRemoved` and stops the updates -- and raises
+    // `Disposed` AFTER the removal, so a handler sees a component the game has
+    // already let go of.
+    func testDisposeRemovesFromComponentsAndThenRaisesDisposed() throws {
+        let game = try makeGame()
+        defer { try? game.Dispose() }
+        let log = ProbeComponent.Log()
+        let component = CountingComponent("a", log: log, game: game)
+        try game.Components.Add(component)
+        try game.Update(Microsoft.Xna.Framework.GameTime())
+        XCTAssertEqual(component.updateCount, 1)
+
+        var countAtRaise: Int32 = -1
+        _ = component.Disposed.Add { _, _ in
+            countAtRaise = game.Components.Count
+        }
+        try component.Dispose()
+        XCTAssertEqual(game.Components.Count, 0)
+        XCTAssertEqual(countAtRaise, 0,
+                       "Disposed is raised after the removal, not before")
+
+        try game.Update(Microsoft.Xna.Framework.GameTime())
+        XCTAssertEqual(component.updateCount, 1, "a disposed component stops")
+    }
+
+    // `Dispose(false)` is the finalizer path and does nothing at all.
+    func testDisposeFalseDoesNothing() throws {
+        let game = try makeGame()
+        defer { try? game.Dispose() }
+        let log = ProbeComponent.Log()
+        let component = CountingComponent("a", log: log, game: game)
+        try game.Components.Add(component)
+        var raised = false
+        _ = component.Disposed.Add { _, _ in raised = true }
+
+        try component.Dispose(false)
+        XCTAssertEqual(game.Components.Count, 1, "the finalizer path removes nothing")
+        XCTAssertFalse(raised)
+    }
+}

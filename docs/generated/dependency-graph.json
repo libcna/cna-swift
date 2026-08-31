@@ -23,7 +23,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 51,
+      "transitiveMissingReverseReach": 50,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -85,7 +85,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Game"
       ],
-      "transitiveMissingReverseReach": 8,
+      "transitiveMissingReverseReach": 7,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
@@ -116,6 +116,22 @@
       "transitivePartialReverseReach": []
     },
     {
+      "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Audio.AudioEmitter",
+        "Microsoft.Xna.Framework.Audio.AudioListener",
+        "Microsoft.Xna.Framework.Audio.SoundState"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+        "Microsoft.Xna.Framework.Audio.SoundEffect"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 2,
+      "transitivePartialReverseReach": []
+    },
+    {
       "type": "Microsoft.Xna.Framework.GameServiceContainer",
       "dependencies": [],
       "dependencyComplete": true,
@@ -123,7 +139,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Game"
       ],
-      "transitiveMissingReverseReach": 3,
+      "transitiveMissingReverseReach": 2,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
@@ -140,27 +156,11 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Game"
       ],
-      "transitiveMissingReverseReach": 3,
+      "transitiveMissingReverseReach": 2,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
       ]
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Audio.AudioEmitter",
-        "Microsoft.Xna.Framework.Audio.AudioListener",
-        "Microsoft.Xna.Framework.Audio.SoundState"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
-        "Microsoft.Xna.Framework.Audio.SoundEffect"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 2,
-      "transitivePartialReverseReach": []
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.Cue",
