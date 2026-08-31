@@ -42,7 +42,23 @@ private func dispatchLifecycle(
         guard let game = runtime.game else { throw CNAError.disposedObject("Game") }
         switch phase {
         case .initialize: try game.Initialize()
-        case .loadContent: try game.LoadContent()
+        case .loadContent:
+            // The CNA host issues this immediately after `initialize`, and it
+            // is the projection of the `LoadContent()` call XNA makes at the
+            // end of `Game.Initialize()`. Assigning that one semantic
+            // invocation to this one callback path is what keeps the
+            // invariant: one XNA lifecycle occurrence, one virtual
+            // invocation. It is why `Game.Initialize`'s base body does NOT
+            // call `LoadContent` -- doing both would give a consumer two.
+            //
+            // Two differences remain, and both need `IGraphicsDeviceService`,
+            // which is not projected, to close. They are recorded in
+            // `Game.Initialize`'s documentation rather than half-reproduced
+            // with a flag, because a flag that suppressed this callback would
+            // also suppress a device-reset reload -- which XNA does issue,
+            // through the handlers `HookDeviceEvents` installs, and which
+            // this host's behaviour has not been measured for.
+            try game.LoadContent()
         case .update: try game.Update(runtime.gameTime(from: nativeTime))
         case .draw: try game.Draw(runtime.gameTime(from: nativeTime))
         case .unloadContent: try game.UnloadContent()

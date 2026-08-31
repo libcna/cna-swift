@@ -279,12 +279,12 @@ private final class GamePadThreadProbeGame: Microsoft.Xna.Framework.Game {
 }
 
 final class NativeLifecycleTests: XCTestCase {
-    private var nativeConfigured: Bool {
+    internal var nativeConfigured: Bool {
         guard let value = ProcessInfo.processInfo.environment["CNA_NATIVE_LIBRARY"] else { return false }
         return value.hasPrefix("/") && FileManager.default.fileExists(atPath: value)
     }
 
-    private func requireNative() throws {
+    internal func requireNative() throws {
         if !nativeConfigured { throw XCTSkip("set CNA_NATIVE_LIBRARY to an exact ABI-0.7 library") }
     }
 
@@ -556,5 +556,85 @@ final class NativeLifecycleTests: XCTestCase {
             "hasRightVibrationMotor": value.HasRightVibrationMotor,
             "hasVoiceSupport": value.HasVoiceSupport,
         ]
+    }
+}
+
+// The exact order in which the native host issues its lifecycle callbacks.
+//
+// This is not a projection question and it cannot be answered from XNA's IL:
+// it is a fact about the CNA host, and the LoadContent dispatch decision turns
+// on it. It is measured rather than assumed.
+private final class OrderRecordingGame: Microsoft.Xna.Framework.Game {
+    nonisolated(unsafe) static var order: [String] = []
+
+    override func Initialize() throws {
+        OrderRecordingGame.order.append("Initialize")
+        try super.Initialize()
+    }
+    override func LoadContent() throws {
+        OrderRecordingGame.order.append("LoadContent")
+    }
+    override func BeginRun() throws {
+        OrderRecordingGame.order.append("BeginRun")
+    }
+    nonisolated(unsafe) static var exitAfterFirstUpdate = false
+
+    override func Update(_ gameTime: Microsoft.Xna.Framework.GameTime) throws {
+        OrderRecordingGame.order.append("Update")
+        try super.Update(gameTime)
+        if OrderRecordingGame.exitAfterFirstUpdate { try Exit() }
+    }
+    override func Draw(_ gameTime: Microsoft.Xna.Framework.GameTime) throws {
+        OrderRecordingGame.order.append("Draw")
+        try super.Draw(gameTime)
+    }
+    override func EndRun() throws {
+        OrderRecordingGame.order.append("EndRun")
+    }
+    override func UnloadContent() throws {
+        OrderRecordingGame.order.append("UnloadContent")
+    }
+}
+
+extension NativeLifecycleTests {
+    func testNativeCallbackOrderIsMeasuredNotAssumed() throws {
+        try requireNative()
+        OrderRecordingGame.order = []
+        let game = try OrderRecordingGame()
+        try game.RunOneFrame()
+        try game.Dispose()
+        print("CNA_CALLBACK_ORDER=\(OrderRecordingGame.order)")
+
+        // LoadContent must be issued exactly once per lifecycle. The whole
+        // point of resolving the dispatch question is that a consumer never
+        // sees it twice.
+        XCTAssertEqual(
+            OrderRecordingGame.order.filter { $0 == "LoadContent" }.count, 1,
+            "one XNA lifecycle occurrence must be one virtual invocation")
+        XCTAssertEqual(
+            OrderRecordingGame.order.filter { $0 == "Initialize" }.count, 1)
+
+        // Initialize precedes LoadContent, which is XNA's order: the base
+        // Initialize is where XNA calls LoadContent from.
+        let initializeAt = OrderRecordingGame.order.firstIndex(of: "Initialize")
+        let loadAt = OrderRecordingGame.order.firstIndex(of: "LoadContent")
+        XCTAssertNotNil(initializeAt)
+        XCTAssertNotNil(loadAt)
+        if let initializeAt, let loadAt {
+            XCTAssertLessThan(initializeAt, loadAt)
+        }
+
+        // The same measurement under a full `Run`, which is where the frame
+        // hooks fire and therefore where `inRun` can change.
+        OrderRecordingGame.order = []
+        OrderRecordingGame.exitAfterFirstUpdate = true
+        defer { OrderRecordingGame.exitAfterFirstUpdate = false }
+        let running = try OrderRecordingGame()
+        try running.Run()
+        try running.Dispose()
+        print("CNA_RUN_CALLBACK_ORDER=\(OrderRecordingGame.order)")
+        XCTAssertEqual(
+            OrderRecordingGame.order.filter { $0 == "LoadContent" }.count, 1,
+            "a full Run must also issue LoadContent exactly once")
     }
 }

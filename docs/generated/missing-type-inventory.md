@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=140
-TARGET_MEMBERS=1747
-TOTAL_DIAGNOSTICS=274
+TARGET_MEMBERS=1749
+TOTAL_DIAGNOSTICS=272
 COMPLETE_TYPES=133
 PARTIAL_TYPES=7
 MISSING_TYPES=117
 MISSING_TYPE=117
-MISSING_MEMBER=132
+MISSING_MEMBER=130
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -87,8 +87,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=67
-PENDING_RETURN_NULLABILITY_PROJECTIONS=302
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=69
+PENDING_RETURN_NULLABILITY_PROJECTIONS=300
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=6
 ```
 
@@ -239,7 +239,7 @@ Expected members: 4; emitted members: 3.
 
 ### `Microsoft.Xna.Framework.Game`
 
-Expected members: 37; emitted members: 16.
+Expected members: 37; emitted members: 18.
 
 - `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.GraphicsDevice()`: XNA can normally return null from Microsoft.Xna.Framework.Graphics.GraphicsDevice here, so the Swift return must be Optional; expected Microsoft.Xna.Framework.Graphics.GraphicsDevice?, found Microsoft.Xna.Framework.Graphics.GraphicsDevice; Swift `throws` is present instead, and a normal null result is not a failure, so throws must not stand in for it
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Tick()`: mapped member is absent
@@ -250,8 +250,6 @@ Expected members: 37; emitted members: 16.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.ShowMissingRequirementMessage(_:CNAException)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.LaunchParameters()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Components()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Services()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.InactiveSleepTime()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.IsMouseVisible()`: mapped member is absent
