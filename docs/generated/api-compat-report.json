@@ -5,7 +5,7 @@
     "path": "tools/api_compat/reference/xna40-windows-runtime-contract.json",
     "sha256": "7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc"
   },
-  "symbolGraph": "/rv/data/development/github.com/openeggbert/_bindings/cna-swift/.build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json",
+  "symbolGraph": ".build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json",
   "summary": {
     "REFERENCE_TYPES": 257,
     "REFERENCE_MEMBERS": 2964,

@@ -1310,6 +1310,19 @@ def system_interface_is_language_mapped(name: str) -> bool:
     return name.startswith("System.")
 
 
+def repository_relative(path: Path) -> str:
+    """`path` as a repository-relative string, or its bare file name.
+
+    Generated reports are committed, so any machine-local prefix in one is a
+    leak. Nothing outside the repository is ever named in full.
+    """
+    resolved = Path(path).resolve()
+    try:
+        return str(resolved.relative_to(ROOT))
+    except ValueError:
+        return resolved.name
+
+
 def diagnostic(category: str, subject: str, detail: str) -> dict[str, str]:
     return {"category": category, "subject": subject, "detail": detail}
 
@@ -6068,7 +6081,12 @@ def make_report(
             "path": str(REFERENCE.relative_to(ROOT)),
             "sha256": hashlib.sha256(REFERENCE.read_bytes()).hexdigest(),
         },
-        "symbolGraph": str(graph_path),
+        # Recorded relative to the repository root whenever it is inside it.
+        # The report is committed, so the caller's own absolute path would be
+        # a developer-path leak the package qualification refuses -- and it
+        # would appear or not depending only on how the caller happened to
+        # spell the argument.
+        "symbolGraph": repository_relative(graph_path),
         "summary": summary,
         "completeTypes": complete_types,
         "partialTypes": partial_types,
