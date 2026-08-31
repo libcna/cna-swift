@@ -11,7 +11,7 @@ package enforces the same thing with `COMPATIBILITY SameMajorVersion`. Under
 the generation this binding was measured against.
 
 A later minor is admitted by that rule. The protection against a later minor
-that removed a route is not a version number: every one of the 29 bound symbols
+that removed a route is not a version number: every one of the 55 bound symbols
 must resolve by name before the runtime starts, and a missing one throws
 `CNAError.missingNativeSymbol`.
 
@@ -47,7 +47,7 @@ a route type, and no strict XNA type exposes a handle or function pointer.
    route type being re-derived from its symbol rather than trusted;
 4. compares every mirrored `CNASwift_*` structure with its canonical
    counterpart field for field — names, order, offsets and widths;
-5. proves both mirrored callbacks are the canonical callback types;
+5. proves every mirrored callback is the canonical callback type;
 6. compiles the canonical constants and every selected `Keys` literal;
 7. audits ELF exports and calls `cna_get_abi_version` on the explicit library,
    requiring it to be inside the admitted window *and* to agree with the header.
@@ -55,9 +55,9 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=36  ROUTE_PAIRINGS=36  PROTOTYPE_TYPE_POSITIONS=113
-CANONICAL_DECLARATION_CHECKS=113  C_SWIFT_MEASUREMENTS=113
-LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=3  CONSTANTS=212  SCALAR_FACTS=3
+BOUND_FUNCTIONS=55  ROUTE_PAIRINGS=55  PROTOTYPE_TYPE_POSITIONS=170
+CANONICAL_DECLARATION_CHECKS=170  C_SWIFT_MEASUREMENTS=170
+LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
 
@@ -132,3 +132,32 @@ callback. Their first verification run failed on two positions the verifier
 could not yet spell — `CNA_RenderTargetEventRegistrationHandle` and `void*` —
 which is the canonical-declaration check working on the first surface added
 since it existed.
+
+## The game-host and device-service routes
+
+Foundations 39 and 40 took the count from 43 to 55. Foundation 39 bound the
+`Game` host members — timing writers, `Tick`, `SuppressDraw`,
+`ResetElapsedTime`, `ShowMissingRequirementMessage`, the activation state and
+the host-event subscribe/unsubscribe pair — with a fourth mirrored callback,
+`CNA_GameEventCallback`, whose shape is the parameterless
+`void (*)(void* context)`. Foundation 40 bound the graphics device manager's
+own creation, `BeginDraw`/`EndDraw`, its device-event subscription pair, and the
+callback-scoped device accessor.
+
+The device accessor is the one route whose *refusal* is part of the measured
+contract: outside a CNA callback `cna_graphics_device_manager_get_device`
+answers `CNA_RESULT_INVALID_STATE` with a zero handle. The Swift guard that
+returns `nil` there is documented defence in depth over a native refusal, not
+the only thing preventing a dangling handle — which is why the mutation that
+removed it was withdrawn as unfalsifiable rather than left in the harness
+claiming coverage it did not have.
+
+## What the state objects deliberately did not add
+
+Foundation 41 added the four graphics state objects and bound **no** route for
+them. CNA publishes `cna_blend_state_init` and
+`cna_graphics_device_set_blend_state` and their neighbours in
+`graphics_state.h`; none is bound, because the milestone projected the managed
+types and did not implement `GraphicsDevice.BlendState`. Binding a route for
+count, without a member that uses it, is the thing this boundary exists to
+prevent.

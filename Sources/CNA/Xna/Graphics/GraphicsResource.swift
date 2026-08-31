@@ -35,13 +35,23 @@ extension Microsoft.Xna.Framework.Graphics {
     /// identity into an integer token would be a fabrication rather than a
     /// projection.
     open class GraphicsResource: RuntimeOwnedChild {
-        internal let storage: NativeHandleStorage
+        /// The native object this resource owns, when it has one.
+        ///
+        /// **Not every `GraphicsResource` is native.** XNA's own state objects
+        /// — `BlendState`, `DepthStencilState`, `RasterizerState`,
+        /// `SamplerState` — derive from this class and are plain settings a
+        /// caller allocates before any device exists; CNA models them as POD
+        /// descriptors and gives them no handle at all. A resource with no
+        /// storage is that case, and it is disposed by a managed flag rather
+        /// than by releasing something.
+        internal let storage: NativeHandleStorage?
+        private var managedDisposed = false
         private let device: GraphicsDevice?
         private let disposingSource = CNAEventSource<CNAEventArgs>()
         private var storedName: String?
         private var storedTag: Any?
 
-        internal init(storage: NativeHandleStorage, device: GraphicsDevice?) {
+        internal init(storage: NativeHandleStorage?, device: GraphicsDevice?) {
             self.storage = storage
             self.device = device
         }
@@ -50,7 +60,7 @@ extension Microsoft.Xna.Framework.Graphics {
         ///
         /// `get_IsDisposed` is `ldarg.0; ldfld isDisposed; ret` — a field read
         /// with no failure path, so the Swift reader does not throw.
-        public var IsDisposed: Bool { storage.isDisposed }
+        public var IsDisposed: Bool { storage?.isDisposed ?? managedDisposed }
 
         /// `GraphicsResource.Name`.
         ///
@@ -108,8 +118,12 @@ extension Microsoft.Xna.Framework.Graphics {
         /// Swift has no `protected`, so this is public — the same single
         /// widening `CNACollection.Items` makes.
         open func Dispose(_ disposing: Bool) throws {
-            guard !storage.isDisposed else { return }
-            try storage.dispose(operation: "\(storage.typeName).Dispose")
+            guard !IsDisposed else { return }
+            if let storage {
+                try storage.dispose(operation: "\(storage.typeName).Dispose")
+            } else {
+                managedDisposed = true
+            }
             try disposingSource.Raise(self, args: CNAEventArgs.Empty)
         }
 
@@ -145,11 +159,25 @@ extension Microsoft.Xna.Framework.Graphics {
         }()
 
         internal func validatedHandle(_ operation: String) throws -> UInt64 {
-            try storage.validatedHandle(operation)
+            guard let storage else {
+                throw CNAError.disposedObject(
+                    "\(GraphicsResource.clrTypeName(of: self)) has no native object")
+            }
+            return try storage.validatedHandle(operation)
         }
 
-        internal var runtimeState: RuntimeState { storage.runtime }
-        internal var runtimeObjectIsDisposed: Bool { storage.isDisposed }
+        /// The native storage, for the subclasses that certainly have one.
+        internal var nativeStorage: NativeHandleStorage {
+            guard let storage else {
+                preconditionFailure(
+                    "\(GraphicsResource.clrTypeName(of: self)) has no native object; "
+                    + "this accessor is internal and only native resources use it")
+            }
+            return storage
+        }
+
+        internal var runtimeState: RuntimeState { nativeStorage.runtime }
+        internal var runtimeObjectIsDisposed: Bool { IsDisposed }
         internal func disposeFromParent() throws { try Dispose() }
     }
 

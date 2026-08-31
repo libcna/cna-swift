@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "referenceSha256": "7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc",
+  "referenceSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d",
   "calibrationAssemblies": [
     "Microsoft.Xna.Framework.Graphics.dll",
     "Microsoft.Xna.Framework.dll"
   ],
   "CALIBRATION_STATUS": "PASS",
-  "RESOURCE_STRING_CHECKS": 30,
-  "RESOURCE_STRINGS_REPRODUCED": 15,
+  "RESOURCE_STRING_CHECKS": 32,
+  "RESOURCE_STRINGS_REPRODUCED": 16,
   "resourceStringFailures": [],
-  "AUDIT_SELF_TESTS": 64,
+  "AUDIT_SELF_TESTS": 80,
   "AUDIT_SELF_TEST_STATUS": "PASS",
   "auditSelfTestFailures": [],
   "CONTRACT_TYPES_REPRODUCED": 257,

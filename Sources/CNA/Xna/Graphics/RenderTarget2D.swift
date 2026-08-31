@@ -206,7 +206,7 @@ extension Microsoft.Xna.Framework.Graphics {
         /// Releases the native subscription before the base releases the
         /// handle, so no native callback can address freed Swift state.
         open override func Dispose(_ disposing: Bool) throws {
-            guard !storage.isDisposed else { return }
+            guard !IsDisposed else { return }
             unsubscribeFromNativeContentLost()
             try super.Dispose(disposing)
         }
@@ -216,18 +216,18 @@ extension Microsoft.Xna.Framework.Graphics {
             do {
                 try contentLostSource.Raise(self, args: CNAEventArgs.Empty)
             } catch {
-                storage.runtime.storeCallbackError(error)
+                nativeStorage.runtime.storeCallbackError(error)
             }
         }
 
         private func subscribeToNativeContentLost() throws {
             let box = Unmanaged.passRetained(RenderTargetContentLostBox(self))
             var registration: UInt64 = 0
-            let result = storage.runtime.functions.renderTargetSubscribeContentLost(
-                storage.handle, renderTargetContentLostCallback, box.toOpaque(), &registration)
+            let result = nativeStorage.runtime.functions.renderTargetSubscribeContentLost(
+                nativeStorage.handle, renderTargetContentLostCallback, box.toOpaque(), &registration)
             guard result == 0 else {
                 box.release()
-                try storage.runtime.functions.check(
+                try nativeStorage.runtime.functions.check(
                     result, operation: "cna_render_target_subscribe_content_lost")
                 return
             }
@@ -237,7 +237,7 @@ extension Microsoft.Xna.Framework.Graphics {
 
         private func unsubscribeFromNativeContentLost() {
             guard contentLostRegistration != 0 else { return }
-            _ = storage.runtime.functions.renderTargetUnsubscribeContentLost(
+            _ = nativeStorage.runtime.functions.renderTargetUnsubscribeContentLost(
                 contentLostRegistration)
             contentLostRegistration = 0
             contentLostBox?.release()

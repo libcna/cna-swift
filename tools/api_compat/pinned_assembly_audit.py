@@ -1385,6 +1385,13 @@ class Parser:
                 tuple(owner.get("genericParameters") or ()), ())),
             "static": "static" in attributes or "literal" in attributes,
             "constant": "literal" in attributes,
+            # `initonly` is CLR metadata (FieldAttributes.InitOnly), not a C#
+            # convention, so it is part of the shape a projection must
+            # reproduce: a readonly field may not become a mutable Swift `var`.
+            # It is recorded separately from `constant`, because `literal` and
+            # `initonly` are different attributes and a field never carries
+            # both.
+            "readonly": "initonly" in attributes,
             "value": value,
         })
 
@@ -1436,7 +1443,8 @@ def member_key(member: dict[str, Any]) -> tuple:
         return (kind, member["name"], member.get("type"))
     return (
         kind, member["name"], bool(member.get("static")), member.get("type"),
-        bool(member.get("constant")), member.get("value"),
+        bool(member.get("constant")), bool(member.get("readonly")),
+        member.get("value"),
     )
 
 
@@ -1493,9 +1501,13 @@ def self_test(
             "Microsoft.Xna.Framework.Input.MouseState",
             "Microsoft.Xna.Framework.Color",
             "Microsoft.Xna.Framework.MathHelper",
+            # BlendState is here because it is the calibration subject that
+            # actually carries `initonly` fields; without it the readonly
+            # mutation below could only ever flip false to true.
+            "Microsoft.Xna.Framework.Graphics.BlendState",
         ) if name in extracted
     ]
-    if len(subjects) < 5:
+    if len(subjects) < 6:
         failures.append("self-test subjects are missing from the extraction")
     checks += 1
 
@@ -1556,6 +1568,13 @@ def self_test(
                 return True
         return False
 
+    def flip_readonly(record: dict[str, Any]) -> bool:
+        for member in record["members"]:
+            if member["kind"] == "field":
+                member["readonly"] = not member.get("readonly")
+                return True
+        return False
+
     def flip_static(record: dict[str, Any]) -> bool:
         for member in record["members"]:
             if member["kind"] in ("method", "property"):
@@ -1578,6 +1597,7 @@ def self_test(
         ("invented extra member", add_member),
         ("renamed method", rename_first_method),
         ("flipped static identity", flip_static),
+        ("flipped field readonly identity", flip_readonly),
     ]
 
     for name in subjects:

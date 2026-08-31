@@ -50,13 +50,13 @@ extension Microsoft.Xna.Framework.Graphics {
         }
 
         public func Begin() throws {
-            let handle = try storage.validatedHandle("SpriteBatch.Begin")
+            let handle = try nativeStorage.validatedHandle("SpriteBatch.Begin")
             var info = CNASwift_SpriteBatchBeginInfo()
             info.struct_size = UInt32(MemoryLayout<CNASwift_SpriteBatchBeginInfo>.size)
             info.struct_version = 1
             info.sort_mode = SpriteSortMode.Deferred.rawValue
-            try storage.runtime.functions.check(
-                storage.runtime.functions.spriteBatchBegin(handle, &info),
+            try nativeStorage.runtime.functions.check(
+                nativeStorage.runtime.functions.spriteBatchBegin(handle, &info),
                 operation: "cna_sprite_batch_begin"
             )
         }
@@ -90,10 +90,10 @@ extension Microsoft.Xna.Framework.Graphics {
             effects: SpriteEffects,
             layerDepth: Float
         ) throws {
-            let batchHandle = try storage.validatedHandle("SpriteBatch.Draw")
+            let batchHandle = try nativeStorage.validatedHandle("SpriteBatch.Draw")
             let textureHandle = try texture.validatedHandle("SpriteBatch.Draw texture")
-            guard texture.runtimeState === storage.runtime else {
-                throw CNAError.staleRuntimeGeneration(expected: storage.generation, actual: texture.runtimeState.generation)
+            guard texture.runtimeState === nativeStorage.runtime else {
+                throw CNAError.staleRuntimeGeneration(expected: nativeStorage.generation, actual: texture.runtimeState.generation)
             }
             var command = CNASwift_SpriteScaledCommand()
             command.struct_size = UInt32(MemoryLayout<CNASwift_SpriteScaledCommand>.size)
@@ -114,16 +114,16 @@ extension Microsoft.Xna.Framework.Graphics {
             command.scale = CNASwift_Vector2(x: scale, y: scale)
             command.effects = effects.rawValue
             command.layer_depth = layerDepth
-            try storage.runtime.functions.check(
-                storage.runtime.functions.spriteBatchSubmitScaled(batchHandle, &command, 1),
+            try nativeStorage.runtime.functions.check(
+                nativeStorage.runtime.functions.spriteBatchSubmitScaled(batchHandle, &command, 1),
                 operation: "cna_sprite_batch_submit_scaled_many"
             )
         }
 
         public func End() throws {
-            let handle = try storage.validatedHandle("SpriteBatch.End")
-            try storage.runtime.functions.check(
-                storage.runtime.functions.spriteBatchEnd(handle),
+            let handle = try nativeStorage.validatedHandle("SpriteBatch.End")
+            try nativeStorage.runtime.functions.check(
+                nativeStorage.runtime.functions.spriteBatchEnd(handle),
                 operation: "cna_sprite_batch_end"
             )
         }

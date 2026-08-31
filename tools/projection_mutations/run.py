@@ -15,6 +15,7 @@ the tree is proven byte-identical afterwards.
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -31,6 +32,7 @@ GAME = ROOT / "Sources/CNA/Xna/Framework/Game.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
+STATES = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStates.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -143,17 +145,27 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
     (
         "disposing-raised-before-release",
         "Disposing raised before the native release", RESOURCE,
-        "            try storage.dispose(operation: \"\\(storage.typeName).Dispose\")\n"
+        "            guard !IsDisposed else { return }\n"
+        "            if let storage {\n"
+        "                try storage.dispose(operation: \"\\(storage.typeName).Dispose\")\n"
+        "            } else {\n"
+        "                managedDisposed = true\n"
+        "            }\n"
         "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)",
+        "            guard !IsDisposed else { return }\n"
         "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)\n"
-        "            try storage.dispose(operation: \"\\(storage.typeName).Dispose\")",
+        "            if let storage {\n"
+        "                try storage.dispose(operation: \"\\(storage.typeName).Dispose\")\n"
+        "            } else {\n"
+        "                managedDisposed = true\n"
+        "            }",
     ),
     (
         "dispose-not-idempotent", "a second Dispose reaching the dead handle",
         RESOURCE,
-        "            guard !storage.isDisposed else { return }\n"
-        "            try storage.dispose",
-        "            try storage.dispose",
+        "            guard !IsDisposed else { return }\n"
+        "            if let storage {",
+        "            if let storage {",
     ),
     (
         "derived-type-name-lost",
@@ -269,7 +281,99 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            runtime.clearCallbackError()",
         "            runtime.clearCallbackError()",
     ),
+    (
+        "state-default-off-by-one", "a single IL-derived state default changed",
+        STATES,
+        "        private var maxAnisotropy: Int32 = 4",
+        "        private var maxAnisotropy: Int32 = 1",
+    ),
+    (
+        "multisample-antialias-default-inverted",
+        "the RasterizerState default XNA turns ON, turned off",
+        STATES,
+        "        private var multiSampleAntiAlias = true",
+        "        private var multiSampleAntiAlias = false",
+    ),
+    (
+        "preset-blend-pair-transposed",
+        "a preset's source and destination blend swapped",
+        STATES,
+        '        public static let Additive = BlendState(\n'
+        '            source: .SourceAlpha, destination: .One, name: "BlendState.Additive")',
+        '        public static let Additive = BlendState(\n'
+        '            source: .One, destination: .SourceAlpha, name: "BlendState.Additive")',
+    ),
+    (
+        "preset-address-mode-on-one-axis-only",
+        "the presetting constructor writing only AddressU",
+        STATES,
+        "            addressU = address\n"
+        "            addressV = address\n"
+        "            addressW = address",
+        "            addressU = address",
+    ),
+    (
+        "bound-message-names-the-dynamic-type",
+        "ThrowIfBound reading the dynamic class instead of the declaring one",
+        STATES,
+        "                of: \"{0}\", with: Self.boundStateTypeName))",
+        "                of: \"{0}\", with: Microsoft.Xna.Framework.Graphics\n"
+        "                    .GraphicsResource.clrTypeName(of: self)\n"
+        "                    .split(separator: \".\").last.map(String.init) ?? \"\"))",
+    ),
+    (
+        "setter-skips-the-bound-guard",
+        "one state setter writing without calling ThrowIfBound",
+        STATES,
+        "        public func SetMultiSampleMask(_ value: Int32) throws {\n"
+        "            try throwIfBound(); multiSampleMask = value",
+        "        public func SetMultiSampleMask(_ value: Int32) throws {\n"
+        "            multiSampleMask = value",
+    ),
+    (
+        "preset-not-born-bound",
+        "a static preset left mutable, so a caller can corrupt a shared global",
+        STATES,
+        "            alphaDestinationBlend = destination\n"
+        "            Name = name\n"
+        "            isBound = true",
+        "            alphaDestinationBlend = destination\n"
+        "            Name = name",
+    ),
+    (
+        "fresh-state-born-bound",
+        "the parameterless constructor binding, freezing a brand-new state",
+        STATES,
+        "        internal var isBound = false\n"
+        "        internal static let boundStateTypeName = \"SamplerState\"",
+        "        internal var isBound = true\n"
+        "        internal static let boundStateTypeName = \"SamplerState\"",
+    ),
+    (
+        "default-back-buffer-width-transcribed-wrong",
+        "the GraphicsDeviceManager default back-buffer width off by a digit",
+        MANAGER,
+        "        public static let DefaultBackBufferWidth: Int32 = 800",
+        "        public static let DefaultBackBufferWidth: Int32 = 640",
+    ),
 ]
+
+
+def require_native_library() -> str | None:
+    """The runtime suites skip without an explicit native library.
+
+    Sixteen of the mutations below are caught only by tests that start a CNA
+    runtime. With `CNA_NATIVE_LIBRARY` unset those tests SKIP rather than fail,
+    every one of those mutations comes back SURVIVED, and the gate reports a
+    coverage loss as a projection defect. Refusing to run is the honest
+    behaviour.
+    """
+    selected = os.environ.get("CNA_NATIVE_LIBRARY")
+    if not selected:
+        return "CNA_NATIVE_LIBRARY is not set"
+    if not Path(selected).is_file():
+        return f"CNA_NATIVE_LIBRARY={selected!r} is not a file"
+    return None
 
 
 def run_tests(swift_test: str) -> int:
@@ -283,10 +387,15 @@ def main() -> int:
     parser.add_argument("--swift-test", default="swift-test")
     args = parser.parse_args()
 
+    problem = require_native_library()
+    if problem is not None:
+        print(f"PROJECTION_MUTATION_PRECONDITION=FAILED — {problem}")
+        return 1
+
     originals = {path: path.read_text(encoding="utf-8")
                  for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
                               RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
-                              CALLBACK_STATE, MANAGER, DRAWABLE}}
+                              CALLBACK_STATE, MANAGER, DRAWABLE, STATES}}
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")

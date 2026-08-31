@@ -115,6 +115,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidEmitterDopplerScale",
       "reason": "AudioEmitter.set_DopplerScale raises ArgumentOutOfRangeException(\"value\", this) for a negative or NaN scale."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BoundStateObject",
+      "reason": "BlendState/DepthStencilState/RasterizerState/SamplerState ThrowIfBound raises InvalidOperationException with this, formatted with the declaring class's own simple name."
     }
   ]
 }

@@ -30,6 +30,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BoundStateObject",
+      "value": "Cannot change read-only {0}. State objects become read-only the first time they are bound to a GraphicsDevice. To change property values, create a new {0} instance."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "BoundingBoxZeroPoints",
       "value": "You should have at least one point in points"
     },

@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=146
-TARGET_MEMBERS=1818
-TOTAL_DIAGNOSTICS=236
-COMPLETE_TYPES=139
+TARGET_TYPES=150
+TARGET_MEMBERS=1885
+TOTAL_DIAGNOSTICS=230
+COMPLETE_TYPES=143
 PARTIAL_TYPES=7
-MISSING_TYPES=111
-MISSING_TYPE=111
-MISSING_MEMBER=108
+MISSING_TYPES=107
+MISSING_TYPE=107
+MISSING_MEMBER=106
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -60,8 +60,8 @@ THROWING_WRITER_METHOD_PROJECTIONS=113
 INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
 GETTER_ONLY_PROJECTIONS=561
 WRITE_ONLY_PROJECTIONS=0
-MEASURED_ACCESSOR_PROJECTIONS=19
-PENDING_ACCESSOR_PROJECTIONS=94
+MEASURED_ACCESSOR_PROJECTIONS=60
+PENDING_ACCESSOR_PROJECTIONS=53
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 NONPUBLIC_CONSTRUCTION_PROJECTIONS=10
 EVENT_PROJECTIONS=49
@@ -72,7 +72,7 @@ NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=15
+XNA_RESOURCE_STRING_PROJECTIONS=16
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,8 +88,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=77
-PENDING_RETURN_NULLABILITY_PROJECTIONS=292
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=93
+PENDING_RETURN_NULLABILITY_PROJECTIONS=276
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 ```
 
@@ -129,6 +129,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.Blend`
 - `Microsoft.Xna.Framework.Graphics.BlendFunction`
+- `Microsoft.Xna.Framework.Graphics.BlendState`
 - `Microsoft.Xna.Framework.Graphics.BufferUsage`
 - `Microsoft.Xna.Framework.Graphics.ClearOptions`
 - `Microsoft.Xna.Framework.Graphics.ColorWriteChannels`
@@ -136,6 +137,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 - `Microsoft.Xna.Framework.Graphics.CubeMapFace`
 - `Microsoft.Xna.Framework.Graphics.CullMode`
 - `Microsoft.Xna.Framework.Graphics.DepthFormat`
+- `Microsoft.Xna.Framework.Graphics.DepthStencilState`
 - `Microsoft.Xna.Framework.Graphics.DeviceLostException`
 - `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
 - `Microsoft.Xna.Framework.Graphics.DisplayMode`
@@ -173,10 +175,12 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 - `Microsoft.Xna.Framework.Graphics.PresentInterval`
 - `Microsoft.Xna.Framework.Graphics.PresentationParameters`
 - `Microsoft.Xna.Framework.Graphics.PrimitiveType`
+- `Microsoft.Xna.Framework.Graphics.RasterizerState`
 - `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetUsage`
 - `Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs`
+- `Microsoft.Xna.Framework.Graphics.SamplerState`
 - `Microsoft.Xna.Framework.Graphics.SetDataOptions`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
@@ -363,7 +367,7 @@ Expected members: 16; emitted members: 4.
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 
-Expected members: 30; emitted members: 8.
+Expected members: 30; emitted members: 10.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
@@ -387,8 +391,6 @@ Expected members: 30; emitted members: 8.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.SupportedOrientations()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.Disposed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DefaultBackBufferWidth()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DefaultBackBufferHeight()`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
 
@@ -433,8 +435,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
 - `Microsoft.Xna.Framework.Graphics.AlphaTestEffect`
 - `Microsoft.Xna.Framework.Graphics.BasicEffect`
-- `Microsoft.Xna.Framework.Graphics.BlendState`
-- `Microsoft.Xna.Framework.Graphics.DepthStencilState`
 - `Microsoft.Xna.Framework.Graphics.DirectionalLight`
 - `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
 - `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`
@@ -467,10 +467,8 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
-- `Microsoft.Xna.Framework.Graphics.RasterizerState`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetBinding`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetCube`
-- `Microsoft.Xna.Framework.Graphics.SamplerState`
 - `Microsoft.Xna.Framework.Graphics.SamplerStateCollection`
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`

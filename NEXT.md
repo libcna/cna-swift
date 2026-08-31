@@ -1,5 +1,11 @@
 # CNA-Swift continuation handoff
 
+> **This file is the handoff written at the end of the Foundation 30-36
+> session, kept as that session's record.** It is not the current state and is
+> not maintained: Foundation Milestones 37 through 41 have landed since, and
+> `plan.md` is the authority for what is true now. Nothing here is deleted,
+> because the measurements it records were real when it was written.
+
 **Foundation Milestones 30 through 36: COMPLETE.** Eleven local commits, none
 pushed.
 

@@ -316,6 +316,11 @@
    "operation": "Callback scope of a manager-supplied graphics device",
    "status": "VERIFIED_NATIVE",
    "evidence": "measured with a pure-C probe: cna_graphics_device_manager_get_graphics_device answers CNA_RESULT_INVALID_STATE with a zero handle before a game runs and after it exits, and succeeds with a real handle inside a lifecycle callback. The binding's own isInsideCallback guard is therefore defence in depth over a host that already refuses"
+  },
+  {
+   "operation": "Graphics state objects (Blend/DepthStencil/Rasterizer/Sampler)",
+   "status": "VERIFIED_MANAGED_NOT_YET_BOUND_TO_A_DEVICE",
+   "evidence": "All four types are complete managed Swift whose defaults and static presets are read out of the pinned XNA IL (SetDefaults and .cctor); ThrowIfBound reproduces the assembly's own BoundStateObject message. No device route is bound, so no state has yet been applied to a live CNA device and `isBound` is reachable only from within the module."
   }
  ]
 }

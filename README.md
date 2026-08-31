@@ -98,29 +98,30 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=126
-TARGET_MEMBERS=1706
-TOTAL_DIAGNOSTICS=284
-COMPLETE_TYPES=121
-PARTIAL_TYPES=5
-MISSING_TYPES=131
-MISSING_MEMBER=130
+TARGET_TYPES=150
+TARGET_MEMBERS=1885
+TOTAL_DIAGNOSTICS=230
+COMPLETE_TYPES=143
+PARTIAL_TYPES=7
+MISSING_TYPES=107
+MISSING_MEMBER=106
 REFERENCE_RETURN_PROJECTIONS=369
-PROVEN_NULLABLE_RETURN_PROJECTIONS=115
-PROVEN_NONNULL_RETURN_PROJECTIONS=128
-UNKNOWN_RETURN_NULLABILITY_PROJECTIONS=126
-BCL_BASE_PROJECTIONS=5
-PROJECTED_BCL_BASE_TYPES=1
+PROVEN_NULLABLE_RETURN_PROJECTIONS=113
+PROVEN_NONNULL_RETURN_PROJECTIONS=133
+UNKNOWN_RETURN_NULLABILITY_PROJECTIONS=123
+BCL_BASE_PROJECTIONS=19
+PROJECTED_BCL_BASE_TYPES=15
 PENDING_BCL_BASE_TYPES=4
-BCL_INHERITED_MEMBER_PROJECTIONS=16
-BCL_SUPPORT_TYPE_MEASUREMENTS=3
+BCL_INHERITED_MEMBER_PROJECTIONS=77
+BCL_SUPPORT_TYPE_MEASUREMENTS=18
 ```
 
 Normal strict verification remains red because deferred XNA types are genuinely
 absent. Leak-only is green: no internal type, pointer, native handle, or public
-FFI declaration leaks into the XNA surface. All remaining member diagnostics
-belong to Game, GraphicsDeviceManager, GraphicsDevice, Texture2D, and
-SpriteBatch. See `docs/generated/api-compat-report.json` and
+FFI declaration leaks into the XNA surface. The remaining member diagnostics
+belong to GraphicsDevice, GraphicsDeviceManager, SpriteBatch, Game and the
+Texture family, and every one of them waits on an XNA type that is not yet
+projected. See `docs/generated/api-compat-report.json` and
 `docs/generated/missing-type-inventory.md` for the exact inventory.
 
 The strict-complete managed foundation includes MathHelper, Point, Rectangle,
@@ -517,6 +518,9 @@ python3 tools/native_abi/verify.py \
 python3 tools/native_abi/mutations.py \
   --cna-include /path/to/cnanext/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY"
+CNA_NATIVE_LIBRARY=/path/to/libcna_c_api.so \
+  python3 tools/projection_mutations/run.py
+python3 tools/runtime_capabilities/render.py --check
 python3 tools/gamepad_native/run.py \
   --library "$CNA_NATIVE_LIBRARY" \
   --output docs/generated/gamepad-native-report.json
@@ -562,13 +566,27 @@ transposed fields, a narrowed field, a wrong callback signature, a wrong
 constant and a wrong `Keys` literal — runs the unmodified verifier, requires it
 to fail every time, and proves the tree is byte-identical afterwards.
 
+`tools/projection_mutations/run.py` is the companion gate over the projected
+behavior. It plants thirty-five realistic defects one at a time — a
+neighbouring exception class at a raise site, a message that reports the Swift
+class name to a user, a mirror that moves on a write the host refused, a
+disposal that leaks a native subscription, an IL-derived state default changed,
+a preset's blend pair transposed, a bound-state message that reads the dynamic
+type instead of the declaring one — and requires the whole test suite to fail
+each time. It refuses to run without a selected `CNA_NATIVE_LIBRARY`: sixteen
+of its mutations are caught only by suites that start a CNA runtime, and those
+suites *skip* rather than fail when no library is selected, which would report
+a coverage loss as sixteen projection defects.
+
 `pinned_assembly_audit.py` decides whether an XNA assembly may be used as a
 behavior authority. It reconstructs each assembly's public metadata from
-`ikdasm` output and diffs it against the retained contract; the seven
-registered assemblies reproduce all 257 types and 2,964 members exactly. It is
-calibrated on the two assemblies registered first and carries 60 mutation
-self-tests, so it cannot pass vacuously. Only assembly hashes are retained; no
-Microsoft binary is in the repository or the release archive.
+`ikdasm` output — including each field's `initonly` attribute, which decides
+whether the Swift projection is a `let` or a `var` — and diffs it against the
+retained contract; the seven registered assemblies reproduce all 257 types and
+2,964 members exactly. It is calibrated on six assemblies-worth of subjects and
+carries 80 mutation self-tests, so it cannot pass vacuously. Only assembly
+hashes are retained; no Microsoft binary is in the repository or the release
+archive.
 
 The normal API verifier exits nonzero until the full selected profile is
 complete; use `--leak-only` for the green encapsulation gate. Architecture,

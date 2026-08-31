@@ -39,6 +39,15 @@ extension Microsoft.Xna.Framework {
         private var eventRegistrations: [UInt32: UInt64] = [:]
         private var eventBoxes: [Unmanaged<GraphicsDeviceManagerEventBox>] = []
 
+        /// `DefaultBackBufferWidth`. `public static initonly int32`, assigned
+        /// `0x320` by the class constructor. `initonly` is why this is a Swift
+        /// `let` rather than a `var`.
+        public static let DefaultBackBufferWidth: Int32 = 800
+
+        /// `DefaultBackBufferHeight`. `public static initonly int32`, assigned
+        /// `0x1e0` by the class constructor.
+        public static let DefaultBackBufferHeight: Int32 = 480
+
         /// The exact `GraphicsDeviceManagerAlreadyPresent` message, read out of
         /// `Microsoft.Xna.Framework.Game.dll`'s own resource table.
         internal static let alreadyPresentMessage =

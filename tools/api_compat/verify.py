@@ -387,7 +387,14 @@ def expected_member(
                     rules.get("mutatingProtocolRequirements", [])
                 )
     elif kind == "field":
-        mutable = not bool(source.get("constant"))
+        # A CLR field is a mutable Swift `var` only when the metadata says it
+        # is writable. `literal` (a compile-time constant) and `initonly`
+        # (`readonly`) are two different CLR attributes and neither is
+        # assignable, so both project to `let`. `readonly` is recorded in the
+        # retained contract, proven against the pinned binaries by
+        # `pinned_assembly_audit.py`, and independently cross-checked with a
+        # second disassembler; it is not inferred from a naming convention.
+        mutable = not bool(source.get("constant")) and not bool(source.get("readonly"))
     elif kind == "event":
         # A CLR event has add/remove accessors and no setter. The projected
         # Swift property is therefore get-only, and a writable one is an
@@ -1734,6 +1741,28 @@ def self_test() -> None:
     property_actual = {"Microsoft.Xna.Framework.P": TypeModel("Microsoft.Xna.Framework.P", "struct", members=[Member("Microsoft.Xna.Framework.P", "property", "Value", False, return_type="Int32", mutable=False, identifier="value")])}
     if "PROPERTY_MAPPING_MISMATCH" not in {item["category"] for item in compare(property_expected, property_actual)}:
         failures.append("property mutability mutation")
+    # The three CLR field shapes project to three different Swift
+    # declarations, and the rule is exercised on the model builder itself
+    # rather than only on `compare`, because the builder is where a readonly
+    # field could silently become a mutable `var` again.
+    field_rules = load_json(RULES)
+    field_mutability_self_tests = 0
+    for label, source, want in (
+        ("plain field", {"kind": "field", "name": "X", "type": "System.Int32",
+                         "static": False, "constant": False, "readonly": False,
+                         "value": None}, True),
+        ("initonly field", {"kind": "field", "name": "X", "type": "System.Int32",
+                            "static": True, "constant": False, "readonly": True,
+                            "value": None}, False),
+        ("literal field", {"kind": "field", "name": "X", "type": "System.Int32",
+                           "static": True, "constant": True, "readonly": False,
+                           "value": "1"}, False),
+    ):
+        built = expected_member(
+            "Microsoft.Xna.Framework.F", source, field_rules, "struct")
+        if built.mutable is not want:
+            failures.append(f"{label} mutability projection")
+        field_mutability_self_tests += 1
     unmeasured_actual = {"Microsoft.Xna.Framework.E": TypeModel("Microsoft.Xna.Framework.E", "enum", members=[Member("Microsoft.Xna.Framework.E", "field", "A", True, return_type="Microsoft.Xna.Framework.E", mutable=False, raw_value=None, identifier="a")])}
     if "UNMEASURED_STRUCTURAL_CATEGORY" not in {item["category"] for item in compare(enum_expected, unmeasured_actual)}:
         failures.append("unmeasured category mutation")
@@ -4899,7 +4928,7 @@ def self_test() -> None:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + curve_baseline_self_tests + accessor_writer_self_tests + 2 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + list_self_tests + order_self_tests + nullability_self_tests}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + curve_baseline_self_tests + accessor_writer_self_tests + 2 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + list_self_tests + order_self_tests + nullability_self_tests + field_mutability_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
