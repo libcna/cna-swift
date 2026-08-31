@@ -12,7 +12,8 @@
     "Microsoft.Xna.Framework.Input.Touch",
     "Microsoft.Xna.Framework.Audio",
     "Microsoft.Xna.Framework.Content",
-    "Microsoft.Xna.Framework.Media"
+    "Microsoft.Xna.Framework.Media",
+    "Microsoft.Xna.Framework.Storage"
   ],
   "typeKinds": {
     "class": "class",
@@ -153,13 +154,19 @@
   "measuredSupportBaseProjections": {
     "System.EventArgs": "CNAEventArgs",
     "System.Collections.ObjectModel.Collection`1": "CNACollection",
-    "System.Collections.ObjectModel.ReadOnlyCollection`1": "CNAReadOnlyCollection"
+    "System.Collections.ObjectModel.ReadOnlyCollection`1": "CNAReadOnlyCollection",
+    "System.Exception": "CNAException",
+    "System.SystemException": "CNASystemException",
+    "System.Runtime.InteropServices.ExternalException": "CNAExternalException"
   },
   "measuredSupportBaseMapping": "A non-XNA CLR base listed in measuredSupportBaseProjections is a MEASURED base, exactly as an XNA base is: the Swift type must be a class whose compiler-emitted superclass is the mapped support type. A missing base, AnyObject or Object in its place, a struct where the CLR declares a class, a different support base, composition in place of inheritance, or any other base projection is a BASE_MAPPING_MISMATCH. It is never silently dropped and never allowlisted. A GENERIC support base additionally requires its CLR generic argument to be preserved in the Swift specialization -- Collection<IGameComponent> projects to CNACollection<any IGameComponent>, never to CNACollection<Any> -- and that argument is measured by bclSupportBaseSpecializationMapping.",
   "bclSupportTypeProjections": {
     "System.Collections.ObjectModel.Collection`1": "CNACollection",
     "System.Collections.ObjectModel.ReadOnlyCollection`1": "CNAReadOnlyCollection",
-    "System.Collections.Generic.List`1": "CNAList"
+    "System.Collections.Generic.List`1": "CNAList",
+    "System.Exception": "CNAException",
+    "System.SystemException": "CNASystemException",
+    "System.Runtime.InteropServices.ExternalException": "CNAExternalException"
   },
   "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
@@ -184,11 +191,46 @@
       "requiredMembers": ["Count", "IsReadOnly", "Item", "SetItem", "Add", "Clear", "Contains", "CopyTo", "GetEnumerator", "IndexOf", "Insert", "RemoveAt"],
       "openMembers": [],
       "forbiddenMembers": ["Sort", "Reverse", "AddRange", "ConvertAll"]
+    },
+    "CNAException": {
+      "kind": "class", "inheritance": "open", "generics": [], "base": null,
+      "conformances": ["Swift.Error"],
+      "clrFamily": "System.Exception",
+      "requiredMembers": ["Message", "InnerException", "HResult", "HelpLink", "GetBaseException"],
+      "openMembers": ["Message", "HelpLink", "GetBaseException"],
+      "finalMembers": ["InnerException"],
+      "forbiddenMembers": ["StackTrace", "Source", "TargetSite", "Data", "GetObjectData", "GetType", "ToString", "SerializeObjectState"]
+    },
+    "CNASystemException": {
+      "kind": "class", "inheritance": "open", "generics": [], "base": "CNAException",
+      "conformances": ["Swift.Error"],
+      "clrFamily": "System.SystemException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": ["ErrorCode", "StackTrace", "Source", "TargetSite", "Data", "GetObjectData", "GetType", "ToString"]
+    },
+    "CNAExternalException": {
+      "kind": "class", "inheritance": "open", "generics": [], "base": "CNASystemException",
+      "conformances": ["Swift.Error"],
+      "clrFamily": "System.Runtime.InteropServices.ExternalException",
+      "requiredMembers": ["ErrorCode"],
+      "openMembers": ["ErrorCode"],
+      "finalMembers": [],
+      "forbiddenMembers": ["StackTrace", "Source", "TargetSite", "Data", "GetObjectData", "GetType", "ToString"]
     }
   },
   "bclSupportMapping": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",
+  "bclExceptionSupportMapping": "A CLR exception class projects to a real Swift CLASS conforming to Swift Error, so a projected XNA exception is a genuine throwable Swift error and the CLR inheritance chain survives as a Swift inheritance chain. The chain is exact and unabbreviated: System.Exception -> CNAException, System.SystemException -> CNASystemException, System.Runtime.InteropServices.ExternalException -> CNAExternalException. Collapsing ExternalException straight onto CNAException would erase SystemException's substituted default message and its 0x80131501 HResult, both of which are observable, and is a BASE_MAPPING_MISMATCH. A struct, an enum, an alias to CNAError, a non-throwable NSObject, or a missing Error conformance are each a mismatch and not a shortcut. CNAError is a SEPARATE channel and is deliberately NOT in this hierarchy: it reports CNA-Swift runtime and language-support failures -- native library failure, owner-thread violation, stale runtime generation, unsupported platform, callback lifecycle misuse -- which correspond to no selected XNA exception identity. CNAError is not a CNAException and CNAException does not wrap CNAError.",
+  "bclExceptionSelectedSurfaceMapping": "The projected members of the exception support family are exactly those whose CLR behaviour is reconstructible from managed state alone: Message, InnerException, HResult, HelpLink, GetBaseException and ExternalException.ErrorCode. Every remaining declared member requires a CLR RUNTIME SERVICE this projection does not have -- StackTrace and Source need the runtime's captured managed stack, TargetSite needs System.Reflection.MethodBase, GetType needs System.Type, Data needs System.Collections.IDictionary and an internal dictionary implementation, GetObjectData and the SerializeObjectState event need the serialization runtime, and ToString appends the stack trace -- so each is FORBIDDEN rather than absent: a member that answered with an empty string, a nil or a fabricated stack would be a lie, and the verifier fails if one appears. The same rule keeps the protected (SerializationInfo, StreamingContext) constructors of ContentLoadException and StorageDeviceNotConnectedException unimplemented and counted as MISSING_MEMBER rather than faked.",
+  "bclResourceStringProjections": [
+    {"key": "Exception_WasThrown", "reason": "System.Exception.get_Message returns this formatted with the CLR class name whenever the stored message is null."},
+    {"key": "Arg_SystemException", "reason": "The message System.SystemException..ctor() passes to its base."},
+    {"key": "Arg_ExternalException", "reason": "The message System.Runtime.InteropServices.ExternalException..ctor() passes to its base."}
+  ],
+  "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "ef5f2428a546b677d797b5def4c07c44e04419844418b13de9a20f61aa323f0e",
+  "bclSelectedShapeSha256": "463f1f334156113714a0e410ccb2d25f10dafe560e2bef42f82fa65db1808f23",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class", "inheritance": "open", "generics": [], "base": null,
@@ -232,7 +274,23 @@
     {"owner": "Microsoft.Xna.Framework.CurveKey", "member": "op_Inequality", "parameter": "b"},
     {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "IndexOf", "parameter": "item"},
     {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "Contains", "parameter": "item"},
-    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "Remove", "parameter": "item"}
+    {"owner": "Microsoft.Xna.Framework.CurveKeyCollection", "member": "Remove", "parameter": "item"},
+    {"owner": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Audio.InstancePlayLimitException", "member": ".ctor", "parameter": "inner"},
+    {"owner": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Audio.NoAudioHardwareException", "member": ".ctor", "parameter": "inner"},
+    {"owner": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException", "member": ".ctor", "parameter": "inner"},
+    {"owner": "Microsoft.Xna.Framework.Content.ContentLoadException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Content.ContentLoadException", "member": ".ctor", "parameter": "innerException"},
+    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceLostException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceLostException", "member": ".ctor", "parameter": "inner"},
+    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceNotResetException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Graphics.DeviceNotResetException", "member": ".ctor", "parameter": "inner"},
+    {"owner": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException", "member": ".ctor", "parameter": "inner"},
+    {"owner": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException", "member": ".ctor", "parameter": "message"},
+    {"owner": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException", "member": ".ctor", "parameter": "innerException"}
   ],
   "globalOperatorProjections": [
     "Microsoft.Xna.Framework.CurveKey.op_Equality",

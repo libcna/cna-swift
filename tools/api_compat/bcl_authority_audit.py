@@ -377,6 +377,156 @@ COLLECTION = "System.Collections.ObjectModel.Collection`1"
 READONLY = "System.Collections.ObjectModel.ReadOnlyCollection`1"
 LIST = "System.Collections.Generic.List`1"
 ILIST = "System.Collections.Generic.IList`1"
+EXCEPTION = "System.Exception"
+SYSTEM_EXCEPTION = "System.SystemException"
+EXTERNAL_EXCEPTION = "System.Runtime.InteropServices.ExternalException"
+
+
+# ----------------------------------------------------------------------------
+# Embedded managed resources
+#
+# `System.Exception.get_Message`, `System.SystemException..ctor()` and
+# `System.Runtime.InteropServices.ExternalException..ctor()` do not carry their
+# default messages as IL string literals: each loads a RESOURCE KEY and calls
+# `Environment.GetResourceString`. The message a projected XNA exception
+# reports is therefore a fact about the assembly's embedded
+# `mscorlib.resources`, not about its code, and it is read from the binary here
+# rather than transcribed from documentation or memory.
+# ----------------------------------------------------------------------------
+
+RESOURCE_MAGIC = 0xBEEFCACE
+
+
+def _rva_to_offset(data: bytes, sections: list[tuple[int, int, int]], rva: int) -> int:
+    for virtual_address, virtual_size, raw_pointer in sections:
+        if virtual_address <= rva < virtual_address + virtual_size:
+            return raw_pointer + (rva - virtual_address)
+    raise ValueError(f"RVA 0x{rva:08x} is in no section")
+
+
+def embedded_resource(data: bytes, name: str) -> bytes | None:
+    """One embedded managed resource, located through the PE and CLI headers.
+
+    Nothing is written to disk and no external tool is invoked: the resource is
+    reached by walking the PE optional header's CLI data directory to the CLI
+    header's own `Resources` directory, which is exactly how the runtime
+    reaches it. The blob is length-prefixed there.
+
+    Only `mscorlib`'s single `System.Resources.ResourceReader` set is needed,
+    so the lookup is by reader identity rather than by a metadata name: the
+    resource whose header names that reader IS the string table, and an
+    assembly carrying none returns `None` rather than a guess.
+    """
+    if data[:2] != b"MZ":
+        return None
+    pe = int.from_bytes(data[0x3C:0x40], "little")
+    if data[pe:pe + 4] != b"PE\0\0":
+        return None
+    coff = pe + 4
+    section_count = int.from_bytes(data[coff + 2:coff + 4], "little")
+    optional_size = int.from_bytes(data[coff + 16:coff + 18], "little")
+    optional = coff + 20
+    magic = int.from_bytes(data[optional:optional + 2], "little")
+    directories = optional + (112 if magic == 0x20B else 96)
+    section_table = optional + optional_size
+    sections: list[tuple[int, int, int]] = []
+    for index in range(section_count):
+        entry = section_table + index * 40
+        sections.append((
+            int.from_bytes(data[entry + 12:entry + 16], "little"),
+            max(
+                int.from_bytes(data[entry + 8:entry + 12], "little"),
+                int.from_bytes(data[entry + 16:entry + 20], "little"),
+            ),
+            int.from_bytes(data[entry + 20:entry + 24], "little"),
+        ))
+    cli_rva = int.from_bytes(
+        data[directories + 14 * 8:directories + 14 * 8 + 4], "little")
+    if not cli_rva:
+        return None
+    cli = _rva_to_offset(data, sections, cli_rva)
+    resources_rva = int.from_bytes(data[cli + 24:cli + 28], "little")
+    resources_size = int.from_bytes(data[cli + 28:cli + 32], "little")
+    if not resources_rva or not resources_size:
+        return None
+    base = _rva_to_offset(data, sections, resources_rva)
+    offset = 0
+    while offset + 4 <= resources_size:
+        length = int.from_bytes(data[base + offset:base + offset + 4], "little")
+        blob = data[base + offset + 4:base + offset + 4 + length]
+        if (
+            len(blob) >= 4 and
+            int.from_bytes(blob[:4], "little") == RESOURCE_MAGIC and
+            b"System.Resources.ResourceReader" in blob[:512]
+        ):
+            return blob
+        offset += 4 + length
+    return None
+
+
+def resource_strings(blob: bytes) -> dict[str, str]:
+    """Every string entry of a v2 `System.Resources.ResourceReader` set.
+
+    The format is fixed: a magic, a reader-header block, the format version,
+    the entry and type counts, the type names, an eight-byte alignment, the
+    name hashes, the name offsets, the data-section offset, then a name table
+    of UTF-16 names each followed by its data offset. A string value is the
+    7-bit-length-prefixed UTF-8 written by `BinaryWriter.Write(string)` under
+    type index 1.
+    """
+    position = 0
+
+    def uint32() -> int:
+        nonlocal position
+        value = int.from_bytes(blob[position:position + 4], "little")
+        position += 4
+        return value
+
+    def seven_bit() -> int:
+        nonlocal position
+        value = shift = 0
+        while True:
+            byte = blob[position]
+            position += 1
+            value |= (byte & 0x7F) << shift
+            if not byte & 0x80:
+                return value
+            shift += 7
+
+    def prefixed() -> str:
+        nonlocal position
+        count = seven_bit()
+        text = blob[position:position + count].decode("utf-8", "replace")
+        position += count
+        return text
+
+    if uint32() != RESOURCE_MAGIC:
+        return {}
+    uint32()                                   # reader-header version
+    header_size = uint32()
+    position += header_size                    # reader and set type names
+    uint32()                                   # resource-set format version
+    entries = uint32()
+    type_count = uint32()
+    for _ in range(type_count):
+        prefixed()
+    while position & 7:
+        position += 1
+    position += 4 * entries                    # name hashes
+    offsets = [uint32() for _ in range(entries)]
+    data_section = uint32()
+    name_section = position
+    found: dict[str, str] = {}
+    for offset in offsets:
+        position = name_section + offset
+        count = seven_bit()
+        name = blob[position:position + count].decode("utf-16-le", "replace")
+        position += count
+        value_offset = uint32()
+        position = data_section + value_offset
+        if seven_bit() == 1:                   # ResourceTypeCode.String
+            found[name] = prefixed()
+    return found
 
 
 def sentinel_checks(
@@ -589,6 +739,192 @@ def sentinel_checks(
         for method in ("IndexOf", "Insert", "RemoveAt"):
             require(len(members_of(ILIST, "method", method)) == 1,
                     f"IList<T>.{method} is missing")
+
+    # ------------------------------------------------------------------
+    # The exception families.
+    #
+    # These decide whether eight XNA types get the right base, the right
+    # constructors and the right observable state. Every fact below is stated
+    # from the documented .NET Framework 4.0 contract, independently of the
+    # extractor, exactly as the collection facts above are.
+    # ------------------------------------------------------------------
+    exception = by_type.get(EXCEPTION)
+    system_exception = by_type.get(SYSTEM_EXCEPTION)
+    external = by_type.get(EXTERNAL_EXCEPTION)
+    for name in (EXCEPTION, SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION):
+        require(name in by_type, f"{name} was not extracted at all")
+    if exception is None or system_exception is None or external is None:
+        return checks, failures
+
+    for name, record in ((EXCEPTION, exception),
+                         (SYSTEM_EXCEPTION, system_exception),
+                         (EXTERNAL_EXCEPTION, external)):
+        require(record["kind"] == "class", f"{name} is not a class")
+        require(not record["sealed"], f"{name} is sealed")
+        require(not record["abstract"], f"{name} is abstract")
+        require(record["genericArity"] == 0, f"{name} is generic")
+
+    # The chain is exactly three links, and the middle one is real. Collapsing
+    # ExternalException straight onto Exception would drop SystemException's
+    # substituted message and its HResult.
+    require(exception["baseType"] == "System.Object",
+            "Exception does not derive directly from System.Object")
+    require(system_exception["baseType"] == EXCEPTION,
+            "SystemException does not derive directly from Exception")
+    require(external["baseType"] == SYSTEM_EXCEPTION,
+            "ExternalException's direct base is not SystemException")
+    require(external["baseType"] != EXCEPTION,
+            "ExternalException was extracted as deriving from Exception "
+            "directly, which would erase SystemException")
+
+    for interface in ("System.Runtime.Serialization.ISerializable",
+                      "System.Runtime.InteropServices._Exception"):
+        require(interface in exception["directInterfaces"],
+                f"Exception does not declare {interface}")
+
+    # Constructors: three public plus one protected serialization constructor
+    # on Exception and SystemException; ExternalException adds the errorCode
+    # overload.
+    for name, public_count in ((EXCEPTION, 3), (SYSTEM_EXCEPTION, 3),
+                               (EXTERNAL_EXCEPTION, 4)):
+        constructors = members_of(name, "constructor", ".ctor")
+        public = [item for item in constructors if item["access"] == "public"]
+        protected = [
+            item for item in constructors if item["access"] == "protected"]
+        require(len(public) == public_count,
+                f"{name} should declare {public_count} public constructors, "
+                f"found {len(public)}")
+        require(len(protected) == 1,
+                f"{name} should declare exactly one protected serialization "
+                f"constructor, found {len(protected)}")
+        require(any(not item["parameters"] for item in public),
+                f"{name} has no public parameterless constructor")
+        require(any(
+            [entry["type"] for entry in item["parameters"]] ==
+            ["System.String"] for item in public),
+            f"{name} has no (String) constructor")
+        require(any(
+            [entry["type"] for entry in item["parameters"]] ==
+            ["System.String", EXCEPTION] for item in public),
+            f"{name} has no (String, Exception) constructor")
+        require(all(
+            [entry["type"] for entry in item["parameters"]] == [
+                "System.Runtime.Serialization.SerializationInfo",
+                "System.Runtime.Serialization.StreamingContext",
+            ] for item in protected),
+            f"{name}'s protected constructor is not "
+            "(SerializationInfo, StreamingContext)")
+    require(any(
+        [entry["type"] for entry in item["parameters"]] ==
+        ["System.String", "System.Int32"]
+        for item in members_of(EXTERNAL_EXCEPTION, "constructor", ".ctor")),
+        "ExternalException has no (String, Int32 errorCode) constructor")
+
+    # Message is overridable; InnerException is `virtual final` and is NOT an
+    # override point. Projecting either the wrong way round changes what an
+    # XNA subclass can do.
+    message = members_of(EXCEPTION, "property", "Message")
+    require(len(message) == 1, "Exception.Message is missing")
+    for member in message:
+        require(member["type"] == "System.String",
+                "Exception.Message is not a String")
+        require(member["getAccess"] == "public" and
+                member["setAccess"] is None,
+                "Exception.Message is not a public get-only property")
+        require(member["getOverridable"],
+                "Exception.Message is not overridable")
+    inner = members_of(EXCEPTION, "property", "InnerException")
+    require(len(inner) == 1, "Exception.InnerException is missing")
+    for member in inner:
+        require(member["type"] == EXCEPTION,
+                "Exception.InnerException is not an Exception")
+        require(member["getAccess"] == "public" and
+                member["setAccess"] is None,
+                "Exception.InnerException is not a public get-only property")
+        require(not member["getOverridable"],
+                "Exception.InnerException is overridable; the CLR seals it")
+
+    # HResult is the protected state SystemException and ExternalException
+    # write and ErrorCode reads.
+    hresult = members_of(EXCEPTION, "property", "HResult")
+    require(len(hresult) == 1, "Exception.HResult is missing")
+    for member in hresult:
+        require(member["type"] == "System.Int32",
+                "Exception.HResult is not an Int32")
+        require(member["getAccess"] == "protected" and
+                member["setAccess"] == "protected",
+                "Exception.HResult is not a protected read/write property")
+
+    help_link = members_of(EXCEPTION, "property", "HelpLink")
+    require(len(help_link) == 1, "Exception.HelpLink is missing")
+    for member in help_link:
+        require(member["getAccess"] == "public" and
+                member["setAccess"] == "public",
+                "Exception.HelpLink is not a public read/write property")
+        require(member["getOverridable"] and member["setOverridable"],
+                "Exception.HelpLink is not overridable in both directions")
+
+    base_exception = members_of(EXCEPTION, "method", "GetBaseException")
+    require(len(base_exception) == 1, "Exception.GetBaseException is missing")
+    for member in base_exception:
+        require(member["returnType"] == EXCEPTION,
+                "Exception.GetBaseException does not return an Exception")
+        require(not member["parameters"],
+                "Exception.GetBaseException takes parameters")
+
+    error_code = members_of(EXTERNAL_EXCEPTION, "property", "ErrorCode")
+    require(len(error_code) == 1, "ExternalException.ErrorCode is missing")
+    for member in error_code:
+        require(member["type"] == "System.Int32",
+                "ExternalException.ErrorCode is not an Int32")
+        require(member["getAccess"] == "public" and
+                member["setAccess"] is None,
+                "ExternalException.ErrorCode is not a public get-only property")
+        require(member["getOverridable"],
+                "ExternalException.ErrorCode is not overridable")
+
+    # SystemException adds no member of its own. If it ever appears to, the
+    # projection would owe a member it has no evidence for.
+    require(not [
+        item for item in system_exception["members"]
+        if item["kind"] != "constructor"
+    ], "SystemException declares a non-constructor member")
+
+    # The CLR runtime services that are deliberately NOT projected must still
+    # be present in the pinned shape, so that dropping them from the Swift
+    # surface stays a recorded decision rather than an extraction accident.
+    for absent in ("StackTrace", "Source", "TargetSite", "Data"):
+        require(len(members_of(EXCEPTION, "property", absent)) == 1,
+                f"Exception.{absent} vanished from the extraction")
+    for absent in ("ToString", "GetObjectData", "GetType"):
+        require(len(members_of(EXCEPTION, "method", absent)) == 1,
+                f"Exception.{absent} vanished from the extraction")
+    return checks, failures
+
+
+def resource_checks(
+    strings: dict[str, str], selected: list[dict[str, Any]],
+) -> tuple[int, list[str]]:
+    """Every selected message string, read from the binary's own resources.
+
+    `Exception.get_Message`, `SystemException..ctor()` and
+    `ExternalException..ctor()` all load a resource KEY. What a projected XNA
+    exception reports is therefore a fact about the embedded resource table,
+    and admitting it means reproducing that table's value exactly.
+    """
+    failures: list[str] = []
+    checks = 0
+    for entry in selected:
+        checks += 1
+        found = strings.get(entry["key"])
+        if found is None:
+            failures.append(
+                f"resource key {entry['key']!r} is not in the assembly's "
+                "embedded string table")
+        elif found != entry["value"]:
+            failures.append(
+                f"resource {entry['key']!r} is {found!r} in the assembly, "
+                f"registered as {entry['value']!r}")
     return checks, failures
 
 
@@ -610,10 +946,11 @@ def mutation_self_tests(
     checks = 0
     by_name = {item["type"]: item for item in manifest}
 
-    subjects = [name for name in (COLLECTION, READONLY, LIST, ILIST)
+    subjects = [name for name in (COLLECTION, READONLY, LIST, ILIST, EXCEPTION,
+                                  SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION)
                 if name in by_name]
     checks += 1
-    if len(subjects) < 4:
+    if len(subjects) < 7:
         failures.append("mutation self-test subjects are missing")
 
     def first_of(record: dict[str, Any], kind: str) -> dict[str, Any] | None:
@@ -650,6 +987,34 @@ def mutation_self_tests(
     def change_base(record: dict[str, Any]) -> bool:
         record["baseType"] = "System.Collections.ObjectModel.ReadOnlyCollection`1"
         return True
+
+    def seal_property(property_name: str) -> Any:
+        """Make one named property's getter non-overridable.
+
+        `flip_virtual` takes whichever member happens to sort first, so it
+        cannot prove that a SPECIFIC override point is protected. Message is
+        overridable and InnerException is not; getting that pair backwards is
+        the mistake this aims at.
+        """
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if (
+                    member["kind"] == "property" and
+                    member["name"] == property_name and
+                    member.get("getOverridable")
+                ):
+                    member["getOverridable"] = False
+                    return True
+            return False
+        return mutate
+
+    def rebase_onto(base: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            if record["baseType"] == base:
+                return False
+            record["baseType"] = base
+            return True
+        return mutate
 
     def drop_interface(record: dict[str, Any]) -> bool:
         if not record["directInterfaces"]:
@@ -807,6 +1172,31 @@ def mutation_self_tests(
          drop_ilist_interface),
         ("ReadOnlyCollection<T>'s IList<T> implementation dropped", READONLY,
          drop_ilist_interface),
+        # The exception chain. Each of these is a way a plausible but wrong
+        # projection could be justified, and each must break a sentinel.
+        ("Exception made sealed", EXCEPTION, flip_sealed),
+        ("Exception rebased", EXCEPTION, change_base),
+        ("an Exception constructor dropped", EXCEPTION,
+         drop_member("constructor")),
+        ("an Exception property dropped", EXCEPTION, drop_member("property")),
+        ("Exception's protected HResult widened", EXCEPTION, change_visibility),
+        ("Message made non-overridable", EXCEPTION, seal_property("Message")),
+        ("HelpLink made non-overridable", EXCEPTION, seal_property("HelpLink")),
+        ("ErrorCode made non-overridable", EXTERNAL_EXCEPTION,
+         seal_property("ErrorCode")),
+        ("ISerializable dropped from Exception", EXCEPTION, drop_interface),
+        ("SystemException collapsed onto Object", SYSTEM_EXCEPTION,
+         rebase_onto("System.Object")),
+        ("SystemException given a member of its own", SYSTEM_EXCEPTION,
+         add_member),
+        ("a SystemException constructor dropped", SYSTEM_EXCEPTION,
+         drop_member("constructor")),
+        ("ExternalException collapsed straight onto Exception",
+         EXTERNAL_EXCEPTION, rebase_onto(EXCEPTION)),
+        ("ErrorCode dropped", EXTERNAL_EXCEPTION, drop_member("property")),
+        ("an ExternalException constructor dropped", EXTERNAL_EXCEPTION,
+         drop_member("constructor")),
+        ("ErrorCode given a setter", EXTERNAL_EXCEPTION, add_setter),
     ]
     for label, subject, mutate in sentinel_mutations:
         if subject not in by_name:
@@ -820,7 +1210,8 @@ def mutation_self_tests(
             failures.append(f"sentinel mutation {label!r} was not detected")
 
     # Removing a whole selected family must break the sentinels too.
-    for subject in (COLLECTION, READONLY, LIST, ILIST):
+    for subject in (COLLECTION, READONLY, LIST, ILIST, EXCEPTION,
+                    SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION):
         if subject not in by_name:
             continue
         reduced = {
@@ -1190,6 +1581,9 @@ def main() -> int:
     identity_checks = 0
     admitted: list[dict[str, Any]] = []
     manifest_records: list[dict[str, Any]] = []
+    manifest_resources: list[dict[str, Any]] = []
+    resource_failures: list[str] = []
+    resource_check_count = 0
     cross_check_checks = 0
     cross_check_failures: list[str] = []
     cross_check_ran = False
@@ -1219,6 +1613,33 @@ def main() -> int:
             identity_failures.append(
                 f"{name}: selected family {absent} is not declared")
         manifest_records.extend(records)
+
+        # The default messages these families report are resource lookups, not
+        # IL literals, so they are read out of the assembly's own embedded
+        # string table by this file's own PE walk -- no external tool, and
+        # nothing written to disk.
+        selected_resources = entry.get("selectedResourceStrings", [])
+        if selected_resources:
+            blob = embedded_resource(path.read_bytes(), "resources")
+            resource_checks_made = 0
+            if blob is None:
+                resource_failures.append(
+                    f"{name}: no embedded ResourceReader string table")
+                resource_checks_made = 1
+            else:
+                strings = resource_strings(blob)
+                resource_checks_made, issues = resource_checks(
+                    strings, selected_resources)
+                resource_failures.extend(f"{name}: {item}" for item in issues)
+                manifest_resources.extend(
+                    {
+                        "assembly": name,
+                        "key": item["key"],
+                        "value": strings.get(item["key"]),
+                    }
+                    for item in selected_resources
+                )
+            resource_check_count += resource_checks_made
 
         admitted.append({
             "assembly": name,
@@ -1251,6 +1672,8 @@ def main() -> int:
             "alone and regenerates byte-identically. No Microsoft binary is "
             "stored in the repository."),
         "types": manifest_records,
+        "resourceStrings": sorted(
+            manifest_resources, key=lambda item: (item["assembly"], item["key"])),
     }
 
     if args.write_manifest:
@@ -1279,6 +1702,29 @@ def main() -> int:
                 continue
             for issue in compare_records(pinned_by_name[key], found_by_name[key]):
                 manifest_failures.append(f"{key[1]}: {issue}")
+        # The pinned resource strings are compared exactly as the shapes are:
+        # a message the Swift support classes reproduce is part of the shape.
+        pinned_resources = {
+            (item["assembly"], item["key"]): item.get("value")
+            for item in pinned.get("resourceStrings", [])
+        }
+        found_resources = {
+            (item["assembly"], item["key"]): item.get("value")
+            for item in manifest_resources
+        }
+        for key in sorted(set(pinned_resources) | set(found_resources)):
+            manifest_checks += 1
+            if key not in found_resources:
+                manifest_failures.append(
+                    f"{key[1]}: pinned resource string not extracted")
+            elif key not in pinned_resources:
+                manifest_failures.append(
+                    f"{key[1]}: extracted resource string absent from the "
+                    "pinned manifest")
+            elif pinned_resources[key] != found_resources[key]:
+                manifest_failures.append(
+                    f"{key[1]}: resource string {found_resources[key]!r} != "
+                    f"pinned {pinned_resources[key]!r}")
     elif not args.write_manifest:
         manifest_failures.append(f"{MANIFEST} does not exist")
 
@@ -1291,7 +1737,8 @@ def main() -> int:
 
     failed = bool(
         identity_failures or manifest_failures or sentinel_failures or
-        mutation_failures or cross_check_failures or control_failures)
+        mutation_failures or cross_check_failures or control_failures or
+        resource_failures)
 
     report = {
         "schemaVersion": 1,
@@ -1309,6 +1756,7 @@ def main() -> int:
         "BCL_MANIFEST_CHECKS": manifest_checks,
         "BCL_MUTATION_SELF_TESTS": mutation_count,
         "BCL_CROSS_CHECKS": cross_check_checks,
+        "BCL_RESOURCE_CHECKS": resource_check_count,
         "BCL_NEGATIVE_CONTROLS": control_checks,
         "BCL_CROSS_CHECK_TOOL": "monodis" if cross_check_ran else "not run",
         "identityFailures": identity_failures,
@@ -1316,6 +1764,7 @@ def main() -> int:
         "sentinelFailures": sentinel_failures,
         "mutationFailures": mutation_failures,
         "crossCheckFailures": cross_check_failures,
+        "resourceFailures": resource_failures,
         "controlFailures": control_failures,
         "negativeControls": controls,
         "assemblies": admitted,
@@ -1342,6 +1791,7 @@ def main() -> int:
         f"BCL_MUTATION_SELF_TESTS={mutation_count} "
         f"BCL_CROSS_CHECKS={cross_check_checks} "
         f"({report['BCL_CROSS_CHECK_TOOL']}) "
+        f"BCL_RESOURCE_CHECKS={resource_check_count} "
         f"BCL_NEGATIVE_CONTROLS={control_checks}")
     for record in controls:
         print(
@@ -1350,7 +1800,8 @@ def main() -> int:
             f"{record['checksRun']} checks failed")
     print(f"BCL_AUTHORITY_STATUS={report['BCL_AUTHORITY_STATUS']}")
     for line in (identity_failures + manifest_failures + sentinel_failures +
-                 mutation_failures + cross_check_failures + control_failures):
+                 mutation_failures + cross_check_failures + resource_failures +
+                 control_failures):
         print(f"  {line}", file=sys.stderr)
     return 1 if failed else 0
 

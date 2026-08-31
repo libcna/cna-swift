@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1861,
-  "ASSERTIONS": 1861,
+  "OBSERVATIONS": 1900,
+  "ASSERTIONS": 1900,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -177,11 +177,21 @@
     "testVisualizationDataCollectionsAreLiveViewsOfTheirStorage",
     "testVisualizationDataLengthIsInvariantAcrossWrites",
     "testVisualizationDataRejectsOutOfRangeIndices",
-    "testVisualizationDataViewsSupportTheReadOnlySurface"
+    "testVisualizationDataViewsSupportTheReadOnlySurface",
+    "testXnaExceptionsDeriveFromTheirExactDeclaredBase",
+    "testProjectedClrClassNamesAreDerivedExactly",
+    "testExceptionDerivedXnaTypesSynthesizeTheirOwnClassNameMessage",
+    "testExternalDerivedXnaTypesReportTheExternalComponentMessage",
+    "testXnaExceptionConstructorsForwardWithoutSynthesizingAnything",
+    "testXnaExceptionsThrowAndCatchByExactTypeAndByBase",
+    "testExternalXnaExceptionIsCaughtByEachLinkOfTheChain",
+    "testXnaExceptionsAreNotCNAErrors",
+    "testTheTwoUnsealedXnaExceptionsAreDerivable",
+    "testALocallyDeclaredSubclassGetsAMangledClassNameInItsDefaultMessage"
   ],
   "BCL_AUTHORITY": "PURE_BCL_DERIVED",
-  "BCL_OBSERVATIONS": 77,
-  "BCL_ASSERTIONS": 77,
+  "BCL_OBSERVATIONS": 126,
+  "BCL_ASSERTIONS": 126,
   "bclTestCases": [
     "testCollectionDefaultConstructorAllocatesItsOwnBackingStore",
     "testCollectionWrappingConstructorObservesLaterMutationsOfTheSuppliedList",
@@ -202,7 +212,19 @@
     "testReadOnlyCollectionReadersMatchTheBackingStore",
     "testTheTwoCollectionFamiliesAreSiblingsNotAChain",
     "testBackingListBoundsUseTheSameRuleForNegativeAndOversizedIndices",
-    "testBackingListIsNeverReadOnly"
+    "testBackingListIsNeverReadOnly",
+    "testBclExceptionResourceStringsAreTheAdmittedAssemblysOwn",
+    "testExceptionDefaultConstructorSynthesizesTheClassNameMessage",
+    "testExceptionNullMessageIsStoredAndSelectsTheSynthesizedDefault",
+    "testExceptionInnerConstructorStoresBothArguments",
+    "testGetBaseExceptionReturnsTheDeepestExceptionInTheChain",
+    "testSystemExceptionSubstitutesItsOwnMessageAndHResult",
+    "testExternalExceptionSubstitutesItsOwnMessageAndHResult",
+    "testExternalExceptionErrorCodeIsTheHResult",
+    "testExceptionSupportChainIsExactlyThreeLinks",
+    "testHelpLinkIsNilUntilAssigned",
+    "testCNAErrorIsNotACNAException",
+    "testSupportExceptionsAreThrowableAndCatchable"
   ],
   "groupCounts": {
     "Vector2": 2,

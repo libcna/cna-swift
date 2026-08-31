@@ -63,6 +63,38 @@
         {
           "type": "System.Collections.Generic.IEnumerator`1",
           "reason": "The declared return type of GetEnumerator on both selected collection families; it is the CLR contract CNAEnumerator<Element> projects."
+        },
+        {
+          "type": "System.Exception",
+          "reason": "The direct CLR base of NoMicrophoneConnectedException, ContentLoadException, DeviceLostException, DeviceNotResetException and NoSuitableGraphicsDeviceException, the transitive base of the other three XNA exception types, and the declared parameter type of every two-argument XNA exception constructor and of Game.ShowMissingRequirementMessage. It owns the whole observable state those eight types have -- Message, InnerException, HResult -- because every one of their constructors is a bare forward to it. Projected as CNAException.",
+          "registered": "Foundation 30"
+        },
+        {
+          "type": "System.SystemException",
+          "reason": "The exact direct CLR base of ExternalException. It is not a marker: each of its constructors substitutes the resource message Arg_SystemException and sets HResult to 0x80131501, which ExternalException then overwrites, so collapsing it would change both. Projected as CNASystemException.",
+          "registered": "Foundation 30"
+        },
+        {
+          "type": "System.Runtime.InteropServices.ExternalException",
+          "reason": "The direct CLR base of InstancePlayLimitException, NoAudioHardwareException and StorageDeviceNotConnectedException. It substitutes the resource message Arg_ExternalException, sets HResult to 0x80004005, and adds the public ErrorCode property that reads it. Projected as CNAExternalException.",
+          "registered": "Foundation 30"
+        }
+      ],
+      "selectedResourceStrings": [
+        {
+          "key": "Exception_WasThrown",
+          "value": "Exception of type '{0}' was thrown.",
+          "reason": "System.Exception.get_Message returns this, formatted with GetClassName(), whenever the stored message is null -- which every parameterless XNA exception constructor produces. Read from the assembly's own embedded mscorlib.resources, never from documentation or memory."
+        },
+        {
+          "key": "Arg_SystemException",
+          "value": "System error.",
+          "reason": "The message System.SystemException..ctor() passes to its base."
+        },
+        {
+          "key": "Arg_ExternalException",
+          "value": "External component has thrown an exception.",
+          "reason": "The message System.Runtime.InteropServices.ExternalException..ctor() passes to its base, and therefore the Message of a parameterless InstancePlayLimitException, NoAudioHardwareException or StorageDeviceNotConnectedException."
         }
       ]
     }

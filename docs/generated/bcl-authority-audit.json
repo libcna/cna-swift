@@ -1,16 +1,17 @@
 {
   "schemaVersion": 1,
-  "registrySha256": "e41836e64b8881732c4b057d1c7d116618e19cdb5fa35165ee232cc73be4066a",
-  "manifestSha256": "ef5f2428a546b677d797b5def4c07c44e04419844418b13de9a20f61aa323f0e",
+  "registrySha256": "730a6c76faabf63e4b56114ef78d3b5862eac30179845b9e5cf181df6c27b38e",
+  "manifestSha256": "463f1f334156113714a0e410ccb2d25f10dafe560e2bef42f82fa65db1808f23",
   "BCL_AUTHORITY_STATUS": "PASS",
   "BCL_AUTHORITY_ASSEMBLIES": 1,
-  "BCL_AUTHORITY_TYPES": 8,
-  "BCL_AUTHORITY_MEMBERS": 94,
+  "BCL_AUTHORITY_TYPES": 11,
+  "BCL_AUTHORITY_MEMBERS": 122,
   "BCL_IDENTITY_CHECKS": 21,
-  "BCL_SENTINEL_CHECKS": 125,
-  "BCL_MANIFEST_CHECKS": 8,
-  "BCL_MUTATION_SELF_TESTS": 97,
-  "BCL_CROSS_CHECKS": 41,
+  "BCL_SENTINEL_CHECKS": 194,
+  "BCL_MANIFEST_CHECKS": 14,
+  "BCL_MUTATION_SELF_TESTS": 168,
+  "BCL_CROSS_CHECKS": 56,
+  "BCL_RESOURCE_CHECKS": 3,
   "BCL_NEGATIVE_CONTROLS": 4,
   "BCL_CROSS_CHECK_TOOL": "monodis",
   "identityFailures": [],
@@ -18,6 +19,7 @@
   "sentinelFailures": [],
   "mutationFailures": [],
   "crossCheckFailures": [],
+  "resourceFailures": [],
   "controlFailures": [],
   "negativeControls": [
     {
@@ -118,8 +120,8 @@
       "publicKeyTokenRecomputed": "b77a5c561934e089",
       "sha256": "5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
       "fileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
-      "selectedTypes": 8,
-      "selectedMembers": 94
+      "selectedTypes": 11,
+      "selectedMembers": 122
     }
   ]
 }

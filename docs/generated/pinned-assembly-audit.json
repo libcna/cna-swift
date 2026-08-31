@@ -6,7 +6,7 @@
     "Microsoft.Xna.Framework.dll"
   ],
   "CALIBRATION_STATUS": "PASS",
-  "AUDIT_SELF_TESTS": 60,
+  "AUDIT_SELF_TESTS": 64,
   "AUDIT_SELF_TEST_STATUS": "PASS",
   "auditSelfTestFailures": [],
   "CONTRACT_TYPES_REPRODUCED": 257,

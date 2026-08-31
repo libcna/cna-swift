@@ -16,6 +16,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 REFERENCE = ROOT / "tools/api_compat/reference/xna40-windows-runtime-contract.json"
+BCL_SELECTED_SHAPE = ROOT / "tools/api_compat/reference/bcl40-selected-shape.json"
 RULES = ROOT / "tools/api_compat/mapping-rules.json"
 ACCESSOR_FALLIBILITY = ROOT / "tools/api_compat/reference/xna40-accessor-fallibility.json"
 RETURN_NULLABILITY = (
@@ -57,7 +58,7 @@ CATEGORIES = (
     "ENUM_VALUE_MISMATCH", "FLAGS_MAPPING_MISMATCH", "EVENT_MAPPING_MISMATCH",
     "OPERATOR_MAPPING_MISMATCH", "REF_OUT_MAPPING_MISMATCH", "LANGUAGE_MAPPING_MISMATCH",
     "INTERNAL_TYPE_LEAK", "RAW_HANDLE_LEAK", "PUBLIC_NATIVE_FFI_LEAK",
-    "UNMEASURED_STRUCTURAL_CATEGORY",
+    "INHERITANCE_MAPPING_MISMATCH", "UNMEASURED_STRUCTURAL_CATEGORY",
 )
 
 TYPE_KINDS = {
@@ -1245,12 +1246,15 @@ def comparable_kind(expected: Member, actual: Member) -> bool:
 # `measuredSupportBaseProjections` by a self-test.
 MEASURED_SUPPORT_BASES = (
     "CNAEventArgs", "CNACollection", "CNAReadOnlyCollection",
+    "CNAException", "CNASystemException", "CNAExternalException",
 )
 
 # The support bases that are GENERIC. For these the Swift superclass identity
 # is only half the fact: `Collection<IGameComponent>` and `Collection<Object>`
 # are different CLR bases and would be different Swift superclasses, so the
 # specialization is measured too. See `bclSupportBaseSpecializationMapping`.
+# The exception support bases are NOT generic, so their superclass identity is
+# the whole fact and there is no argument to supplement from source.
 GENERIC_SUPPORT_BASES = ("CNACollection", "CNAReadOnlyCollection")
 
 # The three CLR roots carry no projected members, so a type sitting directly on
@@ -4101,18 +4105,161 @@ def self_test() -> None:
         event_self_tests += 1
 
     # ------------------------------------------------------------------
+    # The CLR `sealed` rule, and the resource strings the exception support
+    # classes reproduce. Both are general measurements over the pinned
+    # contract, so both are proved non-vacuous the same way: a correct model
+    # must be clean, and each single mutation must be caught.
+    # ------------------------------------------------------------------
+    sealed_contract = {
+        "types": [
+            {
+                "name": "Microsoft.Xna.Framework.Sealed", "kind": "class",
+                "sealed": True,
+                "members": [{"kind": "constructor", "name": ".ctor",
+                             "access": "public", "parameters": []}],
+            },
+            {
+                "name": "Microsoft.Xna.Framework.Open", "kind": "class",
+                "sealed": False,
+                "members": [{"kind": "constructor", "name": ".ctor",
+                             "access": "public", "parameters": []}],
+            },
+        ]
+    }
+
+    def sealed_models(sealed_final: bool, open_final: bool) -> dict[str, TypeModel]:
+        return {
+            "Microsoft.Xna.Framework.Sealed": TypeModel(
+                "Microsoft.Xna.Framework.Sealed", "class",
+                declaration=("final class Sealed" if sealed_final
+                             else "class Sealed"),
+                access="public"),
+            "Microsoft.Xna.Framework.Open": TypeModel(
+                "Microsoft.Xna.Framework.Open", "class",
+                declaration=("final class Open" if open_final else "class Open"),
+                access="open"),
+        }
+
+    clean = sealed_class_evidence(
+        sealed_contract, rules, sealed_models(True, False))
+    if clean[1]:
+        failures.append("the sealed-class reference model is not clean")
+    event_self_tests += 1
+    if len(clean[0]) != 2:
+        failures.append("the sealed-class evidence does not cover both classes")
+    event_self_tests += 1
+    if sum(item["derivableInReferenceButNotInSwift"] for item in clean[0]):
+        failures.append(
+            "a derivable unsealed class was reported as non-derivable")
+    event_self_tests += 1
+
+    unsealed_projection = sealed_class_evidence(
+        sealed_contract, rules, sealed_models(False, False))
+    if "INHERITANCE_MAPPING_MISMATCH" not in {
+        item["category"] for item in unsealed_projection[1]
+    }:
+        failures.append(
+            "a CLR sealed class projected without `final` was not detected")
+    event_self_tests += 1
+
+    # The converse is recorded, never diagnosed: sealing a class XNA leaves
+    # derivable is a public-API decision, so it must show up in the evidence
+    # and must NOT become a diagnostic on its own.
+    over_sealed = sealed_class_evidence(
+        sealed_contract, rules, sealed_models(True, True))
+    if over_sealed[1]:
+        failures.append(
+            "sealing a derivable class was diagnosed rather than recorded")
+    event_self_tests += 1
+    if sum(item["derivableInReferenceButNotInSwift"] for item in over_sealed[0]) != 1:
+        failures.append(
+            "sealing a derivable class was not recorded in the evidence")
+    event_self_tests += 1
+
+    resource_manifest = {
+        "resourceStrings": [
+            {"assembly": "mscorlib.dll", "key": item["key"],
+             "value": {
+                 "Exception_WasThrown": "Exception of type '{0}' was thrown.",
+                 "Arg_SystemException": "System error.",
+                 "Arg_ExternalException":
+                     "External component has thrown an exception.",
+             }.get(item["key"])}
+            for item in rules.get("bclResourceStringProjections", [])
+        ]
+    }
+    resource_clean = bcl_resource_string_evidence(
+        rules, ROOT / "Sources/CNA", resource_manifest)
+    if resource_clean[1]:
+        failures.append(
+            "the Swift support source does not reproduce the pinned resource "
+            "strings")
+    event_self_tests += 1
+    if len(resource_clean[0]) != len(
+        rules.get("bclResourceStringProjections", [])
+    ):
+        failures.append("the resource-string evidence is incomplete")
+    event_self_tests += 1
+
+    mutated_manifest = copy.deepcopy(resource_manifest)
+    if mutated_manifest["resourceStrings"]:
+        mutated_manifest["resourceStrings"][0]["value"] = "Something else."
+        if "BASE_MAPPING_MISMATCH" not in {
+            item["category"]
+            for item in bcl_resource_string_evidence(
+                rules, ROOT / "Sources/CNA", mutated_manifest)[1]
+        }:
+            failures.append(
+                "a resource string the Swift source does not reproduce was "
+                "not detected")
+        event_self_tests += 1
+
+    if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
+        item["category"]
+        for item in bcl_resource_string_evidence(rules, ROOT / "Sources/CNA", None)[1]
+    }:
+        failures.append(
+            "an unreadable BCL manifest was not reported unmeasured")
+    event_self_tests += 1
+    if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
+        item["category"]
+        for item in bcl_resource_string_evidence(
+            rules, ROOT / "no-such-directory", resource_manifest)[1]
+    }:
+        failures.append(
+            "an unreadable BCL support source was not reported unmeasured")
+    event_self_tests += 1
+
+    # ------------------------------------------------------------------
     # The BCL collection support classes are measured the same way.
     # ------------------------------------------------------------------
     def bcl_models() -> dict[str, TypeModel]:
+        """The reference model: every support type exactly as pinned.
+
+        Built from the contract rather than written out, so a new support
+        family -- the exception chain was one -- is measured by every mutation
+        below the moment it is added. The arity, the support BASE and the
+        required CONFORMANCES all come from the specification: a family with no
+        generic parameter must not be modelled as if it had one, and a family
+        whose base is another support type must carry that base or the chain
+        checks would have nothing to test.
+        """
         models: dict[str, TypeModel] = {}
         for name, specification in rules.get("bclSupportContract", {}).items():
+            generics = tuple(specification.get("generics", []))
+            suffix = f"<{', '.join(generics)}>" if generics else ""
             model = TypeModel(
-                name, specification["kind"], generic_count=1,
-                generic_parameters=tuple(specification.get("generics", [])),
+                name, specification["kind"], generic_count=len(generics),
+                generic_parameters=generics,
                 declaration=(
                     f"{'final ' if specification['inheritance'] == 'final' else ''}"
-                    f"class {name}<Element>"),
+                    f"class {name}{suffix}"),
                 identifier=name, access=specification["inheritance"],
+                base=specification.get("base"),
+                interfaces=tuple(
+                    item.replace("Swift.", "")
+                    for item in specification.get("conformances", [])
+                ),
             )
             open_members = set(specification.get("openMembers", []))
             model.members = [
@@ -4122,7 +4269,13 @@ def self_test() -> None:
                     identifier=f"{name}:{member_name}",
                     access="open" if member_name in open_members else "public",
                 )
-                for member_name in specification.get("requiredMembers", [])
+                for member_name in (
+                    list(specification.get("requiredMembers", [])) +
+                    [
+                        item for item in specification.get("finalMembers", [])
+                        if item not in specification.get("requiredMembers", [])
+                    ]
+                )
             ]
             models[name] = model
         return models
@@ -4133,8 +4286,11 @@ def self_test() -> None:
     if bcl_categories(bcl_models()):
         failures.append("the BCL support reference model is not diagnostic-free")
     event_self_tests += 1
-    if len(bcl_support_evidence(bcl_models(), rules)[0]) != 3:
-        failures.append("the BCL support evidence does not cover three types")
+    if len(bcl_support_evidence(bcl_models(), rules)[0]) != len(
+        rules.get("bclSupportContract", {})
+    ):
+        failures.append(
+            "the BCL support evidence does not cover every pinned support type")
     event_self_tests += 1
 
     def bcl_member(owner: str, member_name: str, access: str = "public") -> Member:
@@ -4185,6 +4341,80 @@ def self_test() -> None:
         # The backing store must stay a fixed contract.
         ("CNAList not final",
          lambda m: setattr(m["CNAList"], "declaration", "class CNAList<Element>")),
+
+        # ------------------------------------------------------------------
+        # The exception chain. Each of these is a projection someone could
+        # plausibly reach for and each one loses something the CLR states.
+        # ------------------------------------------------------------------
+
+        # Without `Error`, a projected XNA exception is not throwable and the
+        # entire reason for projecting it as a class is gone.
+        ("CNAException not conforming to Error",
+         lambda m: setattr(m["CNAException"], "interfaces", ())),
+        ("CNAExternalException not conforming to Error",
+         lambda m: setattr(m["CNAExternalException"], "interfaces", ())),
+        # A struct or an enum cannot carry the chain at all.
+        ("CNAException projected as a struct",
+         lambda m: setattr(m["CNAException"], "kind", "struct")),
+        ("CNAException projected as an enum",
+         lambda m: setattr(m["CNAException"], "kind", "enum")),
+        ("CNAExternalException projected as a struct",
+         lambda m: setattr(m["CNAExternalException"], "kind", "struct")),
+        # Sealing the base makes every XNA exception inexpressible.
+        ("CNAException not open",
+         lambda m: setattr(m["CNAException"], "access", "public")),
+        ("CNAExternalException not open",
+         lambda m: setattr(m["CNAExternalException"], "access", "public")),
+        # Collapsing SystemException out of the chain would change both the
+        # default message and the HResult of the three ExternalException
+        # subclasses.
+        ("CNAExternalException collapsed straight onto CNAException",
+         lambda m: setattr(m["CNAExternalException"], "base", "CNAException")),
+        ("CNAExternalException left base-less",
+         lambda m: setattr(m["CNAExternalException"], "base", None)),
+        ("CNASystemException left base-less",
+         lambda m: setattr(m["CNASystemException"], "base", None)),
+        # CNAError is the binding's own runtime failure channel and is NOT a
+        # CLR exception identity. Substituting it as the support base would
+        # merge two channels the architecture keeps apart.
+        ("CNAException rebased on CNAError",
+         lambda m: setattr(m["CNAException"], "base", "CNAError")),
+        ("CNAExternalException rebased on CNAError",
+         lambda m: setattr(m["CNAExternalException"], "base", "CNAError")),
+        # `get_InnerException` is `virtual final`: a sealed implementation, not
+        # an override point.
+        ("InnerException made an override point", lambda m:
+            m["CNAException"].members.append(
+                bcl_member("CNAException", "InnerException", "open"))),
+        # An overridable member that is not overridable is not one.
+        ("Message not open", lambda m: setattr(
+            m["CNAException"], "members",
+            [bcl_member("CNAException", item.name)
+             for item in m["CNAException"].members])),
+        ("ErrorCode not open", lambda m: setattr(
+            m["CNAExternalException"], "members",
+            [bcl_member("CNAExternalException", item.name)
+             for item in m["CNAExternalException"].members])),
+        # A member that needs a CLR runtime service this projection does not
+        # have must stay absent; answering with an empty string or a fabricated
+        # stack would be worse than the absence.
+        ("CNAException exposing StackTrace", lambda m:
+            m["CNAException"].members.append(
+                bcl_member("CNAException", "StackTrace"))),
+        ("CNAException exposing Data", lambda m:
+            m["CNAException"].members.append(
+                bcl_member("CNAException", "Data"))),
+        ("CNAException exposing GetObjectData", lambda m:
+            m["CNAException"].members.append(
+                bcl_member("CNAException", "GetObjectData"))),
+        ("CNAException exposing ToString", lambda m:
+            m["CNAException"].members.append(
+                bcl_member("CNAException", "ToString"))),
+        # ErrorCode belongs to ExternalException alone; SystemException adds
+        # no member of its own in the admitted metadata.
+        ("CNASystemException exposing ErrorCode", lambda m:
+            m["CNASystemException"].members.append(
+                bcl_member("CNASystemException", "ErrorCode"))),
     ]
     for label, mutate in bcl_mutations:
         models = bcl_models()
@@ -4192,6 +4422,21 @@ def self_test() -> None:
         if "BASE_MAPPING_MISMATCH" not in bcl_categories(models):
             failures.append(f"BCL support {label}: was not detected")
         event_self_tests += 1
+
+    # A support type declared inside the XNA namespace is caught, but by a
+    # different route and it is worth being exact about which: the Symbol
+    # Graph path would then be `Microsoft.Xna.Framework.CNAException`, which
+    # matches no name in `bclSupportContract`, so the support type is not found
+    # at all. That is an UNMEASURED_STRUCTURAL_CATEGORY -- the surface it
+    # carries stops being measured -- and the phantom type additionally shows
+    # up in the strict XNA comparison. Either way it is never silent.
+    models = bcl_models()
+    models["Microsoft.Xna.Framework.CNAException"] = models.pop("CNAException")
+    if "UNMEASURED_STRUCTURAL_CATEGORY" not in bcl_categories(models):
+        failures.append(
+            "BCL support: a support type moved into the XNA namespace was not "
+            "reported unmeasured")
+    event_self_tests += 1
 
     # Every required member must actually be required.
     for support_name, specification in rules.get("bclSupportContract", {}).items():
@@ -4725,6 +4970,147 @@ def symbol_graph_self_test(path: Path) -> None:
     print("SYMBOL_GRAPH_SELF_TEST_STATUS=PASS")
 
 
+def sealed_class_evidence(
+    contract: dict[str, Any],
+    rules: dict[str, Any],
+    actual: dict[str, TypeModel],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """A CLR `sealed` class must be a Swift `final` class.
+
+    Sealing is part of a public type's contract: `sealed` says no consumer may
+    derive from it, and a Swift projection that left such a class open would
+    invent an extension point XNA does not have -- the same defect the BCL
+    support checks call an unsealed `virtual final` member. It is measured
+    generally for every implemented reference class, never per named type.
+
+    The converse direction -- a CLR class that is NOT sealed must not be a
+    Swift `final` class -- is deliberately NOT a diagnostic here. It does not
+    hold today, and the types where it fails are named in the report rather
+    than suppressed, because making them derivable is a public-API decision of
+    its own, not a side effect of this rule. `XNA_SEALED_CLASS_PROJECTIONS` and
+    `NONDERIVABLE_UNSEALED_CLASSES` are the two halves of that record.
+    """
+    evidence: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, str]] = []
+    for item in contract["types"]:
+        if item["kind"] != "class":
+            continue
+        name = map_type_name(item["name"], rules)
+        model = actual.get(name)
+        if model is None:
+            continue
+        final = "final class" in model.declaration
+        sealed = bool(item.get("sealed"))
+        public_constructors = sum(
+            member["kind"] == "constructor" and member.get("access") == "public"
+            for member in item["members"]
+        )
+        if sealed and not final:
+            diagnostics.append(diagnostic(
+                "INHERITANCE_MAPPING_MISMATCH", name,
+                "the CLR seals this class, so the Swift projection must be a "
+                f"final class; found {model.declaration!r}",
+            ))
+        evidence.append({
+            "type": name,
+            "clrSealed": sealed,
+            "swiftFinal": final,
+            "swiftAccess": model.access,
+            "referencePublicConstructors": public_constructors,
+            # A non-sealed CLR class with a public constructor is derivable in
+            # XNA. Where the Swift projection is final it is not, and that gap
+            # is recorded here by name rather than hidden.
+            "derivableInReferenceButNotInSwift": (
+                not sealed and public_constructors > 0 and final
+            ),
+        })
+    return evidence, diagnostics
+
+
+def source_bcl_resource_strings(source_root: Path) -> list[str] | None:
+    """Every Swift string literal in the BCL exception support source.
+
+    A default exception message is a RESOURCE LOOKUP in the admitted binary,
+    not an IL literal, so the value the Swift support classes reproduce cannot
+    be checked against the IL. It is checked against the resource table the BCL
+    authority audit read out of that same binary and pinned, and this is the
+    half of that check that reads the compiled source -- exactly as the enum
+    raw types and the superclass specializations are already read from it.
+
+    `None` means the source could not be read, which is reported as unmeasured
+    rather than treated as agreement.
+    """
+    path = source_root / "CNAExceptions.swift"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    literals: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("//") or stripped.startswith("///"):
+            continue
+        literals.extend(re.findall(r'"((?:[^"\\]|\\.)*)"', line))
+    return literals
+
+
+def bcl_resource_string_evidence(
+    rules: dict[str, Any],
+    source_root: Path,
+    manifest: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Each pinned resource string must appear verbatim in the Swift source."""
+    evidence: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, str]] = []
+    selected = rules.get("bclResourceStringProjections", [])
+    if not selected:
+        return evidence, diagnostics
+    if manifest is None:
+        diagnostics.append(diagnostic(
+            "UNMEASURED_STRUCTURAL_CATEGORY", "bclResourceStringProjections",
+            "the pinned BCL selected-shape manifest could not be read, so the "
+            "projected default exception messages are unmeasured",
+        ))
+        return evidence, diagnostics
+    pinned = {
+        item["key"]: item.get("value")
+        for item in manifest.get("resourceStrings", [])
+    }
+    literals = source_bcl_resource_strings(source_root)
+    if literals is None:
+        diagnostics.append(diagnostic(
+            "UNMEASURED_STRUCTURAL_CATEGORY", "bclResourceStringProjections",
+            "the BCL exception support source could not be read, so the "
+            "projected default exception messages are unmeasured",
+        ))
+        return evidence, diagnostics
+    for entry in selected:
+        key = entry["key"]
+        value = pinned.get(key)
+        if value is None:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", f"resourceString.{key}",
+                "the projected resource string is not pinned in the BCL "
+                "selected-shape manifest, so it rests on nothing",
+            ))
+            continue
+        reproduced = value in literals
+        if not reproduced:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", f"resourceString.{key}",
+                f"the Swift support source does not reproduce the pinned "
+                f"value {value!r} read from the admitted assembly's own "
+                "embedded resource table",
+            ))
+        evidence.append({
+            "resourceKey": key,
+            "pinnedValue": value,
+            "reproducedInSwiftSource": reproduced,
+            "reason": entry.get("reason"),
+        })
+    return evidence, diagnostics
+
+
 def event_support_evidence(
     support: dict[str, TypeModel],
     rules: dict[str, Any],
@@ -4942,6 +5328,26 @@ def bcl_support_evidence(
                 "BASE_MAPPING_MISMATCH", name,
                 "a BCL support type must live outside the XNA namespace",
             ))
+        # A CLR exception class is a thing you throw, so its projection must be
+        # a thing Swift can throw. Without the `Error` conformance every
+        # projected XNA exception stops being a real Swift error, `throw` stops
+        # compiling for consumers, and the whole point of the class projection
+        # is lost -- so the conformance is measured from the compiler's own
+        # `conformsTo` relationship rather than assumed from the source text.
+        # `relationship_name` already drops the `Swift.` qualifier from a
+        # standard-library conformance, so the pinned fully-qualified spelling
+        # is matched against both forms rather than only one.
+        observed_conformances = {
+            item.split("<", 1)[0] for item in model.interfaces
+        }
+        for conformance in specification.get("conformances", []):
+            accepted = {conformance, conformance.replace("Swift.", "")}
+            if not accepted & observed_conformances:
+                diagnostics.append(diagnostic(
+                    "BASE_MAPPING_MISMATCH", name,
+                    f"the support type must conform to {conformance}; the "
+                    f"compiler reports {sorted(observed_conformances)}",
+                ))
 
         observed: dict[str, list[Member]] = collections.defaultdict(list)
         for member in model.members:
@@ -4966,12 +5372,28 @@ def bcl_support_evidence(
                     "the CLR declares this a protected virtual hook, so it must "
                     f"be open; found access {found}",
                 ))
+        # The CLR's `virtual final` members are sealed implementations, not
+        # override points. `Exception.InnerException` is one of them, and an
+        # `open` projection of it would invent an extension point the CLR does
+        # not have -- the mirror image of the `openMembers` check above.
+        for member_name in specification.get("finalMembers", []):
+            candidates = observed.get(member_name)
+            if not candidates:
+                continue
+            if any(item.access == "open" for item in candidates):
+                diagnostics.append(diagnostic(
+                    "BASE_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    "the CLR declares this member virtual FINAL, so it is a "
+                    "sealed implementation and must not be open",
+                ))
         for member_name in specification.get("forbiddenMembers", []):
             if member_name in observed:
                 diagnostics.append(diagnostic(
                     "BASE_MAPPING_MISMATCH", f"{name}.{member_name}",
                     "BCL support member is forbidden on this type; mscorlib "
-                    "does not declare it here",
+                    "does not declare it here. Where the CLR member needs a "
+                    "runtime service this projection does not have, an absence "
+                    "is truthful and an implementation would be a fabrication",
                 ))
 
         for member in model.members:
@@ -4991,6 +5413,13 @@ def bcl_support_evidence(
             "inheritance": inheritance,
             "genericParameters": list(model.generic_parameters),
             "base": model.base,
+            "conformances": sorted(observed_conformances),
+            "requiredConformances": list(specification.get("conformances", [])),
+            "finalMembers": [
+                item for item in specification.get("finalMembers", [])
+                if item in observed and
+                not any(entry.access == "open" for entry in observed[item])
+            ],
             "publicMembers": sorted(observed),
             "openHooks": [
                 item for item in specification.get("openMembers", [])
@@ -5142,8 +5571,12 @@ def make_report(
     accessor_fallibility: dict[tuple[str, str], dict[str, bool]],
     return_nullability: dict[tuple[str, str, str, tuple[str, ...]], dict[str, Any]],
     bcl_evidence: list[dict[str, Any]] | None = None,
+    sealed_evidence: list[dict[str, Any]] | None = None,
+    resource_evidence: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     bcl_evidence = bcl_evidence or []
+    sealed_evidence = sealed_evidence or []
+    resource_evidence = resource_evidence or []
     counts = collections.Counter(item["category"] for item in diagnostics)
     type_diagnostics: dict[str, list[dict[str, str]]] = collections.defaultdict(list)
     for item in diagnostics:
@@ -5346,6 +5779,19 @@ def make_report(
     )
     summary["EVENT_SUPPORT_TYPE_MEASUREMENTS"] = len(support_evidence)
     summary["BCL_SUPPORT_TYPE_MEASUREMENTS"] = len(bcl_evidence)
+    # Every implemented CLR class the reference seals, and the Swift `final`
+    # each one must therefore carry.
+    summary["XNA_SEALED_CLASS_PROJECTIONS"] = sum(
+        item["clrSealed"] for item in sealed_evidence)
+    # The other direction, recorded rather than diagnosed: a class XNA leaves
+    # derivable that this projection has sealed. Each is a public-API decision
+    # still to be taken, and `nonDerivableUnsealedClasses` names them.
+    summary["NONDERIVABLE_UNSEALED_CLASSES"] = sum(
+        item["derivableInReferenceButNotInSwift"] for item in sealed_evidence)
+    # Each pinned default exception message the Swift support source
+    # reproduces verbatim from the admitted assembly's own resource table.
+    summary["BCL_RESOURCE_STRING_PROJECTIONS"] = sum(
+        item["reproducedInSwiftSource"] for item in resource_evidence)
     # Every contract type whose CLR base has a decided Swift support
     # projection. The head is what is counted, because a generic support base
     # arrives here specialized -- `CNACollection<...>` -- and is the same
@@ -5361,9 +5807,17 @@ def make_report(
     # type is counted as PROJECTED once it is actually implemented; the
     # remainder are types whose BCL base is now decided but which are still
     # blocked on something else, and are named rather than silently dropped.
+    #
+    # The set is every family admitted through `bcl-authorities.json`, taken
+    # from `bclSupportTypeProjections` rather than from the generic bases: the
+    # exception families are equally BCL and equally admitted, and counting
+    # only the generic ones would have quietly excluded them. `CNAEventArgs` is
+    # a measured support base but NOT a BCL authority family, so it stays out
+    # of this half exactly as before.
+    bcl_support_bases = tuple(rules.get("bclSupportTypeProjections", {}).values())
     bcl_based = [
         item for item in support_based
-        if base_head(map_clr_type(item["baseType"], rules)) in GENERIC_SUPPORT_BASES
+        if base_head(map_clr_type(item["baseType"], rules)) in bcl_support_bases
     ]
     bcl_projected = [
         item for item in bcl_based if item["name"] not in missing_types
@@ -5375,20 +5829,26 @@ def make_report(
     # declaring. They are real usable surface and they are NOT XNA identities,
     # so they are counted here and in no XNA total: REFERENCE_MEMBERS and
     # EXPECTED_SWIFT_MEMBERS are unaffected by this number.
-    bcl_inherited = {
-        "CNACollection": (
-            "Count", "Items", "Item", "SetItem", "Add", "Clear", "Contains",
-            "CopyTo", "GetEnumerator", "IndexOf", "Insert", "Remove",
-            "RemoveAt", "ClearItems", "InsertItem", "RemoveItem",
-        ),
-        "CNAReadOnlyCollection": (
-            "Count", "Items", "Item", "Contains", "CopyTo", "GetEnumerator",
-            "IndexOf",
-        ),
-    }
+    # Derived from the pinned support contract rather than restated here, so
+    # the two cannot drift, and accumulated along the SUPPORT BASE CHAIN: a
+    # type whose base is CNAExternalException inherits that class's members and
+    # every member CNASystemException and CNAException give it too. Counting
+    # only the direct base would have under-reported the exception families by
+    # the whole of `System.Exception`.
+    support_contract = rules.get("bclSupportContract", {})
+
+    def inherited_surface(support_name: str) -> tuple[str, ...]:
+        names: list[str] = []
+        seen: set[str] = set()
+        current: str | None = support_name
+        while current and current in support_contract and current not in seen:
+            seen.add(current)
+            names.extend(support_contract[current].get("requiredMembers", []))
+            current = support_contract[current].get("base")
+        return tuple(dict.fromkeys(names))
+
     summary["BCL_INHERITED_MEMBER_PROJECTIONS"] = sum(
-        len(bcl_inherited.get(
-            base_head(map_clr_type(item["baseType"], rules)), ()))
+        len(inherited_surface(base_head(map_clr_type(item["baseType"], rules))))
         for item in bcl_projected
     )
 
@@ -5482,6 +5942,12 @@ def make_report(
         "nonPublicConstructionProjections": nonpublic_construction_evidence,
         "eventSupportProjections": support_evidence,
         "bclSupportProjections": bcl_evidence,
+        "bclResourceStringProjections": resource_evidence,
+        "sealedClassProjections": sealed_evidence,
+        "nonDerivableUnsealedClasses": [
+            item["type"] for item in sealed_evidence
+            if item["derivableInReferenceButNotInSwift"]
+        ],
         "returnNullabilityProjections": return_projections,
         "unknownReturnNullabilityProjections": [
             f"{item['ownerType']}.{item['member']}"
@@ -5567,6 +6033,12 @@ def main() -> int:
     )
     support_evidence, support_diagnostics = event_support_evidence(support, rules)
     bcl_evidence, bcl_diagnostics = bcl_support_evidence(support, rules)
+    sealed_evidence, sealed_diagnostics = sealed_class_evidence(
+        contract, rules, actual)
+    bcl_manifest = (
+        load_json(BCL_SELECTED_SHAPE) if BCL_SELECTED_SHAPE.exists() else None)
+    resource_evidence, resource_diagnostics = bcl_resource_string_evidence(
+        rules, ROOT / "Sources/CNA", bcl_manifest)
     witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(
         contract, rules, observed_witnesses,
     )
@@ -5575,14 +6047,15 @@ def main() -> int:
     )
     diagnostics, applied_suppressions = apply_manual_suppressions(
         compare(expected, actual) + parser_diagnostics + witness_diagnostics +
-        system_interface_diagnostics + support_diagnostics + bcl_diagnostics,
+        system_interface_diagnostics + support_diagnostics + bcl_diagnostics +
+        sealed_diagnostics + resource_diagnostics,
         rules.get("manualDiagnosticSuppressions", []),
     )
     report = make_report(
         contract, rules, expected, actual, diagnostics, args.symbol_graph,
         applied_suppressions, witness_evidence, accessor_evidence,
         system_interface_evidence, support_evidence, accessor_fallibility,
-        return_nullability, bcl_evidence,
+        return_nullability, bcl_evidence, sealed_evidence, resource_evidence,
     )
     text = json.dumps(report, indent=2, sort_keys=False) + "\n"
     if args.output:

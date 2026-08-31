@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=126
-TARGET_MEMBERS=1706
-TOTAL_DIAGNOSTICS=284
-COMPLETE_TYPES=121
-PARTIAL_TYPES=5
-MISSING_TYPES=131
-MISSING_TYPE=131
-MISSING_MEMBER=130
+TARGET_TYPES=134
+TARGET_MEMBERS=1730
+TOTAL_DIAGNOSTICS=280
+COMPLETE_TYPES=127
+PARTIAL_TYPES=7
+MISSING_TYPES=123
+MISSING_TYPE=123
+MISSING_MEMBER=132
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=4
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=16
+OVERLOAD_MAPPING_MISMATCH=18
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -37,13 +37,14 @@ LANGUAGE_MAPPING_MISMATCH=0
 INTERNAL_TYPE_LEAK=0
 RAW_HANDLE_LEAK=0
 PUBLIC_NATIVE_FFI_LEAK=0
+INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=116
+LANGUAGE_PROJECTION_EXCLUSIONS=117
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
-NAMESPACE_MARKERS=10
+NAMESPACE_MARKERS=11
 INHERITED_MEMBER_PROJECTIONS=3
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=26
 ARRAY_MUTATION_MAPPINGS=20
@@ -65,12 +66,15 @@ GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 NONPUBLIC_CONSTRUCTION_PROJECTIONS=8
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
-BCL_SUPPORT_TYPE_MEASUREMENTS=3
-MEASURED_SUPPORT_BASE_PROJECTIONS=9
-BCL_BASE_PROJECTIONS=5
-PROJECTED_BCL_BASE_TYPES=1
+BCL_SUPPORT_TYPE_MEASUREMENTS=6
+XNA_SEALED_CLASS_PROJECTIONS=13
+NONDERIVABLE_UNSEALED_CLASSES=5
+BCL_RESOURCE_STRING_PROJECTIONS=3
+MEASURED_SUPPORT_BASE_PROJECTIONS=17
+BCL_BASE_PROJECTIONS=13
+PROJECTED_BCL_BASE_TYPES=9
 PENDING_BCL_BASE_TYPES=4
-BCL_INHERITED_MEMBER_PROJECTIONS=16
+BCL_INHERITED_MEMBER_PROJECTIONS=59
 REFERENCE_RETURN_PROJECTIONS=369
 OPTIONAL_RETURN_PROJECTIONS=153
 NONOPTIONAL_RETURN_PROJECTIONS=216
@@ -92,7 +96,10 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 - `Microsoft.Xna.Framework.Audio.AudioEmitter`
 - `Microsoft.Xna.Framework.Audio.AudioListener`
 - `Microsoft.Xna.Framework.Audio.AudioStopOptions`
+- `Microsoft.Xna.Framework.Audio.InstancePlayLimitException`
 - `Microsoft.Xna.Framework.Audio.MicrophoneState`
+- `Microsoft.Xna.Framework.Audio.NoAudioHardwareException`
+- `Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException`
 - `Microsoft.Xna.Framework.Audio.SoundState`
 - `Microsoft.Xna.Framework.BoundingBox`
 - `Microsoft.Xna.Framework.BoundingFrustum`
@@ -118,6 +125,8 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 - `Microsoft.Xna.Framework.Graphics.CubeMapFace`
 - `Microsoft.Xna.Framework.Graphics.CullMode`
 - `Microsoft.Xna.Framework.Graphics.DepthFormat`
+- `Microsoft.Xna.Framework.Graphics.DeviceLostException`
+- `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
 - `Microsoft.Xna.Framework.Graphics.DisplayMode`
 - `Microsoft.Xna.Framework.Graphics.DisplayModeCollection`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterClass`
@@ -129,6 +138,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 - `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
 - `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
 - `Microsoft.Xna.Framework.Graphics.IndexElementSize`
+- `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444`
@@ -212,6 +222,13 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=5
 
 ## Partial types and exact diagnostics
 
+### `Microsoft.Xna.Framework.Content.ContentLoadException`
+
+Expected members: 4; emitted members: 3.
+
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Content.ContentLoadException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)`: mapped member is absent
+- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Content.ContentLoadException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)`: required overload is absent
+
 ### `Microsoft.Xna.Framework.Game`
 
 Expected members: 37; emitted members: 16.
@@ -224,7 +241,7 @@ Expected members: 37; emitted members: 16.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.OnDeactivated(_:Any?,args:CNAEventArgs)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.ShowMissingRequirementMessage(_:System.Exception)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.ShowMissingRequirementMessage(_:CNAException)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.LaunchParameters()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Components()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Services()`: mapped member is absent
@@ -390,22 +407,25 @@ Expected members: 30; emitted members: 4.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DefaultBackBufferWidth()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.DefaultBackBufferHeight()`: mapped member is absent
 
+### `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
+
+Expected members: 4; emitted members: 3.
+
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)`: mapped member is absent
+- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)`: required overload is absent
+
 ## Missing types
 
 - `Microsoft.Xna.Framework.Audio.AudioCategory`
 - `Microsoft.Xna.Framework.Audio.AudioEngine`
 - `Microsoft.Xna.Framework.Audio.Cue`
 - `Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance`
-- `Microsoft.Xna.Framework.Audio.InstancePlayLimitException`
 - `Microsoft.Xna.Framework.Audio.Microphone`
-- `Microsoft.Xna.Framework.Audio.NoAudioHardwareException`
-- `Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException`
 - `Microsoft.Xna.Framework.Audio.RendererDetail`
 - `Microsoft.Xna.Framework.Audio.SoundBank`
 - `Microsoft.Xna.Framework.Audio.SoundEffect`
 - `Microsoft.Xna.Framework.Audio.SoundEffectInstance`
 - `Microsoft.Xna.Framework.Audio.WaveBank`
-- `Microsoft.Xna.Framework.Content.ContentLoadException`
 - `Microsoft.Xna.Framework.Content.ContentManager`
 - `Microsoft.Xna.Framework.Content.ContentReader`
 - `Microsoft.Xna.Framework.Content.ContentSerializerAttribute`
@@ -440,8 +460,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.BasicEffect`
 - `Microsoft.Xna.Framework.Graphics.BlendState`
 - `Microsoft.Xna.Framework.Graphics.DepthStencilState`
-- `Microsoft.Xna.Framework.Graphics.DeviceLostException`
-- `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
 - `Microsoft.Xna.Framework.Graphics.DirectionalLight`
 - `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
 - `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`
@@ -474,7 +492,6 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPart`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
-- `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
 - `Microsoft.Xna.Framework.Graphics.RasterizerState`
 - `Microsoft.Xna.Framework.Graphics.RenderTarget2D`
@@ -521,5 +538,4 @@ Expected members: 30; emitted members: 4.
 - `Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs`
 - `Microsoft.Xna.Framework.Storage.StorageContainer`
 - `Microsoft.Xna.Framework.Storage.StorageDevice`
-- `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
 - `Microsoft.Xna.Framework.TitleContainer`

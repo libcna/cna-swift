@@ -379,6 +379,19 @@ class Parser:
         return " ".join(part for part in parts if part), index
 
     def skip_block(self, index: int, end_marker: str) -> int:
+        """Skip a method body, starting just after its opening brace.
+
+        `end_marker` is the commented closing line `ikdasm` normally emits, but
+        it does **not** always emit one: a `pinvokeimpl(...) ... preservesig`
+        method whose body is nothing but `.custom` attributes closes with a
+        bare `}`. Stopping only on the comment therefore ran past the method,
+        past the *class*, and swallowed the following type's members into this
+        one -- `System.Exception` absorbed all of `System.ValueType`'s. The
+        brace depth is the real boundary, so a `}` at depth zero ends the body
+        whether or not the comment is there. For a well-formed method the two
+        agree, because that depth-zero `}` **is** the commented line, which is
+        matched first; nothing about the XNA contract extraction changes.
+        """
         depth = 0
         while index < len(self.lines):
             stripped = self.lines[index].strip()
@@ -386,7 +399,9 @@ class Parser:
                 return index + 1
             if stripped == "{":
                 depth += 1
-            elif stripped.startswith("}") and depth:
+            elif stripped.startswith("}"):
+                if not depth:
+                    return index + 1
                 depth -= 1
             index += 1
         return index
@@ -841,6 +856,76 @@ def self_test(
             if not compare_type(expected, candidate):
                 failures.append(f"{name}: {label} was not detected")
             checks += 1
+
+    checks_made, boundary_failures = class_boundary_self_test()
+    checks += checks_made
+    failures.extend(boundary_failures)
+    return checks, failures
+
+
+# A `pinvokeimpl(...) ... preservesig` method whose body holds nothing but
+# `.custom` attributes is closed by `ikdasm` with a BARE `}` -- no
+# `// end of method` comment. `Parser.skip_block` used to stop only on that
+# comment, so it ran past the method, past the enclosing type's own `}` and
+# on into the NEXT type, silently attributing that type's members to this one.
+# `System.Exception` contains exactly such a method and absorbed the whole of
+# `System.ValueType`. The fixture below is that shape, minimised, and the
+# assertion is the one the bug broke: two types, each with only its own
+# members.
+CLASS_BOUNDARY_FIXTURE = """\
+.class public auto ansi beforefieldinit Fixture.Leaky
+       extends System.Object
+{
+  .method public hidebysig instance void  Own() cil managed
+  {
+    IL_0000:  ret
+  } // end of method Leaky::Own
+
+  .method private hidebysig static pinvokeimpl("QCall" unicode winapi)
+          void  NativeHelper(int32 kind) cil managed preservesig
+  {
+    .custom instance void System.Security.SecurityCriticalAttribute::.ctor() = ( 01 00 00 00 )
+  }
+} // end of class Fixture.Leaky
+
+.class public auto ansi beforefieldinit Fixture.Follower
+       extends System.Object
+{
+  .method public hidebysig instance void  Neighbour() cil managed
+  {
+    IL_0000:  ret
+  } // end of method Follower::Neighbour
+} // end of class Fixture.Follower
+"""
+
+
+def class_boundary_self_test() -> tuple[int, list[str]]:
+    """Prove a commentless method close cannot merge two types."""
+    failures: list[str] = []
+    checks = 0
+    parsed = Parser(CLASS_BOUNDARY_FIXTURE).parse()
+
+    checks += 1
+    if sorted(parsed) != ["Fixture.Follower", "Fixture.Leaky"]:
+        failures.append(
+            f"the class-boundary fixture parsed as {sorted(parsed)}")
+        return checks, failures
+
+    leaky = {item["name"] for item in parsed["Fixture.Leaky"]["members"]}
+    follower = {item["name"] for item in parsed["Fixture.Follower"]["members"]}
+    checks += 1
+    if "Own" not in leaky:
+        failures.append("the type's own member was lost across a bare `}`")
+    checks += 1
+    if "Neighbour" in leaky:
+        failures.append(
+            "a commentless method close leaked the NEXT type's members into "
+            "this one")
+    checks += 1
+    if follower != {"Neighbour"}:
+        failures.append(
+            f"the following type parsed as {sorted(follower)}, not its own "
+            "single member")
     return checks, failures
 
 
