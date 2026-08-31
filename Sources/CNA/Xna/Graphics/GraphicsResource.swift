@@ -160,8 +160,33 @@ extension Microsoft.Xna.Framework.Graphics {
 
         internal func validatedHandle(_ operation: String) throws -> UInt64 {
             guard let storage else {
-                throw CNAError.disposedObject(
-                    "\(GraphicsResource.clrTypeName(of: self)) has no native object")
+                // A state object has no native member that could reach here.
+                // If one ever does, that is a defect in this binding and not a
+                // consumer error, so it stays on the producer-invariant
+                // channel rather than becoming a projected CLR failure.
+                throw CNAError.producerInvariant(
+                    "\(GraphicsResource.clrTypeName(of: self)) has no native "
+                    + "object, so \(operation) has nothing to validate")
+            }
+            // Where XNA guards a graphics resource it does so with
+            // `Helpers.CheckDisposed(this, pComPtr)`, whose whole body is
+            //
+            //     if (pComPtr == IntPtr.Zero)
+            //         throw new ObjectDisposedException(obj.GetType().Name);
+            //
+            // `GetType()` — the **dynamic** type, unlike `ThrowIfBound` and the
+            // four `Apply` methods, which use `ldtoken` on the declaring class.
+            // `storage.typeName` is the derived name the subclass recorded, so
+            // a disposed `RenderTarget2D` reports `RenderTarget2D`.
+            //
+            // XNA does NOT guard uniformly — `SpriteBatch` has no disposal
+            // guard at all and `Texture2D` has one, inside `CopyData<T>`. This
+            // binding guards every native handle before it crosses into CNA,
+            // because handing a released handle to C is not an option here.
+            // That is deliberately more guarding than XNA performs; what is
+            // reproduced is the class and the payload, not the omission.
+            guard !storage.isDisposed else {
+                throw CNAObjectDisposedException(objectName: storage.typeName)
             }
             return try storage.validatedHandle(operation)
         }

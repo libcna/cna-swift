@@ -33,6 +33,7 @@ CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
 STATES = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStates.swift"
+BATCH = ROOT / "Sources/CNA/Xna/Graphics/SpriteBatch.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -350,6 +351,51 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "        internal static let boundStateTypeName = \"SamplerState\"",
     ),
     (
+        "disposal-back-on-the-runtime-channel",
+        "a use-after-dispose reported as a CNA runtime failure again",
+        RESOURCE,
+        "            guard !storage.isDisposed else {\n"
+        "                throw CNAObjectDisposedException(objectName: storage.typeName)\n"
+        "            }",
+        "            guard !storage.isDisposed else {\n"
+        "                throw CNAError.disposedObject(storage.typeName)\n"
+        "            }",
+    ),
+    (
+        "sprite-batch-guard-bypasses-the-class",
+        "one resource reaching its handle past its own disposal guard",
+        BATCH,
+        '            let handle = try validatedHandle("SpriteBatch.Begin")',
+        '            let handle = try nativeStorage.validatedHandle("SpriteBatch.Begin")',
+    ),
+    (
+        "object-disposed-on-the-wrong-base",
+        "ObjectDisposedException derived from SystemException, not "
+        "InvalidOperationException",
+        EXCEPTIONS,
+        "open class CNAObjectDisposedException: CNAInvalidOperationException {",
+        "open class CNAObjectDisposedException: CNASystemException {",
+    ),
+    (
+        "object-name-not-collapsed-to-empty",
+        "ObjectName answering nil where the CLR getter answers String.Empty",
+        EXCEPTIONS,
+        '    public var ObjectName: String { storedObjectName ?? "" }',
+        '    public var ObjectName: String { storedObjectName ?? " " }',
+    ),
+    (
+        "object-disposed-constructor-transposed",
+        "the single-argument constructor treated as a message, not an object name",
+        EXCEPTIONS,
+        "    public init(objectName: String?) {\n"
+        "        storedObjectName = objectName\n"
+        "        super.init(\n"
+        "            message: CNAObjectDisposedException.objectDisposedGenericMessage)",
+        "    public init(objectName: String?) {\n"
+        "        storedObjectName = nil\n"
+        "        super.init(message: objectName)",
+    ),
+    (
         "default-back-buffer-width-transcribed-wrong",
         "the GraphicsDeviceManager default back-buffer width off by a digit",
         MANAGER,
@@ -395,7 +441,7 @@ def main() -> int:
     originals = {path: path.read_text(encoding="utf-8")
                  for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
                               RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
-                              CALLBACK_STATE, MANAGER, DRAWABLE, STATES}}
+                              CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH}}
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")

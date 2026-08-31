@@ -427,14 +427,22 @@ final class Foundation41GraphicsStateTests: XCTestCase {
         XCTAssertEqual(state.ToString(), "custom")
     }
 
-    /// The four presets classes derive from `GraphicsResource` directly, with
-    /// no invented intermediate public type between them.
+    /// The four state classes derive from `GraphicsResource` directly, with no
+    /// invented intermediate public type between them.
+    ///
+    /// The instances are erased to `Any` first: a statically-known `is` test
+    /// is folded away by the compiler and asserts nothing, so the check has to
+    /// be a real dynamic cast. The **direct** base is asserted by the
+    /// verifier's `BASE_MAPPING_MISMATCH`, which is where the shape lives;
+    /// what this pins is that a `GraphicsResource` reference genuinely reaches
+    /// each of them and that nothing has slipped into the texture hierarchy.
     func testStateObjectsDeriveDirectlyFromGraphicsResource() {
-        XCTAssertTrue(G.BlendState() is G.GraphicsResource)
-        XCTAssertTrue(G.DepthStencilState() is G.GraphicsResource)
-        XCTAssertTrue(G.RasterizerState() is G.GraphicsResource)
-        XCTAssertTrue(G.SamplerState() is G.GraphicsResource)
-        XCTAssertFalse(G.BlendState() is G.Texture)
+        for state in [G.BlendState() as Any, G.DepthStencilState() as Any,
+                      G.RasterizerState() as Any, G.SamplerState() as Any] {
+            XCTAssertTrue(state is G.GraphicsResource)
+            XCTAssertFalse(state is G.Texture)
+            XCTAssertFalse(state is G.Texture2D)
+        }
     }
 
     func testGraphicsDeviceManagerDefaultBackBufferConstants() {

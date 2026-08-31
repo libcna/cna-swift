@@ -395,6 +395,7 @@ ARGUMENT_NULL_EXCEPTION = "System.ArgumentNullException"
 ARGUMENT_RANGE_EXCEPTION = "System.ArgumentOutOfRangeException"
 NOT_SUPPORTED_EXCEPTION = "System.NotSupportedException"
 INVALID_OPERATION_EXCEPTION = "System.InvalidOperationException"
+OBJECT_DISPOSED_EXCEPTION = "System.ObjectDisposedException"
 KEY_NOT_FOUND_EXCEPTION = "System.Collections.Generic.KeyNotFoundException"
 
 
@@ -932,6 +933,84 @@ def sentinel_checks(
             "ArgumentNullException has no (message, innerException) constructor")
 
     # ------------------------------------------------------------------
+    # ObjectDisposedException, the seventh raised family.
+    #
+    # It is the one that is NOT a SystemException specialization: it derives
+    # from InvalidOperationException, so `catch (InvalidOperationException)`
+    # sees a use-after-dispose and a bound-state-object write alike. Its
+    # payload composes the same way ArgumentException's does, with two
+    # differences that a template-driven projection would get wrong:
+    # `ObjectName` is NOT virtual where `ParamName` is, and its getter
+    # substitutes String.Empty for a null field where `ParamName` returns the
+    # field as it stands.
+    # ------------------------------------------------------------------
+    disposed = by_type.get(OBJECT_DISPOSED_EXCEPTION)
+    require(OBJECT_DISPOSED_EXCEPTION in by_type,
+            f"{OBJECT_DISPOSED_EXCEPTION} was not extracted at all")
+    if disposed is not None:
+        require(disposed["kind"] == "class",
+                "ObjectDisposedException is not a class")
+        require(not disposed["sealed"], "ObjectDisposedException is sealed")
+        require(not disposed["abstract"], "ObjectDisposedException is abstract")
+        require(disposed["genericArity"] == 0,
+                "ObjectDisposedException is generic")
+        require(disposed["baseType"] == INVALID_OPERATION_EXCEPTION,
+                "ObjectDisposedException does not derive from "
+                "InvalidOperationException")
+
+        object_name = members_of(OBJECT_DISPOSED_EXCEPTION, "property", "ObjectName")
+        require(len(object_name) == 1,
+                "ObjectDisposedException.ObjectName is missing")
+        for member in object_name:
+            require(member["type"] == "System.String",
+                    "ObjectDisposedException.ObjectName is not a String")
+            require(member["getAccess"] == "public" and
+                    member["setAccess"] is None,
+                    "ObjectDisposedException.ObjectName is not public get-only")
+            require(not member["getOverridable"],
+                    "ObjectDisposedException.ObjectName is overridable; "
+                    "unlike ArgumentException.ParamName it is not virtual")
+
+        disposed_message = members_of(OBJECT_DISPOSED_EXCEPTION, "property", "Message")
+        require(len(disposed_message) == 1,
+                "ObjectDisposedException does not override Message")
+        for member in disposed_message:
+            require(member["type"] == "System.String",
+                    "ObjectDisposedException.Message is not a String")
+            require(member["getAccess"] == "public" and
+                    member["setAccess"] is None,
+                    "ObjectDisposedException.Message is not public get-only")
+            require(member["getOverridable"],
+                    "ObjectDisposedException.Message is not overridable")
+
+        # Three public constructors and one protected serialization one. The
+        # single-String overload takes an OBJECT NAME, not a message, which is
+        # the opposite of every other family here; requiring both two-argument
+        # spellings separately is what stops a transposition being silent.
+        constructors = members_of(OBJECT_DISPOSED_EXCEPTION, "constructor", ".ctor")
+        public = [item for item in constructors if item["access"] == "public"]
+        protected = [item for item in constructors if item["access"] == "protected"]
+        require(len(public) == 3,
+                "ObjectDisposedException should declare 3 public "
+                f"constructors, found {len(public)}")
+        require(len(protected) == 1,
+                "ObjectDisposedException should declare exactly one protected "
+                f"serialization constructor, found {len(protected)}")
+        require(not signature_present(OBJECT_DISPOSED_EXCEPTION, []),
+                "ObjectDisposedException has a parameterless constructor; it "
+                "has none, because an object name is always required")
+        require(signature_present(OBJECT_DISPOSED_EXCEPTION, ["System.String"]),
+                "ObjectDisposedException has no single-String (objectName) "
+                "constructor")
+        require(signature_present(
+            OBJECT_DISPOSED_EXCEPTION, ["System.String", "System.String"]),
+            "ObjectDisposedException has no (objectName, message) constructor")
+        require(signature_present(
+            OBJECT_DISPOSED_EXCEPTION, ["System.String", EXCEPTION]),
+            "ObjectDisposedException has no (message, innerException) "
+            "constructor")
+
+    # ------------------------------------------------------------------
     # The dictionary family.
     # ------------------------------------------------------------------
     dictionary = by_type.get(DICTIONARY)
@@ -1440,6 +1519,27 @@ def mutation_self_tests(
             return False
         return mutate
 
+    def unseal_property(property_name: str) -> Any:
+        """Make one named property's getter overridable.
+
+        The mirror of `seal_property`, and the only way to plant the specific
+        confusion that ObjectDisposedException invites: `ObjectName` is NOT
+        virtual, while the neighbouring `ArgumentException.ParamName` is, so a
+        projection written from the ArgumentException template would make it
+        `open` and nothing else would notice.
+        """
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if (
+                    member["kind"] == "property" and
+                    member["name"] == property_name and
+                    not member.get("getOverridable")
+                ):
+                    member["getOverridable"] = True
+                    return True
+            return False
+        return mutate
+
     def seal_method(method_name: str) -> Any:
         """Make one NAMED method non-overridable.
 
@@ -1686,6 +1786,19 @@ def mutation_self_tests(
          INVALID_OPERATION_EXCEPTION, rebase_onto(EXCEPTION)),
         ("InvalidOperationException given a member of its own",
          INVALID_OPERATION_EXCEPTION, add_member),
+        ("ObjectDisposedException rebased onto SystemException",
+         OBJECT_DISPOSED_EXCEPTION, rebase_onto(SYSTEM_EXCEPTION)),
+        ("ObjectDisposedException made sealed", OBJECT_DISPOSED_EXCEPTION,
+         flip_sealed),
+        ("ObjectName dropped", OBJECT_DISPOSED_EXCEPTION,
+         drop_member("property")),
+        ("ObjectName given a setter", OBJECT_DISPOSED_EXCEPTION, add_setter),
+        ("ObjectName made overridable, as ParamName is",
+         OBJECT_DISPOSED_EXCEPTION, unseal_property("ObjectName")),
+        ("Message made non-overridable on ObjectDisposedException",
+         OBJECT_DISPOSED_EXCEPTION, seal_property("Message")),
+        ("an ObjectDisposedException constructor dropped",
+         OBJECT_DISPOSED_EXCEPTION, drop_member("constructor")),
         ("KeyNotFoundException rebased onto ArgumentException",
          KEY_NOT_FOUND_EXCEPTION, rebase_onto(ARGUMENT_EXCEPTION)),
         ("KeyNotFoundException given a member of its own",
@@ -1753,7 +1866,7 @@ def mutation_self_tests(
                     SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION, DICTIONARY,
                     KEY_COLLECTION, VALUE_COLLECTION, DICT_ENUMERATOR,
                     KEY_VALUE_PAIR, IEQUALITY_COMPARER, IDICTIONARY,
-                    ATTRIBUTE):
+                    ATTRIBUTE, OBJECT_DISPOSED_EXCEPTION):
         if subject not in by_name:
             continue
         reduced = {

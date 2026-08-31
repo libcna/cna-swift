@@ -792,7 +792,7 @@
   "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "ce1404cf6f8922310a2bc4878f25abe594678de498787fad08139e9968472250",
+  "bclSelectedShapeSha256": "9464163d37292ae9a950f07153104e58d2e606d9aa6de1d48b43a1ef1f5816be",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class",
@@ -1086,5 +1086,5 @@
     "System.Collections.Generic.ICollection`1",
     "System.Collections.Generic.IList`1"
   ],
-  "referenceContractSha256": "7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc"
+  "referenceContractSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d"
 }

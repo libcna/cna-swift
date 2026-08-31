@@ -161,6 +161,11 @@
           "type": "System.IndexOutOfRangeException",
           "reason": "The indexed Vector2/Vector3/Vector4 Transform overloads validate the two array LENGTHS and never the indices, so a negative sourceIndex or destinationIndex reaches `ldelema`, which ECMA-335 specifies raises this. It is the one SEALED class in this family, so its Swift projection is final where the others are open. Projected as CNAIndexOutOfRangeException.",
           "registered": "Foundation 37"
+        },
+        {
+          "type": "System.ObjectDisposedException",
+          "reason": "The class XNA raises for a use-after-dispose: Helpers.CheckDisposed, which its guarded graphics-resource members call, is `if (pComPtr == IntPtr.Zero) throw new ObjectDisposedException(obj.GetType().Name);`, and all four state objects' Apply open the same way with `ldtoken` on the declaring class instead. A consumer using a resource it disposed must therefore see this class rather than the CNA runtime channel. Projected as CNAObjectDisposedException with the ObjectName payload and the composed Message.",
+          "registered": "Foundation 42a"
         }
       ],
       "selectedResourceStrings": [
@@ -258,6 +263,16 @@
           "key": "NotSupported_ReadOnlyCollection",
           "value": "Collection is read-only.",
           "reason": "ExceptionResource 28, the message every Collection<T> mutator raises for a read-only backing list. It is NOT Arg_NotSupportedException, which is what a parameterless NotSupportedException carries and what XNA's own TouchCollection mutators raise."
+        },
+        {
+          "key": "ObjectDisposed_Generic",
+          "value": "Cannot access a disposed object.",
+          "reason": "The message ObjectDisposedException..ctor(String objectName) substitutes, and therefore the base message of every ObjectDisposedException raised with only an object name."
+        },
+        {
+          "key": "ObjectDisposed_ObjectName_Name",
+          "value": "Object name: '{0}'.",
+          "reason": "The template ObjectDisposedException.get_Message formats and appends after Environment.NewLine when ObjectName is neither null nor empty."
         }
       ],
       "selectedStaticTables": [

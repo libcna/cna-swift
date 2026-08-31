@@ -5217,6 +5217,165 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "type": "System.ObjectDisposedException",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.InvalidOperationException",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "innerException",
+              "type": "System.Exception",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "objectName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "objectName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetObjectData",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Message",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "ObjectName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.Runtime.InteropServices.ExternalException",
       "kind": "class",
       "sealed": false,
@@ -5557,6 +5716,16 @@
       "assembly": "mscorlib.dll",
       "key": "NotSupported_ReadOnlyCollection",
       "value": "Collection is read-only."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ObjectDisposed_Generic",
+      "value": "Cannot access a disposed object."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ObjectDisposed_ObjectName_Name",
+      "value": "Object name: '{0}'."
     }
   ],
   "ilLiterals": [

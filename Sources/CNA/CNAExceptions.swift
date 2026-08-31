@@ -271,6 +271,7 @@ open class CNAException: Error {
         "CNAKeyNotFoundException": "System.Collections.Generic.KeyNotFoundException",
         "CNANullReferenceException": "System.NullReferenceException",
         "CNAIndexOutOfRangeException": "System.IndexOutOfRangeException",
+        "CNAObjectDisposedException": "System.ObjectDisposedException",
     ]
 }
 
@@ -653,6 +654,81 @@ open class CNAInvalidOperationException: CNASystemException {
     public override init(message: String?, innerException: CNAException?) {
         super.init(message: message, innerException: innerException)
         HResult = CNAInvalidOperationException.corInvalidOperationHResult
+    }
+}
+
+/// The `System.ObjectDisposedException` projection.
+///
+/// Read out of the admitted `mscorlib` `5634668d…acc63`. It is the
+/// `CNAArgumentException` pattern with one payload property, one HResult and a
+/// composed `Message` — with the twist that its getter substitutes the empty
+/// string for a nil field, which `ArgumentException.ParamName` does not.
+open class CNAObjectDisposedException: CNAInvalidOperationException {
+    /// `ObjectDisposed_Generic`, the message the one-argument constructor
+    /// substitutes.
+    internal static let objectDisposedGenericMessage =
+        "Cannot access a disposed object."
+
+    /// `ObjectDisposed_ObjectName_Name`, the template `get_Message` formats.
+    internal static let objectDisposedObjectNameFormat = "Object name: '{0}'."
+
+    /// `COR_E_OBJECTDISPOSED`.
+    internal static let corObjectDisposedHResult = Int32(bitPattern: 0x8013_1622)
+
+    // `ObjectDisposedException.objectName`, stored unvalidated.
+    private let storedObjectName: String?
+
+    /// `ObjectDisposedException..ctor(String objectName)`.
+    ///
+    /// The single-argument constructor takes an **object name**, not a
+    /// message: the IL forwards to `.ctor(objectName, ObjectDisposed_Generic)`.
+    public init(objectName: String?) {
+        storedObjectName = objectName
+        super.init(
+            message: CNAObjectDisposedException.objectDisposedGenericMessage)
+        HResult = CNAObjectDisposedException.corObjectDisposedHResult
+    }
+
+    /// `ObjectDisposedException..ctor(String objectName, String message)`.
+    ///
+    /// The designated one, and the **object name comes first** — the opposite
+    /// order from `ArgumentException(message:paramName:)`. The labels keep the
+    /// CLR's own names so a transposition cannot be silent.
+    public init(objectName: String?, message: String?) {
+        storedObjectName = objectName
+        super.init(message: message)
+        HResult = CNAObjectDisposedException.corObjectDisposedHResult
+    }
+
+    /// `ObjectDisposedException..ctor(String message, Exception innerException)`.
+    ///
+    /// This one takes a **message** first and stores no object name at all,
+    /// which is why it cannot share a label with the constructor above.
+    public override init(message: String?, innerException: CNAException?) {
+        storedObjectName = nil
+        super.init(message: message, innerException: innerException)
+        HResult = CNAObjectDisposedException.corObjectDisposedHResult
+    }
+
+    /// `ObjectDisposedException.ObjectName`.
+    ///
+    /// Non-Optional: the getter is `objectName ?? String.Empty`, so it is
+    /// proven never to answer null — unlike `ArgumentException.ParamName`,
+    /// which returns its field as-is.
+    public var ObjectName: String { storedObjectName ?? "" }
+
+    /// `ObjectDisposedException.Message`.
+    ///
+    /// `String.IsNullOrEmpty(ObjectName)` decides, and because `ObjectName`
+    /// already collapses nil to empty, a nil and an empty object name compose
+    /// identically here — which is not true of the argument family.
+    open override var Message: String {
+        let base = super.Message
+        let name = ObjectName
+        guard !name.isEmpty else { return base }
+        let clause = CNAObjectDisposedException.objectDisposedObjectNameFormat
+            .replacingOccurrences(of: "{0}", with: name)
+        return base + CNAArgumentException.environmentNewLine + clause
     }
 }
 

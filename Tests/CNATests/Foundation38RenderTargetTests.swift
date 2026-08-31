@@ -168,6 +168,14 @@ final class Foundation38RenderTargetTests: XCTestCase {
             do {
                 _ = try asTexture.validatedHandle("probe")
                 game.observations["baseUseAfterDispose"] = "succeeded"
+            } catch let error as CNAObjectDisposedException {
+                // Foundation 42 moved this failure off the CNA runtime channel
+                // onto the projected class XNA actually raises, so what is
+                // asserted is the payload rather than a Swift description.
+                game.observations["baseUseAfterDispose"] = error.ObjectName
+                game.observations["baseUseAfterDisposeMessage"] = error.Message
+                game.observations["baseUseAfterDisposeClass"] =
+                    String(describing: type(of: error))
             } catch {
                 game.observations["baseUseAfterDispose"] = "\(error)"
             }
@@ -177,8 +185,14 @@ final class Foundation38RenderTargetTests: XCTestCase {
         XCTAssertEqual(game.observations["baseSeesDisposed"], "true")
         XCTAssertEqual(
             game.observations["baseUseAfterDispose"],
-            "RenderTarget2D is disposed",
+            "RenderTarget2D",
             "the base must report the DERIVED type's name; one storage, one name")
+        XCTAssertEqual(
+            game.observations["baseUseAfterDisposeClass"],
+            "CNAObjectDisposedException")
+        XCTAssertEqual(
+            game.observations["baseUseAfterDisposeMessage"],
+            "Cannot access a disposed object.\r\nObject name: 'RenderTarget2D'.")
     }
 
     /// `Disposing` fires once, with the resource as sender, and **after** the

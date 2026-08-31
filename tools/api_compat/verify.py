@@ -4598,6 +4598,19 @@ def self_test() -> None:
                 f"BCL support omitted: {name} was not reported unmeasured")
         event_self_tests += 1
 
+    # The retained XNA contract is the shape authority every expectation in
+    # this file is built from, so its digest is pinned the same way the three
+    # derived reference files are. It was NOT enforced until Foundation 42a
+    # found it silently stale: Foundation 41 added `readonly` to all 557 of its
+    # fields and nothing noticed, because nothing read the recorded value. A
+    # pinned digest no gate consults is decoration.
+    contract_digest = hashlib.sha256(REFERENCE.read_bytes()).hexdigest()
+    if contract_digest != rules.get("referenceContractSha256"):
+        failures.append(
+            f"the retained XNA contract digest {contract_digest} does not "
+            f"match the pinned {rules.get('referenceContractSha256')}")
+    event_self_tests += 1
+
     # The BCL support classes and the CLR families they project must stay in
     # step with the pinned selected-shape manifest and its digest.
     bcl_manifest_path = ROOT / rules.get("bclSelectedShapeReference", "")

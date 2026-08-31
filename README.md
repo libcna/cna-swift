@@ -567,7 +567,7 @@ constant and a wrong `Keys` literal — runs the unmodified verifier, requires i
 to fail every time, and proves the tree is byte-identical afterwards.
 
 `tools/projection_mutations/run.py` is the companion gate over the projected
-behavior. It plants thirty-five realistic defects one at a time — a
+behavior. It plants forty realistic defects one at a time — a
 neighbouring exception class at a raise site, a message that reports the Swift
 class name to a user, a mirror that moves on a write the host refused, a
 disposal that leaks a native subscription, an IL-derived state default changed,
@@ -587,6 +587,15 @@ retained contract; the seven registered assemblies reproduce all 257 types and
 carries 80 mutation self-tests, so it cannot pass vacuously. Only assembly
 hashes are retained; no Microsoft binary is in the repository or the release
 archive.
+
+`docs/frontier-research-graphics-device-state-and-vertex-declaration.md`
+records what has been measured about the next two frontiers but not yet
+implemented: CNA's graphics-device handle is a per-callback capability token
+rather than a stable identity, `BlendFunction.Min`/`.Max` are numbered the
+opposite way round in CNA and in XNA, and `VertexDeclaration`'s stride rule,
+its five validation failures and their order are read out of the pinned IL. It
+also records a defect it found in this repository's own accessor-fallibility
+analyser.
 
 The normal API verifier exits nonzero until the full selected profile is
 complete; use `--leak-only` for the green encapsulation gate. Architecture,

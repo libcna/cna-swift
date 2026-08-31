@@ -321,6 +321,21 @@
    "operation": "Graphics state objects (Blend/DepthStencil/Rasterizer/Sampler)",
    "status": "VERIFIED_MANAGED_NOT_YET_BOUND_TO_A_DEVICE",
    "evidence": "All four types are complete managed Swift whose defaults and static presets are read out of the pinned XNA IL (SetDefaults and .cctor); ThrowIfBound reproduces the assembly's own BoundStateObject message. No device route is bound, so no state has yet been applied to a live CNA device and `isBound` is reachable only from within the module."
+  },
+  {
+   "operation": "Use-after-dispose of a graphics resource",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "Reading a disposed RenderTarget2D inside a live LoadContent callback raises CNAObjectDisposedException with ObjectName 'RenderTarget2D', the composed message \"Cannot access a disposed object.\\r\\nObject name: 'RenderTarget2D'.\" and HResult 0x80131622 \u2014 the class XNA's own Helpers.CheckDisposed raises, on the projected-exception channel rather than on CNAError. System.ObjectDisposedException is admitted as the seventh BCL exception authority out of mscorlib 5634668d\u2026acc63."
+  },
+  {
+   "operation": "CNA graphics-device handle identity",
+   "status": "MEASURED_NATIVE_DIVERGENCE",
+   "evidence": "Measured with a pure-C probe: cna_game_get_graphics_device answers a handle that is stable within one lifecycle callback and DIFFERENT in every callback \u2014 LoadContent, the first Update, the first Draw and the third Update each answer a distinct value, and a second run continues the sequence. The handle is therefore a per-callback capability token and not the device's identity, so XNA's device-owned managed state (cachedBlendState and the sampler collections, which live as long as the device) cannot be anchored to the callback-scoped facade. No device-state member is projected yet; when one is, its storage must be anchored to the game, which is the object with the device's lifetime."
+  },
+  {
+   "operation": "BlendFunction numbering across the boundary",
+   "status": "MEASURED_NATIVE_DIVERGENCE",
+   "evidence": "XNA's pinned IL declares BlendFunction.Min = 3 and Max = 4; CNA's graphics_state.h declares CNA_BLEND_FUNCTION_MAX = 3 and MIN = 4. The two are swapped, so a rawValue pass-through would silently exchange them. Every other state enum \u2014 Blend, ColorWriteChannels, CompareFunction, StencilOperation, CullMode, FillMode, TextureAddressMode and TextureFilter \u2014 agrees value for value. No state route is bound yet; when one is, the conversion must be an exhaustive explicit map for every enum rather than a raw cast."
   }
  ]
 }

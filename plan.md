@@ -1,12 +1,13 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 41 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 42a are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
-`IGraphicsDeviceService` producer with `DrawableGameComponent`, and the four
-graphics state objects.
+`IGraphicsDeviceService` producer with `DrawableGameComponent`, the four
+graphics state objects, and `System.ObjectDisposedException` as the seventh
+admitted BCL exception authority.
 
 This file states what is true **now**. The milestone-by-milestone progression
 lives in `NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md`
@@ -38,7 +39,15 @@ milestone's own prose, that milestone's evidence file carries it still.
    consumed natively. The four state objects are complete managed types whose
    values have never been **applied to a device**: no
    `GraphicsDevice.BlendState` or sampler-collection route is bound yet, so
-   `isBound` is reachable only from inside the module.
+   `isBound` is reachable only from inside the module. Two measured
+   divergences stand in the way of binding them and are recorded rather than
+   worked around: CNA's graphics-device handle is a per-callback capability
+   token and not a stable identity, so device-owned managed state must be
+   anchored to the game; and `BlendFunction.Min`/`.Max` are numbered the other
+   way round in CNA than in XNA, so every state enum must cross the boundary
+   through an explicit map. Both are measured, and both are stated with the
+   rest of that research in
+   `docs/frontier-research-graphics-device-state-and-vertex-declaration.md`.
 4. **A CLR field's writability is metadata, not convention.** `literal` and
    `initonly` are two different `FieldAttributes`, and neither is assignable, so
    both project to a Swift `let`. `readonly` is recorded on all 557 contract
@@ -68,11 +77,15 @@ milestone's own prose, that milestone's evidence file carries it still.
    the installed soname, never a developer-tree fallback. Every bound symbol
    must resolve by name before the runtime starts. See `docs/native-abi.md` and
    `docs/native-abi-migration-evidence.md`.
-8. **Two error channels stay separate.** `CNAError` is the CNA runtime's own
-   failure channel. Projected CLR/XNA failures are the `CNAException` class
-   hierarchy, which conforms to `Error`. `catch is CNAException` must not
-   swallow a native CNA runtime failure, and the two are never merged for
-   convenience.
+8. **Two error channels stay separate, and the split is by cause.** `CNAError`
+   is the CNA runtime's own failure channel. Projected CLR/XNA failures are the
+   `CNAException` class hierarchy, which conforms to `Error`. `catch is
+   CNAException` must not swallow a native CNA runtime failure, and the two are
+   never merged for convenience. The line is what *caused* the failure, not
+   which layer noticed it: a consumer using a resource it disposed is a CLR
+   failure and raises `CNAObjectDisposedException`, while a native object whose
+   C lifetime ended has no XNA counterpart and stays on `CNAError`. The same
+   Swift enum case can serve both, and four `CNAError.disposedObject` sites do.
 9. **Native ownership is explicit.** Every native handle has a recorded
    ownership — `OWNED`, `BORROWED`, `PARENT_OWNED`, `PROCESS_GLOBAL` or
    `MANAGED_VALUE` — and disposal is deterministic. A Swift `deinit` is a
@@ -96,7 +109,7 @@ COMPLETE_TYPES=143             PARTIAL_TYPES=7      MISSING_TYPE=107
 MISSING_MEMBER=106             TOTAL_DIAGNOSTICS=230
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
-XNA_RESOURCE_STRING_PROJECTIONS=16 API_COMPAT_SELF_TESTS=2419
+XNA_RESOURCE_STRING_PROJECTIONS=16 API_COMPAT_SELF_TESTS=2420
 ```
 
 Mismatch categories that are not zero, each a recorded decision rather than an
@@ -116,7 +129,7 @@ CANONICAL_DECLARATION_CHECKS=170  C_SWIFT_MEASUREMENTS=170
 LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=35  CAUGHT=35  SURVIVORS=0
+PROJECTION_MUTATIONS=40  CAUGHT=40  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected
@@ -126,9 +139,17 @@ is selected, which would report a coverage loss as sixteen projection defects.
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
-(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=16`).
-`mscorlib` `5634668d…acc63` is the sole admitted BCL authority; `System.dll` is
-available and deliberately unadmitted.
+(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=16`). The BCL authority
+carries `BCL_SENTINEL_CHECKS=433`, `BCL_MUTATION_SELF_TESTS=462`,
+`BCL_CROSS_CHECKS=141` against a second disassembler, and four negative
+controls that are still refused.
+`mscorlib` `5634668d…acc63` is the sole admitted BCL authority — 28 types and
+254 members across seven raised exception families and eleven support types.
+`System.dll` is available, its identity is established, and it is deliberately
+unadmitted: no family it declares is required by any implemented projection,
+and admitting it would register authority nothing consumes. What it would
+unlock is the thirteen `Microsoft.Xna.Framework.Design` converters, which are
+design-time IDE types unreachable from a running game.
 
 ## Platform and release policy
 
@@ -137,6 +158,18 @@ Linux x86-64 with Swift 6.0.3 and an external CNA C ABI 0.21.0 HEADLESS library
 runtime. HEADLESS has no visible window and this host has no attached
 controller, so no visible output and no positive controller behaviour is
 claimed. Apple platforms, Windows, and Web/Wasm remain unqualified.
+
+## The frontier
+
+`docs/frontier-research-graphics-device-state-and-vertex-declaration.md` records
+what has been measured about the next two frontiers and not implemented.
+`docs/generated/dependency-graph.json` ranks the 19 dependency-complete missing
+types; the four with the widest reach are `GraphicsAdapter` (42),
+`VertexDeclaration` (39), `SamplerStateCollection` (39) and `TextureCollection`
+(39). The remaining member diagnostics belong to `GraphicsDevice` (52),
+`GraphicsDeviceManager` (21), `SpriteBatch` (16), `Texture2D` (12, two of them
+constructors) and `Game`
+(2), and every one of them waits on an XNA type that is not yet projected.
 
 Completion of a milestone requires debug and release builds and tests,
 warnings-as-errors including tests, Symbol Graph and its self-tests, the

@@ -101,6 +101,7 @@ BCL_TEST_SOURCES = [
     ROOT / "Tests/CNATests/Foundation30BclExceptionTests.swift",
     ROOT / "Tests/CNATests/Foundation31BclDictionaryTests.swift",
     ROOT / "Tests/CNATests/Foundation37ExceptionPayloadTests.swift",
+    ROOT / "Tests/CNATests/Foundation42ObjectDisposedTests.swift",
 ]
 
 # `assertProjected` asserts FOUR separately observable facts about one

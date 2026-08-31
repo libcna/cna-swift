@@ -50,7 +50,7 @@ extension Microsoft.Xna.Framework.Graphics {
         }
 
         public func Begin() throws {
-            let handle = try nativeStorage.validatedHandle("SpriteBatch.Begin")
+            let handle = try validatedHandle("SpriteBatch.Begin")
             var info = CNASwift_SpriteBatchBeginInfo()
             info.struct_size = UInt32(MemoryLayout<CNASwift_SpriteBatchBeginInfo>.size)
             info.struct_version = 1
@@ -90,7 +90,7 @@ extension Microsoft.Xna.Framework.Graphics {
             effects: SpriteEffects,
             layerDepth: Float
         ) throws {
-            let batchHandle = try nativeStorage.validatedHandle("SpriteBatch.Draw")
+            let batchHandle = try validatedHandle("SpriteBatch.Draw")
             let textureHandle = try texture.validatedHandle("SpriteBatch.Draw texture")
             guard texture.runtimeState === nativeStorage.runtime else {
                 throw CNAError.staleRuntimeGeneration(expected: nativeStorage.generation, actual: texture.runtimeState.generation)
@@ -121,7 +121,7 @@ extension Microsoft.Xna.Framework.Graphics {
         }
 
         public func End() throws {
-            let handle = try nativeStorage.validatedHandle("SpriteBatch.End")
+            let handle = try validatedHandle("SpriteBatch.End")
             try nativeStorage.runtime.functions.check(
                 nativeStorage.runtime.functions.spriteBatchEnd(handle),
                 operation: "cna_sprite_batch_end"
