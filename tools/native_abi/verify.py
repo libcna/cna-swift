@@ -53,7 +53,7 @@ MIRRORED_STRUCTS = [
 # The shim mirrors exactly these canonical callback types.
 MIRRORED_CALLBACKS = [
     "GameLifecycleCallback", "GameBeginDrawCallback",
-    "RenderTargetContentLostCallback",
+    "RenderTargetContentLostCallback", "GameEventCallback",
 ]
 
 # The scalar typedefs a mirrored declaration may name on either side. The
@@ -134,6 +134,7 @@ def canonical_type(value: str) -> str:
         "CNA_GamePadDeadZone": "uint32_t",
         "CNA_RenderTargetEventRegistrationHandle": "uint64_t",
         "CNA_GraphicsResourceEventRegistrationHandle": "uint64_t",
+        "CNA_GameEventRegistrationHandle": "uint64_t", "CNA_GameEvent": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

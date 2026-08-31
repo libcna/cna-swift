@@ -62,7 +62,24 @@ private func dispatchLifecycle(
         case .update: try game.Update(runtime.gameTime(from: nativeTime))
         case .draw: try game.Draw(runtime.gameTime(from: nativeTime))
         case .unloadContent: try game.UnloadContent()
-        case .exiting: try game.OnExiting(game, args: CNAEventArgs.Empty)
+        case .exiting:
+            // Deliberately NOT `OnExiting`. CNA raises two different things
+            // that both read as "exiting", and they are measured apart:
+            //
+            //   CNA_GameCallbacks.exiting  fires at cna_game_request_exit AND
+            //                              again at cna_game_destroy for a
+            //                              game that never ran;
+            //   CNA_GAME_EVENT_EXITING     fires only at cna_game_request_exit.
+            //
+            // XNA raises `Exiting` when the game is exiting, and disposing a
+            // game that never ran raises nothing. The event is therefore the
+            // one that matches, and `Game` subscribes to it; this callback is
+            // a teardown notification with no XNA counterpart, so it maps to
+            // nothing rather than to the nearest-looking member. Mapping it
+            // was harmless while `OnExiting`'s body was empty and became a
+            // real divergence the moment the body raised the event -- which is
+            // how it was found.
+            break
         case .beginRun: try game.BeginRun()
         case .endRun: try game.EndRun()
         case .endDraw: try game.EndDraw()

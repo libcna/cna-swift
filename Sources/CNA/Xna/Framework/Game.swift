@@ -12,6 +12,45 @@ extension Microsoft.Xna.Framework {
         private var disposed = false
         private var callbackFailureWasSurfaced = false
 
+        // The managed mirrors of the host state XNA keeps in fields. See the
+        // block by `IsActive` for why they are mirrors and not native reads.
+        internal var mirroredIsMouseVisible = false
+        internal var mirroredIsFixedTimeStep = true
+        internal var mirroredTargetElapsedTime = Game.duration(fromTicks: 166_667)
+        internal var mirroredInactiveSleepTime = Game.duration(fromTicks: 0)
+
+        private let activatedSource = CNAEventSource<CNAEventArgs>()
+        private let deactivatedSource = CNAEventSource<CNAEventArgs>()
+        private let exitingSource = CNAEventSource<CNAEventArgs>()
+        private let disposedSource = CNAEventSource<CNAEventArgs>()
+        private var eventRegistrations: [UInt32: UInt64] = [:]
+        private var hostEventBoxes: [Unmanaged<GameEventBox>] = []
+
+        /// The exact `TargetElaspedCannotBeZero` message -- XNA's own spelling
+        /// of "Elapsed" included -- read out of
+        /// `Microsoft.Xna.Framework.Game.dll`'s resource table.
+        internal static let targetElapsedCannotBeZeroMessage =
+            "The target elapsed time must be greater than zero.  Specify a "
+            + "non-zero positive value."
+
+        /// The exact `InactiveSleepTimeCannotBeZero` message.
+        internal static let inactiveSleepTimeCannotBeZeroMessage =
+            "The inactive sleep time must be greater than or equal to zero.  "
+            + "Specify zero or a positive value."
+
+        /// A `System.TimeSpan` tick is 100 nanoseconds, and so is CNA's.
+        internal static func duration(fromTicks ticks: Int64) -> Duration {
+            Duration(
+                secondsComponent: ticks / 10_000_000,
+                attosecondsComponent: (ticks % 10_000_000) * 100_000_000_000)
+        }
+
+        internal static func ticks(from value: Duration) -> Int64 {
+            let components = value.components
+            return components.seconds * 10_000_000
+                + components.attoseconds / 100_000_000_000
+        }
+
         // ------------------------------------------------------------------
         // The managed component engine.
         //
@@ -138,6 +177,32 @@ extension Microsoft.Xna.Framework {
             }
             runtime.game = self
 
+            // Seed the managed mirrors from the host, and subscribe to the
+            // four host events. The seeds are what `Game..ctor` sets in XNA:
+            // the create info carried the same values, so this reads back what
+            // the host actually took rather than repeating what was sent.
+            var active: UInt8 = 0
+            if functions.gameGetIsActive(handle, &active) == 0 {
+                IsActive = active != 0
+            }
+            var mouseVisible: UInt8 = 0
+            if functions.gameGetIsMouseVisible(handle, &mouseVisible) == 0 {
+                mirroredIsMouseVisible = mouseVisible != 0
+            }
+            var fixedStep: UInt8 = 0
+            if functions.gameGetIsFixedTimeStep(handle, &fixedStep) == 0 {
+                mirroredIsFixedTimeStep = fixedStep != 0
+            }
+            var targetTicks: Int64 = 0
+            if functions.gameGetTargetElapsedTimeTicks(handle, &targetTicks) == 0 {
+                mirroredTargetElapsedTime = Game.duration(fromTicks: targetTicks)
+            }
+            var sleepTicks: Int64 = 0
+            if functions.gameGetInactiveSleepTimeTicks(handle, &sleepTicks) == 0 {
+                mirroredInactiveSleepTime = Game.duration(fromTicks: sleepTicks)
+            }
+            subscribeToHostEvents(handle: handle)
+
             // `Game..ctor` subscribes these two immediately after allocating
             // the collection. `self` is captured weakly: the CLR delegate
             // holds a strong reference and its cycle is a garbage collector's
@@ -188,10 +253,33 @@ extension Microsoft.Xna.Framework {
             )
         }
 
-        public func Dispose() throws {
+        /// `Game.Dispose()`.
+        ///
+        /// `virtual final` in the metadata -- the sealed `IDisposable`
+        /// implementation -- so `final` here. The body is `Dispose(true)`
+        /// followed by `GC.SuppressFinalize(this)`, which Swift has no
+        /// counterpart for.
+        public final func Dispose() throws {
+            try Dispose(true)
+        }
+
+        /// `protected virtual void Dispose(bool disposing)`.
+        ///
+        /// The one override point. XNA's body, when disposing, snapshots
+        /// `Components` into an array, disposes every `IDisposable` in it,
+        /// disposes `content`, unhooks the graphics device manager and then
+        /// raises `Disposed`. The native teardown is this host's counterpart
+        /// to the last of those, and it happens after the children are gone
+        /// and before `Disposed` is raised -- so a handler sees a game whose
+        /// children are already released, which is the order XNA produces.
+        ///
+        /// Swift has no `protected`, so this is public.
+        open func Dispose(_ disposing: Bool) throws {
+            guard disposing else { return }
             if disposed { return }
             try runtime.owner.validate("Game.Dispose")
             try runtime.disposeChildren()
+            releaseHostEventSubscriptions()
             runtime.clearCallbackError()
             let handle = try validatedHandle("Game.Dispose")
             let result = runtime.functions.gameDestroy(handle)
@@ -201,6 +289,7 @@ extension Microsoft.Xna.Framework {
             disposed = true
             runtime.invalidateAfterNativeShutdown()
             callbackContext.releaseAfterNativeStopsCalling()
+            try disposedSource.Raise(self, args: CNAEventArgs.Empty)
             if let callbackError = runtime.takeCallbackError() { throw callbackError }
             if result == 9 && !callbackFailureWasSurfaced {
                 throw CNAError.nativeFailure(
@@ -214,6 +303,260 @@ extension Microsoft.Xna.Framework {
 
         public var GraphicsDevice: Graphics.GraphicsDevice {
             get throws { try Graphics.GraphicsDevice.borrow(from: runtime) }
+        }
+
+        // ------------------------------------------------------------------
+        // Timing and host state.
+        //
+        // Every getter in this block is `IL_NO_FAILURE_PATH` in the pinned
+        // accessor verdicts, so none of them may throw -- and a native round
+        // trip always can, on the owner thread or a stale generation. Each is
+        // therefore a managed mirror, which is exactly what XNA has: a field.
+        // The mirrors are seeded from the host at construction and updated
+        // only when a write to the host actually succeeded, so the getter
+        // reports what holds rather than what was asked for.
+        // ------------------------------------------------------------------
+
+        /// `Game.IsActive`.
+        ///
+        /// XNA reads `isActive` -- a field the host updates -- and ANDs it
+        /// with `!Guide.IsVisible` when GamerServices is initialized.
+        /// GamerServices is outside the selected profile and is never
+        /// initialized, so the second half is constant true and the value is
+        /// the field. Here the field is seeded from `cna_game_get_is_active`
+        /// at construction and updated by CNA's own Activated/Deactivated
+        /// notifications, which is the same mechanism.
+        public private(set) var IsActive: Bool = false
+
+        /// `Game.IsMouseVisible`.
+        ///
+        /// The CLR setter stores the field and then, **if the window exists**,
+        /// forwards to `GameWindow.set_IsMouseVisible`. Both accessors are
+        /// infallible, so the Swift setter cannot throw; it writes through to
+        /// the host and leaves the mirror unchanged when the host refuses, so
+        /// the getter never reports a state the host does not hold.
+        public var IsMouseVisible: Bool {
+            get { mirroredIsMouseVisible }
+            set {
+                guard let handle = try? validatedHandle("Game.IsMouseVisible") else { return }
+                guard runtime.functions.gameSetIsMouseVisible(handle, newValue ? 1 : 0) == 0
+                else { return }
+                mirroredIsMouseVisible = newValue
+            }
+        }
+
+        /// `Game.IsFixedTimeStep`.
+        ///
+        /// The CLR setter stores the field and calls nothing: in XNA that
+        /// field *is* what `Game.Tick` reads. Here the host owns the loop, so
+        /// the write has to reach it or the property would be inert -- a
+        /// recorded divergence in mechanism and not in observable behaviour.
+        public var IsFixedTimeStep: Bool {
+            get { mirroredIsFixedTimeStep }
+            set {
+                guard let handle = try? validatedHandle("Game.IsFixedTimeStep") else { return }
+                guard runtime.functions.gameSetIsFixedTimeStep(handle, newValue ? 1 : 0) == 0
+                else { return }
+                mirroredIsFixedTimeStep = newValue
+            }
+        }
+
+        /// `Game.TargetElapsedTime` — the getter.
+        public var TargetElapsedTime: Duration { mirroredTargetElapsedTime }
+
+        /// `Game.TargetElapsedTime` — the setter.
+        ///
+        /// Projected as a writer method because the CLR setter is fallible:
+        /// `value <= TimeSpan.Zero` raises
+        /// `ArgumentOutOfRangeException("value", TargetElaspedCannotBeZero)`,
+        /// and Swift has no throwing property setter. The comparison is
+        /// `op_LessThanOrEqual`, so zero itself is refused.
+        public func SetTargetElapsedTime(_ value: Duration) throws {
+            guard value > .zero else {
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "value",
+                    message: Game.targetElapsedCannotBeZeroMessage)
+            }
+            let handle = try validatedHandle("Game.TargetElapsedTime")
+            try runtime.functions.check(
+                runtime.functions.gameSetTargetElapsedTimeTicks(handle, Game.ticks(from: value)),
+                operation: "cna_game_set_target_elapsed_time_ticks"
+            )
+            mirroredTargetElapsedTime = value
+        }
+
+        /// `Game.InactiveSleepTime` — the getter.
+        public var InactiveSleepTime: Duration { mirroredInactiveSleepTime }
+
+        /// `Game.InactiveSleepTime` — the setter.
+        ///
+        /// `value < TimeSpan.Zero` raises
+        /// `ArgumentOutOfRangeException("value", InactiveSleepTimeCannotBeZero)`.
+        /// The comparison is `op_LessThan`, so zero is **accepted** here where
+        /// `TargetElapsedTime` refuses it -- the two messages read alike and
+        /// the two conditions do not.
+        public func SetInactiveSleepTime(_ value: Duration) throws {
+            guard value >= .zero else {
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "value",
+                    message: Game.inactiveSleepTimeCannotBeZeroMessage)
+            }
+            let handle = try validatedHandle("Game.InactiveSleepTime")
+            try runtime.functions.check(
+                runtime.functions.gameSetInactiveSleepTimeTicks(handle, Game.ticks(from: value)),
+                operation: "cna_game_set_inactive_sleep_time_ticks"
+            )
+            mirroredInactiveSleepTime = value
+        }
+
+        /// `Game.Tick()`.
+        ///
+        /// XNA runs the whole fixed/variable-step body here. The host owns
+        /// that loop, so this is its single route; the sequence it produces is
+        /// pinned by
+        /// `NativeLifecycleTests.testHostGameTimeSequenceIsMeasuredNotAssumed`.
+        public func Tick() throws {
+            let handle = try validatedHandle("Game.Tick")
+            try runtime.functions.check(
+                runtime.functions.gameTick(handle), operation: "cna_game_tick")
+            if let callbackError = runtime.takeCallbackError() { throw callbackError }
+        }
+
+        /// `Game.SuppressDraw()`.
+        ///
+        /// The CLR body is one field store that `Tick` reads. The host reads
+        /// its own flag, so the call has to reach it.
+        public func SuppressDraw() throws {
+            let handle = try validatedHandle("Game.SuppressDraw")
+            try runtime.functions.check(
+                runtime.functions.gameSuppressDraw(handle),
+                operation: "cna_game_suppress_draw")
+        }
+
+        /// `Game.ResetElapsedTime()`.
+        ///
+        /// The CLR body sets `forceElapsedTimeToZero`, clears
+        /// `drawRunningSlowly` and pushes both running-slowly counters to
+        /// `Int32.MaxValue` -- all state the host owns here.
+        public func ResetElapsedTime() throws {
+            let handle = try validatedHandle("Game.ResetElapsedTime")
+            try runtime.functions.check(
+                runtime.functions.gameResetElapsedTime(handle),
+                operation: "cna_game_reset_elapsed_time")
+        }
+
+        /// `Game.ShowMissingRequirementMessage(Exception)`.
+        ///
+        /// The CLR body is `host != null ? host.ShowMissingRequirementMessage(e)
+        /// : false`, and `GameHost`'s own base returns `false`. Only
+        /// `WindowsGameHost` overrides it, with a `System.Windows.Forms`
+        /// message box. CNA is the host here and shows no message, so `false`
+        /// is this host's answer and not a stand-in for one -- a caller that
+        /// gets `false` learns exactly what XNA tells it: the message was not
+        /// shown, so rethrow.
+        open func ShowMissingRequirementMessage(_ exception: CNAException) -> Bool {
+            false
+        }
+
+        // ------------------------------------------------------------------
+        // The four host events.
+        //
+        // CNA_GAME_EVENT_ACTIVATED, _DEACTIVATED, _EXITING and _DISPOSED are
+        // real host notifications, subscribed at construction and released at
+        // disposal. The callback carries only the context, so one box is
+        // registered per event and each box carries the identity it was
+        // registered for.
+        //
+        // The raise sites are XNA's own: a host notification calls the
+        // corresponding `On…` method, which is what raises the event -- so an
+        // override that does not call `super` suppresses the event exactly as
+        // it does in XNA, and `Exiting` is raised from `OnExiting` and not
+        // from the teardown path. That distinction matters: mapping a CNA
+        // teardown notification straight onto `Exiting` would fire it where
+        // XNA does not.
+        // ------------------------------------------------------------------
+
+        internal func nativeGameEventFired(_ event: UInt32) {
+            do {
+                switch event {
+                case Game.eventActivated:
+                    IsActive = true
+                    try OnActivated(self, args: CNAEventArgs.Empty)
+                case Game.eventDeactivated:
+                    IsActive = false
+                    try OnDeactivated(self, args: CNAEventArgs.Empty)
+                case Game.eventExiting:
+                    try OnExiting(self, args: CNAEventArgs.Empty)
+                case Game.eventDisposed:
+                    try disposedSource.Raise(self, args: CNAEventArgs.Empty)
+                default:
+                    break
+                }
+            } catch {
+                runtime.storeCallbackError(error)
+            }
+        }
+
+        /// How many host event subscriptions are live, for the test that
+        /// asserts they are real and are released.
+        internal var hostEventRegistrationCountForTests: Int { eventRegistrations.count }
+
+        internal static let eventActivated: UInt32 = 0
+        internal static let eventDeactivated: UInt32 = 1
+        internal static let eventDisposed: UInt32 = 2
+        internal static let eventExiting: UInt32 = 3
+
+        private func subscribeToHostEvents(handle: UInt64) {
+            for event in [Game.eventActivated, Game.eventDeactivated,
+                          Game.eventExiting, Game.eventDisposed] {
+                let box = Unmanaged.passRetained(GameEventBox(game: self, event: event))
+                var registration: UInt64 = 0
+                let result = runtime.functions.gameSubscribe(
+                    handle, event, gameEventCallback, box.toOpaque(), &registration)
+                if result == 0 {
+                    eventRegistrations[event] = registration
+                    hostEventBoxes.append(box)
+                } else {
+                    box.release()
+                }
+            }
+        }
+
+        internal func releaseHostEventSubscriptions() {
+            for registration in eventRegistrations.values {
+                _ = runtime.functions.gameUnsubscribe(registration)
+            }
+            eventRegistrations.removeAll()
+            for box in hostEventBoxes { box.release() }
+            hostEventBoxes.removeAll()
+        }
+
+        /// `Game.Activated`.
+        public var Activated: CNAEvent<CNAEventArgs> { activatedSource.Event }
+
+        /// `Game.Deactivated`.
+        public var Deactivated: CNAEvent<CNAEventArgs> { deactivatedSource.Event }
+
+        /// `Game.Exiting`.
+        public var Exiting: CNAEvent<CNAEventArgs> { exitingSource.Event }
+
+        /// `Game.Disposed`.
+        public var Disposed: CNAEvent<CNAEventArgs> { disposedSource.Event }
+
+        /// `protected virtual void OnActivated(object sender, EventArgs args)`.
+        ///
+        /// The IL raises the handler with **`this`** as the sender and the
+        /// `args` parameter as the argument -- `ldarg.0` then `ldarg.2`. The
+        /// `sender` parameter is declared and never used, which is XNA's own
+        /// quirk and is reproduced rather than corrected.
+        open func OnActivated(_ sender: Any?, args: CNAEventArgs) throws {
+            try activatedSource.Raise(self, args: args)
+        }
+
+        /// `protected virtual void OnDeactivated(object sender, EventArgs args)`.
+        /// The same shape, and the same ignored `sender`.
+        open func OnDeactivated(_ sender: Any?, args: CNAEventArgs) throws {
+            try deactivatedSource.Raise(self, args: args)
         }
 
         /// `protected virtual void Initialize()`.
@@ -341,7 +684,11 @@ extension Microsoft.Xna.Framework {
         }
         open func BeginDraw() throws -> Bool { true }
         open func EndDraw() throws {}
-        open func OnExiting(_ sender: Any?, args: CNAEventArgs) throws {}
+        /// `protected virtual void OnExiting(object sender, EventArgs args)`.
+        /// The same shape as the other two, and the same ignored `sender`.
+        open func OnExiting(_ sender: Any?, args: CNAEventArgs) throws {
+            try exitingSource.Raise(self, args: args)
+        }
 
         // ------------------------------------------------------------------
         // `Game::GameComponentAdded` and `Game::GameComponentRemoved`.
@@ -520,4 +867,25 @@ extension Microsoft.Xna.Framework {
             return runtime.gameHandle
         }
     }
+}
+
+/// The rooted context CNA's game-event subscriptions carry.
+///
+/// One box serves all four events; the event identity is not passed to the
+/// callback, so a separate box is registered per event and each carries the
+/// identity it was registered for. The game is held **weakly**, so a
+/// subscription cannot keep it alive.
+internal final class GameEventBox {
+    weak var game: Microsoft.Xna.Framework.Game?
+    let event: UInt32
+    init(game: Microsoft.Xna.Framework.Game, event: UInt32) {
+        self.game = game
+        self.event = event
+    }
+}
+
+internal let gameEventCallback: CNASwift_GameEventCallback = { context in
+    guard let context else { return }
+    let box = Unmanaged<GameEventBox>.fromOpaque(context).takeUnretainedValue()
+    box.game?.nativeGameEventFired(box.event)
 }

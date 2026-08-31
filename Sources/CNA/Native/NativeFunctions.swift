@@ -84,6 +84,20 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
     typealias RenderTargetSubscribeContentLostRoute = @convention(c) (UInt64, CNASwift_RenderTargetContentLostCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias RenderTargetUnsubscribeContentLostRoute = @convention(c) (UInt64) -> UInt32
+    typealias GameTickRoute = @convention(c) (UInt64) -> UInt32
+    typealias GameSuppressDrawRoute = @convention(c) (UInt64) -> UInt32
+    typealias GameResetElapsedTimeRoute = @convention(c) (UInt64) -> UInt32
+    typealias GameGetIsActiveRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GameGetIsMouseVisibleRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GameSetIsMouseVisibleRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias GameGetIsFixedTimeStepRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GameSetIsFixedTimeStepRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias GameGetTargetElapsedTimeTicksRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias GameSetTargetElapsedTimeTicksRoute = @convention(c) (UInt64, Int64) -> UInt32
+    typealias GameGetInactiveSleepTimeTicksRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias GameSetInactiveSleepTimeTicksRoute = @convention(c) (UInt64, Int64) -> UInt32
+    typealias GameSubscribeRoute = @convention(c) (UInt64, UInt32, CNASwift_GameEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GameUnsubscribeRoute = @convention(c) (UInt64) -> UInt32
 
     private static let lock = NSLock()
     private static var cached: Result<NativeFunctions, Error>?
@@ -128,6 +142,20 @@ internal final class NativeFunctions {
     let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
     let renderTargetSubscribeContentLost: RenderTargetSubscribeContentLostRoute
     let renderTargetUnsubscribeContentLost: RenderTargetUnsubscribeContentLostRoute
+    let gameTick: GameTickRoute
+    let gameSuppressDraw: GameSuppressDrawRoute
+    let gameResetElapsedTime: GameResetElapsedTimeRoute
+    let gameGetIsActive: GameGetIsActiveRoute
+    let gameGetIsMouseVisible: GameGetIsMouseVisibleRoute
+    let gameSetIsMouseVisible: GameSetIsMouseVisibleRoute
+    let gameGetIsFixedTimeStep: GameGetIsFixedTimeStepRoute
+    let gameSetIsFixedTimeStep: GameSetIsFixedTimeStepRoute
+    let gameGetTargetElapsedTimeTicks: GameGetTargetElapsedTimeTicksRoute
+    let gameSetTargetElapsedTimeTicks: GameSetTargetElapsedTimeTicksRoute
+    let gameGetInactiveSleepTimeTicks: GameGetInactiveSleepTimeTicksRoute
+    let gameSetInactiveSleepTimeTicks: GameSetInactiveSleepTimeTicksRoute
+    let gameSubscribe: GameSubscribeRoute
+    let gameUnsubscribe: GameUnsubscribeRoute
 
     static func load() throws -> NativeFunctions {
         lock.lock()
@@ -192,6 +220,20 @@ internal final class NativeFunctions {
         graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)
         renderTargetSubscribeContentLost = try library.resolve("cna_render_target_subscribe_content_lost", as: RenderTargetSubscribeContentLostRoute.self)
         renderTargetUnsubscribeContentLost = try library.resolve("cna_render_target_unsubscribe_content_lost", as: RenderTargetUnsubscribeContentLostRoute.self)
+        gameTick = try library.resolve("cna_game_tick", as: GameTickRoute.self)
+        gameSuppressDraw = try library.resolve("cna_game_suppress_draw", as: GameSuppressDrawRoute.self)
+        gameResetElapsedTime = try library.resolve("cna_game_reset_elapsed_time", as: GameResetElapsedTimeRoute.self)
+        gameGetIsActive = try library.resolve("cna_game_get_is_active", as: GameGetIsActiveRoute.self)
+        gameGetIsMouseVisible = try library.resolve("cna_game_get_is_mouse_visible", as: GameGetIsMouseVisibleRoute.self)
+        gameSetIsMouseVisible = try library.resolve("cna_game_set_is_mouse_visible", as: GameSetIsMouseVisibleRoute.self)
+        gameGetIsFixedTimeStep = try library.resolve("cna_game_get_is_fixed_time_step", as: GameGetIsFixedTimeStepRoute.self)
+        gameSetIsFixedTimeStep = try library.resolve("cna_game_set_is_fixed_time_step", as: GameSetIsFixedTimeStepRoute.self)
+        gameGetTargetElapsedTimeTicks = try library.resolve("cna_game_get_target_elapsed_time_ticks", as: GameGetTargetElapsedTimeTicksRoute.self)
+        gameSetTargetElapsedTimeTicks = try library.resolve("cna_game_set_target_elapsed_time_ticks", as: GameSetTargetElapsedTimeTicksRoute.self)
+        gameGetInactiveSleepTimeTicks = try library.resolve("cna_game_get_inactive_sleep_time_ticks", as: GameGetInactiveSleepTimeTicksRoute.self)
+        gameSetInactiveSleepTimeTicks = try library.resolve("cna_game_set_inactive_sleep_time_ticks", as: GameSetInactiveSleepTimeTicksRoute.self)
+        gameSubscribe = try library.resolve("cna_game_subscribe", as: GameSubscribeRoute.self)
+        gameUnsubscribe = try library.resolve("cna_game_unsubscribe", as: GameUnsubscribeRoute.self)
     }
 
     func check(_ result: UInt32, operation: String) throws {

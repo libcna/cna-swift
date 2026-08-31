@@ -154,6 +154,8 @@ typedef struct CNASwift_RenderTargetInfo {
     uint8_t reserved[2];
 } CNASwift_RenderTargetInfo;
 
+typedef void (*CNASwift_GameEventCallback)(void* context);
+
 typedef void (*CNASwift_RenderTargetContentLostCallback)(
     CNASwift_Handle render_target,
     void* context);

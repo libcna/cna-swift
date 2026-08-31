@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=145
-TARGET_MEMBERS=1785
-TOTAL_DIAGNOSTICS=262
+TARGET_MEMBERS=1801
+TOTAL_DIAGNOSTICS=245
 COMPLETE_TYPES=138
 PARTIAL_TYPES=7
 MISSING_TYPES=112
 MISSING_TYPE=112
-MISSING_MEMBER=128
+MISSING_MEMBER=112
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=4
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=17
+OVERLOAD_MAPPING_MISMATCH=16
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -245,28 +245,11 @@ Expected members: 4; emitted members: 3.
 
 ### `Microsoft.Xna.Framework.Game`
 
-Expected members: 37; emitted members: 19.
+Expected members: 37; emitted members: 35.
 
 - `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.GraphicsDevice()`: XNA can normally return null from Microsoft.Xna.Framework.Graphics.GraphicsDevice here, so the Swift return must be Optional; expected Microsoft.Xna.Framework.Graphics.GraphicsDevice?, found Microsoft.Xna.Framework.Graphics.GraphicsDevice; Swift `throws` is present instead, and a normal null result is not a failure, so throws must not stand in for it
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Tick()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.SuppressDraw()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.ResetElapsedTime()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.OnActivated(_:Any?,args:CNAEventArgs)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.OnDeactivated(_:Any?,args:CNAEventArgs)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.ShowMissingRequirementMessage(_:CNAException)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.InactiveSleepTime()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.IsMouseVisible()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.TargetElapsedTime()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.IsFixedTimeStep()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Window()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.IsActive()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Content()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Activated()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Deactivated()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Exiting()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Disposed()`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 

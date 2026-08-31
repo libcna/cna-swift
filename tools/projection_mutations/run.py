@@ -27,6 +27,8 @@ SERVICES = ROOT / "Sources/CNA/Xna/Framework/GameServiceContainer.swift"
 RESOURCE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsResource.swift"
 TEXTURE2D = ROOT / "Sources/CNA/Xna/Graphics/Texture2D.swift"
 RENDER_TARGET = ROOT / "Sources/CNA/Xna/Graphics/RenderTarget2D.swift"
+GAME = ROOT / "Sources/CNA/Xna/Framework/Game.swift"
+CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -165,6 +167,68 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            try super.Dispose(disposing)",
         "            try super.Dispose(disposing)",
     ),
+    # The Foundation 39 Game surface.
+    (
+        "event-sender-is-the-parameter",
+        "an On... method passing its sender parameter rather than the game",
+        GAME,
+        "        open func OnActivated(_ sender: Any?, args: CNAEventArgs) throws {\n"
+        "            try activatedSource.Raise(self, args: args)",
+        "        open func OnActivated(_ sender: Any?, args: CNAEventArgs) throws {\n"
+        "            try activatedSource.Raise(sender, args: args)",
+    ),
+    (
+        "target-elapsed-accepts-zero",
+        "the strict TargetElapsedTime bound loosened to the sleep-time one",
+        GAME,
+        "            guard value > .zero else {\n"
+        "                throw CNAArgumentOutOfRangeException(\n"
+        "                    paramName: \"value\",\n"
+        "                    message: Game.targetElapsedCannotBeZeroMessage)",
+        "            guard value >= .zero else {\n"
+        "                throw CNAArgumentOutOfRangeException(\n"
+        "                    paramName: \"value\",\n"
+        "                    message: Game.targetElapsedCannotBeZeroMessage)",
+    ),
+    (
+        "inactive-sleep-refuses-zero",
+        "the sleep-time bound tightened to the target-elapsed one", GAME,
+        "            guard value >= .zero else {\n"
+        "                throw CNAArgumentOutOfRangeException(\n"
+        "                    paramName: \"value\",\n"
+        "                    message: Game.inactiveSleepTimeCannotBeZeroMessage)",
+        "            guard value > .zero else {\n"
+        "                throw CNAArgumentOutOfRangeException(\n"
+        "                    paramName: \"value\",\n"
+        "                    message: Game.inactiveSleepTimeCannotBeZeroMessage)",
+    ),
+    (
+        "mirror-moves-on-a-refused-write",
+        "the mirror reporting a state the host never took", GAME,
+        "                guard let handle = try? validatedHandle(\"Game.IsFixedTimeStep\") else { return }\n"
+        "                guard runtime.functions.gameSetIsFixedTimeStep(handle, newValue ? 1 : 0) == 0\n"
+        "                else { return }\n"
+        "                mirroredIsFixedTimeStep = newValue",
+        "                mirroredIsFixedTimeStep = newValue\n"
+        "                guard let handle = try? validatedHandle(\"Game.IsFixedTimeStep\") else { return }\n"
+        "                _ = runtime.functions.gameSetIsFixedTimeStep(handle, newValue ? 1 : 0)",
+    ),
+    (
+        "teardown-callback-mapped-onto-exiting",
+        "CNA's teardown notification mapped onto XNA's Exiting", CALLBACK_STATE,
+        "        case .exiting:\n"
+        "            // Deliberately NOT `OnExiting`.",
+        "        case .exiting:\n"
+        "            try game.OnExiting(game, args: CNAEventArgs.Empty)\n"
+        "            // Deliberately NOT `OnExiting`.",
+    ),
+    (
+        "host-subscriptions-leaked",
+        "disposal leaving the four host subscriptions alive", GAME,
+        "            releaseHostEventSubscriptions()\n"
+        "            runtime.clearCallbackError()",
+        "            runtime.clearCallbackError()",
+    ),
 ]
 
 
@@ -181,7 +245,8 @@ def main() -> int:
 
     originals = {path: path.read_text(encoding="utf-8")
                  for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
-                              RESOURCE, TEXTURE2D, RENDER_TARGET}}
+                              RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
+                              CALLBACK_STATE}}
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")
