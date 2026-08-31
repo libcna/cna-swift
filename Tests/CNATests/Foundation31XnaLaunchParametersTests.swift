@@ -15,7 +15,8 @@ extension PureValueTests {
 
     func testLaunchParametersDerivesFromTheDictionarySpecialization() {
         let parameters = Microsoft.Xna.Framework.LaunchParameters()
-        XCTAssertTrue(parameters is CNADictionary<String, String>)
+        let erased: Any = parameters
+        XCTAssertTrue(erased is CNADictionary<String, String>)
         // The element types are preserved, not erased: a `CNADictionary<Any,
         // Any>` would have made every inherited signature wrong.
         let asBase: CNADictionary<String, String> = parameters
@@ -157,8 +158,9 @@ extension PureValueTests {
         derived.Clear()
         try derived.Add("/mode", value: "test")
         XCTAssertEqual(derived.Count, 1)
-        XCTAssertTrue(derived is Microsoft.Xna.Framework.LaunchParameters)
-        XCTAssertTrue(derived is CNADictionary<String, String>)
+        let erased: Any = derived
+        XCTAssertTrue(erased is Microsoft.Xna.Framework.LaunchParameters)
+        XCTAssertTrue(erased is CNADictionary<String, String>)
     }
 }
 

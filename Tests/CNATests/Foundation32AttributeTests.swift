@@ -33,12 +33,13 @@ extension PureValueTests {
             XCTAssertFalse(attribute.IsDefaultAttribute())
         }
         // They are attributes, and they are not each other.
+        let first: Any = attributes[0]
         XCTAssertFalse(
-            attributes[0] is Microsoft.Xna.Framework.Content
+            first is Microsoft.Xna.Framework.Content
                 .ContentSerializerIgnoreAttribute)
         // ... and an attribute is not an exception, which is the other support
         // hierarchy this binding carries.
-        XCTAssertFalse(attributes[0] is CNAException)
+        XCTAssertFalse(first is CNAException)
     }
 
     // ------------------------------------------------------------------
@@ -216,6 +217,7 @@ extension PureValueTests {
             override func IsDefaultAttribute() -> Bool { true }
         }
         XCTAssertTrue(ConsumerAttribute().IsDefaultAttribute())
-        XCTAssertTrue(ConsumerAttribute() is CNAAttribute)
+        let consumer: Any = ConsumerAttribute()
+        XCTAssertTrue(consumer is CNAAttribute)
     }
 }

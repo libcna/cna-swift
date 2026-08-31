@@ -151,17 +151,22 @@ extension PureValueTests {
     // The chain is three links, and it is a real Swift chain.
     // ------------------------------------------------------------------
 
+    // Every check goes through `Any`, so the chain is tested at RUNTIME. A
+    // direct `external is CNASystemException` would be answered by the
+    // compiler -- which is itself evidence the declaration is right, and is
+    // also why it is a warning, and why warnings are errors here.
     func testExceptionSupportChainIsExactlyThreeLinks() {
-        let external = CNAExternalException()
+        let external: Any = CNAExternalException()
         XCTAssertTrue(external is CNASystemException)
         XCTAssertTrue(external is CNAException)
         XCTAssertTrue(external is Error)
 
-        let system = CNASystemException()
+        let system: Any = CNASystemException()
         XCTAssertTrue(system is CNAException)
         // ... and not in the other direction: the chain is not a cycle and the
         // base is not the derived class.
-        XCTAssertFalse(CNAException() is CNASystemException)
+        let base: Any = CNAException()
+        XCTAssertFalse(base is CNASystemException)
         XCTAssertFalse(system is CNAExternalException)
     }
 
@@ -192,7 +197,7 @@ extension PureValueTests {
         XCTAssertFalse(runtimeFailure is CNAExternalException)
 
         // ... and an exception is not a CNAError either.
-        let exception: Error = CNAException(message: "m")
+        let exception: Any = CNAException(message: "m")
         XCTAssertFalse(exception is CNAError)
 
         var caughtAsException = false

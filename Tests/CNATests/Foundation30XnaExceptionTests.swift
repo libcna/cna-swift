@@ -48,11 +48,12 @@ extension PureValueTests {
             Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException(),
         ]
         for exception in onExternal {
+            let erased: Any = exception
             XCTAssertTrue(
-                exception is CNAExternalException,
+                erased is CNAExternalException,
                 "\(type(of: exception)) derives from ExternalException in the IL")
             // ... and therefore, through the exact chain, from SystemException.
-            XCTAssertTrue(exception is CNASystemException)
+            XCTAssertTrue(erased is CNASystemException)
         }
     }
 
@@ -278,8 +279,10 @@ extension PureValueTests {
     func testTheTwoUnsealedXnaExceptionsAreDerivable() {
         let derived = DerivedContentLoadException(message: "from a subclass")
         XCTAssertEqual(derived.Message, "from a subclass")
-        XCTAssertTrue(derived is Microsoft.Xna.Framework.Content.ContentLoadException)
-        XCTAssertTrue(derived is CNAException)
+        let erasedDerived: Any = derived
+        XCTAssertTrue(
+            erasedDerived is Microsoft.Xna.Framework.Content.ContentLoadException)
+        XCTAssertTrue(erasedDerived is CNAException)
 
         // A subclass that adds nothing still reports its OWN class name in the
         // synthesized default, because `GetClassName` resolves from the
@@ -293,7 +296,7 @@ extension PureValueTests {
             + "was thrown.")
 
         let storage = DerivedStorageDeviceNotConnectedException()
-        XCTAssertTrue(storage is CNAExternalException)
+        XCTAssertTrue((storage as Any) is CNAExternalException)
         XCTAssertEqual(storage.ErrorCode, Int32(bitPattern: 0x8000_4005))
         XCTAssertEqual(storage.Message,
                        "External component has thrown an exception.")
