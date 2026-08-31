@@ -14,6 +14,8 @@
   "resourceStringNote": "A user-visible XNA message is not an IL literal: the code loads a resource KEY and the runtime resolves it against the assembly's own embedded string table. Every message this binding reproduces is therefore read out of the registered binary by tools/api_compat/pinned_assembly_audit.py, pinned in tools/api_compat/reference/xna40-selected-resource-strings.json, and compared against the Swift source by the verifier. Transcribing one from memory is a mapping mismatch even when it looks right -- one already differed by a whole clause and by a double space.",
   "selectedResourceStrings": [
     {"assembly": "Microsoft.Xna.Framework.Game.dll", "key": "CannotAddSameComponentMultipleTimes", "reason": "GameComponentCollection.InsertItem raises ArgumentException with this when the item is already present."},
-    {"assembly": "Microsoft.Xna.Framework.Game.dll", "key": "CannotSetItemsIntoGameComponentCollection", "reason": "GameComponentCollection.SetItem's whole body is a throw carrying this."}
+    {"assembly": "Microsoft.Xna.Framework.Game.dll", "key": "CannotSetItemsIntoGameComponentCollection", "reason": "GameComponentCollection.SetItem's whole body is a throw carrying this."},
+    {"assembly": "Microsoft.Xna.Framework.Game.dll", "key": "ServiceAlreadyPresent", "reason": "GameServiceContainer.AddService raises ArgumentException with this when the container already holds the type."},
+    {"assembly": "Microsoft.Xna.Framework.Game.dll", "key": "ServiceMustBeAssignable", "reason": "GameServiceContainer.AddService raises ArgumentException with this, formatted with two type names, when the provider is not assignable to the service type. The TEMPLATE is reproduced; the substituted names cannot be, because Type.FullName is not part of the Any.Type language projection."}
   ]
 }

@@ -57,6 +57,20 @@ extension Microsoft.Xna.Framework {
         /// carries this process's parsed arguments.
         public let LaunchParameters = Microsoft.Xna.Framework.LaunchParameters()
 
+        /// `Game.Services`.
+        ///
+        /// `Game..ctor` allocates exactly one `GameServiceContainer` and
+        /// `get_Services` is a bare field read, so this is the same object on
+        /// every read. It is what `RunGame` asks for the
+        /// `IGraphicsDeviceManager` before creating the device, and what
+        /// `DrawableGameComponent` will ask for the graphics device service.
+        ///
+        /// Nothing registers anything into it here. XNA's own registration
+        /// happens in `GraphicsDeviceManager..ctor`, which is a separate
+        /// member; an empty container is what a `Game` with no manager has in
+        /// XNA too.
+        public let Services = GameServiceContainer()
+
         /// `Game.Components`.
         ///
         /// `get_Components` is a bare field read of the single collection

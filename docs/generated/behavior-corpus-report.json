@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 1980,
-  "ASSERTIONS": 1980,
+  "OBSERVATIONS": 2002,
+  "ASSERTIONS": 2002,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -202,7 +202,14 @@
     "testCollectionItemNameAttributeRefusesAnEmptyName",
     "testRuntimeTypeAttributeRefusesAnEmptyTypeName",
     "testTypeVersionAttributeValidatesNothing",
-    "testCNAAttributeIsConstructibleWhichTheCLRForbids"
+    "testCNAAttributeIsConstructibleWhichTheCLRForbids",
+    "testAnEmptyContainerReturnsNilRatherThanFailing",
+    "testAddedServicesComeBackByTheirRegisteredType",
+    "testAddingTheSameTypeTwiceIsRefused",
+    "testANullProviderIsRefused",
+    "testAssignabilityAcceptsProtocolsAndBaseClassesAndRefusesTheRest",
+    "testRemoveServiceIsIdempotent",
+    "testDistinctTypesAreDistinctKeys"
   ],
   "BCL_AUTHORITY": "PURE_BCL_DERIVED",
   "BCL_OBSERVATIONS": 210,

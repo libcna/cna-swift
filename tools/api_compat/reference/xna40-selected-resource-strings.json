@@ -12,6 +12,16 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "CannotSetItemsIntoGameComponentCollection",
       "value": "Cannot set a value using operator[] on GameComponentCollection.  Use Add/Remove instead."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "ServiceAlreadyPresent",
+      "value": "Container already contains a service of this type."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "ServiceMustBeAssignable",
+      "value": "Service provider object of type {0} must be assignable to service type {1}."
     }
   ]
 }

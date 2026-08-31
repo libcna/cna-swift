@@ -107,7 +107,8 @@
     "System.EventArgs": "CNAEventArgs",
     "System.TimeSpan": "Duration",
     "System.IO.Stream": "Foundation.InputStream",
-    "System.IntPtr": "Int"
+    "System.IntPtr": "Int",
+    "System.Type": "Any.Type"
   },
   "refOutMapping": "inout",
   "mutatingProtocolRequirements": [
@@ -350,6 +351,7 @@
     "Microsoft.Xna.Framework.CurveKey.op_Equality",
     "Microsoft.Xna.Framework.CurveKey.op_Inequality"
   ],
+  "clrTypeLanguageProjection": "System.Type maps to the Swift metatype Any.Type. It is a LANGUAGE PROJECTION in the same sense as System.IntPtr -> Int and System.Object -> Any?: the Swift type that carries the same VALUE, which here is a runtime type token. The pinned contract names System.Type in twenty-four positions and calls a member on it in none of them -- every one passes it, compares it or returns it -- so the selected surface of the family is identity and assignability, both of which a Swift metatype has: `==` decides identity and `_openExistential` decides `Type.IsAssignableFrom`, exactly, including protocol conformance and class inheritance. What a Swift metatype does NOT have is System.Type's reflection surface -- Name, FullName, Assembly, GetMethods and the rest -- so any XNA member that needed one of those would be blocked on this projection rather than served by it, and none does. A wrapper class would have had to either invent those members or be an empty box; neither is better than the language type.",
   "intPtrLanguageProjection": "System.IntPtr maps to Swift Int: the opaque pointer-width signed numeric value of the CLR IntPtr, and IntPtr.Zero maps to 0. It is a LANGUAGE PROJECTION and is not a Swift pointer, a dereferenceable address, a CNA native handle, an SDL window, or proof that the value is valid. The expected projection is never RAW_HANDLE_LEAK; UnsafeRawPointer, UnsafeMutableRawPointer, OpaquePointer and native-handle wrappers remain leaks, and a fixed-width Int64 or an unsigned UInt substitute remains a mapping mismatch. RAW_HANDLE_LEAK stays required at zero.",
   "accessorProjectionMapping": "One general accessor-level rule covers every CLR property, indexed or not. A getter keeps Swift accessor syntax -- `var P` for a plain property, `subscript` for an indexed one -- and gains the `get throws` effect exactly when the CLR getter is fallible. A writer keeps Swift `set` syntax only when Swift can express it: a setter accessor cannot throw, and the compiler additionally refuses any `set` beside a throwing getter, so a writer whose own setter is fallible, or whose getter is, becomes the method `Set<PropertyName>` carrying the setter's own `throws` and preserving XNA capitalisation. Getter fallibility and setter fallibility are decided independently and never infect one another, apart from that one compiler constraint, which is recorded as the compiler fact it is. The writer method is the projection of the CLR setter ACCESSOR, never a new XNA member: the verifier recombines reader and writer into the one source property identity every scoreboard counts.",
   "indexedPropertyAccessorMapping": "The indexed case of the general accessor rule, unchanged in shape from the rule it generalises. A read-only indexed property stays a Swift subscript, gaining `get throws` when its getter is fallible. When its writer becomes a method the reader is spelled `Item(...)` beside `SetItem(...)` rather than as a subscript, so the two halves of one CLR member stay one named pair; the verifier combines both compiler symbols into one source property identity.",

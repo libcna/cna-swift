@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=141
-TARGET_MEMBERS=1762
-TOTAL_DIAGNOSTICS=271
-COMPLETE_TYPES=134
+TARGET_TYPES=142
+TARGET_MEMBERS=1767
+TOTAL_DIAGNOSTICS=269
+COMPLETE_TYPES=135
 PARTIAL_TYPES=7
-MISSING_TYPES=116
-MISSING_TYPE=116
-MISSING_MEMBER=130
+MISSING_TYPES=115
+MISSING_TYPE=115
+MISSING_MEMBER=129
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -72,7 +72,7 @@ NONDERIVABLE_UNSEALED_CLASSES=5
 BCL_RESOURCE_STRING_PROJECTIONS=8
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=2
+XNA_RESOURCE_STRING_PROJECTIONS=4
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=70
-PENDING_RETURN_NULLABILITY_PROJECTIONS=299
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=6
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=72
+PENDING_RETURN_NULLABILITY_PROJECTIONS=297
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=7
 ```
 
 ## Complete types
@@ -124,6 +124,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=6
 - `Microsoft.Xna.Framework.GameComponent`
 - `Microsoft.Xna.Framework.GameComponentCollection`
 - `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
+- `Microsoft.Xna.Framework.GameServiceContainer`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.Graphics.Blend`
 - `Microsoft.Xna.Framework.Graphics.BlendFunction`
@@ -241,7 +242,7 @@ Expected members: 4; emitted members: 3.
 
 ### `Microsoft.Xna.Framework.Game`
 
-Expected members: 37; emitted members: 18.
+Expected members: 37; emitted members: 19.
 
 - `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.GraphicsDevice()`: XNA can normally return null from Microsoft.Xna.Framework.Graphics.GraphicsDevice here, so the Swift return must be Optional; expected Microsoft.Xna.Framework.Graphics.GraphicsDevice?, found Microsoft.Xna.Framework.Graphics.GraphicsDevice; Swift `throws` is present instead, and a normal null result is not a failure, so throws must not stand in for it
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Tick()`: mapped member is absent
@@ -252,7 +253,6 @@ Expected members: 37; emitted members: 18.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Game.Dispose(_:Bool)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.ShowMissingRequirementMessage(_:CNAException)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Services()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.InactiveSleepTime()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.IsMouseVisible()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.TargetElapsedTime()`: mapped member is absent
@@ -455,7 +455,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Design.Vector4Converter`
 - `Microsoft.Xna.Framework.DrawableGameComponent`
 - `Microsoft.Xna.Framework.FrameworkDispatcher`
-- `Microsoft.Xna.Framework.GameServiceContainer`
 - `Microsoft.Xna.Framework.GameWindow`
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
 - `Microsoft.Xna.Framework.Graphics.AlphaTestEffect`

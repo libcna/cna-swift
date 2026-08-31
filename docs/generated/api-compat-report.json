@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 141,
-    "TARGET_MEMBERS": 1762,
-    "TOTAL_DIAGNOSTICS": 271,
-    "COMPLETE_TYPES": 134,
+    "TARGET_TYPES": 142,
+    "TARGET_MEMBERS": 1767,
+    "TOTAL_DIAGNOSTICS": 269,
+    "COMPLETE_TYPES": 135,
     "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 116,
-    "MISSING_TYPE": 116,
-    "MISSING_MEMBER": 130,
+    "MISSING_TYPES": 115,
+    "MISSING_TYPE": 115,
+    "MISSING_MEMBER": 129,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 8,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 2,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 4,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 70,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 299,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 6
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 72,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 297,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 7
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -125,6 +125,7 @@
     "Microsoft.Xna.Framework.GameComponent",
     "Microsoft.Xna.Framework.GameComponentCollection",
     "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
+    "Microsoft.Xna.Framework.GameServiceContainer",
     "Microsoft.Xna.Framework.GameTime",
     "Microsoft.Xna.Framework.Graphics.Blend",
     "Microsoft.Xna.Framework.Graphics.BlendFunction",
@@ -272,7 +273,6 @@
     "Microsoft.Xna.Framework.Design.Vector4Converter",
     "Microsoft.Xna.Framework.DrawableGameComponent",
     "Microsoft.Xna.Framework.FrameworkDispatcher",
-    "Microsoft.Xna.Framework.GameServiceContainer",
     "Microsoft.Xna.Framework.GameWindow",
     "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
     "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
@@ -571,11 +571,6 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Game.Services()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Game.InactiveSleepTime()",
       "detail": "mapped member is absent"
     },
@@ -628,11 +623,6 @@
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Game.Disposed()",
       "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.GameServiceContainer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
       "category": "MISSING_TYPE",
@@ -3786,6 +3776,18 @@
       "resourceKey": "CannotSetItemsIntoGameComponentCollection",
       "pinnedValue": "Cannot set a value using operator[] on GameComponentCollection.  Use Add/Remove instead.",
       "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "ServiceAlreadyPresent",
+      "pinnedValue": "Container already contains a service of this type.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "ServiceMustBeAssignable",
+      "pinnedValue": "Service provider object of type {0} must be assignable to service type {1}.",
+      "reproducedInSwiftSource": true
     }
   ],
   "sealedClassProjections": [
@@ -3935,6 +3937,14 @@
     },
     {
       "type": "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GameServiceContainer",
       "clrSealed": false,
       "swiftFinal": false,
       "swiftAccess": "open",
@@ -4551,7 +4561,7 @@
       "static": false,
       "typeState": "missing",
       "clrReturnType": "System.Type",
-      "swiftReturnType": "System.Type",
+      "swiftReturnType": "Any.Type",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
@@ -5227,8 +5237,8 @@
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.GameServiceContainer"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Game",
@@ -5305,14 +5315,14 @@
       "member": "GetService",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Object",
       "swiftReturnType": "Any?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Any?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.GameWindow",
@@ -10010,7 +10020,7 @@
       "type": "Microsoft.Xna.Framework.Game",
       "status": "PARTIAL",
       "expectedMembers": 37,
-      "targetMembers": 18,
+      "targetMembers": 19,
       "diagnostics": [
         {
           "category": "PROPERTY_MAPPING_MISMATCH",
@@ -10055,11 +10065,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Game.ShowMissingRequirementMessage(_:CNAException)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Game.Services()",
           "detail": "mapped member is absent"
         },
         {
@@ -10142,16 +10147,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.GameServiceContainer",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 4,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.GameServiceContainer",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 4,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.GameTime",
