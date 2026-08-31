@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
-"""Compiler-backed CNA 0.7 ABI verifier for the Swift function manifest."""
+"""Compiler-backed CNA C ABI verifier for the Swift native route manifest.
+
+Everything the report counts is derived from the sources it just compiled. The
+chain has five independent links:
+
+1. the manifest's C declaration for a symbol is compared **textually** to the
+   canonical declaration in the CNA headers, so recording a merely compatible
+   spelling (`CNA_Handle` where the header says
+   `CNA_GraphicsDeviceManagerHandle`) is a mismatch, not a pass;
+2. the same declaration is compiled into a `__builtin_types_compatible_p`
+   assertion against `&symbol`, so the header and the manifest must also agree
+   after typedef resolution;
+3. every Swift stored property is paired with exactly one symbol and one route
+   type of its own, and each route type is derived from the symbol rather than
+   trusted, so two routes cannot share a structurally identical alias;
+4. every mirrored `CNASwift_*` structure is compared field for field with its
+   canonical counterpart — names, order, offsets and widths — so an omitted,
+   reordered or resized field fails;
+5. the two callback types are compared with `__builtin_types_compatible_p`.
+"""
 
 from __future__ import annotations
 
@@ -17,24 +36,86 @@ ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "Sources/CNA/Native/NativeManifest.swift"
 FUNCTIONS = ROOT / "Sources/CNA/Native/NativeFunctions.swift"
 SHIM_INCLUDE = ROOT / "Sources/CNAShim/include"
+SHIM_HEADER = SHIM_INCLUDE / "CNAShim.h"
 PROBE = ROOT / "tools/native_abi/probe.c"
 KEYS = ROOT / "Sources/CNA/Xna/Input/Keyboard.swift"
 
+# The shim mirrors exactly these canonical structures, one for one.
+MIRRORED_STRUCTS = [
+    "StringView", "Color", "Vector2", "Rectangle", "GameTime", "CallbackError",
+    "GameCallbacks", "GameFrameHooks", "GameCreateInfo", "Viewport",
+    "Texture2DInfo", "Texture2DDecodeInfo", "SpriteBatchBeginInfo",
+    "SpriteScaledCommand", "KeyboardState", "GamePadAnalogState",
+    "GamePadState", "GamePadCapabilities",
+]
+
+# The shim mirrors exactly these canonical callback types.
+MIRRORED_CALLBACKS = ["GameLifecycleCallback", "GameBeginDrawCallback"]
+
+# The scalar typedefs a mirrored declaration may name on either side. The
+# callback wall proves each pair is the same underlying type, which is what
+# makes translating a shim signature into canonical names sound.
+MIRRORED_SCALARS = ["Result", "Bool", "Handle"]
+
+
+# --------------------------------------------------------------------------
+# Sources of record
+# --------------------------------------------------------------------------
 
 def manifest_entries() -> list[dict[str, Any]]:
     text = MANIFEST.read_text(encoding="utf-8")
     pattern = re.compile(
-        r'\.init\(symbol: "(?P<symbol>[^"]+)", cReturn: "(?P<ret>[^"]+)", '
+        r'\.init\(symbol: "(?P<symbol>[^"]+)", swiftField: "(?P<field>[^"]+)", '
+        r'routeType: "(?P<route>[^"]+)", cReturn: "(?P<ret>[^"]+)", '
         r'cParameters: \[(?P<params>.*?)\], ownership:', re.S
     )
     entries: list[dict[str, Any]] = []
     for match in pattern.finditer(text):
         params = re.findall(r'"([^"]+)"', match.group("params"))
-        entries.append({"symbol": match.group("symbol"), "return": match.group("ret"), "parameters": params})
+        entries.append({
+            "symbol": match.group("symbol"),
+            "swiftField": match.group("field"),
+            "routeType": match.group("route"),
+            "return": match.group("ret"),
+            "parameters": params,
+        })
     if not entries:
         raise RuntimeError("NativeManifest.swift contained no parseable entries")
     return entries
 
+
+def derived_route_type(symbol: str) -> str:
+    """A route type is a function of its symbol, so it cannot be shared."""
+    words = symbol[len("cna_"):].split("_") if symbol.startswith("cna_") else symbol.split("_")
+    return "".join(word[:1].upper() + word[1:].lower() for word in words) + "Route"
+
+
+def abi_policy() -> dict[str, int]:
+    text = FUNCTIONS.read_text(encoding="utf-8")
+    def value(name: str) -> int:
+        match = re.search(rf"static let {name}: UInt32 = (\d+)", text)
+        if not match:
+            raise RuntimeError(f"NativeFunctions.swift does not declare {name}")
+        return int(match.group(1))
+    qualified = re.search(
+        r"static let qualifiedVersion: UInt32 = encode\(major: (\d+), minor: (\d+), patch: (\d+)\)",
+        text,
+    )
+    if not qualified:
+        raise RuntimeError("NativeFunctions.swift does not declare qualifiedVersion")
+    major, minor, patch = (int(group) for group in qualified.groups())
+    return {
+        "admittedMajor": value("admittedMajor"),
+        "minimumMinor": value("minimumMinor"),
+        "qualifiedMajor": major,
+        "qualifiedMinor": minor,
+        "qualifiedPatch": patch,
+    }
+
+
+# --------------------------------------------------------------------------
+# Swift side
+# --------------------------------------------------------------------------
 
 def strip_parameter_name(value: str) -> str:
     return re.sub(r"\s+[A-Za-z_][A-Za-z0-9_]*$", "", value.strip())
@@ -64,17 +145,9 @@ def swift_type(value: str) -> str:
     mapping = {
         "UInt8": "uint8_t", "UInt32": "uint32_t", "UInt64": "uint64_t", "Int32": "int32_t",
         "Int64": "int64_t", "Float": "float", "Double": "double", "CChar": "char",
-        "CNASwift_GameCreateInfo": "CNA_GameCreateInfo",
-        "CNASwift_GameFrameHooks": "CNA_GameFrameHooks",
-        "CNASwift_Viewport": "CNA_Viewport",
-        "CNASwift_Texture2DDecodeInfo": "CNA_Texture2DDecodeInfo",
-        "CNASwift_Texture2DInfo": "CNA_Texture2DInfo",
-        "CNASwift_SpriteBatchBeginInfo": "CNA_SpriteBatchBeginInfo",
-        "CNASwift_SpriteScaledCommand": "CNA_SpriteScaledCommand",
-        "CNASwift_KeyboardState": "CNA_KeyboardState",
-        "CNASwift_GamePadState": "CNA_GamePadState",
-        "CNASwift_GamePadCapabilities": "CNA_GamePadCapabilities",
     }
+    if text.startswith("CNASwift_"):
+        return "CNA_" + text[len("CNASwift_"):]
     return mapping.get(text, text)
 
 
@@ -93,17 +166,102 @@ def split_swift_types(text: str) -> list[str]:
     return values
 
 
-def swift_aliases() -> tuple[dict[str, tuple[str, list[str]]], dict[str, str]]:
+def swift_routes() -> tuple[dict[str, tuple[str, list[str]]], dict[str, str], dict[str, tuple[str, str]]]:
+    """Route typealiases, declared property types, and field -> (symbol, type)."""
     text = FUNCTIONS.read_text(encoding="utf-8")
     aliases: dict[str, tuple[str, list[str]]] = {}
     for match in re.finditer(r"typealias\s+(\w+)\s*=\s*@convention\(c\)\s*\((.*?)\)\s*->\s*([^\n]+)", text):
-        aliases[match.group(1)] = (swift_type(match.group(3)), [swift_type(item) for item in split_swift_types(match.group(2))])
-    resolutions = {
-        symbol: alias
-        for symbol, alias in re.findall(r'library\.resolve\("([^"]+)", as:\s*(\w+)\.self\)', text)
+        aliases[match.group(1)] = (
+            swift_type(match.group(3)),
+            [swift_type(item) for item in split_swift_types(match.group(2))],
+        )
+    declared = {
+        field: kind
+        for field, kind in re.findall(r"^\s{4}let (\w+): (\w+Route)$", text, re.M)
     }
-    return aliases, resolutions
+    resolutions = {
+        field: (symbol, kind)
+        for field, symbol, kind in re.findall(
+            r'(\w+) = try library\.resolve\("([^"]+)", as:\s*(\w+)\.self\)', text
+        )
+    }
+    return aliases, declared, resolutions
 
+
+# --------------------------------------------------------------------------
+# Canonical C headers
+# --------------------------------------------------------------------------
+
+def strip_comments(text: str) -> str:
+    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    return re.sub(r"//[^\n]*", " ", text)
+
+
+def header_text(include: Path) -> str:
+    parts = []
+    for path in sorted((include / "CNA" / "C").glob("*.h")):
+        parts.append(strip_comments(path.read_text(encoding="utf-8")))
+    return "\n".join(parts)
+
+
+def canonical_declarations(text: str) -> dict[str, tuple[str, list[str]]]:
+    declarations: dict[str, tuple[str, list[str]]] = {}
+    for match in re.finditer(
+        r"CNA_C_API\s+([A-Za-z_][A-Za-z0-9_]*(?:\s*\*)?)\s+(cna_[A-Za-z0-9_]+)\s*\(([^;]*?)\)\s*;",
+        text, re.S,
+    ):
+        ret = re.sub(r"\s+", " ", match.group(1)).strip()
+        raw = re.sub(r"\s+", " ", match.group(3)).strip()
+        params = [] if raw in ("", "void") else [item.strip() for item in raw.split(",")]
+        declarations[match.group(2)] = (ret, [re.sub(r"\s*\*\s*", "* ", item) for item in params])
+    return declarations
+
+
+def callback_signatures(text: str, prefix: str) -> dict[str, tuple[str, list[str]]]:
+    """Ordered (return, parameters) for every `<prefix><name>` callback typedef."""
+    result: dict[str, tuple[str, list[str]]] = {}
+    for match in re.finditer(
+        rf"typedef\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*\*\s*{prefix}([A-Za-z0-9_]+)\s*\)\s*\(([^;]*?)\)\s*;",
+        text, re.S,
+    ):
+        raw = re.sub(r"\s+", " ", match.group(3)).strip()
+        params = [] if raw in ("", "void") else [item.strip() for item in raw.split(",")]
+        result[match.group(2)] = (
+            match.group(1),
+            [re.sub(r"\s*\*\s*", "* ", item) for item in params],
+        )
+    return result
+
+
+def translate(text: str, prefix: str) -> str:
+    """Rewrite every `<prefix>X` name as its canonical `CNA_X` counterpart."""
+    return re.sub(rf"\b{prefix}([A-Za-z0-9_]+)\b", r"CNA_\1", text)
+
+
+def struct_fields(text: str, prefix: str, names: list[str]) -> dict[str, list[tuple[str, str]]]:
+    """Ordered (type, field) pairs for `typedef struct <prefix><name> { ... }`."""
+    result: dict[str, list[tuple[str, str]]] = {}
+    for name in names:
+        full = prefix + name
+        match = re.search(rf"typedef\s+struct\s+{full}\s*\{{(.*?)\}}\s*{full}\s*;", text, re.S)
+        if not match:
+            continue
+        fields: list[tuple[str, str]] = []
+        for line in match.group(1).split(";"):
+            line = re.sub(r"\s+", " ", line).strip()
+            if not line:
+                continue
+            member = re.fullmatch(r"(.+?)\s*\*?\s*([A-Za-z_][A-Za-z0-9_]*)(\[\d+\])?", line)
+            if not member:
+                raise RuntimeError(f"unparsed member in {full}: {line!r}")
+            fields.append((line, member.group(2)))
+        result[name] = fields
+    return result
+
+
+# --------------------------------------------------------------------------
+# Generated compilation walls
+# --------------------------------------------------------------------------
 
 def prototype_assertions(entries: list[dict[str, Any]]) -> str:
     lines = ['#include "CNA/C/cna.h"']
@@ -113,6 +271,68 @@ def prototype_assertions(entries: list[dict[str, Any]]) -> str:
         lines.append(
             f'_Static_assert(__builtin_types_compatible_p(__typeof__(&{entry["symbol"]}), Expected_{index}), '
             f'"prototype mismatch: {entry["symbol"]}");'
+        )
+    lines.append("int main(void) { return 0; }")
+    return "\n".join(lines) + "\n"
+
+
+def layout_assertions(canonical: dict[str, list[tuple[str, str]]],
+                      shim: dict[str, list[tuple[str, str]]]) -> tuple[str, int, int]:
+    lines = ['#include <stddef.h>', '#include "CNA/C/cna.h"', '#include "CNAShim.h"']
+    layouts = 0
+    fields = 0
+    for name in MIRRORED_STRUCTS:
+        c_name, s_name = "CNA_" + name, "CNASwift_" + name
+        lines.append(f'_Static_assert(sizeof({c_name}) == sizeof({s_name}), "size: {c_name}");')
+        lines.append(f'_Static_assert(_Alignof({c_name}) == _Alignof({s_name}), "align: {c_name}");')
+        layouts += 1
+        for _, field in canonical[name]:
+            lines.append(
+                f'_Static_assert(offsetof({c_name}, {field}) == offsetof({s_name}, {field}), '
+                f'"offset: {c_name}.{field}");'
+            )
+            lines.append(
+                f'_Static_assert(sizeof((({c_name}*)0)->{field}) == sizeof((({s_name}*)0)->{field}), '
+                f'"width: {c_name}.{field}");'
+            )
+            fields += 1
+    lines.append("int main(void) { return 0; }")
+    return "\n".join(lines) + "\n", layouts, fields
+
+
+def callback_assertions(shim: dict[str, tuple[str, list[str]]]) -> str:
+    """Three linked facts per callback.
+
+    A. the shim typedef is exactly the shape parsed out of `CNAShim.h`;
+    B. that shape, with every `CNASwift_` name rewritten to its canonical
+       counterpart, *is* the canonical typedef — so a dropped, added, reordered
+       or retyped parameter fails here;
+    C. every scalar typedef named on both sides is the same underlying type,
+       which is what makes the rewrite in B sound. The structure types named on
+       both sides are proven layout-identical field for field by the layout
+       wall.
+    """
+    lines = ['#include "CNA/C/cna.h"', '#include "CNAShim.h"']
+    for name in MIRRORED_SCALARS:
+        lines.append(
+            f'_Static_assert(__builtin_types_compatible_p(CNA_{name}, CNASwift_{name}), '
+            f'"scalar typedef: {name}");'
+        )
+    for name in MIRRORED_CALLBACKS:
+        ret, params = shim[name]
+        spelled = ", ".join(params) or "void"
+        lines.append(f'typedef {ret} (*ShimShape_{name})({spelled});')
+        lines.append(
+            f'_Static_assert(__builtin_types_compatible_p(ShimShape_{name}, CNASwift_{name}), '
+            f'"shim callback shape: {name}");'
+        )
+        lines.append(
+            f'typedef {translate(ret, "CNASwift_")} (*Translated_{name})'
+            f'({translate(spelled, "CNASwift_")});'
+        )
+        lines.append(
+            f'_Static_assert(__builtin_types_compatible_p(Translated_{name}, CNA_{name}), '
+            f'"callback ABI: {name}");'
         )
     lines.append("int main(void) { return 0; }")
     return "\n".join(lines) + "\n"
@@ -144,13 +364,31 @@ def c_key_name(swift_name: str) -> str:
     return "CNA_KEY_" + name
 
 
-def compile_and_run(cc: str, source: Path, include: Path, output: Path) -> str:
-    subprocess.run([
+def probe_constants() -> int:
+    """Distinct canonical constants the probe proves, counted from its source."""
+    text = strip_comments(PROBE.read_text(encoding="utf-8"))
+    names: set[str] = set()
+    for match in re.finditer(r"_Static_assert\((.*?)\);", text, re.S):
+        names.update(re.findall(r"\bCNA_[A-Z0-9_]+\b", match.group(1)))
+    main = text[text.index("int main(void)"):]
+    main = main[:main.index("printf")]
+    names.update(re.findall(r"\bCNA_[A-Z0-9_]+\b", main))
+    return len({n for n in names if not n.startswith(("CNA_ABI_VERSION", "CNA_SWIFT_"))})
+
+
+def compile_and_run(cc: str, source: Path, include: Path, output: Path,
+                    defines: list[str] | None = None) -> str:
+    compile_result = subprocess.run([
         cc, "-std=c11", "-Wall", "-Wextra", "-Wpedantic", "-Werror",
-        f"-I{include}", f"-I{SHIM_INCLUDE}", str(source), "-o", str(output),
-    ], check=True, text=True, capture_output=True)
+        *(defines or []), f"-I{include}", f"-I{SHIM_INCLUDE}", str(source), "-o", str(output),
+    ], text=True, capture_output=True)
+    if compile_result.returncode != 0:
+        raise SystemExit(
+            f"{source.name} failed the compiler wall:\n{compile_result.stderr.strip()}")
     return subprocess.run([str(output)], check=True, text=True, capture_output=True).stdout
 
+
+# --------------------------------------------------------------------------
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -161,17 +399,76 @@ def main() -> int:
     args = parser.parse_args()
 
     entries = manifest_entries()
-    aliases, resolutions = swift_aliases()
+    policy = abi_policy()
+    aliases, declared, resolutions = swift_routes()
     mismatches: list[str] = []
+
+    headers = header_text(args.cna_include)
+    declarations = canonical_declarations(headers)
+    shim_text = strip_comments(SHIM_HEADER.read_text(encoding="utf-8"))
+    canonical_structs = struct_fields(headers, "CNA_", MIRRORED_STRUCTS)
+    shim_structs = struct_fields(shim_text, "CNASwift_", MIRRORED_STRUCTS)
+    canonical_callbacks = callback_signatures(headers, "CNA_")
+    shim_callbacks = callback_signatures(shim_text, "CNASwift_")
+
+    # --- route pairing, one property to one symbol to one route type --------
+    route_pairings = 0
+    seen_fields: set[str] = set()
+    seen_routes: set[str] = set()
+    for entry in entries:
+        symbol, field, route = entry["symbol"], entry["swiftField"], entry["routeType"]
+        expected_route = derived_route_type(symbol)
+        if route != expected_route:
+            mismatches.append(f"{symbol}: manifest route type {route} != derived {expected_route}")
+        if field in seen_fields:
+            mismatches.append(f"{symbol}: Swift field {field} is bound to more than one route")
+        if route in seen_routes:
+            mismatches.append(f"{symbol}: route type {route} is shared by more than one route")
+        seen_fields.add(field)
+        seen_routes.add(route)
+        if declared.get(field) != route:
+            mismatches.append(
+                f"{symbol}: NativeFunctions declares {field}: {declared.get(field)!r}, manifest says {route}")
+        resolved = resolutions.get(field)
+        if resolved is None:
+            mismatches.append(f"{symbol}: NativeFunctions never resolves into {field}")
+        elif resolved != (symbol, route):
+            mismatches.append(
+                f"{symbol}: {field} resolves {resolved[0]} as {resolved[1]}, manifest says {symbol} as {route}")
+        else:
+            route_pairings += 1
+
+    for name in sorted(set(aliases) - seen_routes):
+        mismatches.append(f"{name}: route type is declared but no manifest route uses it")
+    for field, (symbol, _) in sorted(resolutions.items()):
+        if field not in seen_fields:
+            mismatches.append(f"{field}: resolves {symbol} but is not in the manifest")
+
+    # --- manifest vs canonical declaration, textually ------------------------
+    missing_header = []
+    declaration_checks = 0
+    for entry in entries:
+        declaration = declarations.get(entry["symbol"])
+        if declaration is None:
+            missing_header.append(entry["symbol"])
+            continue
+        ret, params = declaration
+        declaration_checks += 1 + len(params)
+        if ret != entry["return"]:
+            mismatches.append(f'{entry["symbol"]}: manifest return {entry["return"]!r} != canonical {ret!r}')
+        manifest_params = [re.sub(r"\s*\*\s*", "* ", item.strip()) for item in entry["parameters"]]
+        if manifest_params != params:
+            mismatches.append(
+                f'{entry["symbol"]}: manifest parameters {manifest_params} != canonical {params}')
+
+    # --- Swift signature vs manifest ----------------------------------------
     measured_positions = 0
     for entry in entries:
-        alias_name = resolutions.get(entry["symbol"])
-        if entry["symbol"] == "cna_get_abi_version":
-            alias_name = "GetABIVersion"
-        if not alias_name or alias_name not in aliases:
-            mismatches.append(f'{entry["symbol"]}: no Swift function alias/resolution')
+        alias = aliases.get(entry["routeType"])
+        if alias is None:
+            mismatches.append(f'{entry["symbol"]}: no Swift route type {entry["routeType"]}')
             continue
-        swift_return, swift_parameters = aliases[alias_name]
+        swift_return, swift_parameters = alias
         c_return = canonical_type(entry["return"])
         c_parameters = [canonical_type(item) for item in entry["parameters"]]
         measured_positions += 1 + len(c_parameters)
@@ -180,12 +477,56 @@ def main() -> int:
         if swift_parameters != c_parameters:
             mismatches.append(f'{entry["symbol"]}: parameters {swift_parameters} != {c_parameters}')
 
+    # --- mirrored structures, field for field --------------------------------
+    for name in MIRRORED_STRUCTS:
+        canonical_names = [field for _, field in canonical_structs.get(name, [])]
+        shim_names = [field for _, field in shim_structs.get(name, [])]
+        if not canonical_names:
+            mismatches.append(f"CNA_{name}: no canonical definition in the CNA headers")
+        elif not shim_names:
+            mismatches.append(f"CNASwift_{name}: no shim definition")
+        elif canonical_names != shim_names:
+            mismatches.append(
+                f"CNA_{name}: shim fields {shim_names} != canonical {canonical_names}")
+
+    # --- mirrored callbacks, position for position ---------------------------
+    if sorted(shim_callbacks) != sorted(MIRRORED_CALLBACKS):
+        mismatches.append(
+            f"CNAShim.h declares callbacks {sorted(shim_callbacks)}, "
+            f"the mirrored set is {sorted(MIRRORED_CALLBACKS)}")
+    for name in MIRRORED_CALLBACKS:
+        if name not in canonical_callbacks:
+            mismatches.append(f"CNA_{name}: no canonical callback typedef in the CNA headers")
+            continue
+        if name not in shim_callbacks:
+            mismatches.append(f"CNASwift_{name}: no shim callback typedef")
+            continue
+        c_return, c_params = canonical_callbacks[name]
+        s_return, s_params = shim_callbacks[name]
+        translated = (translate(s_return, "CNASwift_"), [translate(item, "CNASwift_") for item in s_params])
+        if translated != (c_return, c_params):
+            mismatches.append(
+                f"CNA_{name}: shim signature {translated} != canonical {(c_return, c_params)}")
+
     with tempfile.TemporaryDirectory(prefix="cna-swift-abi-") as temporary:
         temp = Path(temporary)
-        probe_output = compile_and_run(args.cc, PROBE, args.cna_include, temp / "probe")
+        probe_output = compile_and_run(
+            args.cc, PROBE, args.cna_include, temp / "probe",
+            defines=[f'-DCNA_SWIFT_ABI_MAJOR={policy["admittedMajor"]}',
+                     f'-DCNA_SWIFT_ABI_MINOR={policy["minimumMinor"]}'],
+        )
         generated = temp / "prototypes.c"
         generated.write_text(prototype_assertions(entries), encoding="utf-8")
         compile_and_run(args.cc, generated, args.cna_include, temp / "prototypes")
+
+        callback_path = temp / "callbacks.c"
+        callback_path.write_text(callback_assertions(shim_callbacks), encoding="utf-8")
+        compile_and_run(args.cc, callback_path, args.cna_include, temp / "callbacks")
+
+        layout_source, layouts, layout_fields = layout_assertions(canonical_structs, shim_structs)
+        layout_path = temp / "layouts.c"
+        layout_path.write_text(layout_source, encoding="utf-8")
+        compile_and_run(args.cc, layout_path, args.cna_include, temp / "layouts")
 
         key_source = temp / "keys.c"
         key_lines = ['#include "CNA/C/input.h"']
@@ -210,26 +551,46 @@ def main() -> int:
         loaded_abi = int(library.cna_get_abi_version())
     except OSError as error:
         load_error = str(error)
-    if loaded_abi != 0x700:
-        mismatches.append(f"loaded ABI {loaded_abi!r} != exact 1792")
     if load_error:
         mismatches.append(f"library load: {load_error}")
+    elif loaded_abi is None:
+        mismatches.append("library did not answer cna_get_abi_version")
+    else:
+        major, minor = (loaded_abi >> 16) & 0xFFFF, (loaded_abi >> 8) & 0xFF
+        if major != policy["admittedMajor"] or minor < policy["minimumMinor"]:
+            mismatches.append(
+                f"loaded ABI {major}.{minor}.{loaded_abi & 0xFF} is outside the admitted window "
+                f'major {policy["admittedMajor"]} minor >= {policy["minimumMinor"]}')
 
     probe_values = dict(line.split("=", 1) for line in probe_output.splitlines() if "=" in line)
+    header_abi = int(probe_values["ABI_VERSION"])
+    if loaded_abi is not None and loaded_abi != header_abi:
+        mismatches.append(
+            f"library ABI {loaded_abi} disagrees with the canonical header ABI {header_abi}")
+
+    constants = probe_constants() + len(keys)
     report = {
-        "schemaVersion": 1,
-        "CNA_ABI_VERSION": "0.7.0",
-        "CNA_ABI_ENCODED": 0x700,
+        "schemaVersion": 2,
+        "ADMITTED_ABI_MAJOR": policy["admittedMajor"],
+        "ADMITTED_ABI_MINIMUM_MINOR": policy["minimumMinor"],
+        "QUALIFIED_ABI_VERSION": f'{policy["qualifiedMajor"]}.{policy["qualifiedMinor"]}.{policy["qualifiedPatch"]}',
+        "HEADER_ABI_VERSION": f'{probe_values["ABI_MAJOR"]}.{probe_values["ABI_MINOR"]}.{probe_values["ABI_PATCH"]}',
+        "HEADER_ABI_ENCODED": header_abi,
         "LOADED_ABI_ENCODED": loaded_abi,
         "BOUND_FUNCTIONS": len(entries),
+        "ROUTE_PAIRINGS": route_pairings,
         "PROTOTYPE_TYPE_POSITIONS": sum(1 + len(entry["parameters"]) for entry in entries),
+        "CANONICAL_DECLARATION_CHECKS": declaration_checks,
         "C_SWIFT_MEASUREMENTS": measured_positions,
-        "LAYOUTS": int(probe_values["LAYOUTS"]),
-        "CALLBACKS": int(probe_values["CALLBACKS"]),
-        "CONSTANTS": int(probe_values["CONSTANTS"]) + len(keys),
-        "MISSING_HEADER_SYMBOLS": 0,
+        "LAYOUTS": layouts,
+        "LAYOUT_FIELDS": layout_fields,
+        "CALLBACKS": len(MIRRORED_CALLBACKS),
+        "CONSTANTS": constants,
+        "SCALAR_FACTS": sum(1 for key in probe_values if key.endswith("_SIZE")),
+        "MISSING_HEADER_SYMBOLS": len(missing_header),
         "MISSING_LIBRARY_SYMBOLS": len(missing_library),
         "ABI_MISMATCHES": len(mismatches),
+        "missingHeaderSymbols": missing_header,
         "missingLibrarySymbols": missing_library,
         "mismatches": mismatches,
         "probeOutput": probe_values,
@@ -245,10 +606,12 @@ def main() -> int:
     else:
         print(text, end="")
     print(" ".join(f"{key}={report[key]}" for key in (
-        "BOUND_FUNCTIONS", "PROTOTYPE_TYPE_POSITIONS", "C_SWIFT_MEASUREMENTS", "LAYOUTS",
-        "CALLBACKS", "CONSTANTS", "MISSING_HEADER_SYMBOLS", "MISSING_LIBRARY_SYMBOLS", "ABI_MISMATCHES"
+        "BOUND_FUNCTIONS", "ROUTE_PAIRINGS", "PROTOTYPE_TYPE_POSITIONS",
+        "CANONICAL_DECLARATION_CHECKS", "C_SWIFT_MEASUREMENTS", "LAYOUTS", "LAYOUT_FIELDS",
+        "CALLBACKS", "CONSTANTS", "SCALAR_FACTS", "MISSING_HEADER_SYMBOLS",
+        "MISSING_LIBRARY_SYMBOLS", "ABI_MISMATCHES"
     )))
-    return 1 if missing_library or mismatches else 0
+    return 1 if missing_library or missing_header or mismatches else 0
 
 
 if __name__ == "__main__":

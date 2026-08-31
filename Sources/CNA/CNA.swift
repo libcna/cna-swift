@@ -41,7 +41,7 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
     case nativeLibraryNotFound(candidates: [String])
     case nativeLibraryLoadFailed(path: String, message: String)
     case missingNativeSymbol(String)
-    case unsupportedABIVersion(expected: UInt32, actual: UInt32)
+    case unsupportedABIVersion(admitted: String, actual: String, actualEncoded: UInt32, path: String)
     case nativeFailure(operation: String, result: UInt32, message: String)
     case unsupportedPlatform(String)
     case disposedObject(String)
@@ -66,8 +66,15 @@ public enum CNAError: Error, Equatable, CustomStringConvertible {
             return "Could not load CNA native library at \(path): \(message)"
         case .missingNativeSymbol(let symbol):
             return "CNA native library is missing required symbol \(symbol)"
-        case .unsupportedABIVersion(let expected, let actual):
-            return String(format: "Unsupported CNA C ABI 0x%08X; expected exactly 0x%08X", actual, expected)
+        case .unsupportedABIVersion(let admitted, let actual, let actualEncoded, let path):
+            // The diagnostic names all three facts a caller needs to act:
+            // what was admitted, what the library actually reports, and which
+            // file was selected — an installed soname and an absolute
+            // CNA_NATIVE_LIBRARY override are otherwise indistinguishable.
+            return String(
+                format: "CNA native library %@ reports C ABI %@ (0x%08X); CNA-Swift admits %@",
+                path, actual, actualEncoded, admitted
+            )
         case .nativeFailure(let operation, let result, let message):
             return "CNA operation \(operation) failed with result \(result): \(message)"
         case .unsupportedPlatform(let platform):

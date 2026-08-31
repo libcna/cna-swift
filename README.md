@@ -453,9 +453,9 @@ properties and no public initializer. State constructors, physical and virtual
 button queries, all-bit combination behavior, packet/connection fields,
 binary32 clamps, equality, hashing, and strings follow the pinned XNA IL.
 
-The four static GamePad methods bind only existing canonical CNA 0.7.0 C ABI
-routes. Native snapshots carry real packet numbers and per-control capabilities;
-vibration returns CNA's device-accepted Boolean. The current HEADLESS/NULL host
+The four static GamePad methods bind only existing canonical CNA C ABI routes.
+Native snapshots carry real packet numbers and per-control capabilities;
+vibration returns CNA's device-accepted Boolean. The qualified HEADLESS host
 has no controller, so disconnected routes are verified while positive state,
 capability diversity, and physical rumble remain `HARDWARE_PENDING`. See
 `docs/gamepad-evidence.md`, `docs/gamepad-native-inventory.md`, and the separate
@@ -464,8 +464,8 @@ generated native qualification report.
 ## Qualified runtime
 
 The qualified host is Linux x86-64 with Swift 6.0.3
-(`x86_64-pc-linux-gnu`) and an external CNA C ABI 0.7.0 HEADLESS/NULL library.
-Supply it explicitly:
+(`x86_64-pc-linux-gnu`) and an external CNA C ABI 0.21.0 HEADLESS library with
+the SDL3 audio backend. Supply it explicitly:
 
 ```bash
 export CNA_NATIVE_LIBRARY=/absolute/path/to/libcna_c_api.so
@@ -473,14 +473,25 @@ swift test
 ```
 
 `CNA_NATIVE_LIBRARY` must be absolute. Without it Linux tries only an installed
-`libcna_c_api.so`; there is no developer-tree fallback. ABI 0.8 is rejected,
-and no native binary ships in the source package. Managed Curve and GamePad
-value tests require no native library.
+`libcna_c_api.so`; there is no developer-tree fallback. The admitted ABI window
+is CNA's own published consumer rule — major `0` exactly, minor `21` or later —
+so every earlier generation, `0.7.0` included, is rejected by a diagnostic that
+names the window, the reported version and the selected file. No native binary
+ships in the source package. Managed Curve and GamePad value tests require no
+native library. See `docs/native-abi.md` and
+`docs/native-abi-migration-evidence.md`.
 
 HEADLESS executes real viewport, clear, PNG decode, SpriteBatch, keyboard, and
 GamePad disconnected routes but has no visible window or attached controller.
 Visible output and positive controller behavior are not claimed. macOS, iOS,
 tvOS, visionOS, Windows, and Web/Wasm are unqualified.
+
+One host behaviour is a **measured divergence from XNA and is not corrected by
+this binding**: under a fixed time step CNA 0.21.0 issues one leading frame
+whose `Update` carries a zero `ElapsedGameTime`, where pinned XNA `Game.Tick`
+returns without calling `Update` or `DrawFrame` at all. Every later frame
+reproduces XNA's sequence exactly. The whole sequence is pinned by
+`NativeLifecycleTests.testHostGameTimeSequenceIsMeasuredNotAssumed`.
 
 ## Verification
 
@@ -501,7 +512,10 @@ python3 tools/api_compat/dependency_graph.py \
   --report docs/generated/api-compat-report.json \
   --output docs/generated/dependency-graph.json
 python3 tools/native_abi/verify.py \
-  --cna-include /path/to/cna/modules/c-api/include \
+  --cna-include /path/to/cnanext/modules/c-api/include \
+  --library "$CNA_NATIVE_LIBRARY"
+python3 tools/native_abi/mutations.py \
+  --cna-include /path/to/cnanext/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY"
 python3 tools/gamepad_native/run.py \
   --library "$CNA_NATIVE_LIBRARY" \
@@ -538,6 +552,15 @@ file's digest does not match `returnNullabilitySha256` in `mapping-rules.json`.
 Symbol Graph the compiler actually emitted: each mutates a real declaration the
 way a wrong Swift signature would and must introduce a diagnostic the unmutated
 graph does not already carry.
+
+`tools/native_abi/mutations.py` is the native ABI gate's falsifiability
+control. It plants fourteen realistic defects one at a time — a wrong parameter
+width, a canonical type recorded as a merely compatible alias, a stale symbol, a
+swapped route symbol, a swapped route type, two routes sharing one type, a wrong
+Swift position width, an unsatisfiable ABI window, an omitted structure field,
+transposed fields, a narrowed field, a wrong callback signature, a wrong
+constant and a wrong `Keys` literal — runs the unmodified verifier, requires it
+to fail every time, and proves the tree is byte-identical afterwards.
 
 `pinned_assembly_audit.py` decides whether an XNA assembly may be used as a
 behavior authority. It reconstructs each assembly's public metadata from

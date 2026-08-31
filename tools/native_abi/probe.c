@@ -6,101 +6,18 @@
 #include "CNA/C/cna.h"
 #include "CNAShim.h"
 
-#define LAYOUT(canonical, swift_side) \
-    _Static_assert(sizeof(canonical) == sizeof(swift_side), "size mismatch: " #canonical); \
-    _Static_assert(_Alignof(canonical) == _Alignof(swift_side), "align mismatch: " #canonical)
-
-#define OFFSET(canonical, swift_side, field) \
-    _Static_assert(offsetof(canonical, field) == offsetof(swift_side, field), \
-        "offset mismatch: " #canonical "." #field)
-
-LAYOUT(CNA_StringView, CNASwift_StringView);
-OFFSET(CNA_StringView, CNASwift_StringView, data);
-OFFSET(CNA_StringView, CNASwift_StringView, byte_length);
-LAYOUT(CNA_Color, CNASwift_Color);
-OFFSET(CNA_Color, CNASwift_Color, a);
-LAYOUT(CNA_Vector2, CNASwift_Vector2);
-OFFSET(CNA_Vector2, CNASwift_Vector2, y);
-LAYOUT(CNA_Rectangle, CNASwift_Rectangle);
-OFFSET(CNA_Rectangle, CNASwift_Rectangle, width);
-LAYOUT(CNA_GameTime, CNASwift_GameTime);
-OFFSET(CNA_GameTime, CNASwift_GameTime, is_running_slowly);
-LAYOUT(CNA_CallbackError, CNASwift_CallbackError);
-OFFSET(CNA_CallbackError, CNASwift_CallbackError, message);
-LAYOUT(CNA_GameCallbacks, CNASwift_GameCallbacks);
-OFFSET(CNA_GameCallbacks, CNASwift_GameCallbacks, context);
-LAYOUT(CNA_GameFrameHooks, CNASwift_GameFrameHooks);
-OFFSET(CNA_GameFrameHooks, CNASwift_GameFrameHooks, begin_draw);
-LAYOUT(CNA_GameCreateInfo, CNASwift_GameCreateInfo);
-OFFSET(CNA_GameCreateInfo, CNASwift_GameCreateInfo, callbacks);
-LAYOUT(CNA_Viewport, CNASwift_Viewport);
-OFFSET(CNA_Viewport, CNASwift_Viewport, min_depth);
-LAYOUT(CNA_Texture2DInfo, CNASwift_Texture2DInfo);
-OFFSET(CNA_Texture2DInfo, CNASwift_Texture2DInfo, format);
-LAYOUT(CNA_Texture2DDecodeInfo, CNASwift_Texture2DDecodeInfo);
-OFFSET(CNA_Texture2DDecodeInfo, CNASwift_Texture2DDecodeInfo, zoom);
-LAYOUT(CNA_SpriteBatchBeginInfo, CNASwift_SpriteBatchBeginInfo);
-OFFSET(CNA_SpriteBatchBeginInfo, CNASwift_SpriteBatchBeginInfo, sort_mode);
-LAYOUT(CNA_SpriteScaledCommand, CNASwift_SpriteScaledCommand);
-OFFSET(CNA_SpriteScaledCommand, CNASwift_SpriteScaledCommand, layer_depth);
-LAYOUT(CNA_KeyboardState, CNASwift_KeyboardState);
-OFFSET(CNA_KeyboardState, CNASwift_KeyboardState, pressed_key_words);
-LAYOUT(CNA_GamePadAnalogState, CNASwift_GamePadAnalogState);
-OFFSET(CNA_GamePadAnalogState, CNASwift_GamePadAnalogState, left_thumb_stick);
-OFFSET(CNA_GamePadAnalogState, CNASwift_GamePadAnalogState, right_thumb_stick);
-OFFSET(CNA_GamePadAnalogState, CNASwift_GamePadAnalogState, left_trigger);
-OFFSET(CNA_GamePadAnalogState, CNASwift_GamePadAnalogState, right_trigger);
-LAYOUT(CNA_GamePadState, CNASwift_GamePadState);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, struct_size);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, struct_version);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, is_connected);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, reserved0);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, packet_number);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, pressed_buttons);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, reserved1);
-OFFSET(CNA_GamePadState, CNASwift_GamePadState, analog);
-LAYOUT(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, struct_size);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, struct_version);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, gamepad_type);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, is_connected);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_a_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_b_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_x_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_y_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_back_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_start_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_big_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_dpad_up_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_dpad_down_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_dpad_left_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_dpad_right_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_left_shoulder_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_right_shoulder_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_left_stick_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_right_stick_button);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_left_x_thumb_stick);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_left_y_thumb_stick);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_right_x_thumb_stick);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_right_y_thumb_stick);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_left_trigger);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_right_trigger);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_left_vibration_motor);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_right_vibration_motor);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_voice_support);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_light_bar_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_trigger_vibration_motors_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_misc1_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_paddle1_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_paddle2_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_paddle3_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_paddle4_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_touchpad_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_gyro_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, has_accelerometer_ext);
-OFFSET(CNA_GamePadCapabilities, CNASwift_GamePadCapabilities, reserved);
-
-_Static_assert(CNA_ABI_VERSION == UINT32_C(0x00000700), "canonical header is not ABI 0.7.0");
+/* CNA's own rule, from docs/c-api/ABI_VERSIONING.md and the installed
+   package's SameMajorVersion compatibility file: reject a different major,
+   require a minimum minor. CNA_SWIFT_ABI_MAJOR/MINOR are supplied by
+   tools/native_abi/verify.py out of Sources/CNA/Native/NativeFunctions.swift,
+   so the C wall and the Swift runtime cannot drift apart. */
+_Static_assert(CNA_ABI_VERSION_MAJOR == (uint32_t) (CNA_SWIFT_ABI_MAJOR),
+    "canonical header major is outside the admitted CNA C ABI window");
+_Static_assert(CNA_ABI_VERSION_MINOR >= (uint32_t) (CNA_SWIFT_ABI_MINOR),
+    "canonical header minor is below the admitted CNA C ABI minimum");
+_Static_assert(CNA_ABI_VERSION == CNA_ABI_VERSION_ENCODE(
+    CNA_ABI_VERSION_MAJOR, CNA_ABI_VERSION_MINOR, CNA_ABI_VERSION_PATCH),
+    "canonical ABI encoding is not major<<16 | minor<<8 | patch");
 _Static_assert(sizeof(CNA_Bool) == 1, "CNA_Bool width");
 _Static_assert(CNA_FALSE == 0 && CNA_TRUE == 1, "CNA_Bool values");
 _Static_assert(CNA_SPRITE_SORT_MODE_DEFERRED == 0, "SpriteSortMode.Deferred");
@@ -160,15 +77,23 @@ _Static_assert(CNA_GAMEPAD_TYPE_DRUM_KIT == 8, "GamePadType.DrumKit");
 _Static_assert(CNA_GAMEPAD_TYPE_BIG_BUTTON_PAD == 9, "CNA BigButtonPad compact identity");
 
 int main(void) {
+    /* Three canonical floating-point constants, compared as values because a
+       preprocessor comparison of a float expression is not a constant
+       expression the C wall above can hold. */
     if (CNA_GAMEPAD_LEFT_DEAD_ZONE != (7849.0f / 32768.0f) ||
         CNA_GAMEPAD_RIGHT_DEAD_ZONE != (8689.0f / 32768.0f) ||
         CNA_GAMEPAD_TRIGGER_THRESHOLD != (30.0f / 255.0f)) {
         return 1;
     }
+    /* Only facts the compiler alone can answer are printed. Every count the
+       report carries is derived by tools/native_abi/verify.py from the source
+       it just compiled, so no number here is a hand-maintained literal. */
     printf("ABI_VERSION=%u\n", (unsigned) CNA_ABI_VERSION);
-    printf("LAYOUTS=18\n");
-    printf("CALLBACKS=2\n");
-    printf("CONSTANTS=54\n");
+    printf("ABI_MAJOR=%u\n", (unsigned) CNA_ABI_VERSION_MAJOR);
+    printf("ABI_MINOR=%u\n", (unsigned) CNA_ABI_VERSION_MINOR);
+    printf("ABI_PATCH=%u\n", (unsigned) CNA_ABI_VERSION_PATCH);
     printf("CNA_BOOL_SIZE=%zu\n", sizeof(CNA_Bool));
+    printf("CNA_HANDLE_SIZE=%zu\n", sizeof(CNA_Handle));
+    printf("CNA_RESULT_SIZE=%zu\n", sizeof(CNA_Result));
     return 0;
 }

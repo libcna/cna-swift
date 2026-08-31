@@ -1,67 +1,291 @@
 {
-  "schemaVersion": 1,
-  "qualifiedEnvironment": {
-    "platform": "Linux x86-64",
-    "swift": "6.0.3",
-    "target": "x86_64-pc-linux-gnu",
-    "cnaAbi": "0.7.0",
-    "renderer": "HEADLESS",
-    "audio": "NULL"
+ "schemaVersion": 1,
+ "qualifiedEnvironment": {
+  "platform": "Linux x86-64",
+  "swift": "6.0.3",
+  "target": "x86_64-pc-linux-gnu",
+  "cnaAbi": "0.21.0",
+  "renderer": "HEADLESS",
+  "audio": "SDL3",
+  "cnaAbiAdmittedWindow": "major 0, minor >= 21",
+  "cnaSourceRevision": "0a6158e4ff764907065cd7259e3d29e331a52088",
+  "cnaLibrarySha256": "c32bfbd307d695664f906ccf2834ec3f9ebc240fa388d544ac21ee3ebaeb731b"
+ },
+ "capabilities": [
+  {
+   "operation": "XNA namespace projection",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "Swift Symbol Graph emits the strict Microsoft.Xna.Framework path; marker symbols are measured exclusions"
   },
-  "capabilities": [
-    {"operation":"XNA namespace projection","status":"VERIFIED_MANAGED","evidence":"Swift Symbol Graph emits the strict Microsoft.Xna.Framework path; marker symbols are measured exclusions"},
-    {"operation":"Pure math/value foundation","status":"VERIFIED_MANAGED","evidence":"MathHelper, Point, Rectangle, GameTime, the binary32/geometry closure, Color, and both packed-vector protocols are strict-complete managed Swift"},
-    {"operation":"DisplayOrientation","status":"VERIFIED_MANAGED","evidence":"exact root-framework Int32 OptionSet with Default=0, LandscapeLeft=1, LandscapeRight=2, and Portrait=4; no runtime orientation claim"},
-    {"operation":"BufferUsage","status":"VERIFIED_MANAGED","evidence":"exact Graphics Int32 OptionSet with None=0 and WriteOnly=1; no buffer or GPU resource capability is claimed"},
-    {"operation":"DepthFormat","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with None=0, Depth16=1, Depth24=2, and Depth24Stencil8=3; no depth buffer, stencil, render-target, GPU-format, or native capability is claimed"},
-    {"operation":"FillMode","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with Solid=0 and WireFrame=1; no RasterizerState, polygon mode, or wireframe rendering capability is claimed"},
-    {"operation":"SurfaceFormat","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with all twenty pinned literals; no texture, render-target, display, GPU-format, DXT, HDR, or native capability is claimed"},
-    {"operation":"RenderTargetUsage managed enum contract","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with DiscardContents=0, PreserveContents=1, and PlatformContents=2; no RenderTarget2D, RenderTargetCube, PresentationParameters, GraphicsDevice render-target operation, content discard/preserve/platform-defined semantics, or native capability is claimed"},
-    {"operation":"GraphicsProfile managed enum contract","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with Reach=0 and HiDef=1; no profile selection, GraphicsAdapter, GraphicsDeviceInformation, capability negotiation, or native capability is claimed"},
-    {"operation":"Presentation and device-status managed enum contracts","status":"VERIFIED_MANAGED","evidence":"exact Graphics enums PresentInterval (Default=0..Immediate=3), GraphicsDeviceStatus (Normal=0, Lost=1, NotReset=2) and PrimitiveType (TriangleList=0..LineStrip=3), plus the ClearOptions Int32 OptionSet (Target=1, DepthBuffer=2, Stencil=4); no present interval, vsync, swap chain, device-lost handling, device reset, Clear option path, DrawPrimitives, or native capability is claimed"},
-    {"operation":"Render-state managed enum contracts","status":"VERIFIED_MANAGED","evidence":"exact Graphics enums Blend, BlendFunction, CompareFunction, StencilOperation, CullMode, TextureFilter and TextureAddressMode, plus the ColorWriteChannels and SetDataOptions Int32 OptionSets; no BlendState, DepthStencilState, RasterizerState, SamplerState, blending, depth/stencil testing, culling, filtering, buffer update, or native capability is claimed"},
-    {"operation":"Vertex declaration managed contracts","status":"VERIFIED_MANAGED","evidence":"exact Graphics enums VertexElementFormat, VertexElementUsage and IndexElementSize, plus the VertexElement value struct with verbatim unvalidated construction, four-field equality, SmartGetHashCode word XOR and the exact reference ToString; no VertexDeclaration, IVertexType, VertexBuffer, IndexBuffer, vertex submission, or native vertex-format capability is claimed"},
-    {"operation":"CubeMapFace managed enum contract","status":"VERIFIED_MANAGED","evidence":"exact Graphics non-flags Int32 enum with PositiveX=0 through NegativeZ=5; no TextureCube, RenderTargetBinding, cube render target, cube sampling, or native face-mapping capability is claimed"},
-    {"operation":"Effect parameter and effect interface managed contracts","status":"VERIFIED_MANAGED","evidence":"exact Graphics enums EffectParameterClass and EffectParameterType, plus the IEffectFog and IEffectMatrices protocols with their exact abstract read/write property sets and no conformer; no Effect, EffectParameter, EffectAnnotation, BasicEffect, shader compilation, fog, applied matrix, or native capability is claimed"},
-    {"operation":"Audio managed enum contracts","status":"VERIFIED_MANAGED","evidence":"exact Audio non-flags Int32 enums SoundState (Playing=0, Paused=1, Stopped=2) and AudioChannels (Mono=1, Stereo=2, no zero literal). AudioListener and AudioEmitter exist as pure managed 3D data that reproduce the pinned XACT handedness flip and hold no engine handle; no SoundEffect, SoundEffectInstance, Cue, playback, mixing, XACT interop or audio device capability is claimed, and the audio backend remains NULL"},
-    {"operation":"CLR property accessor projection","status":"VERIFIED_MANAGED","evidence":"one accessor-level rule for every CLR property: the getter keeps Swift property or subscript syntax and gains `get throws` exactly when the XNA getter is fallible, and a setter Swift cannot express becomes Set<PropertyName> carrying the setter's own throws. Fallibility is derived from the CIL of the seven registered assemblies and pinned as tools/api_compat/reference/xna40-accessor-fallibility.json -- 114 fallible getters and 113 fallible setters of 840 properties -- and hash-checked by the verifier. This is a language mapping only: it claims no runtime, device or native behaviour, and the projected writer is the CLR setter accessor, not an added XNA member"},
-    {"operation":"AudioEmitter managed 3D data","status":"VERIFIED_MANAGED","evidence":"the pinned XACT_EMITTER_DATA storage, the FlipHandedness involution and its negative-zero default Position.Z and Velocity.Z, and the exact ordered bge.un DopplerScale boundary in which NaN and -0.0 are accepted while every ordered negative throws. No XACT engine, voice, listener pairing or audio device is involved; Cue.Apply3D is not implemented, so nothing consumes an emitter and constructing one claims no audio capability"},
-    {"operation":"DisplayMode managed descriptor contract","status":"VERIFIED_MANAGED","evidence":"exact Graphics class with six pinned identities, no public constructor, internal-only construction, verbatim Width/Height/Format storage, guarded binary32 AspectRatio, unmodified Windows TitleSafeArea rectangle, and exact ToString; no monitor enumeration, display-mode discovery, resolution switching, GraphicsAdapter, GraphicsDevice.DisplayMode, fullscreen mode management, or native display capability is claimed"},
-    {"operation":"Game lifecycle","status":"VERIFIED_NATIVE","evidence":"Initialize/LoadContent/BeginRun/Update/Draw/EndRun/UnloadContent/Exiting execute through CNA callbacks; 60/600 runs pass"},
-    {"operation":"Game callback error containment","status":"VERIFIED_NATIVE","evidence":"Initialize, LoadContent, Update, Draw and UnloadContent errors are caught in C trampolines and rethrown at controlled Swift boundaries"},
-    {"operation":"Game recreation","status":"VERIFIED_NATIVE","evidence":"20 create/run/exit/destroy cycles pass; stale generations reject use"},
-    {"operation":"GraphicsDevice","status":"VERIFIED_NATIVE","evidence":"callback-scoped borrowed device returned by cna_game_get_graphics_device"},
-    {"operation":"Clear","status":"VERIFIED_NATIVE","evidence":"cna_graphics_device_clear_rgba executes on qualified HEADLESS device"},
-    {"operation":"Texture2D stream load","status":"VERIFIED_NATIVE","evidence":"Foundation.InputStream bytes decode through CNA; logo reports native 128x128 and stress fixture reports 1x1"},
-    {"operation":"SpriteBatch Begin/Draw/End","status":"VERIFIED_NATIVE","evidence":"begin, scaled submit, and end execute for 60/600 template frames and 20 ownership cycles"},
-    {"operation":"Keyboard","status":"VERIFIED_NATIVE","evidence":"native HEADLESS state route executes; empty state is observed backend evidence, not fabricated"},
-    {"operation":"ButtonState","status":"VERIFIED_MANAGED","evidence":"exact non-flags Int32 values and managed value behavior"},
-    {"operation":"Buttons","status":"VERIFIED_MANAGED","evidence":"exact Int32 OptionSet constants, arbitrary combinations, and verifier flags coverage"},
-    {"operation":"GamePadButtons","status":"VERIFIED_MANAGED","evidence":"11 physical properties plus exact equality, hash, string, and copy behavior"},
-    {"operation":"GamePadDPad","status":"VERIFIED_MANAGED","evidence":"asymmetric constructor/property ordering plus exact equality, hash, string, and copy behavior"},
-    {"operation":"GamePadDeadZone","status":"VERIFIED_MANAGED","evidence":"exact None, IndependentAxes, and Circular Int32 values"},
-    {"operation":"GamePadState","status":"VERIFIED_MANAGED","evidence":"both constructors, connection/packet defaults, every physical and virtual button, combinations, equality, hash, string, and copy behavior"},
-    {"operation":"GamePadThumbSticks","status":"VERIFIED_MANAGED","evidence":"exact square clamp, special binary32 behavior, equality, hash, string, and copies"},
-    {"operation":"GamePadTriggers","status":"VERIFIED_MANAGED","evidence":"exact clamp order, special binary32 behavior, equality, hash, string, and copies"},
-    {"operation":"GamePadType","status":"VERIFIED_MANAGED","evidence":"ten exact Int32 identities including BigButtonPad=768"},
-    {"operation":"GamePadCapabilities value representation","status":"VERIFIED_MANAGED","evidence":"26 read-only properties, value copies, and no public initializer"},
-    {"operation":"GamePad.GetState default","status":"VERIFIED_NATIVE_ROUTE","evidence":"canonical cna_gamepad_get_state returned a real disconnected IndependentAxes snapshot; positive controller state HARDWARE_PENDING"},
-    {"operation":"GamePad.GetState None","status":"VERIFIED_NATIVE_ROUTE","evidence":"canonical explicit dead-zone route returned a real disconnected snapshot; physical analog boundaries HARDWARE_PENDING"},
-    {"operation":"GamePad.GetState IndependentAxes","status":"VERIFIED_NATIVE_ROUTE","evidence":"canonical explicit dead-zone route returned a real disconnected snapshot; physical analog boundaries HARDWARE_PENDING"},
-    {"operation":"GamePad.GetState Circular","status":"VERIFIED_NATIVE_ROUTE","evidence":"canonical explicit dead-zone route returned a real disconnected snapshot; physical analog boundaries HARDWARE_PENDING"},
-    {"operation":"GamePad.GetCapabilities","status":"VERIFIED_NATIVE_ROUTE","evidence":"canonical per-control snapshot route returned real disconnected values; positive capability diversity HARDWARE_PENDING"},
-    {"operation":"GamePad.SetVibration","status":"VERIFIED_NATIVE_ROUTE","evidence":"canonical route returned applied=false for disconnected slot; positive physical rumble HARDWARE_PENDING"},
-    {"operation":"Visible renderer output","status":"BACKEND_BLOCKED","evidence":"qualified renderer is HEADLESS; native graphics submission is verified but no window/pixels are claimed"},
-    {"operation":"Content/XNB","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"deferred; fake ContentManager was removed"},
-    {"operation":"Effects/3D","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"deferred; fake BasicEffect/cube/capability route was removed"},
-    {"operation":"Audio","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"outside Foundation-1 selected profile"},
-    {"operation":"Media","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"outside Foundation-1 selected profile"},
-    {"operation":"Storage","status":"UNIMPLEMENTED_CNA_SWIFT","evidence":"outside Foundation-1 selected profile"},
-    {"operation":"Canonical CNA HEAD C API build","status":"UPSTREAM_CNA_BLOCKED","evidence":"read-only HEAD 1bb2145 fails on missing GameUpdateRequiredException.hpp; retained exact ABI-0.7 artifact independently passes"},
-    {"operation":"Linux runtime","status":"VERIFIED_NATIVE","evidence":"Swift 6.0.3 x86_64-pc-linux-gnu, exact ABI-0.7 HEADLESS/NULL"},
-    {"operation":"macOS runtime","status":"PLATFORM_PENDING","evidence":"not compiled or executed; no support claim"},
-    {"operation":"iOS/tvOS/visionOS runtime","status":"PLATFORM_PENDING","evidence":"not compiled or executed; package platform declarations removed"},
-    {"operation":"Windows runtime","status":"PLATFORM_PENDING","evidence":"no LoadLibrary implementation or qualification"},
-    {"operation":"Browser/Wasm runtime","status":"PLATFORM_PENDING","evidence":"no Swift/Wasm CNA artifact or loader qualification"}
-  ]
+  {
+   "operation": "Pure math/value foundation",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "MathHelper, Point, Rectangle, GameTime, the binary32/geometry closure, Color, and both packed-vector protocols are strict-complete managed Swift"
+  },
+  {
+   "operation": "DisplayOrientation",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact root-framework Int32 OptionSet with Default=0, LandscapeLeft=1, LandscapeRight=2, and Portrait=4; no runtime orientation claim"
+  },
+  {
+   "operation": "BufferUsage",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics Int32 OptionSet with None=0 and WriteOnly=1; no buffer or GPU resource capability is claimed"
+  },
+  {
+   "operation": "DepthFormat",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics non-flags Int32 enum with None=0, Depth16=1, Depth24=2, and Depth24Stencil8=3; no depth buffer, stencil, render-target, GPU-format, or native capability is claimed"
+  },
+  {
+   "operation": "FillMode",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics non-flags Int32 enum with Solid=0 and WireFrame=1; no RasterizerState, polygon mode, or wireframe rendering capability is claimed"
+  },
+  {
+   "operation": "SurfaceFormat",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics non-flags Int32 enum with all twenty pinned literals; no texture, render-target, display, GPU-format, DXT, HDR, or native capability is claimed"
+  },
+  {
+   "operation": "RenderTargetUsage managed enum contract",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics non-flags Int32 enum with DiscardContents=0, PreserveContents=1, and PlatformContents=2; no RenderTarget2D, RenderTargetCube, PresentationParameters, GraphicsDevice render-target operation, content discard/preserve/platform-defined semantics, or native capability is claimed"
+  },
+  {
+   "operation": "GraphicsProfile managed enum contract",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics non-flags Int32 enum with Reach=0 and HiDef=1; no profile selection, GraphicsAdapter, GraphicsDeviceInformation, capability negotiation, or native capability is claimed"
+  },
+  {
+   "operation": "Presentation and device-status managed enum contracts",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics enums PresentInterval (Default=0..Immediate=3), GraphicsDeviceStatus (Normal=0, Lost=1, NotReset=2) and PrimitiveType (TriangleList=0..LineStrip=3), plus the ClearOptions Int32 OptionSet (Target=1, DepthBuffer=2, Stencil=4); no present interval, vsync, swap chain, device-lost handling, device reset, Clear option path, DrawPrimitives, or native capability is claimed"
+  },
+  {
+   "operation": "Render-state managed enum contracts",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics enums Blend, BlendFunction, CompareFunction, StencilOperation, CullMode, TextureFilter and TextureAddressMode, plus the ColorWriteChannels and SetDataOptions Int32 OptionSets; no BlendState, DepthStencilState, RasterizerState, SamplerState, blending, depth/stencil testing, culling, filtering, buffer update, or native capability is claimed"
+  },
+  {
+   "operation": "Vertex declaration managed contracts",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics enums VertexElementFormat, VertexElementUsage and IndexElementSize, plus the VertexElement value struct with verbatim unvalidated construction, four-field equality, SmartGetHashCode word XOR and the exact reference ToString; no VertexDeclaration, IVertexType, VertexBuffer, IndexBuffer, vertex submission, or native vertex-format capability is claimed"
+  },
+  {
+   "operation": "CubeMapFace managed enum contract",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics non-flags Int32 enum with PositiveX=0 through NegativeZ=5; no TextureCube, RenderTargetBinding, cube render target, cube sampling, or native face-mapping capability is claimed"
+  },
+  {
+   "operation": "Effect parameter and effect interface managed contracts",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics enums EffectParameterClass and EffectParameterType, plus the IEffectFog and IEffectMatrices protocols with their exact abstract read/write property sets and no conformer; no Effect, EffectParameter, EffectAnnotation, BasicEffect, shader compilation, fog, applied matrix, or native capability is claimed"
+  },
+  {
+   "operation": "Audio managed enum contracts",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Audio non-flags Int32 enums SoundState (Playing=0, Paused=1, Stopped=2) and AudioChannels (Mono=1, Stereo=2, no zero literal). AudioListener and AudioEmitter exist as pure managed 3D data that reproduce the pinned XACT handedness flip and hold no engine handle; no SoundEffect, SoundEffectInstance, Cue, playback, mixing, XACT interop or audio device capability is claimed, and the audio backend remains NULL"
+  },
+  {
+   "operation": "CLR property accessor projection",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "one accessor-level rule for every CLR property: the getter keeps Swift property or subscript syntax and gains `get throws` exactly when the XNA getter is fallible, and a setter Swift cannot express becomes Set<PropertyName> carrying the setter's own throws. Fallibility is derived from the CIL of the seven registered assemblies and pinned as tools/api_compat/reference/xna40-accessor-fallibility.json -- 114 fallible getters and 113 fallible setters of 840 properties -- and hash-checked by the verifier. This is a language mapping only: it claims no runtime, device or native behaviour, and the projected writer is the CLR setter accessor, not an added XNA member"
+  },
+  {
+   "operation": "AudioEmitter managed 3D data",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "the pinned XACT_EMITTER_DATA storage, the FlipHandedness involution and its negative-zero default Position.Z and Velocity.Z, and the exact ordered bge.un DopplerScale boundary in which NaN and -0.0 are accepted while every ordered negative throws. No XACT engine, voice, listener pairing or audio device is involved; Cue.Apply3D is not implemented, so nothing consumes an emitter and constructing one claims no audio capability"
+  },
+  {
+   "operation": "DisplayMode managed descriptor contract",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Graphics class with six pinned identities, no public constructor, internal-only construction, verbatim Width/Height/Format storage, guarded binary32 AspectRatio, unmodified Windows TitleSafeArea rectangle, and exact ToString; no monitor enumeration, display-mode discovery, resolution switching, GraphicsAdapter, GraphicsDevice.DisplayMode, fullscreen mode management, or native display capability is claimed"
+  },
+  {
+   "operation": "Game lifecycle",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "Initialize/LoadContent/BeginRun/Update/Draw/EndRun/UnloadContent/Exiting execute through CNA callbacks; 60/600 runs pass"
+  },
+  {
+   "operation": "Game callback error containment",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "Initialize, LoadContent, Update, Draw and UnloadContent errors are caught in C trampolines and rethrown at controlled Swift boundaries"
+  },
+  {
+   "operation": "Game recreation",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "20 create/run/exit/destroy cycles pass; stale generations reject use"
+  },
+  {
+   "operation": "GraphicsDevice",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "callback-scoped borrowed device returned by cna_game_get_graphics_device"
+  },
+  {
+   "operation": "Clear",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "cna_graphics_device_clear_rgba executes on qualified HEADLESS device"
+  },
+  {
+   "operation": "Texture2D stream load",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "Foundation.InputStream bytes decode through CNA; logo reports native 128x128 and stress fixture reports 1x1"
+  },
+  {
+   "operation": "SpriteBatch Begin/Draw/End",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "begin, scaled submit, and end execute for 60/600 template frames and 20 ownership cycles"
+  },
+  {
+   "operation": "Keyboard",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "native HEADLESS state route executes; empty state is observed backend evidence, not fabricated"
+  },
+  {
+   "operation": "ButtonState",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact non-flags Int32 values and managed value behavior"
+  },
+  {
+   "operation": "Buttons",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact Int32 OptionSet constants, arbitrary combinations, and verifier flags coverage"
+  },
+  {
+   "operation": "GamePadButtons",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "11 physical properties plus exact equality, hash, string, and copy behavior"
+  },
+  {
+   "operation": "GamePadDPad",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "asymmetric constructor/property ordering plus exact equality, hash, string, and copy behavior"
+  },
+  {
+   "operation": "GamePadDeadZone",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact None, IndependentAxes, and Circular Int32 values"
+  },
+  {
+   "operation": "GamePadState",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "both constructors, connection/packet defaults, every physical and virtual button, combinations, equality, hash, string, and copy behavior"
+  },
+  {
+   "operation": "GamePadThumbSticks",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact square clamp, special binary32 behavior, equality, hash, string, and copies"
+  },
+  {
+   "operation": "GamePadTriggers",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "exact clamp order, special binary32 behavior, equality, hash, string, and copies"
+  },
+  {
+   "operation": "GamePadType",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "ten exact Int32 identities including BigButtonPad=768"
+  },
+  {
+   "operation": "GamePadCapabilities value representation",
+   "status": "VERIFIED_MANAGED",
+   "evidence": "26 read-only properties, value copies, and no public initializer"
+  },
+  {
+   "operation": "GamePad.GetState default",
+   "status": "VERIFIED_NATIVE_ROUTE",
+   "evidence": "canonical cna_gamepad_get_state returned a real disconnected IndependentAxes snapshot; positive controller state HARDWARE_PENDING"
+  },
+  {
+   "operation": "GamePad.GetState None",
+   "status": "VERIFIED_NATIVE_ROUTE",
+   "evidence": "canonical explicit dead-zone route returned a real disconnected snapshot; physical analog boundaries HARDWARE_PENDING"
+  },
+  {
+   "operation": "GamePad.GetState IndependentAxes",
+   "status": "VERIFIED_NATIVE_ROUTE",
+   "evidence": "canonical explicit dead-zone route returned a real disconnected snapshot; physical analog boundaries HARDWARE_PENDING"
+  },
+  {
+   "operation": "GamePad.GetState Circular",
+   "status": "VERIFIED_NATIVE_ROUTE",
+   "evidence": "canonical explicit dead-zone route returned a real disconnected snapshot; physical analog boundaries HARDWARE_PENDING"
+  },
+  {
+   "operation": "GamePad.GetCapabilities",
+   "status": "VERIFIED_NATIVE_ROUTE",
+   "evidence": "canonical per-control snapshot route returned real disconnected values; positive capability diversity HARDWARE_PENDING"
+  },
+  {
+   "operation": "GamePad.SetVibration",
+   "status": "VERIFIED_NATIVE_ROUTE",
+   "evidence": "canonical route returned applied=false for disconnected slot; positive physical rumble HARDWARE_PENDING"
+  },
+  {
+   "operation": "Visible renderer output",
+   "status": "BACKEND_BLOCKED",
+   "evidence": "qualified renderer is HEADLESS; native graphics submission is verified but no window/pixels are claimed"
+  },
+  {
+   "operation": "Content/XNB",
+   "status": "UNIMPLEMENTED_CNA_SWIFT",
+   "evidence": "deferred; fake ContentManager was removed"
+  },
+  {
+   "operation": "Effects/3D",
+   "status": "UNIMPLEMENTED_CNA_SWIFT",
+   "evidence": "deferred; fake BasicEffect/cube/capability route was removed"
+  },
+  {
+   "operation": "Audio",
+   "status": "UNIMPLEMENTED_CNA_SWIFT",
+   "evidence": "outside Foundation-1 selected profile"
+  },
+  {
+   "operation": "Media",
+   "status": "UNIMPLEMENTED_CNA_SWIFT",
+   "evidence": "outside Foundation-1 selected profile"
+  },
+  {
+   "operation": "Storage",
+   "status": "UNIMPLEMENTED_CNA_SWIFT",
+   "evidence": "outside Foundation-1 selected profile"
+  },
+  {
+   "operation": "Canonical CNA HEAD C API build",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "resolved upstream: the Foundation-11 blocker was a missing GameUpdateRequiredException.hpp at CNA HEAD 1bb2145. The current C API builds at cnanext HEAD 0a6158e4f, and the admitted 0.21.0 artifact is byte-identical to cnanext/cmake-build-headless with headers byte-identical to that HEAD and exactly the 4,054 exports in cnanext tools/c-api/abi_baseline.json"
+  },
+  {
+   "operation": "Linux runtime",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "Swift 6.0.3 x86_64-pc-linux-gnu, exact ABI-0.7 HEADLESS/NULL"
+  },
+  {
+   "operation": "macOS runtime",
+   "status": "PLATFORM_PENDING",
+   "evidence": "not compiled or executed; no support claim"
+  },
+  {
+   "operation": "iOS/tvOS/visionOS runtime",
+   "status": "PLATFORM_PENDING",
+   "evidence": "not compiled or executed; package platform declarations removed"
+  },
+  {
+   "operation": "Windows runtime",
+   "status": "PLATFORM_PENDING",
+   "evidence": "no LoadLibrary implementation or qualification"
+  },
+  {
+   "operation": "Browser/Wasm runtime",
+   "status": "PLATFORM_PENDING",
+   "evidence": "no Swift/Wasm CNA artifact or loader qualification"
+  },
+  {
+   "operation": "Host GameTime under a fixed time step",
+   "status": "VERIFIED_NATIVE_WITH_MEASURED_XNA_DIVERGENCE",
+   "evidence": "CNA 0.21.0 issues one leading frame whose Update carries elapsed=0 and then reproduces pinned XNA Game.Tick exactly: Update sees ElapsedGameTime == TargetElapsedTime and the pre-increment TotalGameTime, Draw sees the advanced TotalGameTime. Pinned XNA returns from Tick without calling Update or DrawFrame when the accumulated/target step count is zero, so no XNA callback observes a zero elapsed time; the leading frame is an upstream divergence this binding reports rather than corrects. Pinned by NativeLifecycleTests.testHostGameTimeSequenceIsMeasuredNotAssumed; derivation in docs/native-abi-migration-evidence.md"
+  }
+ ]
 }

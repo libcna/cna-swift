@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
-// Reviewed Swift-side declarations for the CNA C ABI 0.7.0 foundation slice.
-// tools/native_abi verifies these independently against canonical CNA headers.
+// Reviewed Swift-side declarations for the bound slice of the CNA C ABI.
+// Every structure here mirrors a canonical CNA_* structure field for field, and
+// every callback mirrors a canonical callback type. tools/native_abi verifies
+// both independently against the canonical CNA headers: field names, order,
+// offsets and widths, and __builtin_types_compatible_p on the callbacks.
 #ifndef CNA_SWIFT_SHIM_H
 #define CNA_SWIFT_SHIM_H
 

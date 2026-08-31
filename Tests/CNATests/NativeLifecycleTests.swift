@@ -66,6 +66,9 @@ private final class LifecycleProbeGame: Microsoft.Xna.Framework.Game {
     var events: [String] = []
     var Updates = 0
     var Draws = 0
+    /// (TotalGameTime, ElapsedGameTime) as the host reported it, in order.
+    var updateTimings: [(total: Duration, elapsed: Duration)] = []
+    var drawTimings: [(total: Duration, elapsed: Duration)] = []
     var viewport: Microsoft.Xna.Framework.Graphics.Viewport?
     var observedPressedKeys: [Microsoft.Xna.Framework.Input.Keys] = []
     var manager: Microsoft.Xna.Framework.GraphicsDeviceManager?
@@ -103,12 +106,14 @@ private final class LifecycleProbeGame: Microsoft.Xna.Framework.Game {
 
     override func Update(_ gameTime: Microsoft.Xna.Framework.GameTime) throws {
         XCTAssertGreaterThanOrEqual(gameTime.TotalGameTime, .zero)
-        XCTAssertGreaterThan(gameTime.ElapsedGameTime, .zero)
+        XCTAssertGreaterThanOrEqual(gameTime.ElapsedGameTime, .zero)
+        updateTimings.append((gameTime.TotalGameTime, gameTime.ElapsedGameTime))
         Updates += 1
         if Updates == frameLimit { try Exit() }
     }
 
     override func Draw(_ gameTime: Microsoft.Xna.Framework.GameTime) throws {
+        drawTimings.append((gameTime.TotalGameTime, gameTime.ElapsedGameTime))
         Draws += 1
         guard let texture, let spriteBatch else { return }
         try GraphicsDevice.Clear(.CornflowerBlue)
@@ -636,5 +641,65 @@ extension NativeLifecycleTests {
         XCTAssertEqual(
             OrderRecordingGame.order.filter { $0 == "LoadContent" }.count, 1,
             "a full Run must also issue LoadContent exactly once")
+    }
+}
+
+extension NativeLifecycleTests {
+    /// The `GameTime` the host hands each callback, pinned as a measurement.
+    ///
+    /// This is a **native runtime** observation, not XNA behaviour evidence.
+    /// It is pinned because migrating from CNA C ABI 0.7.0 to 0.21.0 changed
+    /// it, and nothing here noticed until a `> .zero` assertion failed.
+    ///
+    /// Measured on CNA 0.21.0, `IsFixedTimeStep` true, target 166,667 ticks,
+    /// four consecutive `RunOneFrame` calls:
+    ///
+    /// ```text
+    /// frame 0  Update total=0        elapsed=0        Draw total=0       elapsed=166667
+    /// frame 1  Update total=0        elapsed=166667   Draw total=166667  elapsed=166667
+    /// frame 2  Update total=166667   elapsed=166667   Draw total=333334  elapsed=166667
+    /// frame 3  Update total=333334   elapsed=166667   Draw total=500001  elapsed=166667
+    /// ```
+    ///
+    /// Frames 1 onward reproduce pinned XNA `Game.Tick` exactly: it assigns
+    /// `gameTime.ElapsedGameTime = targetElapsedTime` and
+    /// `gameTime.TotalGameTime = totalGameTime` *before* the `finally` adds a
+    /// step, while `DrawFrame` re-reads the already advanced `totalGameTime`.
+    /// **Frame 0 is a divergence**: XNA's `Tick` computes
+    /// `accumulated / target` and returns without calling `Update` *or*
+    /// `DrawFrame` when that count is zero, so no XNA callback ever observes a
+    /// zero `ElapsedGameTime` under a fixed time step. CNA 0.21.0 issues that
+    /// leading frame anyway. See `docs/native-abi-migration-evidence.md`.
+    ///
+    /// CNA 0.7.0 diverged differently, and in both halves: its `Update` saw a
+    /// total one step ahead of XNA's, and its `Draw` saw the same total as its
+    /// `Update` rather than the advanced one.
+    func testHostGameTimeSequenceIsMeasuredNotAssumed() throws {
+        try requireNative()
+        let target = Duration(secondsComponent: 0, attosecondsComponent: 166_667 * 100_000_000_000)
+        let game = try LifecycleProbeGame(frameLimit: 1_000)
+        for _ in 0..<4 { try game.RunOneFrame() }
+        try game.Dispose()
+
+        print("CNA_HOST_UPDATE_TIMINGS=\(game.updateTimings)")
+        print("CNA_HOST_DRAW_TIMINGS=\(game.drawTimings)")
+        XCTAssertEqual(game.updateTimings.count, 4)
+        XCTAssertEqual(game.drawTimings.count, 4)
+
+        // The leading frame CNA issues and XNA does not.
+        XCTAssertEqual(game.updateTimings[0].total, .zero)
+        XCTAssertEqual(game.updateTimings[0].elapsed, .zero,
+                       "CNA 0.21 issues one leading Update with a zero elapsed time")
+        XCTAssertEqual(game.drawTimings[0].total, .zero)
+        XCTAssertEqual(game.drawTimings[0].elapsed, target)
+
+        // Every later frame is XNA's own sequence, one step apart, with Draw
+        // reading the total that Update's step already advanced.
+        for frame in 1..<4 {
+            XCTAssertEqual(game.updateTimings[frame].elapsed, target)
+            XCTAssertEqual(game.drawTimings[frame].elapsed, target)
+            XCTAssertEqual(game.updateTimings[frame].total, target * (frame - 1))
+            XCTAssertEqual(game.drawTimings[frame].total, target * frame)
+        }
     }
 }

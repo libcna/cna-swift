@@ -1,5 +1,15 @@
 // SPDX-License-Identifier: MIT
 
+/// The erased destroy route a `NativeHandleStorage` holds.
+///
+/// This is deliberately *not* one of the per-route types in
+/// `NativeFunctions`: those exist so tools/native_abi can pair one canonical
+/// symbol with one stored property, and every owned handle kind hands its own
+/// destroy route to the same storage slot. Assigning a route type here is
+/// checked by the compiler, because a Swift typealias is transparent and the
+/// two spellings denote the same `@convention(c)` function type.
+internal typealias NativeDestroyRoute = @convention(c) (UInt64) -> UInt32
+
 internal protocol RuntimeOwnedChild: AnyObject {
     var runtimeObjectIsDisposed: Bool { get }
     func disposeFromParent() throws
@@ -16,14 +26,14 @@ internal final class NativeHandleStorage {
     let ownership: NativeOwnership
     let generation: UInt64
     let runtime: RuntimeState
-    private let destroy: NativeFunctions.HandleOperation
+    private let destroy: NativeDestroyRoute
 
     init(
         handle: UInt64,
         typeName: String,
         ownership: NativeOwnership,
         runtime: RuntimeState,
-        destroy: @escaping NativeFunctions.HandleOperation
+        destroy: @escaping NativeDestroyRoute
     ) {
         self.handle = handle
         self.typeName = typeName

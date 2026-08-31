@@ -1,224 +1,125 @@
 # CNA-Swift normative plan and status
 
-**Milestone:** Foundation 18 — Pure Managed Batch D. Three entirely missing
-pure-managed XNA types carrying 21 mapped Swift XNA identities, over the
-completed Foundation 1–17 baseline.
+**Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 36 are
+complete, and the native migration off the historical `0.7.0` boundary is done.
+
+This file states what is true **now**. The milestone-by-milestone progression
+lives in `NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md`
+files, which are not summarised away here; where this document once carried a
+milestone's own prose, that milestone's evidence file carries it still.
 
 ## Normative rules
 
-1. Pinned Microsoft XNA 4.0 Windows runtime metadata is the public shape
-   authority, and the hash-matched assembly IL is the behavior authority. An
-   assembly earns behavior authority only by **registration**: its SHA-256 is
-   recorded and `tools/api_compat/pinned_assembly_audit.py` machine-compares
-   its public metadata against every retained contract entry it declares. The
-   audit is calibrated on the assemblies whose provenance predates it and
-   carries its own mutation self-tests, so it cannot pass vacuously. Seven
-   assemblies are registered and together reproduce the contract's 257 types
-   and 2,964 members exactly. FNA
-   and MonoGame are engineering comparators only. For a type whose entire
-   contract is metadata, the pinned contract alone is sufficient and no
-   behavior surrogate or reference probe is created. Every type completed in
-   this batch was additionally re-derived from a pinned, hash-matched assembly;
-   a candidate whose declaring assembly lies outside the pinned set is deferred
-   rather than completed on weaker provenance.
-2. The batch is managed-only. It introduces no native route, constant, layout,
-   callback, device, adapter, buffer, texture, render target, effect, audio
-   engine, or renderer operation.
-3. A complete type does not imply runtime capability. Profile selection,
+1. **XNA authority.** Pinned Microsoft XNA 4.0 Windows runtime metadata is the
+   public shape authority, and the hash-matched assembly IL is the behaviour
+   authority. An assembly earns behaviour authority only by **registration**:
+   its SHA-256 is recorded and `tools/api_compat/pinned_assembly_audit.py`
+   machine-compares its public metadata against every retained contract entry it
+   declares. The audit is calibrated on the assemblies whose provenance predates
+   it and carries its own mutation self-tests, so it cannot pass vacuously.
+   Seven assemblies are registered and together reproduce the contract's 257
+   types and 2,964 members exactly. FNA and MonoGame are engineering
+   comparators only. **CNA is never XNA behaviour authority**: a value observed
+   from the native runtime is native evidence and is recorded separately.
+2. **A user-visible XNA message is read, not transcribed.** XNA loads a
+   resource key and the runtime resolves it against the assembly's own string
+   table, so every reproduced message is read out of the registered binary,
+   pinned in `tools/api_compat/reference/xna40-selected-resource-strings.json`,
+   and compared against the Swift source by the verifier.
+3. **A complete type does not imply runtime capability.** Profile selection,
    presentation, device status, primitives, clear paths, blend/depth/stencil/
-   rasterizer/sampler state, vertex and index buffers, cube textures, effects,
-   fog, and audio playback all remain unclaimed.
-4. Public strict names use `Microsoft.Xna.Framework...` and exact XNA
+   rasterizer/sampler state, vertex and index buffers, cube textures, render
+   targets, effects, content loading, windows, and audio playback all remain
+   unclaimed.
+4. **Public strict names** use `Microsoft.Xna.Framework...` and exact XNA
    PascalCase. Formal Swift projections are measured; manual diagnostic
-   allowlisting is forbidden.
-5. Mapping rules are unchanged and no new mapping policy was created to make a
-   candidate convenient. Foundation 15 promoted the pre-existing
-   `System.IntPtr -> Swift Int` entry to a documented **general** language rule
-   with verifier support and ten negative controls; it invented nothing,
-   because the rule was already in `mapping-rules.json` and the mapping
-   document before this milestone. The expected projection is never
-   `RAW_HANDLE_LEAK`; that exemption covers only the mapped XNA IntPtr value
-   and never a CNA FFI or native implementation handle. Earlier rules:
-   - a public non-flags CLR enum maps to a Swift `enum` with the CLR underlying
-     type as its raw type and one explicitly valued case per CLR literal;
-   - a public `[Flags]` CLR enum maps to a Swift `OptionSet` struct with the CLR
-     underlying type as `rawValue`, one `static let` per CLR literal, and a
-     zero-valued literal spelled as the empty set;
-   - a public CLR interface maps to a Swift `protocol` with one requirement per
-     declared member and no invented conformance;
-   - the synthetic `value__` storage identity remains the existing enum-storage
-     language mapping and never appears in the public Swift surface;
-   - `[Flags]` presence is read out of the pinned binary, never assumed.
-   A namespace marker is added when a namespace gains its first implemented
-   type; `Microsoft.Xna.Framework.Audio` gained its marker this milestone.
-6. Exact CNA ABI 0.7.0 only. Native selection is an absolute environment
-   override or installed soname, never a developer-tree fallback.
-7. The five runtime-partial types — `Game`, `GraphicsDeviceManager`,
-   `GraphicsDevice`, `Texture2D`, `SpriteBatch` — are off limits. A candidate
-   that would require modifying one of them is skipped and recorded, and
-   `MISSING_MEMBER` stays at 131 with `PARTIAL_TYPES=5`.
-8. The batch consumes candidates by regenerated dependency rank, one at a time,
-   regenerating the graph after every completion. An unsafe highest-ranked
-   candidate is skipped with a recorded reason; it does not stop the batch.
-
-## Qualified selected surface
-
-Foundation 18 adds exactly these three types, all previously entirely missing:
-
-- `Input.Touch.TouchLocation`, a sealed value struct storing the position as
-  two separate `float32` fields and holding both the current and the previous
-  location in one value. Its typed `Equals` compares five fields and ignores
-  both state fields, while `op_Equality` compares all seven; that asymmetry is
-  in the pinned IL and is preserved. `TryGetPreviousLocation` writes its `out`
-  parameter even when it returns false.
-- `Input.Touch.GestureSample`, a sealed value struct with one constructor and
-  six get-only properties and no equality, hash or string identity.
-- `Graphics.DisplayModeCollection`, a descriptor class with non-public
-  construction, mapping `IEnumerator<T>` to `CNAEnumerator<T>` and
-  `IEnumerable<T>` to a Swift array. Foundation 14 and 16 deferred it on the
-  grounds that any implementation would be permanently empty or fabricate
-  adapter data; that objection describes its *producer*,
-  `GraphicsAdapter.SupportedDisplayModes`, not the collection, which has no
-  accessible constructor at all. The assessment is revised in favour of the
-  `DisplayMode` precedent, and no display or adapter capability is claimed.
-
-`Media.Video` was dependency-complete and pure managed and was still deferred:
-its pinned internal constructor takes a `GraphicsDevice` runtime partial and
-its only producer, `ContentManager`, is not implemented.
-
-Foundation 17 registers `Microsoft.Xna.Framework.Game.dll`,
-`Microsoft.Xna.Framework.Input.Touch.dll`, `Microsoft.Xna.Framework.Xact.dll`,
-`Microsoft.Xna.Framework.Video.dll` and `Microsoft.Xna.Framework.Storage.dll`,
-and adds exactly these seven types, all previously entirely missing:
-
-- `Input.Touch.GestureType`, the one Foundation-17 enum carrying
-  `System.FlagsAttribute`, mapping to a Swift `OptionSet` with `None` as the
-  empty set and ten disjoint single bits.
-- Three ordinary `Int32` enums with no `[Flags]` attribute:
-  `Input.Touch.TouchLocationState`, `Media.VideoSoundtrackType`, and
-  `Audio.AudioStopOptions` — whose flags-free status is corroborated by the
-  pinned `CA1027:MarkEnumsWithFlags` suppression it carries.
-- `Input.Touch.TouchPanelCapabilities`, a sealed value struct whose two auto
-  properties have private setters, projected with internal construction and no
-  public initializer. `TouchPanel` is not implemented and no capability is
-  claimed, queried, or invented.
-- `IGameComponent` and `IGraphicsDeviceManager`, mapping to Swift protocols
-  whose four requirements all take the established `throws` projection. Nothing
-  conforms to either; `GraphicsDeviceManager` remains an untouched partial.
-
-`Audio.RendererDetail` was dependency-complete and within a newly registered
-assembly and was still deferred: its `GetHashCode` depends on
-`System.String.GetHashCode()`, which is an unspecified, implementation-defined
-function that is not derivable from IL. Semantic fidelity outranks scoreboard
-progress.
-
-`Microsoft.Xna.Framework.Input.Touch` gained its namespace marker.
-
-Foundation 16 added exactly these four types, all previously entirely missing:
-
-- `Microsoft.Xna.Framework.Input.MouseState`, a sealed sequential value struct
-  mapping to a Swift struct with 14 identities: the constructor, eight get-only
-  properties, `GetHashCode`, `ToString`, `Equals(object)`, and the two equality
-  operators. Its pinned constructor order places `middleButton` before
-  `rightButton`; because both share a mapped type and a `_` label, the
-  transposition is caught only by the registered
-  `internalParameterOrderChecks` entry, which the self-test exercises for every
-  adjacent pair. `GetHashCode` is a plain `Int32` XOR with **no**
-  `SmartGetHashCode` zero substitution, and `ToString` emits buttons in the
-  order Left, Right, Middle, XButton1, XButton2. No typed `Equals`, no
-  `Equatable`/`Hashable` conformance, and no mutable property is added.
-- Three ordinary CLR `Int32` enums with no `[Flags]` attribute in the pinned
-  binary: `Media.MediaState`, `Media.MediaSourceType`, and
-  `Audio.MicrophoneState`. `MediaSourceType`'s literals are non-contiguous
-  (0 and 4) and no literal was invented to close the gap;
-  `MicrophoneState.Started` is the zero literal.
-
-`Microsoft.Xna.Framework.Media` gained its namespace marker.
-
-Completing these four types claims no mouse device, cursor, microphone,
-capture, media player, media library, or video capability.
-
-Foundation 15 added exactly one type, previously entirely missing:
-
-- `Microsoft.Xna.Framework.Graphics.PresentationParameters`, a public
-  non-sealed CLR class with a public parameterless constructor, mapping to an
-  `open` Swift class with 13 identities: `init()`, non-virtual `Clone()`, ten
-  read/write properties, and the get-only `Bounds`. Its internal nested
-  `Settings` value struct and `settings` field mirror the pinned `assembly`
-  storage and stay out of the public Swift surface. `IsFullScreen` defaults to
-  `true` per the pinned `ldc.i4.1`; nothing validates, clamps, or rejects any
-  value; `Clone` is a wholesale value-struct copy that yields a base instance
-  even from a derived one; there is no `Clear` member to implement.
-  `DeviceWindowHandle` is pure managed descriptor state and is never
-  dereferenced, validated against a window, resolved through SDL, or handed to
-  CNA.
-
-Foundation 14 added exactly these 25 types, all previously entirely missing:
-
-- 19 ordinary CLR `Int32` enums → Swift `enum: Int32`: `GraphicsProfile`,
-  `PresentInterval`, `VertexElementFormat`, `VertexElementUsage`,
-  `CompareFunction`, `CubeMapFace`, `IndexElementSize`, `Blend`,
-  `BlendFunction`, `CullMode`, `StencilOperation`, `TextureAddressMode`,
-  `TextureFilter`, `GraphicsDeviceStatus`, `PrimitiveType`,
-  `EffectParameterClass`, `EffectParameterType`, `Audio.SoundState`,
-  `Audio.AudioChannels`.
-- 3 `[Flags]` CLR `Int32` enums → Swift `OptionSet` structs:
-  `ColorWriteChannels`, `ClearOptions`, `SetDataOptions`.
-- 1 sealed sequential value struct: `VertexElement`.
-- 2 pure abstract interfaces → Swift protocols: `IEffectFog`,
-  `IEffectMatrices`.
-
-No enum gained a `description`, `ToString`, `String`, predicate, alias,
-`OptionSet` convenience, or native-conversion member, and no `None`, `Default`,
-or `All` literal was invented. `VertexElement` gained no typed `Equals`
-overload, no `Equatable`/`Hashable` conformance, and no static factory; its two
-element-name tables are `private`, so neither element enum gained a public
-string surface. The two protocols gained no default implementation, no
-extension, and no XNA conformer.
-
-No CNAShim declaration, native manifest row, native function, C layout,
-callback, or constant was added, and the five runtime partials are untouched.
+   allowlisting is forbidden, and `ALLOWLIST_ENTRIES` is 0.
+5. **Mapping rules are measured, never invented for convenience.** The full set
+   is in `docs/xna-swift-mapping.md` and `tools/api_compat/mapping-rules.json`.
+   The load-bearing ones: a non-flags CLR enum maps to a Swift `enum` with the
+   CLR underlying raw type and one explicitly valued case per literal; a
+   `[Flags]` enum maps to an `OptionSet`, with `[Flags]` read out of the pinned
+   binary rather than assumed; a CLR interface maps to a Swift `protocol` with
+   no invented conformance; a CLR class maps to a Swift class, and CLR
+   derivability is not strengthened casually; `System.Type` maps to the Swift
+   metatype; `Dictionary<K,V>` maps to a reference class with the CLR's own
+   storage algorithm; a CLR event maps to the `CNAEvent` architecture;
+   `System.IntPtr` maps to Swift `Int` as a documented general language rule
+   whose expected projection is never `RAW_HANDLE_LEAK` — an exemption that
+   covers the mapped XNA IntPtr value and never a CNA FFI or native handle.
+6. **The native boundary.** CNA-Swift admits the ABI window CNA itself
+   publishes for a consumer — reject a different major, require a minimum minor
+   — which is major `0` exactly and minor `21` or later, qualified against
+   `0.21.0`. Native selection is an absolute `CNA_NATIVE_LIBRARY` override or
+   the installed soname, never a developer-tree fallback. Every bound symbol
+   must resolve by name before the runtime starts. See `docs/native-abi.md` and
+   `docs/native-abi-migration-evidence.md`.
+7. **Two error channels stay separate.** `CNAError` is the CNA runtime's own
+   failure channel. Projected CLR/XNA failures are the `CNAException` class
+   hierarchy, which conforms to `Error`. `catch is CNAException` must not
+   swallow a native CNA runtime failure, and the two are never merged for
+   convenience.
+8. **Native ownership is explicit.** Every native handle has a recorded
+   ownership — `OWNED`, `BORROWED`, `PARENT_OWNED`, `PROCESS_GLOBAL` or
+   `MANAGED_VALUE` — and disposal is deterministic. A Swift `deinit` is a
+   backstop, never the only correctness mechanism, and no callback may outlive
+   the rooted Swift state.
+9. **Every gate must be shown to fail.** A verifier, audit or runtime gate is
+   evidence only once a planted, realistic defect has been proven to break it.
+   `tools/native_abi/mutations.py`, the API verifier's self-tests and graph
+   fixtures, the pinned-assembly audit's mutations and the BCL authority's
+   negative controls are all of this kind.
 
 ## Measurement status
 
-- Pinned contract: 257 types / 2,964 members; contract SHA-256
-  `7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc`. The
-  Foundation-15 entry was independently re-read and machine-compared against
-  the pinned assembly IL for this milestone, as were all 25 Foundation-14
-  entries before it.
-- Formal projection: 257 Swift types / 2,887 Swift members.
-- Compiler target: 113 types / 1,641 members; 108 complete, five partial, 144
-  missing. Total diagnostics are 295. Normal strict remains red only for the
-  deferred profile; leak-only is green.
-- Verifier: 1,994 mutation/self-tests pass, up from 1,822. Every completed type
-  is locally complete with zero diagnostics. Manual/applied allowlists and
-  unmeasured structural categories are zero.
-- Reference assemblies: seven registered, reproducing 257 contract types and
-  2,964 contract members exactly; calibration passes and 60 audit mutation
-  self-tests pass.
-- Pure behavior: 1,595 XNA-derived observation/assertion sites with zero
-  failures, up from 1,523. Swift projection qualification stays in separate
-  tests and is not counted as XNA behavior.
-- Dependency graph: node names are now mapped exactly as the strict verifier
-  maps them, which removed six false-positive dependency-complete candidates
-  caused by CLR nested and generic-collision names.
-- Native ABI: 29 functions, 91 prototype positions, 91 C/Swift measurements,
-  18 layouts, 2 callbacks, and 214 constants; header, library, and ABI mismatch
-  counters are zero and unchanged.
-- All earlier managed, GamePad, Keyboard, PackedVector, native lifecycle,
-  template, archive, and isolated-consumer gates remain required and pass.
+Reproduced live on CNA 0.21.0 at the current HEAD.
+
+```text
+REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
+EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
+TARGET_TYPES=142               TARGET_MEMBERS=1767
+COMPLETE_TYPES=135             PARTIAL_TYPES=7      MISSING_TYPE=115
+MISSING_MEMBER=129             TOTAL_DIAGNOSTICS=269
+ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
+NONDERIVABLE_UNSEALED_CLASSES=5    PENDING_BCL_BASE_TYPES=4
+```
+
+Mismatch categories that are not zero, each a recorded decision rather than an
+oversight: `BASE_MAPPING_MISMATCH=2`, `INTERFACE_MAPPING_MISMATCH=1`,
+`PROPERTY_MAPPING_MISMATCH=4`, `OVERLOAD_MAPPING_MISMATCH=18`. Every other
+mismatch and leak category is 0, including `INTERNAL_TYPE_LEAK`,
+`RAW_HANDLE_LEAK` and `PUBLIC_NATIVE_FFI_LEAK`.
+
+Native boundary:
+
+```text
+BOUND_FUNCTIONS=29  ROUTE_PAIRINGS=29  PROTOTYPE_TYPE_POSITIONS=91
+CANONICAL_DECLARATION_CHECKS=91  C_SWIFT_MEASUREMENTS=91
+LAYOUTS=18  LAYOUT_FIELDS=129  CALLBACKS=2  CONSTANTS=212  SCALAR_FACTS=3
+MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
+NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
+```
+
+The seven registered reference assemblies reproduce 257 contract types and 2,964
+contract members exactly; calibration and the audit's mutation self-tests pass.
+`mscorlib` `5634668d…acc63` is the sole admitted BCL authority; `System.dll` is
+available and deliberately unadmitted.
 
 ## Platform and release policy
 
-Linux x86-64 with Swift 6.0.3 and exact CNA 0.7.0 HEADLESS/NULL is the only
-qualified runtime. HEADLESS has no visible window, this host has no attached
-controller, and the audio backend is NULL. Apple, Windows, and Web/Wasm remain
-unqualified.
+Linux x86-64 with Swift 6.0.3 and an external CNA C ABI 0.21.0 HEADLESS library
+(SDL3 audio backend, `CNA_DEVICES=OFF`, `CNA_CNAEXT=OFF`) is the qualified
+runtime. HEADLESS has no visible window and this host has no attached
+controller, so no visible output and no positive controller behaviour is
+claimed. Apple platforms, Windows, and Web/Wasm remain unqualified.
 
-Completion requires debug/release builds and tests, warnings-as-errors, Symbol
-Graph, verifier self-tests/strict/leak-only, pure behavior, unchanged full ABI,
-GamePad and Keyboard regression, native stress, Swift ASan and TSan, unchanged
-template 60/600, a clean exact source archive, isolated consumer,
-`git diff --check`, one milestone commit for the whole batch, and the explicit
-publication boundary. Work stops after selecting—but not starting—one
-regenerated next closure.
+Completion of a milestone requires debug and release builds and tests,
+warnings-as-errors including tests, Symbol Graph and its self-tests, the
+verifier's self-tests, strict and leak-only runs, pure XNA and BCL behaviour,
+the pinned assembly audit, the BCL authority audit, the native ABI verifier and
+its mutation controls, GamePad and Keyboard regression, native stress, Swift
+ASan and TSan, an unchanged template at 60 and 600 frames, a deterministic exact
+source archive, the isolated consumer and its rejected negative consumers,
+`git diff --check`, and one coherent commit. Publication is a separate explicit
+boundary and is never crossed without instruction.
