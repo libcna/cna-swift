@@ -45,7 +45,7 @@
     "IL_MEMBER_NOT_FOUND": "the contract declares a member the IL does not; a hard error",
     "CLR_FIELD_READ_CANNOT_FAIL": "reading a field executes no user code and has no failure path"
   },
-  "SELF_TESTS": 115,
+  "SELF_TESTS": 118,
   "SELF_TEST_STATUS": "PASS",
   "selfTestFailures": [],
   "REFERENCE_RETURN_POSITIONS": 369,
@@ -54,15 +54,15 @@
   "REFERENCE_RETURN_FIELDS": 22,
   "REFERENCE_RETURN_STATIC": 36,
   "REFERENCE_RETURN_INSTANCE": 333,
-  "PROVEN_NONNULL_RETURNS": 128,
-  "PROVEN_NULLABLE_RETURNS": 115,
-  "UNKNOWN_REFERENCE_RETURNS": 126,
-  "NULLABLE_INFALLIBLE": 70,
+  "PROVEN_NONNULL_RETURNS": 133,
+  "PROVEN_NULLABLE_RETURNS": 113,
+  "UNKNOWN_REFERENCE_RETURNS": 123,
+  "NULLABLE_INFALLIBLE": 68,
   "NULLABLE_FALLIBLE": 45,
-  "NONNULL_INFALLIBLE": 62,
-  "NONNULL_FALLIBLE": 66,
-  "UNKNOWN_INFALLIBLE": 85,
-  "UNKNOWN_FALLIBLE": 41,
+  "NONNULL_INFALLIBLE": 66,
+  "NONNULL_FALLIBLE": 67,
+  "UNKNOWN_INFALLIBLE": 83,
+  "UNKNOWN_FALLIBLE": 40,
   "CLASSIFIED_MEMBERS": 2964,
   "coverage": {
     "NOT_A_REFERENCE_RETURN": 2326,
@@ -132,15 +132,15 @@
       "parameters": [],
       "ilMethod": "get_Name",
       "nullability": {
-        "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+        "verdict": "PROVEN_NONNULL_SUCCESS",
         "evidence": "IL_RETURN_VALUE_ANALYSIS",
         "normalNullPossible": false,
-        "normalNonNullPossible": false,
-        "outcomesExhaustive": false,
+        "normalNonNullPossible": true,
+        "outcomesExhaustive": true,
         "returnSites": [
           {
             "offset": "IL_0006",
-            "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+            "verdict": "PROVEN_NONNULL_SUCCESS",
             "origin": "field Microsoft.Xna.Framework.Audio.AudioCategory::_name"
           }
         ],
@@ -570,8 +570,8 @@
         "verdict": "PROVEN_NULLABLE_SUCCESS",
         "evidence": "IL_FIELD_LIFECYCLE",
         "normalNullPossible": true,
-        "normalNonNullPossible": false,
-        "outcomesExhaustive": false,
+        "normalNonNullPossible": true,
+        "outcomesExhaustive": true,
         "returnSites": [
           {
             "offset": "IL_0006",
@@ -1058,11 +1058,11 @@
       "parameters": [],
       "ilMethod": "get_CollectionItemName",
       "nullability": {
-        "verdict": "PROVEN_NULLABLE_SUCCESS",
+        "verdict": "PROVEN_NONNULL_SUCCESS",
         "evidence": "IL_FIELD_LIFECYCLE",
-        "normalNullPossible": true,
+        "normalNullPossible": false,
         "normalNonNullPossible": true,
-        "outcomesExhaustive": false,
+        "outcomesExhaustive": true,
         "returnSites": [
           {
             "offset": "IL_0012",
@@ -1071,7 +1071,7 @@
           },
           {
             "offset": "IL_0019",
-            "verdict": "PROVEN_NULLABLE_SUCCESS",
+            "verdict": "PROVEN_NONNULL_SUCCESS",
             "origin": "field Microsoft.Xna.Framework.Content.ContentSerializerAttribute::collectionItemName"
           }
         ],
@@ -1100,15 +1100,15 @@
       "parameters": [],
       "ilMethod": "get_CollectionItemName",
       "nullability": {
-        "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+        "verdict": "PROVEN_NONNULL_SUCCESS",
         "evidence": "IL_RETURN_VALUE_ANALYSIS",
         "normalNullPossible": false,
-        "normalNonNullPossible": false,
-        "outcomesExhaustive": false,
+        "normalNonNullPossible": true,
+        "outcomesExhaustive": true,
         "returnSites": [
           {
             "offset": "IL_0006",
-            "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+            "verdict": "PROVEN_NONNULL_SUCCESS",
             "origin": "field Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute::collectionItemName"
           }
         ],
@@ -1134,15 +1134,15 @@
       "parameters": [],
       "ilMethod": "get_RuntimeType",
       "nullability": {
-        "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+        "verdict": "PROVEN_NONNULL_SUCCESS",
         "evidence": "IL_RETURN_VALUE_ANALYSIS",
         "normalNullPossible": false,
-        "normalNonNullPossible": false,
-        "outcomesExhaustive": false,
+        "normalNonNullPossible": true,
+        "outcomesExhaustive": true,
         "returnSites": [
           {
             "offset": "IL_0006",
-            "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+            "verdict": "PROVEN_NONNULL_SUCCESS",
             "origin": "field Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute::runtimeType"
           }
         ],
@@ -6700,15 +6700,15 @@
       "parameters": [],
       "ilMethod": "ToString",
       "nullability": {
-        "verdict": "PROVEN_NULLABLE_SUCCESS",
+        "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
         "evidence": "IL_RETURN_VALUE_ANALYSIS",
-        "normalNullPossible": true,
-        "normalNonNullPossible": false,
+        "normalNullPossible": false,
+        "normalNonNullPossible": true,
         "outcomesExhaustive": false,
         "returnSites": [
           {
             "offset": "IL_0030",
-            "verdict": "PROVEN_NULLABLE_SUCCESS",
+            "verdict": "PROVEN_NONNULL_SUCCESS",
             "origin": "local"
           },
           {
@@ -12431,7 +12431,7 @@
         "verdict": "PROVEN_NULLABLE_SUCCESS",
         "evidence": "IL_RETURN_VALUE_ANALYSIS",
         "normalNullPossible": true,
-        "normalNonNullPossible": false,
+        "normalNonNullPossible": true,
         "outcomesExhaustive": false,
         "returnSites": [
           {
@@ -12470,7 +12470,7 @@
         "verdict": "PROVEN_NULLABLE_SUCCESS",
         "evidence": "IL_FIELD_LIFECYCLE",
         "normalNullPossible": true,
-        "normalNonNullPossible": false,
+        "normalNonNullPossible": true,
         "outcomesExhaustive": false,
         "returnSites": [
           {
@@ -13393,15 +13393,15 @@
       "parameters": [],
       "ilMethod": "get_DisplayName",
       "nullability": {
-        "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+        "verdict": "PROVEN_NONNULL_SUCCESS",
         "evidence": "IL_RETURN_VALUE_ANALYSIS",
         "normalNullPossible": false,
-        "normalNonNullPossible": false,
-        "outcomesExhaustive": false,
+        "normalNonNullPossible": true,
+        "outcomesExhaustive": true,
         "returnSites": [
           {
             "offset": "IL_000c",
-            "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
+            "verdict": "PROVEN_NONNULL_SUCCESS",
             "origin": "field Microsoft.Xna.Framework.Storage.StorageContainer::_displayName"
           }
         ],

@@ -488,6 +488,9 @@ def describe_origin(origin) -> str | None:
         return f"static field {origin[1]}"
     if origin[0] == "call":
         return f"call {origin[1]}"
+    if origin[0] == "isNullOrEmpty":
+        inner = describe_origin(origin[1])
+        return f"String.IsNullOrEmpty({inner})" if inner else None
     if origin[0] == "native":
         return "native calli"
     if origin[0] == "l":
@@ -962,13 +965,27 @@ class Nullness:
             if shape is None:
                 raise Undecodable(f"unresolved call operand {operand[:60]!r}")
             call_owner, call_name, call_arity, has_this, returns_value = shape
-            for _ in range(call_arity + (1 if has_this else 0)):
-                pop()
+            arguments = [pop() for _ in range(call_arity + (1 if has_this else 0))]
             kill()
             if returns_value:
+                # `String.IsNullOrEmpty(x)` is a NULL TEST that happens to be
+                # spelled as a call, and the branch that follows tests its
+                # RESULT rather than `x`. Without carrying the argument's
+                # origin through, a `false` branch -- which proves `x` is not
+                # null -- refines nothing, and a field read on that branch is
+                # reported nullable although it demonstrably cannot be. The
+                # result therefore remembers what was tested; the branch
+                # handler uses it in the one direction that proves something.
+                origin = ("call", f"{call_owner}::{call_name}/{call_arity}")
+                if (
+                    call_owner == "System.String" and
+                    call_name == "IsNullOrEmpty" and
+                    call_arity == 1 and not has_this and
+                    arguments and arguments[0][1] is not None
+                ):
+                    origin = ("isNullOrEmpty", arguments[0][1])
                 push(self.call_value(call_owner, call_name, call_arity,
-                                     base == "callvirt"),
-                     ("call", f"{call_owner}::{call_name}/{call_arity}"))
+                                     base == "callvirt"), origin)
             return ([(None, state)], None)
         if base == "newobj":
             shape = call_shape(operand)
@@ -998,8 +1015,20 @@ class Nullness:
             value, origin = pop()
             taken_is_null = base.split(".")[0] in ("brfalse", "brnull", "brzero")
             taken, fallthrough = state.copy(), state.copy()
-            refine_origin(taken, origin, V_NULL if taken_is_null else V_NONNULL)
-            refine_origin(fallthrough, origin, V_NONNULL if taken_is_null else V_NULL)
+            if origin is not None and origin[0] == "isNullOrEmpty":
+                # `IsNullOrEmpty(x) == false` proves x is neither null nor
+                # empty, so x is NON-NULL on that branch. The `true` side
+                # proves nothing: x may be null OR merely empty, and treating
+                # it as null would be the mirror-image over-approximation.
+                tested = origin[1]
+                if taken_is_null:
+                    refine_origin(taken, tested, V_NONNULL)
+                else:
+                    refine_origin(fallthrough, tested, V_NONNULL)
+            else:
+                refine_origin(taken, origin, V_NULL if taken_is_null else V_NONNULL)
+                refine_origin(
+                    fallthrough, origin, V_NONNULL if taken_is_null else V_NULL)
             return ([(offsets.get(branch_target(operand)), taken),
                      (None, fallthrough)], None)
         stem = base[:-2] if base.endswith(".s") else base
@@ -1660,6 +1689,56 @@ def mutation_tests(assemblies, graph, failures: list[str]) -> int:
         failures.append(
             "an interface member must become non-null when every registered "
             "implementor does")
+
+    # `String.IsNullOrEmpty` is a null test spelled as a call, and the branch
+    # that follows tests its RESULT. Without carrying the argument's origin
+    # through the call, a field read on the `false` branch -- which is reached
+    # only when the field is not null -- is reported nullable although it
+    # demonstrably cannot be. `ContentSerializerAttribute.CollectionItemName`
+    # is exactly that shape, and it is the member the refinement was found on.
+    guarded = ("Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
+               "get_CollectionItemName", 0)
+    checks += 1
+    if summary_for(Nullness(assemblies, graph), *guarded) != PROVEN_NONNULL:
+        failures.append(
+            "a field read guarded by String.IsNullOrEmpty must be proven "
+            "non-null on the branch the guard cannot reach with null")
+
+    def defeat_the_guard(clone) -> None:
+        """Rename the guard so the refinement no longer recognises it.
+
+        The call keeps its exact shape -- one string argument, a bool result --
+        so the body stays well formed and the branch still consumes what the
+        call pushed; only the recognition is removed. The verdict must then
+        stop being a proof, which is what shows the proof came from the guard
+        and not from somewhere else.
+        """
+        for method in body_of(clone, guarded):
+            method.body = [
+                accessor.uncommented(line).replace(
+                    "IsNullOrEmpty", "IsNullOrEmptyMutated")
+                for line in method.body
+            ]
+    checks += 1
+    analysis, _ = rebuild(assemblies, defeat_the_guard)
+    if summary_for(analysis, *guarded) == PROVEN_NONNULL:
+        failures.append(
+            "removing the IsNullOrEmpty guard must stop "
+            "ContentSerializerAttribute.CollectionItemName being proven "
+            "non-null")
+
+    # The mirror image, which the refinement must NOT claim: `IsNullOrEmpty`
+    # returning true means null OR empty, so nothing about nullness is proven
+    # on that branch. `GraphicsResource.ToString` returns the guarded value on
+    # the false branch and `Object.ToString()` on the true one, so it must be
+    # UNKNOWN -- never nullable, and never a non-null proof either.
+    stringly = ("Microsoft.Xna.Framework.Graphics.GraphicsResource",
+                "ToString", 0)
+    checks += 1
+    if summary_for(Nullness(assemblies, graph), *stringly) != UNKNOWN:
+        failures.append(
+            "IsNullOrEmpty being TRUE proves nothing about nullness, so "
+            "GraphicsResource.ToString must stay unproven")
     return checks
 
 
