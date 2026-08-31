@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 134,
-    "TARGET_MEMBERS": 1730,
-    "TOTAL_DIAGNOSTICS": 280,
-    "COMPLETE_TYPES": 127,
+    "TARGET_TYPES": 135,
+    "TARGET_MEMBERS": 1731,
+    "TOTAL_DIAGNOSTICS": 279,
+    "COMPLETE_TYPES": 128,
     "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 123,
-    "MISSING_TYPE": 123,
+    "MISSING_TYPES": 122,
+    "MISSING_TYPE": 122,
     "MISSING_MEMBER": 132,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -69,15 +69,16 @@
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 8,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
-    "BCL_SUPPORT_TYPE_MEASUREMENTS": 6,
+    "BCL_SUPPORT_TYPE_MEASUREMENTS": 9,
     "XNA_SEALED_CLASS_PROJECTIONS": 13,
     "NONDERIVABLE_UNSEALED_CLASSES": 5,
-    "BCL_RESOURCE_STRING_PROJECTIONS": 3,
-    "MEASURED_SUPPORT_BASE_PROJECTIONS": 17,
-    "BCL_BASE_PROJECTIONS": 13,
-    "PROJECTED_BCL_BASE_TYPES": 9,
+    "BCL_RESOURCE_STRING_PROJECTIONS": 7,
+    "BCL_STATIC_TABLE_PROJECTIONS": 1,
+    "MEASURED_SUPPORT_BASE_PROJECTIONS": 18,
+    "BCL_BASE_PROJECTIONS": 14,
+    "PROJECTED_BCL_BASE_TYPES": 10,
     "PENDING_BCL_BASE_TYPES": 4,
-    "BCL_INHERITED_MEMBER_PROJECTIONS": 59,
+    "BCL_INHERITED_MEMBER_PROJECTIONS": 72,
     "REFERENCE_RETURN_PROJECTIONS": 369,
     "OPTIONAL_RETURN_PROJECTIONS": 153,
     "NONOPTIONAL_RETURN_PROJECTIONS": 216,
@@ -203,6 +204,7 @@
     "Microsoft.Xna.Framework.Input.Touch.TouchLocation",
     "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",
+    "Microsoft.Xna.Framework.LaunchParameters",
     "Microsoft.Xna.Framework.MathHelper",
     "Microsoft.Xna.Framework.Matrix",
     "Microsoft.Xna.Framework.Media.MediaSourceType",
@@ -330,7 +332,6 @@
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-    "Microsoft.Xna.Framework.LaunchParameters",
     "Microsoft.Xna.Framework.Media.Album",
     "Microsoft.Xna.Framework.Media.AlbumCollection",
     "Microsoft.Xna.Framework.Media.Artist",
@@ -1624,11 +1625,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.LaunchParameters",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -3420,6 +3416,84 @@
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
     {
+      "supportType": "CNADictionary",
+      "clrFamily": "System.Collections.Generic.Dictionary`2",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [
+        "Key",
+        "Value"
+      ],
+      "base": null,
+      "conformances": [],
+      "requiredConformances": [],
+      "finalMembers": [
+        "Count",
+        "Comparer",
+        "Item",
+        "SetItem",
+        "Add",
+        "Clear",
+        "ContainsKey",
+        "ContainsValue",
+        "Remove",
+        "TryGetValue",
+        "GetEnumerator",
+        "Keys",
+        "Values"
+      ],
+      "publicMembers": [
+        ".ctor",
+        "Add",
+        "Clear",
+        "Comparer",
+        "ContainsKey",
+        "ContainsValue",
+        "Count",
+        "GetEnumerator",
+        "Item",
+        "Keys",
+        "Remove",
+        "SetItem",
+        "TryGetValue",
+        "Values"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "GetObjectData",
+        "OnDeserialization",
+        "Sort",
+        "AddRange",
+        "Capacity",
+        "TrimExcess",
+        "EnsureCapacity"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAEqualityComparer",
+      "clrFamily": "System.Collections.Generic.IEqualityComparer`1",
+      "kind": "protocol",
+      "inheritance": "public",
+      "genericParameters": [
+        "Element"
+      ],
+      "base": null,
+      "conformances": [],
+      "requiredConformances": [],
+      "finalMembers": [],
+      "publicMembers": [
+        "Equals",
+        "GetHashCode"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "Default",
+        "Compare"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNAException",
       "clrFamily": "System.Exception",
       "kind": "class",
@@ -3491,6 +3565,32 @@
         "GetObjectData",
         "GetType",
         "ToString"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAKeyValuePair",
+      "clrFamily": "System.Collections.Generic.KeyValuePair`2",
+      "kind": "struct",
+      "inheritance": "final",
+      "genericParameters": [
+        "Key",
+        "Value"
+      ],
+      "base": null,
+      "conformances": [],
+      "requiredConformances": [],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor",
+        "Key",
+        "Value"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "ToString",
+        "SetKey",
+        "SetValue"
       ],
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
@@ -3616,6 +3716,40 @@
       "pinnedValue": "External component has thrown an exception.",
       "reproducedInSwiftSource": true,
       "reason": "The message System.Runtime.InteropServices.ExternalException..ctor() passes to its base."
+    },
+    {
+      "resourceKey": "Argument_AddingDuplicate",
+      "pinnedValue": "An item with the same key has already been added.",
+      "reproducedInSwiftSource": true,
+      "reason": "Dictionary<TKey,TValue>.Add raises this when the key is already present."
+    },
+    {
+      "resourceKey": "Arg_KeyNotFound",
+      "pinnedValue": "The given key was not present in the dictionary.",
+      "reproducedInSwiftSource": true,
+      "reason": "Dictionary<TKey,TValue>'s indexer getter raises this for an absent key."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_NeedNonNegNum",
+      "pinnedValue": "Non-negative number required.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message a negative capacity produces on the Dictionary<TKey,TValue> capacity constructors."
+    },
+    {
+      "resourceKey": "Arg_ArrayPlusOffTooSmall",
+      "pinnedValue": "Destination array is not long enough to copy all the items in the collection. Check array index and length.",
+      "reproducedInSwiftSource": true,
+      "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that is too short."
+    }
+  ],
+  "bclStaticTableProjections": [
+    {
+      "clrType": "System.Collections.HashHelpers",
+      "clrField": "primes",
+      "swiftSymbol": "CNAHashHelpers.hashPrimes",
+      "entries": 72,
+      "reproducedInSwiftSource": true,
+      "reason": "Dictionary<TKey,TValue>::Initialize and ::Resize size their arrays through HashHelpers.GetPrime, which reads this table."
     }
   ],
   "sealedClassProjections": [
@@ -3841,6 +3975,14 @@
       "swiftFinal": true,
       "swiftAccess": "public",
       "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.LaunchParameters",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 1,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -12062,16 +12204,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.LaunchParameters",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.LaunchParameters",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.MathHelper",

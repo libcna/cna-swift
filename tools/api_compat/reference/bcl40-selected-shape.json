@@ -5,6 +5,666 @@
   "types": [
     {
       "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.Dictionary`2",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 2,
+      "genericParameters": [
+        "TKey",
+        "TValue"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.Generic.IDictionary`2[!TKey,!TValue]",
+        "System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.ICollection",
+        "System.Collections.IDictionary",
+        "System.Collections.IEnumerable",
+        "System.Runtime.Serialization.IDeserializationCallback",
+        "System.Runtime.Serialization.ISerializable"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "comparer",
+              "type": "System.Collections.Generic.IEqualityComparer`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "comparer",
+              "type": "System.Collections.Generic.IEqualityComparer`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "dictionary",
+              "type": "System.Collections.Generic.IDictionary`2[!0,!1]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "comparer",
+              "type": "System.Collections.Generic.IEqualityComparer`1[!0]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "dictionary",
+              "type": "System.Collections.Generic.IDictionary`2[!0,!1]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Add",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "!1",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Clear",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ContainsKey",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ContainsValue",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "!1",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.Dictionary`2+Enumerator[!0,!1]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetObjectData",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "OnDeserialization",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "sender",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "TryGetValue",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "!1&",
+              "ref": true,
+              "out": true
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Comparer",
+          "type": "System.Collections.Generic.IEqualityComparer`1[!0]",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "!1",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": [
+            {
+              "name": "",
+              "type": "!0"
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Keys",
+          "type": "System.Collections.Generic.Dictionary`2+KeyCollection[!0,!1]",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Values",
+          "type": "System.Collections.Generic.Dictionary`2+ValueCollection[!0,!1]",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.Dictionary`2+Enumerator",
+      "kind": "struct",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.ValueType",
+      "genericArity": 2,
+      "genericParameters": [
+        "TKey",
+        "TValue"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.IEnumerator`1[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.IDictionaryEnumerator",
+        "System.Collections.IEnumerator",
+        "System.IDisposable"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "Dispose",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "MoveNext",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Current",
+          "type": "System.Collections.Generic.KeyValuePair`2[!0,!1]",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.Dictionary`2+KeyCollection",
+      "kind": "class",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 2,
+      "genericParameters": [
+        "TKey",
+        "TValue"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[!TKey]",
+        "System.Collections.Generic.IEnumerable`1[!TKey]",
+        "System.Collections.ICollection",
+        "System.Collections.IEnumerable"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "dictionary",
+              "type": "System.Collections.Generic.Dictionary`2[!0,!1]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "!0[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.Dictionary`2+KeyCollection+Enumerator[!0,!1]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.Dictionary`2+ValueCollection",
+      "kind": "class",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 2,
+      "genericParameters": [
+        "TKey",
+        "TValue"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[!TValue]",
+        "System.Collections.Generic.IEnumerable`1[!TValue]",
+        "System.Collections.ICollection",
+        "System.Collections.IEnumerable"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "dictionary",
+              "type": "System.Collections.Generic.Dictionary`2[!0,!1]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "!1[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.Generic.Dictionary`2+ValueCollection+Enumerator[!0,!1]",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.Collections.Generic.ICollection`1",
       "kind": "interface",
       "sealed": false,
@@ -144,6 +804,156 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.IDictionary`2",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 2,
+      "genericParameters": [
+        "TKey",
+        "TValue"
+      ],
+      "directInterfaces": [
+        "System.Collections.Generic.ICollection`1[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.Generic.IEnumerable`1[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.IEnumerable"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "Add",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "!1",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ContainsKey",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "TryGetValue",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "!1&",
+              "ref": true,
+              "out": true
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "!1",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": true,
+          "setOverridable": true,
+          "parameters": [
+            {
+              "name": "",
+              "type": "!0"
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Keys",
+          "type": "System.Collections.Generic.ICollection`1[!0]",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Values",
+          "type": "System.Collections.Generic.ICollection`1[!1]",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.Collections.Generic.IEnumerable`1",
       "kind": "interface",
       "sealed": false,
@@ -198,6 +1008,67 @@
           "getOverridable": true,
           "setOverridable": false,
           "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.IEqualityComparer`1",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 1,
+      "genericParameters": [
+        "T"
+      ],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "method",
+          "name": "Equals",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "x",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "y",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetHashCode",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "obj",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            }
+          ]
         }
       ]
     },
@@ -299,6 +1170,83 @@
               "type": "System.Int32"
             }
           ]
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.Generic.KeyValuePair`2",
+      "kind": "struct",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.ValueType",
+      "genericArity": 2,
+      "genericParameters": [
+        "TKey",
+        "TValue"
+      ],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "!0",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "!1",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ToString",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Key",
+          "type": "!0",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Value",
+          "type": "!1",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
         }
       ]
     },
@@ -2530,8 +3478,18 @@
   "resourceStrings": [
     {
       "assembly": "mscorlib.dll",
+      "key": "Arg_ArrayPlusOffTooSmall",
+      "value": "Destination array is not long enough to copy all the items in the collection. Check array index and length."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "Arg_ExternalException",
       "value": "External component has thrown an exception."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "Arg_KeyNotFound",
+      "value": "The given key was not present in the dictionary."
     },
     {
       "assembly": "mscorlib.dll",
@@ -2540,8 +3498,100 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_NeedNonNegNum",
+      "value": "Non-negative number required."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "Argument_AddingDuplicate",
+      "value": "An item with the same key has already been added."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "Exception_WasThrown",
       "value": "Exception of type '{0}' was thrown."
+    }
+  ],
+  "staticTables": [
+    {
+      "type": "System.Collections.HashHelpers",
+      "field": "primes",
+      "swiftSymbol": "CNAHashHelpers.hashPrimes",
+      "values": [
+        3,
+        7,
+        11,
+        17,
+        23,
+        29,
+        37,
+        47,
+        59,
+        71,
+        89,
+        107,
+        131,
+        163,
+        197,
+        239,
+        293,
+        353,
+        431,
+        521,
+        631,
+        761,
+        919,
+        1103,
+        1327,
+        1597,
+        1931,
+        2333,
+        2801,
+        3371,
+        4049,
+        4861,
+        5839,
+        7013,
+        8419,
+        10103,
+        12143,
+        14591,
+        17519,
+        21023,
+        25229,
+        30293,
+        36353,
+        43627,
+        52361,
+        62851,
+        75431,
+        90523,
+        108631,
+        130363,
+        156437,
+        187751,
+        225307,
+        270371,
+        324449,
+        389357,
+        467237,
+        560689,
+        672827,
+        807403,
+        968897,
+        1162687,
+        1395263,
+        1674319,
+        2009191,
+        2411033,
+        2893249,
+        3471899,
+        4166287,
+        4999559,
+        5999471,
+        7199369
+      ],
+      "assembly": "mscorlib.dll"
     }
   ]
 }

@@ -75,6 +75,41 @@
           "registered": "Foundation 30"
         },
         {
+          "type": "System.Collections.Generic.Dictionary`2",
+          "reason": "The direct CLR base of Microsoft.Xna.Framework.LaunchParameters, which declares one parameterless constructor and inherits everything else. Its bucket/entry/free-list storage is what defines the enumeration order, the duplicate-key refusal and the version invalidation CNADictionary<Key, Value> projects.",
+          "registered": "Foundation 31"
+        },
+        {
+          "type": "System.Collections.Generic.Dictionary`2+KeyCollection",
+          "reason": "The declared type of Dictionary<TKey,TValue>.Keys. A live view over the dictionary, not a copy, projected as the nested CNADictionary.KeyCollection.",
+          "registered": "Foundation 31"
+        },
+        {
+          "type": "System.Collections.Generic.Dictionary`2+ValueCollection",
+          "reason": "The declared type of Dictionary<TKey,TValue>.Values, projected as the nested CNADictionary.ValueCollection.",
+          "registered": "Foundation 31"
+        },
+        {
+          "type": "System.Collections.Generic.Dictionary`2+Enumerator",
+          "reason": "The declared return type of Dictionary<TKey,TValue>.GetEnumerator. Its whole surface is Current/MoveNext/Dispose, so it is the IEnumerator<KeyValuePair<TKey,TValue>> contract CNAEnumerator already projects, and admitting it is what proves the struct adds nothing that projection would drop.",
+          "registered": "Foundation 31"
+        },
+        {
+          "type": "System.Collections.Generic.KeyValuePair`2",
+          "reason": "The element type of Dictionary<TKey,TValue> enumeration. A CLR struct with two get-only properties, projected as the Swift struct CNAKeyValuePair<Key, Value>.",
+          "registered": "Foundation 31"
+        },
+        {
+          "type": "System.Collections.Generic.IEqualityComparer`1",
+          "reason": "The declared type of Dictionary<TKey,TValue>.Comparer and of three of its constructors. It is what the dictionary asks for BOTH halves of key identity, so a caller-supplied comparer decides which keys collide and which are equal. Projected as the CNAEqualityComparer protocol.",
+          "registered": "Foundation 31"
+        },
+        {
+          "type": "System.Collections.Generic.IDictionary`2",
+          "reason": "The declared parameter type of two Dictionary<TKey,TValue> constructors and the interface whose members the class implements as sealed virtual finals; it is what establishes that nothing on the public surface is an override point.",
+          "registered": "Foundation 31"
+        },
+        {
           "type": "System.Runtime.InteropServices.ExternalException",
           "reason": "The direct CLR base of InstancePlayLimitException, NoAudioHardwareException and StorageDeviceNotConnectedException. It substitutes the resource message Arg_ExternalException, sets HResult to 0x80004005, and adds the public ErrorCode property that reads it. Projected as CNAExternalException.",
           "registered": "Foundation 30"
@@ -95,6 +130,34 @@
           "key": "Arg_ExternalException",
           "value": "External component has thrown an exception.",
           "reason": "The message System.Runtime.InteropServices.ExternalException..ctor() passes to its base, and therefore the Message of a parameterless InstancePlayLimitException, NoAudioHardwareException or StorageDeviceNotConnectedException."
+        },
+        {
+          "key": "Argument_AddingDuplicate",
+          "value": "An item with the same key has already been added.",
+          "reason": "ExceptionResource 14, which Dictionary<TKey,TValue>::Insert passes to ThrowHelper::ThrowArgumentException when Add is given a key that is already present."
+        },
+        {
+          "key": "Arg_KeyNotFound",
+          "value": "The given key was not present in the dictionary.",
+          "reason": "The message KeyNotFoundException..ctor() carries, which Dictionary<TKey,TValue>::get_Item raises through ThrowHelper::ThrowKeyNotFoundException."
+        },
+        {
+          "key": "ArgumentOutOfRange_NeedNonNegNum",
+          "value": "Non-negative number required.",
+          "reason": "The message a negative capacity produces on the Dictionary<TKey,TValue> capacity constructors."
+        },
+        {
+          "key": "Arg_ArrayPlusOffTooSmall",
+          "value": "Destination array is not long enough to copy all the items in the collection. Check array index and length.",
+          "reason": "The message KeyCollection.CopyTo and ValueCollection.CopyTo raise for a destination that cannot hold the collection from the supplied index."
+        }
+      ],
+      "selectedStaticTables": [
+        {
+          "type": "System.Collections.HashHelpers",
+          "field": "primes",
+          "swiftSymbol": "CNAHashHelpers.hashPrimes",
+          "reason": "Dictionary<TKey,TValue>::Initialize and ::Resize size their bucket and entry arrays with HashHelpers.GetPrime, which reads this 72-entry table. Nothing observable depends on it -- enumeration order is entry order and a lookup is correct for any bucket count -- but transcribing it by hand would be a sizing decision of this projection's own, so it is read out of the assembly's static-array initializer and compared against the Swift source."
         }
       ]
     }

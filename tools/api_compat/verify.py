@@ -1247,6 +1247,7 @@ def comparable_kind(expected: Member, actual: Member) -> bool:
 MEASURED_SUPPORT_BASES = (
     "CNAEventArgs", "CNACollection", "CNAReadOnlyCollection",
     "CNAException", "CNASystemException", "CNAExternalException",
+    "CNADictionary",
 )
 
 # The support bases that are GENERIC. For these the Swift superclass identity
@@ -1255,7 +1256,9 @@ MEASURED_SUPPORT_BASES = (
 # specialization is measured too. See `bclSupportBaseSpecializationMapping`.
 # The exception support bases are NOT generic, so their superclass identity is
 # the whole fact and there is no argument to supplement from source.
-GENERIC_SUPPORT_BASES = ("CNACollection", "CNAReadOnlyCollection")
+GENERIC_SUPPORT_BASES = (
+    "CNACollection", "CNAReadOnlyCollection", "CNADictionary",
+)
 
 # The three CLR roots carry no projected members, so a type sitting directly on
 # one of them has nothing to inherit and needs no base decision. Every other
@@ -4176,18 +4179,12 @@ def self_test() -> None:
             "sealing a derivable class was not recorded in the evidence")
     event_self_tests += 1
 
-    resource_manifest = {
-        "resourceStrings": [
-            {"assembly": "mscorlib.dll", "key": item["key"],
-             "value": {
-                 "Exception_WasThrown": "Exception of type '{0}' was thrown.",
-                 "Arg_SystemException": "System error.",
-                 "Arg_ExternalException":
-                     "External component has thrown an exception.",
-             }.get(item["key"])}
-            for item in rules.get("bclResourceStringProjections", [])
-        ]
-    }
+    # The pinned manifest itself is the reference model here. Restating the
+    # values would only prove this file agrees with itself; what has to hold is
+    # that the Swift source reproduces what the AUDIT read out of the assembly.
+    resource_manifest = (
+        load_json(BCL_SELECTED_SHAPE) if BCL_SELECTED_SHAPE.exists()
+        else {"resourceStrings": [], "staticTables": []})
     resource_clean = bcl_resource_string_evidence(
         rules, ROOT / "Sources/CNA", resource_manifest)
     if resource_clean[1]:
@@ -4200,6 +4197,32 @@ def self_test() -> None:
     ):
         failures.append("the resource-string evidence is incomplete")
     event_self_tests += 1
+
+    table_clean = bcl_static_table_evidence(
+        rules, ROOT / "Sources/CNA", resource_manifest)
+    if table_clean[1]:
+        failures.append(
+            "the Swift support source does not reproduce the pinned static "
+            "tables")
+    event_self_tests += 1
+    if len(table_clean[0]) != len(rules.get("bclStaticTableProjections", [])):
+        failures.append("the static-table evidence is incomplete")
+    event_self_tests += 1
+
+    mutated_tables = copy.deepcopy(resource_manifest)
+    for entry in mutated_tables.get("staticTables", []):
+        if entry.get("values"):
+            entry["values"] = list(entry["values"]) + [999]
+    if mutated_tables.get("staticTables"):
+        if "BASE_MAPPING_MISMATCH" not in {
+            item["category"]
+            for item in bcl_static_table_evidence(
+                rules, ROOT / "Sources/CNA", mutated_tables)[1]
+        }:
+            failures.append(
+                "a static table the Swift source does not reproduce was not "
+                "detected")
+        event_self_tests += 1
 
     mutated_manifest = copy.deepcopy(resource_manifest)
     if mutated_manifest["resourceStrings"]:
@@ -5040,18 +5063,121 @@ def source_bcl_resource_strings(source_root: Path) -> list[str] | None:
     `None` means the source could not be read, which is reported as unmeasured
     rather than treated as agreement.
     """
-    path = source_root / "CNAExceptions.swift"
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError:
+    sources = sorted(source_root.glob("CNA*.swift"))
+    if not sources:
         return None
     literals: list[str] = []
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("//") or stripped.startswith("///"):
-            continue
-        literals.extend(re.findall(r'"((?:[^"\\]|\\.)*)"', line))
+    for path in sources:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            return None
+        body = "\n".join(
+            line for line in text.splitlines()
+            if not line.strip().startswith("//")
+        )
+        # A message too long for one line is written as `"first " + "second"`.
+        # Collapsing the seam first means the pinned value is matched against
+        # what the program actually produces rather than against however the
+        # source happened to wrap it.
+        body = re.sub(r'"\s*\+\s*"', "", body)
+        literals.extend(re.findall(r'"((?:[^"\\]|\\.)*)"', body))
     return literals
+
+
+def source_bcl_static_tables(source_root: Path) -> dict[str, list[int]] | None:
+    """Every `static let <name>: [Int32] = [...]` in the BCL support sources.
+
+    The companion to `source_bcl_resource_strings`: a numeric table the
+    projection reproduces is read back out of the compiled source and compared
+    against the one the audit extracted from the assembly's own static-array
+    initializer.
+    """
+    sources = sorted(source_root.glob("CNA*.swift"))
+    if not sources:
+        return None
+    tables: dict[str, list[int]] = {}
+    pattern = re.compile(
+        r"static\s+let\s+(\w+)\s*:\s*\[Int32\]\s*=\s*\[([^\]]*)\]", re.S)
+    for path in sources:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            return None
+        stem = path.stem
+        for found in pattern.finditer(text):
+            values = [
+                int(item) for item in re.findall(r"-?\d+", found.group(2))
+            ]
+            tables[f"{stem}.{found.group(1)}"] = values
+            tables[found.group(1)] = values
+    return tables
+
+
+def bcl_static_table_evidence(
+    rules: dict[str, Any],
+    source_root: Path,
+    manifest: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    """Each pinned static table must be reproduced element for element."""
+    evidence: list[dict[str, Any]] = []
+    diagnostics: list[dict[str, str]] = []
+    selected = rules.get("bclStaticTableProjections", [])
+    if not selected:
+        return evidence, diagnostics
+    if manifest is None:
+        diagnostics.append(diagnostic(
+            "UNMEASURED_STRUCTURAL_CATEGORY", "bclStaticTableProjections",
+            "the pinned BCL selected-shape manifest could not be read, so the "
+            "reproduced static tables are unmeasured",
+        ))
+        return evidence, diagnostics
+    pinned = {
+        (item["type"], item["field"]): item.get("values")
+        for item in manifest.get("staticTables", [])
+    }
+    tables = source_bcl_static_tables(source_root)
+    if tables is None:
+        diagnostics.append(diagnostic(
+            "UNMEASURED_STRUCTURAL_CATEGORY", "bclStaticTableProjections",
+            "the BCL support sources could not be read, so the reproduced "
+            "static tables are unmeasured",
+        ))
+        return evidence, diagnostics
+    for entry in selected:
+        key = (entry["type"], entry["field"])
+        subject = f"staticTable.{entry['type']}.{entry['field']}"
+        values = pinned.get(key)
+        if values is None:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", subject,
+                "the reproduced static table is not pinned in the BCL "
+                "selected-shape manifest, so it rests on nothing",
+            ))
+            continue
+        symbol = entry.get("swiftSymbol", "")
+        found = tables.get(symbol) or tables.get(symbol.split(".")[-1])
+        if found is None:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", subject,
+                f"the Swift support source declares no table {symbol!r}",
+            ))
+            continue
+        if found != values:
+            diagnostics.append(diagnostic(
+                "BASE_MAPPING_MISMATCH", subject,
+                f"the Swift table has {len(found)} entries and differs from "
+                f"the {len(values)} read from the admitted assembly",
+            ))
+        evidence.append({
+            "clrType": entry["type"],
+            "clrField": entry["field"],
+            "swiftSymbol": symbol,
+            "entries": len(values),
+            "reproducedInSwiftSource": found == values,
+            "reason": entry.get("reason"),
+        })
+    return evidence, diagnostics
 
 
 def bcl_resource_string_evidence(
@@ -5312,7 +5438,13 @@ def bcl_support_evidence(
                 "directly on System.Object and neither derives from the other",
             ))
         inheritance = specification.get("inheritance")
-        if inheritance == "final" and "final class" not in model.declaration:
+        # `inheritance` describes how a support CLASS may be derived from. A
+        # CLR value type and a CLR interface have no such axis, and their kind
+        # is already checked above, so neither is held to a class shape here.
+        if (
+            specification["kind"] == "class" and inheritance == "final" and
+            "final class" not in model.declaration
+        ):
             diagnostics.append(diagnostic(
                 "BASE_MAPPING_MISMATCH", name,
                 f"expected a final support class, found {model.declaration!r}",
@@ -5791,7 +5923,14 @@ def make_report(
     # Each pinned default exception message the Swift support source
     # reproduces verbatim from the admitted assembly's own resource table.
     summary["BCL_RESOURCE_STRING_PROJECTIONS"] = sum(
-        item["reproducedInSwiftSource"] for item in resource_evidence)
+        item["reproducedInSwiftSource"] for item in resource_evidence
+        if "resourceKey" in item)
+    # Each pinned static data table the Swift source reproduces element for
+    # element, so no sizing decision of this projection's own enters the
+    # algorithm it feeds.
+    summary["BCL_STATIC_TABLE_PROJECTIONS"] = sum(
+        item["reproducedInSwiftSource"] for item in resource_evidence
+        if "clrField" in item)
     # Every contract type whose CLR base has a decided Swift support
     # projection. The head is what is counted, because a generic support base
     # arrives here specialized -- `CNACollection<...>` -- and is the same
@@ -5942,7 +6081,12 @@ def make_report(
         "nonPublicConstructionProjections": nonpublic_construction_evidence,
         "eventSupportProjections": support_evidence,
         "bclSupportProjections": bcl_evidence,
-        "bclResourceStringProjections": resource_evidence,
+        "bclResourceStringProjections": [
+            item for item in resource_evidence if "resourceKey" in item
+        ],
+        "bclStaticTableProjections": [
+            item for item in resource_evidence if "clrField" in item
+        ],
         "sealedClassProjections": sealed_evidence,
         "nonDerivableUnsealedClasses": [
             item["type"] for item in sealed_evidence
@@ -6039,6 +6183,10 @@ def main() -> int:
         load_json(BCL_SELECTED_SHAPE) if BCL_SELECTED_SHAPE.exists() else None)
     resource_evidence, resource_diagnostics = bcl_resource_string_evidence(
         rules, ROOT / "Sources/CNA", bcl_manifest)
+    table_evidence, table_diagnostics = bcl_static_table_evidence(
+        rules, ROOT / "Sources/CNA", bcl_manifest)
+    resource_evidence = resource_evidence + table_evidence
+    resource_diagnostics = resource_diagnostics + table_diagnostics
     witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(
         contract, rules, observed_witnesses,
     )

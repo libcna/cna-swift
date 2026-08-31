@@ -377,6 +377,13 @@ COLLECTION = "System.Collections.ObjectModel.Collection`1"
 READONLY = "System.Collections.ObjectModel.ReadOnlyCollection`1"
 LIST = "System.Collections.Generic.List`1"
 ILIST = "System.Collections.Generic.IList`1"
+DICTIONARY = "System.Collections.Generic.Dictionary`2"
+KEY_COLLECTION = "System.Collections.Generic.Dictionary`2+KeyCollection"
+VALUE_COLLECTION = "System.Collections.Generic.Dictionary`2+ValueCollection"
+DICT_ENUMERATOR = "System.Collections.Generic.Dictionary`2+Enumerator"
+KEY_VALUE_PAIR = "System.Collections.Generic.KeyValuePair`2"
+IEQUALITY_COMPARER = "System.Collections.Generic.IEqualityComparer`1"
+IDICTIONARY = "System.Collections.Generic.IDictionary`2"
 EXCEPTION = "System.Exception"
 SYSTEM_EXCEPTION = "System.SystemException"
 EXTERNAL_EXCEPTION = "System.Runtime.InteropServices.ExternalException"
@@ -899,7 +906,269 @@ def sentinel_checks(
     for absent in ("ToString", "GetObjectData", "GetType"):
         require(len(members_of(EXCEPTION, "method", absent)) == 1,
                 f"Exception.{absent} vanished from the extraction")
+
+    # ------------------------------------------------------------------
+    # The dictionary family.
+    # ------------------------------------------------------------------
+    dictionary = by_type.get(DICTIONARY)
+    for name in (DICTIONARY, KEY_COLLECTION, VALUE_COLLECTION,
+                 DICT_ENUMERATOR, KEY_VALUE_PAIR, IEQUALITY_COMPARER,
+                 IDICTIONARY):
+        require(name in by_type, f"{name} was not extracted at all")
+    if dictionary is None:
+        return checks, failures
+
+    require(dictionary["kind"] == "class", "Dictionary<K,V> is not a class")
+    require(not dictionary["sealed"],
+            "Dictionary<K,V> is sealed, so LaunchParameters could not derive "
+            "from it")
+    require(dictionary["baseType"] == "System.Object",
+            "Dictionary<K,V> does not derive directly from System.Object")
+    require(dictionary["genericArity"] == 2,
+            "Dictionary<K,V> is not of generic arity 2")
+    for interface in (
+        "System.Collections.Generic.ICollection`1"
+        "[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.Generic.IDictionary`2[!TKey,!TValue]",
+        "System.Collections.Generic.IEnumerable`1"
+        "[System.Collections.Generic.KeyValuePair`2[!TKey,!TValue]]",
+        "System.Collections.ICollection",
+        "System.Collections.IDictionary",
+        "System.Collections.IEnumerable",
+        "System.Runtime.Serialization.IDeserializationCallback",
+        "System.Runtime.Serialization.ISerializable",
+    ):
+        require(interface in dictionary["directInterfaces"],
+                f"Dictionary<K,V> does not declare {interface}")
+
+    # NOTHING on the public surface is an override point. `GetObjectData` and
+    # `OnDeserialization` are the only overridable members, and neither is
+    # projected, so a Swift projection whose methods were `open` would invent
+    # extension points the CLR does not have.
+    for method in ("Add", "Clear", "ContainsKey", "ContainsValue", "Remove",
+                   "TryGetValue", "GetEnumerator"):
+        candidates = members_of(DICTIONARY, "method", method)
+        require(len(candidates) == 1,
+                f"Dictionary<K,V>.{method} should be declared exactly once, "
+                f"found {len(candidates)}")
+        for member in candidates:
+            require(member["access"] == "public",
+                    f"Dictionary<K,V>.{method} is not public")
+            require(not member["overridable"],
+                    f"Dictionary<K,V>.{method} is overridable; the CLR does "
+                    "not make it an override point")
+    for method in ("GetObjectData", "OnDeserialization"):
+        candidates = members_of(DICTIONARY, "method", method)
+        require(len(candidates) == 1,
+                f"Dictionary<K,V>.{method} is missing")
+        for member in candidates:
+            require(member["overridable"],
+                    f"Dictionary<K,V>.{method} should be the one kind of "
+                    "overridable member this class has")
+
+    # Six public constructors plus the protected serialization one.
+    constructors = members_of(DICTIONARY, "constructor", ".ctor")
+    public_constructors = [
+        item for item in constructors if item["access"] == "public"]
+    require(len(public_constructors) == 6,
+            f"Dictionary<K,V> should declare 6 public constructors, found "
+            f"{len(public_constructors)}")
+    require(len([
+        item for item in constructors if item["access"] == "protected"]) == 1,
+        "Dictionary<K,V> should declare one protected serialization "
+        "constructor")
+    for signature in (
+        [],
+        ["System.Int32"],
+        [f"{IEQUALITY_COMPARER}[!0]"],
+        ["System.Int32", f"{IEQUALITY_COMPARER}[!0]"],
+        [f"{IDICTIONARY}[!0,!1]"],
+        [f"{IDICTIONARY}[!0,!1]", f"{IEQUALITY_COMPARER}[!0]"],
+    ):
+        require(any(
+            [entry["type"] for entry in item["parameters"]] == signature
+            for item in public_constructors),
+            f"Dictionary<K,V> has no constructor taking {signature}")
+
+    # The indexer is read/write while Keys, Values, Count and Comparer are
+    # get-only. Getting the indexer wrong is the difference between Add
+    # refusing a duplicate and the setter overwriting it.
+    indexer = members_of(DICTIONARY, "property", "Item")
+    require(len(indexer) == 1, "Dictionary<K,V>.Item is missing")
+    for member in indexer:
+        require(member["getAccess"] == "public" and
+                member["setAccess"] == "public",
+                "Dictionary<K,V>.Item is not a public read/write indexer")
+        require(len(member["parameters"]) == 1 and
+                member["parameters"][0]["type"] == "!0",
+                "Dictionary<K,V>.Item is not indexed by the key type")
+        require(member["type"] == "!1",
+                "Dictionary<K,V>.Item does not yield the value type")
+    for name, clr_type in (
+        ("Count", "System.Int32"),
+        ("Comparer", f"{IEQUALITY_COMPARER}[!0]"),
+        ("Keys", f"{KEY_COLLECTION}[!0,!1]"),
+        ("Values", f"{VALUE_COLLECTION}[!0,!1]"),
+    ):
+        candidates = members_of(DICTIONARY, "property", name)
+        require(len(candidates) == 1, f"Dictionary<K,V>.{name} is missing")
+        for member in candidates:
+            require(member["getAccess"] == "public" and
+                    member["setAccess"] is None,
+                    f"Dictionary<K,V>.{name} is not a public get-only property")
+            require(member["type"] == clr_type,
+                    f"Dictionary<K,V>.{name} is {member['type']}, not "
+                    f"{clr_type}")
+
+    # `GetEnumerator` returns the nested struct, not the interface, and that
+    # struct carries nothing beyond the enumeration contract.
+    for member in members_of(DICTIONARY, "method", "GetEnumerator"):
+        require(member["returnType"] == f"{DICT_ENUMERATOR}[!0,!1]",
+                "Dictionary<K,V>.GetEnumerator does not return its own "
+                "nested Enumerator")
+    enumerator = by_type.get(DICT_ENUMERATOR)
+    if enumerator is not None:
+        require(enumerator["kind"] == "struct",
+                "Dictionary<K,V>.Enumerator is not a struct")
+        require({item["name"] for item in enumerator["members"]} ==
+                {"Current", "MoveNext", "Dispose"},
+                "Dictionary<K,V>.Enumerator carries more than the enumeration "
+                "contract, so projecting it as CNAEnumerator would drop "
+                "something")
+
+    # The two collection views are sealed live views, and neither exposes a
+    # mutator or a public Contains.
+    for name in (KEY_COLLECTION, VALUE_COLLECTION):
+        view = by_type.get(name)
+        if view is None:
+            continue
+        require(view["kind"] == "class", f"{name} is not a class")
+        require(view["sealed"], f"{name} is not sealed")
+        require(len(members_of(name, "constructor", ".ctor")) == 1,
+                f"{name} should declare exactly one constructor")
+        for method in ("Add", "Clear", "Remove", "Contains"):
+            require(not members_of(name, "method", method),
+                    f"{name} unexpectedly exposes {method}")
+        require(len(members_of(name, "method", "CopyTo")) == 1,
+                f"{name}.CopyTo is missing")
+        require(len(members_of(name, "property", "Count")) == 1,
+                f"{name}.Count is missing")
+
+    pair = by_type.get(KEY_VALUE_PAIR)
+    if pair is not None:
+        require(pair["kind"] == "struct", "KeyValuePair<K,V> is not a struct")
+        for name, clr_type in (("Key", "!0"), ("Value", "!1")):
+            candidates = members_of(KEY_VALUE_PAIR, "property", name)
+            require(len(candidates) == 1, f"KeyValuePair<K,V>.{name} is missing")
+            for member in candidates:
+                require(member["setAccess"] is None,
+                        f"KeyValuePair<K,V>.{name} has a setter")
+                require(member["type"] == clr_type,
+                        f"KeyValuePair<K,V>.{name} is not {clr_type}")
+
+    comparer = by_type.get(IEQUALITY_COMPARER)
+    if comparer is not None:
+        require(comparer["kind"] == "interface",
+                "IEqualityComparer<T> is not an interface")
+        require(comparer["genericArity"] == 1,
+                "IEqualityComparer<T> is not of generic arity 1")
+        require({item["name"] for item in comparer["members"]} ==
+                {"Equals", "GetHashCode"},
+                "IEqualityComparer<T> is not exactly Equals and GetHashCode")
+        for member in members_of(IEQUALITY_COMPARER, "method", "GetHashCode"):
+            require(member["returnType"] == "System.Int32",
+                    "IEqualityComparer<T>.GetHashCode does not return Int32")
     return checks, failures
+
+
+def static_int32_table(il: str, type_name: str, field_name: str) -> list[int] | None:
+    """One `static readonly int[]` initialised from a static-array RVA blob.
+
+    The C# compiler lowers such a table to a `<PrivateImplementationDetails>`
+    field placed at a data address, filled by `RuntimeHelpers.InitializeArray`.
+    The chain followed here is exactly that one: the type's `.cctor` names the
+    initializer field, the field declaration names its data address, and the
+    address names a `.data ... = bytearray (...)` blob. Reading it means a
+    table this binding reproduces is a fact about the assembly rather than
+    something transcribed by hand.
+
+    `None` when any link is absent, which is reported rather than assumed away.
+    """
+    opening = re.search(
+        rf"^\.class\s+.*?\b{re.escape(type_name)}\s*$", il, re.M)
+    if opening is None:
+        return None
+    closing = re.search(
+        rf"^\}}\s*//\s*end of class\s+{re.escape(type_name)}\s*$",
+        il[opening.start():], re.M)
+    if closing is None:
+        return None
+    block = il[opening.start():opening.start() + closing.end()]
+
+    # The `.cctor` stores into the named field; the `ldtoken` immediately
+    # before that store names the initializer field.
+    store = re.search(
+        rf"ldtoken\s+field[^\n]*?'(\$\$method[0-9a-zA-Z-]+)'[\s\S]{{0,400}}?"
+        rf"stsfld\s+int32\[\]\s+{re.escape(type_name)}::{re.escape(field_name)}",
+        block)
+    if store is None:
+        return None
+    initializer = store.group(1)
+
+    placement = re.search(
+        rf"'{re.escape(initializer)}'\s+at\s+(I_[0-9A-Fa-f]+)", il)
+    if placement is None:
+        return None
+    blob = re.search(
+        rf"^\.data\s+cil\s+{placement.group(1)}\s*=\s*bytearray\s*\("
+        rf"([\s\S]*?)\)\s*$", il, re.M)
+    if blob is None:
+        return None
+    # `ikdasm` appends an ASCII rendering after `//` on most rows, and a
+    # rendering can contain two characters that look like a hex byte. The
+    # comment is removed per line before any byte is read, so nothing outside
+    # the blob can be mistaken for data.
+    hex_only = "\n".join(
+        line.split("//", 1)[0] for line in blob.group(1).splitlines())
+    payload = bytes(
+        int(item, 16) for item in re.findall(r"\b([0-9A-Fa-f]{2})\b", hex_only))
+
+    # The declared element count comes from the `newarr` the `.cctor` performs,
+    # so a blob that is longer than the array cannot silently add entries.
+    size = re.search(
+        r"ldc\.i4(?:\.s)?\s+(\d+)\s*\n\s*IL_[0-9a-f]+:\s+newarr\s+System\.Int32",
+        block)
+    count = int(size.group(1)) if size else len(payload) // 4
+    if len(payload) < count * 4:
+        return None
+    return [
+        int.from_bytes(payload[index * 4:index * 4 + 4], "little", signed=True)
+        for index in range(count)
+    ]
+
+
+def static_table_checks(
+    il: str, selected: list[dict[str, Any]],
+) -> tuple[int, list[str], list[dict[str, Any]]]:
+    """Extract every registered static table, or say why it could not be."""
+    failures: list[str] = []
+    records: list[dict[str, Any]] = []
+    checks = 0
+    for entry in selected:
+        checks += 1
+        values = static_int32_table(il, entry["type"], entry["field"])
+        if values is None:
+            failures.append(
+                f"static table {entry['type']}::{entry['field']} could not be "
+                "read from the assembly")
+            continue
+        records.append({
+            "type": entry["type"],
+            "field": entry["field"],
+            "swiftSymbol": entry.get("swiftSymbol"),
+            "values": values,
+        })
+    return checks, failures, records
 
 
 def resource_checks(
@@ -947,10 +1216,13 @@ def mutation_self_tests(
     by_name = {item["type"]: item for item in manifest}
 
     subjects = [name for name in (COLLECTION, READONLY, LIST, ILIST, EXCEPTION,
-                                  SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION)
+                                  SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION,
+                                  DICTIONARY, KEY_COLLECTION, VALUE_COLLECTION,
+                                  DICT_ENUMERATOR, KEY_VALUE_PAIR,
+                                  IEQUALITY_COMPARER, IDICTIONARY)
                 if name in by_name]
     checks += 1
-    if len(subjects) < 7:
+    if len(subjects) < 14:
         failures.append("mutation self-test subjects are missing")
 
     def first_of(record: dict[str, Any], kind: str) -> dict[str, Any] | None:
@@ -966,6 +1238,16 @@ def mutation_self_tests(
                     del record["members"][index]
                     return True
             return False
+        return mutate
+
+    def add_member_named(member_name: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            record["members"].append(member_record({
+                "kind": "method", "name": member_name, "access": "public",
+                "static": False, "returnType": "System.Void",
+                "genericParameters": [], "parameters": [],
+            }))
+            return True
         return mutate
 
     def add_member(record: dict[str, Any]) -> bool:
@@ -1197,6 +1479,39 @@ def mutation_self_tests(
         ("an ExternalException constructor dropped", EXTERNAL_EXCEPTION,
          drop_member("constructor")),
         ("ErrorCode given a setter", EXTERNAL_EXCEPTION, add_setter),
+        # The dictionary family. Each of these is a way the projection could
+        # have been quietly wrong.
+        ("Dictionary<K,V> made sealed", DICTIONARY, flip_sealed),
+        ("Dictionary<K,V> arity changed", DICTIONARY, change_arity),
+        ("Dictionary<K,V> rebased", DICTIONARY, rebase_onto(COLLECTION)),
+        ("a Dictionary<K,V> method made an override point", DICTIONARY,
+         unseal_public_member),
+        ("a Dictionary<K,V> constructor dropped", DICTIONARY,
+         drop_member("constructor")),
+        ("a Dictionary<K,V> property dropped", DICTIONARY,
+         drop_member("property")),
+        ("a Dictionary<K,V> method dropped", DICTIONARY,
+         drop_member("method")),
+        ("a Dictionary<K,V> declared interface dropped", DICTIONARY,
+         drop_interface),
+        ("a Dictionary<K,V> property retyped", DICTIONARY,
+         change_property_type),
+        ("KeyCollection unsealed", KEY_COLLECTION, flip_sealed),
+        ("KeyCollection given a mutator", KEY_COLLECTION, add_member_named("Add")),
+        ("KeyCollection's CopyTo dropped", KEY_COLLECTION,
+         drop_member("method")),
+        ("ValueCollection given a mutator", VALUE_COLLECTION,
+         add_member_named("Remove")),
+        ("the nested Enumerator turned into a class", DICT_ENUMERATOR,
+         change_kind),
+        ("the nested Enumerator given a member beyond the contract",
+         DICT_ENUMERATOR, add_member),
+        ("KeyValuePair turned into a class", KEY_VALUE_PAIR, change_kind),
+        ("KeyValuePair.Key given a setter", KEY_VALUE_PAIR, add_setter),
+        ("IEqualityComparer<T> turned into a class", IEQUALITY_COMPARER,
+         change_kind),
+        ("IEqualityComparer<T>.GetHashCode dropped", IEQUALITY_COMPARER,
+         drop_member("method")),
     ]
     for label, subject, mutate in sentinel_mutations:
         if subject not in by_name:
@@ -1211,7 +1526,9 @@ def mutation_self_tests(
 
     # Removing a whole selected family must break the sentinels too.
     for subject in (COLLECTION, READONLY, LIST, ILIST, EXCEPTION,
-                    SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION):
+                    SYSTEM_EXCEPTION, EXTERNAL_EXCEPTION, DICTIONARY,
+                    KEY_COLLECTION, VALUE_COLLECTION, DICT_ENUMERATOR,
+                    KEY_VALUE_PAIR, IEQUALITY_COMPARER, IDICTIONARY):
         if subject not in by_name:
             continue
         reduced = {
@@ -1582,8 +1899,10 @@ def main() -> int:
     admitted: list[dict[str, Any]] = []
     manifest_records: list[dict[str, Any]] = []
     manifest_resources: list[dict[str, Any]] = []
+    manifest_tables: list[dict[str, Any]] = []
     resource_failures: list[str] = []
     resource_check_count = 0
+    table_check_count = 0
     cross_check_checks = 0
     cross_check_failures: list[str] = []
     cross_check_ran = False
@@ -1641,6 +1960,16 @@ def main() -> int:
                 )
             resource_check_count += resource_checks_made
 
+        # Static data tables the projection reproduces, followed through the
+        # `.cctor` -> initializer field -> `.data` blob chain.
+        selected_tables = entry.get("selectedStaticTables", [])
+        if selected_tables:
+            made, issues, table_records = static_table_checks(il, selected_tables)
+            table_check_count += made
+            resource_failures.extend(f"{name}: {item}" for item in issues)
+            manifest_tables.extend(
+                dict(record, assembly=name) for record in table_records)
+
         admitted.append({
             "assembly": name,
             "assemblyName": entry["assemblyName"],
@@ -1674,6 +2003,9 @@ def main() -> int:
         "types": manifest_records,
         "resourceStrings": sorted(
             manifest_resources, key=lambda item: (item["assembly"], item["key"])),
+        "staticTables": sorted(
+            manifest_tables,
+            key=lambda item: (item["assembly"], item["type"], item["field"])),
     }
 
     if args.write_manifest:
@@ -1725,6 +2057,28 @@ def main() -> int:
                 manifest_failures.append(
                     f"{key[1]}: resource string {found_resources[key]!r} != "
                     f"pinned {pinned_resources[key]!r}")
+        pinned_tables = {
+            (item["assembly"], item["type"], item["field"]): item.get("values")
+            for item in pinned.get("staticTables", [])
+        }
+        found_tables = {
+            (item["assembly"], item["type"], item["field"]): item.get("values")
+            for item in manifest_tables
+        }
+        for key in sorted(set(pinned_tables) | set(found_tables)):
+            manifest_checks += 1
+            if key not in found_tables:
+                manifest_failures.append(
+                    f"{key[1]}::{key[2]}: pinned static table not extracted")
+            elif key not in pinned_tables:
+                manifest_failures.append(
+                    f"{key[1]}::{key[2]}: extracted static table absent from "
+                    "the pinned manifest")
+            elif pinned_tables[key] != found_tables[key]:
+                manifest_failures.append(
+                    f"{key[1]}::{key[2]}: static table differs from the pinned "
+                    f"one ({len(found_tables[key] or [])} extracted vs "
+                    f"{len(pinned_tables[key] or [])} pinned)")
     elif not args.write_manifest:
         manifest_failures.append(f"{MANIFEST} does not exist")
 
@@ -1757,6 +2111,7 @@ def main() -> int:
         "BCL_MUTATION_SELF_TESTS": mutation_count,
         "BCL_CROSS_CHECKS": cross_check_checks,
         "BCL_RESOURCE_CHECKS": resource_check_count,
+        "BCL_STATIC_TABLE_CHECKS": table_check_count,
         "BCL_NEGATIVE_CONTROLS": control_checks,
         "BCL_CROSS_CHECK_TOOL": "monodis" if cross_check_ran else "not run",
         "identityFailures": identity_failures,
@@ -1792,6 +2147,7 @@ def main() -> int:
         f"BCL_CROSS_CHECKS={cross_check_checks} "
         f"({report['BCL_CROSS_CHECK_TOOL']}) "
         f"BCL_RESOURCE_CHECKS={resource_check_count} "
+        f"BCL_STATIC_TABLE_CHECKS={table_check_count} "
         f"BCL_NEGATIVE_CONTROLS={control_checks}")
     for record in controls:
         print(
