@@ -98,12 +98,12 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=151
-TARGET_MEMBERS=1890
-TOTAL_DIAGNOSTICS=229
-COMPLETE_TYPES=144
+TARGET_TYPES=156
+TARGET_MEMBERS=1929
+TOTAL_DIAGNOSTICS=224
+COMPLETE_TYPES=149
 PARTIAL_TYPES=7
-MISSING_TYPES=106
+MISSING_TYPES=101
 MISSING_MEMBER=106
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=113
@@ -567,7 +567,7 @@ constant and a wrong `Keys` literal — runs the unmodified verifier, requires i
 to fail every time, and proves the tree is byte-identical afterwards.
 
 `tools/projection_mutations/run.py` is the companion gate over the projected
-behavior. It plants forty-six realistic defects one at a time — a
+behavior. It plants fifty realistic defects one at a time — a
 neighbouring exception class at a raise site, a message that reports the Swift
 class name to a user, a mirror that moves on a write the host refused, a
 disposal that leaks a native subscription, an IL-derived state default changed,

@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 19,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 18,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
@@ -23,7 +23,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 41,
+      "transitiveMissingReverseReach": 36,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -42,7 +42,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 38,
+      "transitiveMissingReverseReach": 33,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -61,7 +61,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 38,
+      "transitiveMissingReverseReach": 33,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -130,22 +130,6 @@
       ]
     },
     {
-      "type": "Microsoft.Xna.Framework.Graphics.IVertexType",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.VertexDeclaration"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
-        "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
-        "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
-        "Microsoft.Xna.Framework.Graphics.VertexPositionTexture"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 4,
-      "transitivePartialReverseReach": []
-    },
-    {
       "type": "Microsoft.Xna.Framework.Audio.AudioCategory",
       "dependencies": [
         "Microsoft.Xna.Framework.Audio.AudioStopOptions"
@@ -183,6 +167,21 @@
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 2,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.Cue",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Audio.AudioEmitter",
+        "Microsoft.Xna.Framework.Audio.AudioListener",
+        "Microsoft.Xna.Framework.Audio.AudioStopOptions"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Audio.SoundBank"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 1,
       "transitivePartialReverseReach": []
     }
   ]

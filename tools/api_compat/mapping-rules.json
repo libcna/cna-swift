@@ -150,6 +150,10 @@
     "Microsoft.Xna.Framework.Graphics.PackedVector.Short2.PackFromVector4",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Short2.ToVector4",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Short4.PackFromVector4",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionColor.VertexDeclaration",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture.VertexDeclaration",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture.VertexDeclaration",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionTexture.VertexDeclaration",
     "Microsoft.Xna.Framework.GraphicsDeviceManager.BeginDraw",
     "Microsoft.Xna.Framework.GraphicsDeviceManager.CreateDevice",
     "Microsoft.Xna.Framework.GraphicsDeviceManager.EndDraw"

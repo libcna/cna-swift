@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 151,
-    "TARGET_MEMBERS": 1890,
-    "TOTAL_DIAGNOSTICS": 229,
-    "COMPLETE_TYPES": 144,
+    "TARGET_TYPES": 156,
+    "TARGET_MEMBERS": 1929,
+    "TOTAL_DIAGNOSTICS": 224,
+    "COMPLETE_TYPES": 149,
     "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 106,
-    "MISSING_TYPE": 106,
+    "MISSING_TYPES": 101,
+    "MISSING_TYPE": 101,
     "MISSING_MEMBER": 106,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -44,12 +44,12 @@
     "UNMEASURED_STRUCTURAL_CATEGORY": 0,
     "ALLOWLIST_ENTRIES": 0,
     "APPLIED_ALLOWLIST_ENTRIES": 0,
-    "LANGUAGE_PROJECTION_EXCLUSIONS": 118,
+    "LANGUAGE_PROJECTION_EXCLUSIONS": 122,
     "ENUM_STORAGE_FIELD_EXCLUSIONS": 49,
     "FINALIZER_LANGUAGE_MAPPINGS": 28,
     "NAMESPACE_MARKERS": 11,
     "INHERITED_MEMBER_PROJECTIONS": 1,
-    "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 29,
+    "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 33,
     "ARRAY_MUTATION_MAPPINGS": 20,
     "COMPARABLE_INTERFACE_PROJECTIONS": 1,
     "COLLECTION_INTERFACE_PROJECTIONS": 1,
@@ -91,8 +91,8 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 94,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 275,
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 103,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 266,
     "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 11
   },
   "completeTypes": [
@@ -152,6 +152,7 @@
     "Microsoft.Xna.Framework.Graphics.IEffectFog",
     "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
     "Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService",
+    "Microsoft.Xna.Framework.Graphics.IVertexType",
     "Microsoft.Xna.Framework.Graphics.IndexElementSize",
     "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
@@ -194,6 +195,10 @@
     "Microsoft.Xna.Framework.Graphics.VertexElement",
     "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
     "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
+    "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
     "Microsoft.Xna.Framework.Graphics.Viewport",
     "Microsoft.Xna.Framework.IDrawable",
     "Microsoft.Xna.Framework.IGameComponent",
@@ -302,7 +307,6 @@
     "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
     "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
     "Microsoft.Xna.Framework.Graphics.IEffectLights",
-    "Microsoft.Xna.Framework.Graphics.IVertexType",
     "Microsoft.Xna.Framework.Graphics.IndexBuffer",
     "Microsoft.Xna.Framework.Graphics.Model",
     "Microsoft.Xna.Framework.Graphics.ModelBone",
@@ -327,10 +331,6 @@
     "Microsoft.Xna.Framework.Graphics.TextureCube",
     "Microsoft.Xna.Framework.Graphics.VertexBuffer",
     "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
-    "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
-    "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
-    "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
-    "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
@@ -921,11 +921,6 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.IVertexType",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
@@ -1232,26 +1227,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1736,6 +1711,42 @@
       "swiftMember": "PackFromVector4",
       "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1[System.UInt64]",
       "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector`1.PackFromVector4",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
+      "swiftMember": "VertexDeclaration",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.IVertexType",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.IVertexType.VertexDeclaration",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
+      "swiftMember": "VertexDeclaration",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.IVertexType",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.IVertexType.VertexDeclaration",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
+      "swiftMember": "VertexDeclaration",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.IVertexType",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.IVertexType.VertexDeclaration",
+      "absentFromPublicDeclaredClrMembers": true,
+      "compilerSourceOriginObserved": true,
+      "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
+      "swiftMember": "VertexDeclaration",
+      "forcingClrInterface": "Microsoft.Xna.Framework.Graphics.IVertexType",
+      "interfaceRequirement": "Microsoft.Xna.Framework.Graphics.IVertexType.VertexDeclaration",
       "absentFromPublicDeclaredClrMembers": true,
       "compilerSourceOriginObserved": true,
       "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation"
@@ -7148,14 +7159,14 @@
       "member": "VertexDeclaration",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.Model",
@@ -8114,112 +8125,112 @@
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
       "member": "VertexDeclaration",
       "kind": "field",
       "static": true,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
       "member": "VertexDeclaration",
       "kind": "field",
       "static": true,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
       "member": "VertexDeclaration",
       "kind": "field",
       "static": true,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
       "member": "VertexDeclaration",
       "kind": "field",
       "static": true,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.Viewport",
@@ -11302,16 +11313,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IVertexType",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.IVertexType",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
@@ -12127,55 +12132,31 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Viewport",

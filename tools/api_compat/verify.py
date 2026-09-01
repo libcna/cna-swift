@@ -5843,15 +5843,26 @@ def protocol_witness_projection_evidence(
             direct for direct in owner.get("directInterfaces", [])
             if declares(open_name(direct), member_name, set())
         ]
+        # "Absent from the owner's own public members" means absent as an
+        # INSTANCE member. A CLR type may declare a static member of the same
+        # name beside an explicit instance implementation, and the four vertex
+        # structs do exactly that: `VertexPositionColor` has a
+        # `public static initonly VertexDeclaration VertexDeclaration` field
+        # AND an explicit `IVertexType.get_VertexDeclaration`. The CLR
+        # distinguishes them by staticness, Swift distinguishes them the same
+        # way, and a name-only test would refuse a witness that is genuinely
+        # explicit. Only a same-named INSTANCE member means the class
+        # implemented the interface implicitly and needs no witness.
         declared = [] if owner is None else [
-            item for item in owner["members"] if item["name"] == member_name
+            item for item in owner["members"]
+            if item["name"] == member_name and not item.get("static")
         ]
         if owner is None or len(forcing) != 1 or declared:
             failures.append(diagnostic(
                 "UNMEASURED_STRUCTURAL_CATEGORY", identity,
                 "protocol-witness rule lacks a unique concrete owner, exactly one direct CLR "
                 "interface declaring the member, or absence from the owner's public declared "
-                "CLR members",
+                "CLR instance members",
             ))
             continue
         forcing_interfaces = forcing

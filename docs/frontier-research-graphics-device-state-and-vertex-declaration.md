@@ -143,10 +143,12 @@ identity that `SamplerStateCollection`'s own `beq` early-out shows XNA relies on
 
 ## Part 2 — `VertexDeclaration`
 
-**Implemented in Foundation 43.** What follows is the research this section was
-written from; `docs/foundation-43-vertex-declaration-evidence.md` records what
-was actually built, including the CNA corroboration of the stride rule that this
-section only proposed.
+**Implemented in Foundation 43**, and the five types it unblocked in
+Foundation 44. What follows is the research this section was written from;
+`docs/foundation-43-vertex-declaration-evidence.md` records what was actually
+built, including the CNA corroboration of the stride rule that this section only
+proposed, and `docs/foundation-44-vertex-types-evidence.md` records
+`IVertexType` and the four vertex structs.
 
 Reach 39, dependency-complete, and **no callback-scope problem at all**: none of
 CNA's eight `cna_vertex_declaration_*` routes takes a device handle, so a

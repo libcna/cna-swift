@@ -35,6 +35,8 @@ DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
 STATES = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStates.swift"
 BATCH = ROOT / "Sources/CNA/Xna/Graphics/SpriteBatch.swift"
 VERTEXDECL = ROOT / "Sources/CNA/Xna/Graphics/VertexDeclaration.swift"
+VERTEXCOLOR = ROOT / "Sources/CNA/Xna/Graphics/VertexPositionColor.swift"
+VERTEXNORMAL = ROOT / "Sources/CNA/Xna/Graphics/VertexPositionNormalTexture.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -448,6 +450,42 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                storedElements = nil",
     ),
     (
+        "vertex-element-quadruple-transposed",
+        "a static declaration's element offset and format exchanged",
+        VERTEXCOLOR,
+        "                VertexElement(12, .Color, .Color, 0),",
+        "                VertexElement(16, .Color, .Color, 0),",
+    ),
+    (
+        "vertex-declaration-name-dropped",
+        "a static declaration left unnamed where the class constructor names it",
+        VERTEXCOLOR,
+        '            .named("VertexPositionColor.VertexDeclaration")',
+        "",
+    ),
+    (
+        "vertex-hash-drops-a-word",
+        "one word of a vertex layout left out of the folded hash",
+        VERTEXNORMAL,
+        "            let hash = Position.X.bitPattern\n"
+        "                ^ Position.Y.bitPattern\n"
+        "                ^ Position.Z.bitPattern\n"
+        "                ^ Normal.X.bitPattern",
+        "            let hash = Position.X.bitPattern\n"
+        "                ^ Position.Y.bitPattern\n"
+        "                ^ Position.Z.bitPattern",
+    ),
+    (
+        "vertex-equality-ignores-a-field",
+        "a vertex field left out of op_Equality",
+        VERTEXNORMAL,
+        "            lhs.Position == rhs.Position\n"
+        "                && lhs.Normal == rhs.Normal\n"
+        "                && lhs.TextureCoordinate == rhs.TextureCoordinate",
+        "            lhs.Position == rhs.Position\n"
+        "                && lhs.Normal == rhs.Normal",
+    ),
+    (
         "default-back-buffer-width-transcribed-wrong",
         "the GraphicsDeviceManager default back-buffer width off by a digit",
         MANAGER,
@@ -494,7 +532,7 @@ def main() -> int:
                  for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
                               RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
                               CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH,
-                              VERTEXDECL}}
+                              VERTEXDECL, VERTEXCOLOR, VERTEXNORMAL}}
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")

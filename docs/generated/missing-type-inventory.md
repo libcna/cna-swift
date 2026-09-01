@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=151
-TARGET_MEMBERS=1890
-TOTAL_DIAGNOSTICS=229
-COMPLETE_TYPES=144
+TARGET_TYPES=156
+TARGET_MEMBERS=1929
+TOTAL_DIAGNOSTICS=224
+COMPLETE_TYPES=149
 PARTIAL_TYPES=7
-MISSING_TYPES=106
-MISSING_TYPE=106
+MISSING_TYPES=101
+MISSING_TYPE=101
 MISSING_MEMBER=106
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -41,12 +41,12 @@ INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=118
+LANGUAGE_PROJECTION_EXCLUSIONS=122
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=11
 INHERITED_MEMBER_PROJECTIONS=1
-PROTOCOL_WITNESS_MEMBER_PROJECTIONS=29
+PROTOCOL_WITNESS_MEMBER_PROJECTIONS=33
 ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
 COLLECTION_INTERFACE_PROJECTIONS=1
@@ -88,8 +88,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=94
-PENDING_RETURN_NULLABILITY_PROJECTIONS=275
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=103
+PENDING_RETURN_NULLABILITY_PROJECTIONS=266
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 ```
 
@@ -151,6 +151,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 - `Microsoft.Xna.Framework.Graphics.IEffectFog`
 - `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
 - `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
+- `Microsoft.Xna.Framework.Graphics.IVertexType`
 - `Microsoft.Xna.Framework.Graphics.IndexElementSize`
 - `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
@@ -193,6 +194,10 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 - `Microsoft.Xna.Framework.Graphics.VertexElement`
 - `Microsoft.Xna.Framework.Graphics.VertexElementFormat`
 - `Microsoft.Xna.Framework.Graphics.VertexElementUsage`
+- `Microsoft.Xna.Framework.Graphics.VertexPositionColor`
+- `Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture`
+- `Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture`
+- `Microsoft.Xna.Framework.Graphics.VertexPositionTexture`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
 - `Microsoft.Xna.Framework.IDrawable`
 - `Microsoft.Xna.Framework.IGameComponent`
@@ -453,7 +458,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
 - `Microsoft.Xna.Framework.Graphics.IEffectLights`
-- `Microsoft.Xna.Framework.Graphics.IVertexType`
 - `Microsoft.Xna.Framework.Graphics.IndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.Model`
 - `Microsoft.Xna.Framework.Graphics.ModelBone`
@@ -478,10 +482,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.TextureCube`
 - `Microsoft.Xna.Framework.Graphics.VertexBuffer`
 - `Microsoft.Xna.Framework.Graphics.VertexBufferBinding`
-- `Microsoft.Xna.Framework.Graphics.VertexPositionColor`
-- `Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture`
-- `Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture`
-- `Microsoft.Xna.Framework.Graphics.VertexPositionTexture`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.Input.Mouse`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`

@@ -1,14 +1,14 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 43 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 44 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
 `IGraphicsDeviceService` producer with `DrawableGameComponent`, the four
 graphics state objects, `System.ObjectDisposedException` as the seventh
-admitted BCL exception authority, and `VertexDeclaration` with the validator
-behind it.
+admitted BCL exception authority, `VertexDeclaration` with the validator behind
+it, and `IVertexType` with the four vertex structs.
 
 This file states what is true **now**. The milestone-by-milestone progression
 lives in `NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md`
@@ -105,9 +105,9 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=151               TARGET_MEMBERS=1890
-COMPLETE_TYPES=144             PARTIAL_TYPES=7      MISSING_TYPE=106
-MISSING_MEMBER=106             TOTAL_DIAGNOSTICS=229
+TARGET_TYPES=156               TARGET_MEMBERS=1929
+COMPLETE_TYPES=149             PARTIAL_TYPES=7      MISSING_TYPE=101
+MISSING_MEMBER=106             TOTAL_DIAGNOSTICS=224
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 XNA_RESOURCE_STRING_PROJECTIONS=20 API_COMPAT_SELF_TESTS=2420
@@ -115,10 +115,15 @@ XNA_RESOURCE_STRING_PROJECTIONS=20 API_COMPAT_SELF_TESTS=2420
 
 Mismatch categories that are not zero, each a recorded decision rather than an
 oversight: `PROPERTY_MAPPING_MISMATCH=1` (`GraphicsDevice.SetViewport`) and
-`OVERLOAD_MAPPING_MISMATCH=16` (the `SpriteBatch.Begin` and
-`GraphicsDeviceManager.Dispose` overloads that wait on types not yet
-projected). Every other mismatch and leak category is 0, including
-`UNEXPECTED_TYPE`, `BASE_MAPPING_MISMATCH`, `FIELD_MAPPING_MISMATCH`,
+`OVERLOAD_MAPPING_MISMATCH=16`, spread over eight members that each wait on a
+type not yet projected — `SpriteBatch.Draw` (5), `SpriteBatch.Begin` (4),
+`GraphicsDevice.Clear` (2), and one each on `GraphicsDevice.SetRenderTarget`,
+`Texture2D.FromStream`, `GraphicsDeviceManager.Dispose` and the two
+serialization constructors of `ContentLoadException` and
+`StorageDeviceNotConnectedException`.
+
+Every other mismatch and leak category is 0, including `UNEXPECTED_TYPE`,
+`UNEXPECTED_MEMBER`, `BASE_MAPPING_MISMATCH`, `FIELD_MAPPING_MISMATCH`,
 `INTERFACE_MAPPING_MISMATCH`, `INHERITANCE_MAPPING_MISMATCH`,
 `INTERNAL_TYPE_LEAK`, `RAW_HANDLE_LEAK` and `PUBLIC_NATIVE_FFI_LEAK`.
 
@@ -130,7 +135,7 @@ CANONICAL_DECLARATION_CHECKS=170  C_SWIFT_MEASUREMENTS=170
 LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=46  CAUGHT=46  SURVIVORS=0
+PROJECTION_MUTATIONS=50  CAUGHT=50  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected
@@ -164,11 +169,11 @@ claimed. Apple platforms, Windows, and Web/Wasm remain unqualified.
 
 `docs/frontier-research-graphics-device-state-and-vertex-declaration.md` records
 what has been measured about the next two frontiers and not implemented.
-`docs/generated/dependency-graph.json` ranks the 19 dependency-complete missing
-types; the widest reach after Foundation 43 is `GraphicsAdapter` (41), then
-`SamplerStateCollection` and `TextureCollection` (38 each), `EffectAnnotation`
-(25), `MathTypeConverter` (12), `ContentManager` (6) and `IVertexType` (4) —
-the last of which `VertexDeclaration` unblocked.
+`docs/generated/dependency-graph.json` ranks the 18 dependency-complete missing
+types; the widest reach after Foundation 44 is `GraphicsAdapter` (36), then
+`SamplerStateCollection` and `TextureCollection` (33 each), `EffectAnnotation`
+(25), `MathTypeConverter` (12) and `ContentManager` (6). The rest are audio
+types of reach 3 or less.
 
 The remaining member diagnostics belong to `GraphicsDevice` (52),
 `GraphicsDeviceManager` (21), `SpriteBatch` (16), `Texture2D` (12) and `Game`

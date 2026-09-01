@@ -341,6 +341,11 @@
    "operation": "VertexDeclaration and its validator",
    "status": "VERIFIED_MANAGED_NO_NATIVE_ROUTE",
    "evidence": "Complete managed Swift. The type-size table, the maximum-end-offset stride rule, the five validation failures and the order they are checked in all come from the pinned VertexElementValidator IL. CNA's own cna_vertex_declaration_create computes the same stride for four layouts chosen to separate a sum from a maximum and an ordered scan from an unordered one (build-probe/f43_stride.c) \u2014 corroboration, not authority. No cna_vertex_declaration_* route is bound, because no projected member consumes a declaration yet."
+  },
+  {
+   "operation": "IVertexType and the four vertex structs",
+   "status": "VERIFIED_MANAGED_WITH_A_TOOLCHAIN_LIMITATION",
+   "evidence": "All five are complete managed Swift. The four static VertexDeclaration fields are built by the same one-argument constructor XNA's class constructors use, so their strides (16/24/32/20) are computed by Foundation 43's rule rather than transcribed. The limitation is the Swift 6.0.3 toolchain, not the projection: opening an `any Microsoft.Xna.Framework.Graphics.IVertexType` existential and reading its property crashes swift-frontend in IR generation with \"Forming a CanType out of a non-canonical type!\". Concrete access, the static field and a generic constraint all compile, and `any IGraphicsDeviceService` and `any IPackedVector` open fine, so it is neither existentials in general nor this binding's nested namespaces. A consumer on this toolchain must use a generic constraint."
   }
  ]
 }
