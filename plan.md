@@ -1,13 +1,14 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 42a are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 43 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
 `IGraphicsDeviceService` producer with `DrawableGameComponent`, the four
-graphics state objects, and `System.ObjectDisposedException` as the seventh
-admitted BCL exception authority.
+graphics state objects, `System.ObjectDisposedException` as the seventh
+admitted BCL exception authority, and `VertexDeclaration` with the validator
+behind it.
 
 This file states what is true **now**. The milestone-by-milestone progression
 lives in `NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md`
@@ -104,12 +105,12 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=150               TARGET_MEMBERS=1885
-COMPLETE_TYPES=143             PARTIAL_TYPES=7      MISSING_TYPE=107
-MISSING_MEMBER=106             TOTAL_DIAGNOSTICS=230
+TARGET_TYPES=151               TARGET_MEMBERS=1890
+COMPLETE_TYPES=144             PARTIAL_TYPES=7      MISSING_TYPE=106
+MISSING_MEMBER=106             TOTAL_DIAGNOSTICS=229
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
-XNA_RESOURCE_STRING_PROJECTIONS=16 API_COMPAT_SELF_TESTS=2420
+XNA_RESOURCE_STRING_PROJECTIONS=20 API_COMPAT_SELF_TESTS=2420
 ```
 
 Mismatch categories that are not zero, each a recorded decision rather than an
@@ -129,7 +130,7 @@ CANONICAL_DECLARATION_CHECKS=170  C_SWIFT_MEASUREMENTS=170
 LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=40  CAUGHT=40  SURVIVORS=0
+PROJECTION_MUTATIONS=46  CAUGHT=46  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected
@@ -139,7 +140,7 @@ is selected, which would report a coverage loss as sixteen projection defects.
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
-(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=16`). The BCL authority
+(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=20`). The BCL authority
 carries `BCL_SENTINEL_CHECKS=433`, `BCL_MUTATION_SELF_TESTS=462`,
 `BCL_CROSS_CHECKS=141` against a second disassembler, and four negative
 controls that are still refused.
@@ -164,11 +165,13 @@ claimed. Apple platforms, Windows, and Web/Wasm remain unqualified.
 `docs/frontier-research-graphics-device-state-and-vertex-declaration.md` records
 what has been measured about the next two frontiers and not implemented.
 `docs/generated/dependency-graph.json` ranks the 19 dependency-complete missing
-types; the four with the widest reach are `GraphicsAdapter` (42),
-`VertexDeclaration` (39), `SamplerStateCollection` (39) and `TextureCollection`
-(39). The remaining member diagnostics belong to `GraphicsDevice` (52),
-`GraphicsDeviceManager` (21), `SpriteBatch` (16), `Texture2D` (12, two of them
-constructors) and `Game`
+types; the widest reach after Foundation 43 is `GraphicsAdapter` (41), then
+`SamplerStateCollection` and `TextureCollection` (38 each), `EffectAnnotation`
+(25), `MathTypeConverter` (12), `ContentManager` (6) and `IVertexType` (4) —
+the last of which `VertexDeclaration` unblocked.
+
+The remaining member diagnostics belong to `GraphicsDevice` (52),
+`GraphicsDeviceManager` (21), `SpriteBatch` (16), `Texture2D` (12) and `Game`
 (2), and every one of them waits on an XNA type that is not yet projected.
 
 Completion of a milestone requires debug and release builds and tests,

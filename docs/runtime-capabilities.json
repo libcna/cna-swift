@@ -336,6 +336,11 @@
    "operation": "BlendFunction numbering across the boundary",
    "status": "MEASURED_NATIVE_DIVERGENCE",
    "evidence": "XNA's pinned IL declares BlendFunction.Min = 3 and Max = 4; CNA's graphics_state.h declares CNA_BLEND_FUNCTION_MAX = 3 and MIN = 4. The two are swapped, so a rawValue pass-through would silently exchange them. Every other state enum \u2014 Blend, ColorWriteChannels, CompareFunction, StencilOperation, CullMode, FillMode, TextureAddressMode and TextureFilter \u2014 agrees value for value. No state route is bound yet; when one is, the conversion must be an exhaustive explicit map for every enum rather than a raw cast."
+  },
+  {
+   "operation": "VertexDeclaration and its validator",
+   "status": "VERIFIED_MANAGED_NO_NATIVE_ROUTE",
+   "evidence": "Complete managed Swift. The type-size table, the maximum-end-offset stride rule, the five validation failures and the order they are checked in all come from the pinned VertexElementValidator IL. CNA's own cna_vertex_declaration_create computes the same stride for four layouts chosen to separate a sum from a maximum and an ordered scan from an unordered one (build-probe/f43_stride.c) \u2014 corroboration, not authority. No cna_vertex_declaration_* route is bound, because no projected member consumes a declaration yet."
   }
  ]
 }

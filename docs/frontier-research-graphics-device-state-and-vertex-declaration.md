@@ -143,6 +143,11 @@ identity that `SamplerStateCollection`'s own `beq` early-out shows XNA relies on
 
 ## Part 2 — `VertexDeclaration`
 
+**Implemented in Foundation 43.** What follows is the research this section was
+written from; `docs/foundation-43-vertex-declaration-evidence.md` records what
+was actually built, including the CNA corroboration of the stride rule that this
+section only proposed.
+
 Reach 39, dependency-complete, and **no callback-scope problem at all**: none of
 CNA's eight `cna_vertex_declaration_*` routes takes a device handle, so a
 declaration is an ordinary `OWNED` native object with a clean lifetime.
@@ -187,18 +192,32 @@ let d = VertexDeclaration(elements: [])   // accepted
 d.GetVertexElements()                     // NullReferenceException
 ```
 
-is reachable, yet `xna40-accessor-fallibility.json` records the member as
-`fallible: false, IL_NO_FAILURE_PATH`. The analyser does not treat a `callvirt`
-on a reference loaded from a possibly-null field as a failure path.
+is reachable, yet the record for it says `fallible: false,
+IL_NO_FAILURE_PATH`. The analyser does not treat a `callvirt` on a reference
+loaded from a possibly-null field as a failure path.
 
-That is a defect in `tools/api_compat/accessor_fallibility.py`, not in XNA, and
-it must not be papered over by writing a throwing Swift method against a
-non-throwing verdict — the verifier compares the projection against the recorded
-verdict, so the two have to be made to agree honestly. Either teach the analyser
-the rule and regenerate the pinned file (which carries its own digest in
-`mapping-rules.json` and 34 self-tests), or record the one member as a measured
-exception with the IL quoted. Measure the blast radius of the first before
-choosing it.
+Three things about that, in order of what they change.
+
+**Which file.** `GetVertexElements` is a method, not a property accessor, so it
+is not in `xna40-accessor-fallibility.json` at all; the verdict lives in the
+`fallibility` block of its `xna40-reference-return-nullability.json` record,
+produced by `return_nullability.py`.
+
+**What depends on it.** `verify.py` reads that block into `Member.return_fallible`
+and uses it in exactly one place: a clause appended to the diagnostic for a
+*surplus* Optional return. Nothing compares a method's Swift `throws` against
+it — `throws` is compared only for property accessors, through
+`THROWING_GETTER_PROJECTIONS` and the writer-method rules. So the inaccuracy is
+not load-bearing, and it does **not** block projecting `GetVertexElements` as
+throwing, which is what the IL requires.
+
+**What to do.** Record it, and treat teaching the analyser the rule as its own
+scoped change rather than a step inside a type's milestone: the pinned file
+carries its own digest in `mapping-rules.json` and 115 self-tests, and a new
+failure-path rule would reclassify an unknown number of unrelated members.
+Measure that blast radius before changing it. What must not happen is the
+reverse — writing a *non*-throwing `GetVertexElements` because a record says
+`IL_NO_FAILURE_PATH` when the IL says otherwise.
 
 ### `Dispose(Boolean)` reduces to the base call, and it is shown
 

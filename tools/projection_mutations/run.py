@@ -34,6 +34,7 @@ MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
 STATES = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStates.swift"
 BATCH = ROOT / "Sources/CNA/Xna/Graphics/SpriteBatch.swift"
+VERTEXDECL = ROOT / "Sources/CNA/Xna/Graphics/VertexDeclaration.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -396,6 +397,57 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "        super.init(message: objectName)",
     ),
     (
+        "stride-summed-instead-of-maximised",
+        "the vertex stride as a sum of element sizes rather than the widest end",
+        VERTEXDECL,
+        "                let end = element.Offset + typeSize(element.VertexElementFormat)\n"
+        "                if maximum < end { maximum = end }",
+        "                maximum += typeSize(element.VertexElementFormat)",
+    ),
+    (
+        "one-type-size-wrong",
+        "a single VertexElementFormat size off by a half",
+        VERTEXDECL,
+        "            case .HalfVector4: return 8",
+        "            case .HalfVector4: return 4",
+    ),
+    (
+        "duplicate-check-ignores-the-usage-index",
+        "two elements treated as duplicates on usage alone",
+        VERTEXDECL,
+        "                for earlier in elements[..<index] where\n"
+        "                    earlier.VertexElementUsage == element.VertexElementUsage\n"
+        "                    && earlier.UsageIndex == element.UsageIndex {",
+        "                for earlier in elements[..<index] where\n"
+        "                    earlier.VertexElementUsage == element.VertexElementUsage {",
+    ),
+    (
+        "overlap-check-dropped",
+        "two elements allowed to claim the same byte of the vertex",
+        VERTEXDECL,
+        "                    guard owner[byte] < 0 else {",
+        "                    guard true else {",
+    ),
+    (
+        "alignment-checked-before-the-stride-fit",
+        "the two per-element checks in the wrong order, so a doubly-invalid "
+        "element reports the wrong message",
+        VERTEXDECL,
+        "                guard element.Offset >= 0,\n"
+        "                      element.Offset + size <= vertexStride else {",
+        "                guard element.Offset & 3 == 0, element.Offset >= 0,\n"
+        "                      element.Offset + size <= vertexStride else {",
+    ),
+    (
+        "empty-element-array-refused",
+        "an empty element array rejected where XNA accepts it in silence",
+        VERTEXDECL,
+        "            guard !elements.isEmpty else {\n"
+        "                storedElements = nil",
+        "            guard !elements.isEmpty, false else {\n"
+        "                storedElements = nil",
+    ),
+    (
         "default-back-buffer-width-transcribed-wrong",
         "the GraphicsDeviceManager default back-buffer width off by a digit",
         MANAGER,
@@ -441,7 +493,8 @@ def main() -> int:
     originals = {path: path.read_text(encoding="utf-8")
                  for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
                               RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
-                              CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH}}
+                              CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH,
+                              VERTEXDECL}}
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")

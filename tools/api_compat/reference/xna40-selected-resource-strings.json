@@ -45,6 +45,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "DuplicateVertexElement",
+      "value": "Invalid VertexDeclaration. Duplicate element {0}{1}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidEmitterDopplerScale",
       "value": "The doppler scale of an audio emitter must be greater than or equal to zero."
     },
@@ -82,6 +87,21 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OutRangeFieldOfView",
       "value": "{0} takes a value between 0 and Pi (180 degrees) in radians."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexElementOffsetNotMultipleFour",
+      "value": "Invalid VertexDeclaration. Vertex stride and VertexElement.Offset must be multiples of four."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexElementOutsideStride",
+      "value": "Invalid VertexDeclaration. Element {0}{1} does not fit within the specified vertex stride."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexElementsOverlap",
+      "value": "Invalid VertexDeclaration. Elements {0}{1} and {2}{3} are overlapping."
     }
   ]
 }

@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 150,
-    "TARGET_MEMBERS": 1885,
-    "TOTAL_DIAGNOSTICS": 230,
-    "COMPLETE_TYPES": 143,
+    "TARGET_TYPES": 151,
+    "TARGET_MEMBERS": 1890,
+    "TOTAL_DIAGNOSTICS": 229,
+    "COMPLETE_TYPES": 144,
     "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 107,
-    "MISSING_TYPE": 107,
+    "MISSING_TYPES": 106,
+    "MISSING_TYPE": 106,
     "MISSING_MEMBER": 106,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 16,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 20,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,8 +91,8 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 93,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 276,
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 94,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 275,
     "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 11
   },
   "completeTypes": [
@@ -190,6 +190,7 @@
     "Microsoft.Xna.Framework.Graphics.Texture",
     "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
     "Microsoft.Xna.Framework.Graphics.TextureFilter",
+    "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
     "Microsoft.Xna.Framework.Graphics.VertexElement",
     "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
     "Microsoft.Xna.Framework.Graphics.VertexElementUsage",
@@ -326,7 +327,6 @@
     "Microsoft.Xna.Framework.Graphics.TextureCube",
     "Microsoft.Xna.Framework.Graphics.VertexBuffer",
     "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
-    "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
     "Microsoft.Xna.Framework.Graphics.VertexPositionColor",
     "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture",
     "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
@@ -1232,11 +1232,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -4161,6 +4156,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "DuplicateVertexElement",
+      "pinnedValue": "Invalid VertexDeclaration. Duplicate element {0}{1}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "InvalidEmitterDopplerScale",
       "pinnedValue": "The doppler scale of an audio emitter must be greater than or equal to zero.",
       "reproducedInSwiftSource": true
@@ -4205,6 +4206,24 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "OutRangeFieldOfView",
       "pinnedValue": "{0} takes a value between 0 and Pi (180 degrees) in radians.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "VertexElementOffsetNotMultipleFour",
+      "pinnedValue": "Invalid VertexDeclaration. Vertex stride and VertexElement.Offset must be multiples of four.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "VertexElementOutsideStride",
+      "pinnedValue": "Invalid VertexDeclaration. Element {0}{1} does not fit within the specified vertex stride.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "VertexElementsOverlap",
+      "pinnedValue": "Invalid VertexDeclaration. Elements {0}{1} and {2}{3} are overlapping.",
       "reproducedInSwiftSource": true
     }
   ],
@@ -4523,6 +4542,14 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "clrSealed": false,
       "swiftFinal": false,
       "swiftAccess": "open",
@@ -8059,14 +8086,14 @@
       "member": "GetVertexElements",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexElement[]",
       "swiftReturnType": "[Microsoft.Xna.Framework.Graphics.VertexElement]",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "[Microsoft.Xna.Framework.Graphics.VertexElement]"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexElement",
@@ -12072,16 +12099,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexElement",
