@@ -117,6 +117,16 @@ typedef struct CNASwift_Texture2DInfo {
     uint32_t format;
 } CNASwift_Texture2DInfo;
 
+typedef struct CNASwift_Texture2DCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t width;
+    uint32_t height;
+    CNASwift_Bool mip_map;
+    uint8_t reserved[3];
+    uint32_t format;
+} CNASwift_Texture2DCreateInfo;
+
 typedef struct CNASwift_TextureInfo {
     uint32_t struct_size;
     uint32_t struct_version;

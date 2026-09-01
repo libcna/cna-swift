@@ -83,6 +83,52 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 55: the Texture2D constructors -----------------------
+    (
+        "texture-dimension-guard-accepts-zero",
+        "the dimension guard written as `>= 0`, so a zero-sized texture is asked for",
+        TEXTURE2D,
+        "            guard width > 0 else {",
+        "            guard width >= 0 else {",
+    ),
+    (
+        "texture-dimension-guard-blames-the-wrong-parameter",
+        "the height's refusal naming the width",
+        TEXTURE2D,
+        "                throw CNAArgumentOutOfRangeException(\n"
+        "                    paramName: \"height\",",
+        "                throw CNAArgumentOutOfRangeException(\n"
+        "                    paramName: \"width\",",
+    ),
+    (
+        "short-texture-constructor-defaults-to-mipmaps",
+        "the three-parameter constructor forwarding mipMap true, not the IL's ldc.i4.0",
+        TEXTURE2D,
+        "            try self.init(graphicsDevice: graphicsDevice, width: width,\n"
+        "                          height: height, mipMap: false, format: .Color)",
+        "            try self.init(graphicsDevice: graphicsDevice, width: width,\n"
+        "                          height: height, mipMap: true, format: .Color)",
+    ),
+    (
+        # Aimed at the level count and not at the dimensions, because
+        # `build-probe/f55_grants.c` shows CNA granting the requested width and
+        # height EXACTLY in every case tried -- 7x3 and 5000x5000 included --
+        # so "reports what was asked for" and "reports what was granted" are
+        # indistinguishable there and no test could separate them. The level
+        # count is the one field where the grant is not the request: a mipped
+        # 16x16 comes back with five levels and the request carries none.
+        "created-texture-reports-a-level-count-of-its-own",
+        "the granted mip level count replaced by a constant",
+        TEXTURE2D,
+        "                    levelCount: Int32(info.level_count),\n"
+        "                    format: grantedFormat\n"
+        "                )\n"
+        "            } catch {",
+        "                    levelCount: 1,\n"
+        "                    format: grantedFormat\n"
+        "                )\n"
+        "            } catch {",
+    ),
     # ---- Foundation 54: Begin's states and when they are applied ---------
     (
         "deferred-batch-applies-its-states-at-begin",

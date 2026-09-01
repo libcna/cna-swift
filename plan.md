@@ -129,16 +129,16 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=157               TARGET_MEMBERS=1965
+TARGET_TYPES=157               TARGET_MEMBERS=1967
 COMPLETE_TYPES=150             PARTIAL_TYPES=7      MISSING_TYPE=100
-MISSING_MEMBER=71              TOTAL_DIAGNOSTICS=177
+MISSING_MEMBER=69              TOTAL_DIAGNOSTICS=175
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
-XNA_RESOURCE_STRING_PROJECTIONS=34 API_COMPAT_SELF_TESTS=2420
+XNA_RESOURCE_STRING_PROJECTIONS=35 API_COMPAT_SELF_TESTS=2420
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=100`, `MISSING_MEMBER=71`, and `OVERLOAD_MAPPING_MISMATCH=6`,
+`MISSING_TYPE=100`, `MISSING_MEMBER=69`, and `OVERLOAD_MAPPING_MISMATCH=6`,
 whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
 both taking an `Effect`), and one each on `GraphicsDevice.SetRenderTarget`,
 `Texture2D.FromStream` and the two serialization constructors of
@@ -162,12 +162,12 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=84  ROUTE_PAIRINGS=84  PROTOTYPE_TYPE_POSITIONS=266
-CANONICAL_DECLARATION_CHECKS=266  C_SWIFT_MEASUREMENTS=266
-LAYOUTS=26  LAYOUT_FIELDS=228  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
+BOUND_FUNCTIONS=85  ROUTE_PAIRINGS=85  PROTOTYPE_TYPE_POSITIONS=270
+CANONICAL_DECLARATION_CHECKS=270  C_SWIFT_MEASUREMENTS=270
+LAYOUTS=27  LAYOUT_FIELDS=235  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=103  CAUGHT=103  SURVIVORS=0
+PROJECTION_MUTATIONS=107  CAUGHT=107  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected
@@ -177,7 +177,7 @@ is selected, which would report a coverage loss as sixteen projection defects.
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
-(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=34`). The BCL authority
+(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=35`). The BCL authority
 carries `BCL_SENTINEL_CHECKS=433`, `BCL_MUTATION_SELF_TESTS=462`,
 `BCL_CROSS_CHECKS=141` against a second disassembler, and four negative
 controls that are still refused. The four are not the same four binaries as in

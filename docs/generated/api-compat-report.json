@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1965,
-    "TOTAL_DIAGNOSTICS": 177,
+    "TARGET_MEMBERS": 1967,
+    "TOTAL_DIAGNOSTICS": 175,
     "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
     "MISSING_TYPES": 100,
     "MISSING_TYPE": 100,
-    "MISSING_MEMBER": 71,
+    "MISSING_MEMBER": 69,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 34,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 35,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -988,16 +988,6 @@
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32,mipMap:Bool,format:Microsoft.Xna.Framework.Graphics.SurfaceFormat)",
-      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -4065,6 +4055,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "OutRangeFieldOfView",
       "pinnedValue": "{0} takes a value between 0 and Pi (180 degrees) in radians.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ResourcesMustBeGreaterThanZeroSize",
+      "pinnedValue": "Resource size must be greater than zero.",
       "reproducedInSwiftSource": true
     },
     {
@@ -11671,18 +11667,8 @@
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "status": "PARTIAL",
       "expectedMembers": 16,
-      "targetMembers": 4,
+      "targetMembers": 6,
       "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32,mipMap:Bool,format:Microsoft.Xna.Framework.Graphics.SurfaceFormat)",
-          "detail": "mapped member is absent"
-        },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(_:Microsoft.Xna.Framework.Graphics.GraphicsDevice,stream:Foundation.InputStream,width:Int32,height:Int32,zoom:Bool)",

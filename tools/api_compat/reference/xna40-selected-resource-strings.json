@@ -150,6 +150,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ResourcesMustBeGreaterThanZeroSize",
+      "value": "Resource size must be greater than zero."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ScissorInvalid",
       "value": "The scissor rectangle is invalid. The scissor rectangle cannot be larger than or outside of the current render target bounds."
     },

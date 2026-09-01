@@ -188,6 +188,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ResourcesMustBeGreaterThanZeroSize",
+      "reason": "Texture2D.ValidateCreationParameters raises ArgumentOutOfRangeException with this for a non-positive width or height. One message, two parameter names, width tested first."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ScissorInvalid",
       "reason": "GraphicsDevice.set_ScissorRectangle raises ArgumentException with this from three branches: a negative field, an edge past the current render target's bounds, and an extent past them that only an int32 overflow can reach."
     },

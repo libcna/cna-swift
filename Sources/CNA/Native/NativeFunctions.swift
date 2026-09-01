@@ -73,6 +73,7 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceGetViewportRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Viewport>?) -> UInt32
     typealias Texture2dCreateFromEncodedMemoryRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, UnsafePointer<CNASwift_Texture2DDecodeInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias Texture2dGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Texture2DInfo>?) -> UInt32
+    typealias Texture2dCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Texture2DCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias Texture2dDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchBeginWithStatesRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
@@ -165,6 +166,7 @@ internal final class NativeFunctions {
     let graphicsDeviceGetViewport: GraphicsDeviceGetViewportRoute
     let textureCreateMemory: Texture2dCreateFromEncodedMemoryRoute
     let textureGetInfo: Texture2dGetInfoRoute
+    let textureCreate: Texture2dCreateRoute
     let textureDestroy: Texture2dDestroyRoute
     let spriteBatchCreate: SpriteBatchCreateRoute
     let spriteBatchBeginWithStates: SpriteBatchBeginWithStatesRoute
@@ -277,6 +279,7 @@ internal final class NativeFunctions {
         graphicsDeviceGetViewport = try library.resolve("cna_graphics_device_get_viewport", as: GraphicsDeviceGetViewportRoute.self)
         textureCreateMemory = try library.resolve("cna_texture2d_create_from_encoded_memory", as: Texture2dCreateFromEncodedMemoryRoute.self)
         textureGetInfo = try library.resolve("cna_texture2d_get_info", as: Texture2dGetInfoRoute.self)
+        textureCreate = try library.resolve("cna_texture2d_create", as: Texture2dCreateRoute.self)
         textureDestroy = try library.resolve("cna_texture2d_destroy", as: Texture2dDestroyRoute.self)
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
         spriteBatchBeginWithStates = try library.resolve("cna_sprite_batch_begin_with_states", as: SpriteBatchBeginWithStatesRoute.self)

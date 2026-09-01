@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1965
-TOTAL_DIAGNOSTICS=177
+TARGET_MEMBERS=1967
+TOTAL_DIAGNOSTICS=175
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
 MISSING_TYPE=100
-MISSING_MEMBER=71
+MISSING_MEMBER=69
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -72,7 +72,7 @@ NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=34
+XNA_RESOURCE_STRING_PROJECTIONS=35
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -327,10 +327,8 @@ Expected members: 21; emitted members: 12.
 
 ### `Microsoft.Xna.Framework.Graphics.Texture2D`
 
-Expected members: 16; emitted members: 4.
+Expected members: 16; emitted members: 6.
 
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D..ctor(graphicsDevice:Microsoft.Xna.Framework.Graphics.GraphicsDevice,width:Int32,height:Int32,mipMap:Bool,format:Microsoft.Xna.Framework.Graphics.SurfaceFormat)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(_:Microsoft.Xna.Framework.Graphics.GraphicsDevice,stream:Foundation.InputStream,width:Int32,height:Int32,zoom:Bool)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(_:Microsoft.Xna.Framework.Graphics.GraphicsDevice,stream:Foundation.InputStream,width:Int32,height:Int32,zoom:Bool)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsJpeg(_:Foundation.InputStream,width:Int32,height:Int32)`: mapped member is absent

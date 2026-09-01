@@ -44,7 +44,7 @@ KEYS = ROOT / "Sources/CNA/Xna/Input/Keyboard.swift"
 MIRRORED_STRUCTS = [
     "StringView", "Color", "Vector2", "Rectangle", "GameTime", "CallbackError",
     "GameCallbacks", "GameFrameHooks", "GameCreateInfo", "Viewport",
-    "Texture2DInfo", "Texture2DDecodeInfo",
+    "Texture2DInfo", "Texture2DCreateInfo", "Texture2DDecodeInfo",
     "SpriteScaledCommand", "KeyboardState", "GamePadAnalogState",
     "GamePadState", "GamePadCapabilities", "TextureInfo",
     "RenderTarget2DCreateInfo", "RenderTargetInfo",

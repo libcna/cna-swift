@@ -62,6 +62,151 @@ extension Microsoft.Xna.Framework.Graphics {
             runtime.register(self)
         }
 
+        /// `FrameworkResources.ResourcesMustBeGreaterThanZeroSize`, read out
+        /// of the registered `Microsoft.Xna.Framework.dll`. One message serves
+        /// both dimensions; only the parameter name differs.
+        internal static let resourcesMustBeGreaterThanZeroSizeMessage =
+            "Resource size must be greater than zero."
+
+        /// `Texture2D(GraphicsDevice graphicsDevice, Int32 width, Int32 height)`.
+        ///
+        /// Thirty bytes, and every one of them forwards:
+        ///
+        /// ```text
+        /// CreateTexture(graphicsDevice, width, height,
+        ///               mipMap: false, 0, 1, format: SurfaceFormat.Color)
+        /// ```
+        ///
+        /// `ldc.i4.0` for `mipMap` and `ldc.i4.0` for `format` — which is
+        /// `SurfaceFormat.Color`, the zero-valued case — so the short
+        /// constructor is the long one with two literals, not a different
+        /// creation path.
+        ///
+        /// The two arguments between them are `ldc.i4.0` and `ldc.i4.1` in
+        /// **both** constructors, so neither is a projected parameter; they
+        /// are `CreateTexture`'s own D3D usage and pool, and CNA's create
+        /// info has no counterpart for either.
+        public convenience init(
+            graphicsDevice: GraphicsDevice,
+            width: Int32,
+            height: Int32
+        ) throws {
+            try self.init(graphicsDevice: graphicsDevice, width: width,
+                          height: height, mipMap: false, format: .Color)
+        }
+
+        /// `Texture2D(GraphicsDevice, Int32, Int32, Boolean, SurfaceFormat)`.
+        ///
+        /// Both constructors wrap `CreateTexture` in a `try`/`finally` whose
+        /// handler is `this.Dispose(true)`: a texture whose creation throws
+        /// disposes itself on the way out. There is nothing to dispose here —
+        /// the Swift initializer has no handle until the native create
+        /// succeeds, and a failed `init` never produces an object — so the
+        /// handler has no counterpart rather than an empty one.
+        ///
+        /// CNA reports back what it actually granted, and those values become
+        /// `Width`, `Height`, `LevelCount` and `Format` rather than the ones
+        /// that were asked for. `RenderTarget2D` reads its own grants the same
+        /// way, and for the same reason: "preferred" is what the parameter
+        /// name means.
+        public convenience init(
+            graphicsDevice: GraphicsDevice,
+            width: Int32,
+            height: Int32,
+            mipMap: Bool,
+            format: SurfaceFormat
+        ) throws {
+            // `Texture2D.ValidateCreationParameters(width, height, format,
+            // mipMap)` opens with two `bgt` tests against zero, each naming
+            // its own parameter:
+            //
+            //     if (width  <= 0) throw new ArgumentOutOfRangeException(
+            //         "width",  ResourcesMustBeGreaterThanZeroSize);
+            //     if (height <= 0) throw new ArgumentOutOfRangeException(
+            //         "height", ResourcesMustBeGreaterThanZeroSize);
+            //
+            // One message, two parameter names, and the width is tested
+            // first -- so a texture that is invalid in both dimensions blames
+            // the width.
+            //
+            // What follows in that method is the GraphicsProfile capability
+            // family -- DXT alignment, power-of-two rules, the maximum size
+            // for the profile in force, and format support. None of it is
+            // projected, and the blocker is named in
+            // `tools/api_compat/recorded-message-absences.json`: the checks
+            // read the device's profile, and `GraphicsDevice.GraphicsProfile`
+            // is not a projected member. Inventing a profile to check against
+            // would fabricate the fact the check depends on.
+            guard width > 0 else {
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "width",
+                    message: Texture2D.resourcesMustBeGreaterThanZeroSizeMessage)
+            }
+            guard height > 0 else {
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "height",
+                    message: Texture2D.resourcesMustBeGreaterThanZeroSizeMessage)
+            }
+            let deviceHandle = try graphicsDevice.validatedHandle("Texture2D.init")
+            let runtime = graphicsDevice.runtimeState
+
+            var create = CNASwift_Texture2DCreateInfo()
+            create.struct_size = UInt32(MemoryLayout<CNASwift_Texture2DCreateInfo>.size)
+            create.struct_version = 1
+            create.width = UInt32(bitPattern: width)
+            create.height = UInt32(bitPattern: height)
+            create.mip_map = mipMap ? 1 : 0
+            create.format = UInt32(bitPattern: format.rawValue)
+
+            var handle: UInt64 = 0
+            try runtime.functions.check(
+                withUnsafePointer(to: &create) {
+                    runtime.functions.textureCreate(deviceHandle, $0, &handle)
+                },
+                operation: "cna_texture2d_create"
+            )
+
+            var info = CNASwift_Texture2DInfo()
+            info.struct_size = UInt32(MemoryLayout<CNASwift_Texture2DInfo>.size)
+            info.struct_version = 1
+            do {
+                try runtime.functions.check(
+                    runtime.functions.textureGetInfo(handle, &info),
+                    operation: "cna_texture2d_get_info"
+                )
+                guard info.width <= UInt32(Int32.max), info.height <= UInt32(Int32.max),
+                      info.level_count <= UInt32(Int32.max) else {
+                    throw CNAError.nativeFailure(
+                        operation: "Texture2D dimensions", result: 10,
+                        message: "dimensions exceed the XNA Int32 range")
+                }
+                guard let grantedFormat = SurfaceFormat(
+                    rawValue: Int32(bitPattern: info.format)) else {
+                    throw CNAError.nativeFailure(
+                        operation: "Texture2D.Format", result: 1,
+                        message: "native surface format \(info.format) is not an XNA SurfaceFormat")
+                }
+                self.init(
+                    handle: handle,
+                    runtime: runtime,
+                    device: graphicsDevice,
+                    typeName: "Texture2D",
+                    destroy: runtime.functions.textureDestroy,
+                    width: Int32(info.width),
+                    height: Int32(info.height),
+                    levelCount: Int32(info.level_count),
+                    format: grantedFormat
+                )
+            } catch {
+                // The native texture exists and this initializer will not
+                // return an object to own it, so it is released here. This is
+                // the counterpart of XNA's `finally`, at the only place a
+                // Swift initializer can put one.
+                _ = runtime.functions.textureDestroy(handle)
+                throw error
+            }
+        }
+
         public static func FromStream(
             _ graphicsDevice: GraphicsDevice,
             stream: InputStream
