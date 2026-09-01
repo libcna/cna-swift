@@ -43,6 +43,11 @@
   "selectedResourceStrings": [
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "BackBufferDimMustBePositive",
+      "reason": "GraphicsDeviceManager.set_PreferredBackBufferWidth and set_PreferredBackBufferHeight both raise ArgumentOutOfRangeException with this for a non-positive value. One message names both dimensions whichever setter raised it."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "CannotAddSameComponentMultipleTimes",
       "reason": "GameComponentCollection.InsertItem raises ArgumentException with this when the item is already present."
     },

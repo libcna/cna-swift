@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1942,
-    "TOTAL_DIAGNOSTICS": 208,
+    "TARGET_MEMBERS": 1952,
+    "TOTAL_DIAGNOSTICS": 198,
     "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
     "MISSING_TYPES": 100,
     "MISSING_TYPE": 100,
-    "MISSING_MEMBER": 94,
+    "MISSING_MEMBER": 84,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 33,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 34,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -1156,11 +1156,6 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)",
       "detail": "mapped member is absent"
     },
@@ -1207,51 +1202,6 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnPreparingDeviceSettings(_:Any?,args:Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsProfile()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredDepthStencilFormat()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferFormat()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferWidth()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferHeight()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.IsFullScreen()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.SynchronizeWithVerticalRetrace()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferMultiSampling()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.SupportedOrientations()",
       "detail": "mapped member is absent"
     },
     {
@@ -2558,28 +2508,28 @@
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "sourceProperty": "PreferredBackBufferWidth",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferWidth()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.GraphicsDeviceManager.SetPreferredBackBufferWidth(_:Int32)",
       "writerName": "SetPreferredBackBufferWidth",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "sourceProperty": "PreferredBackBufferHeight",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferHeight()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.GraphicsDeviceManager.SetPreferredBackBufferHeight(_:Int32)",
       "writerName": "SetPreferredBackBufferHeight",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -4048,6 +3998,12 @@
     }
   ],
   "xnaResourceStringProjections": [
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "BackBufferDimMustBePositive",
+      "pinnedValue": "BackBufferWidth and BackBufferHeight must be greater than zero.",
+      "reproducedInSwiftSource": true
+    },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "resourceKey": "CannotAddSameComponentMultipleTimes",
@@ -12118,13 +12074,8 @@
       "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "status": "PARTIAL",
       "expectedMembers": 30,
-      "targetMembers": 10,
+      "targetMembers": 20,
       "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.ToggleFullScreen()",
-          "detail": "mapped member is absent"
-        },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)",
@@ -12173,51 +12124,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnPreparingDeviceSettings(_:Any?,args:Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.GraphicsProfile()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredDepthStencilFormat()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferFormat()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferWidth()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferredBackBufferHeight()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.IsFullScreen()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.SynchronizeWithVerticalRetrace()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreferMultiSampling()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.SupportedOrientations()",
           "detail": "mapped member is absent"
         },
         {

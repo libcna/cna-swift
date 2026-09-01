@@ -152,6 +152,7 @@ def canonical_type(value: str) -> str:
         "CNA_ClearOptions": "uint32_t", "CNA_SurfaceFormat": "uint32_t",
         "CNA_DepthFormat": "uint32_t", "CNA_PresentInterval": "uint32_t",
         "CNA_DisplayOrientation": "uint32_t", "CNA_RenderTargetUsage": "uint32_t",
+        "CNA_GraphicsProfile": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

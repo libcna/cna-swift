@@ -5,6 +5,11 @@
   "resourceStrings": [
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "BackBufferDimMustBePositive",
+      "value": "BackBufferWidth and BackBufferHeight must be greater than zero."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "CannotAddSameComponentMultipleTimes",
       "value": "Cannot add the same game component to a game component collection multiple times."
     },

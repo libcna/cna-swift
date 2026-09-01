@@ -148,16 +148,266 @@ extension Microsoft.Xna.Framework {
         /// `IGraphicsDeviceService.DeviceResetting`.
         public var DeviceResetting: CNAEvent<CNAEventArgs> { deviceResettingSource.Event }
 
+        // ------------------------------------------------------------------
+        // The preferences.
+        //
+        // XNA keeps every one of these in a managed field and applies them at
+        // `ChangeDevice`, which is what `ApplyChanges`, `ToggleFullScreen` and
+        // `CreateDevice` all reach. That is not an implementation detail to
+        // route around: it is the reason every getter is a bare `ldfld` and
+        // therefore `IL_NO_FAILURE_PATH`. Reading them back from CNA would
+        // make each one fallible and contradict the pinned verdict, the same
+        // wall `GraphicsDevice.PresentationParameters` hit in Foundation 48.
+        //
+        // So the managed field is the value, and CNA is told at the same
+        // moments XNA tells Direct3D. CNA's own header agrees with the
+        // division: "Every preference route here records a request;
+        // cna_graphics_device_manager_apply_changes is what acts on it."
+        //
+        // The two sides start in the same place, which is measured rather than
+        // assumed. `build-probe/f51_manager_prefs.c` reads CNA's manager
+        // before anything is applied and gets Reach, 800x480, Color, Depth24,
+        // windowed, no multisampling, vsync on, orientation Default -- every
+        // one of the eight the pinned `.ctor` sets, including the `ldc.i4.1`
+        // that makes `SynchronizeWithVerticalRetrace` true.
+
+        /// `graphicsProfile`. CLR default, which is `GraphicsProfile.Reach`.
+        private var graphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile = .Reach
+
+        /// `backBufferFormat`. CLR default, which is `SurfaceFormat.Color`.
+        private var backBufferFormat: Microsoft.Xna.Framework.Graphics.SurfaceFormat = .Color
+
+        /// `backBufferWidth`, assigned `DefaultBackBufferWidth` by the `.ctor`.
+        private var backBufferWidth: Int32 = GraphicsDeviceManager.DefaultBackBufferWidth
+
+        /// `backBufferHeight`, assigned `DefaultBackBufferHeight`.
+        private var backBufferHeight: Int32 = GraphicsDeviceManager.DefaultBackBufferHeight
+
+        /// `depthStencilFormat`, assigned `ldc.i4.2` — `DepthFormat.Depth24`.
+        /// Not the CLR default, which would be `DepthFormat.None`.
+        private var depthStencilFormat: Microsoft.Xna.Framework.Graphics.DepthFormat = .Depth24
+
+        /// `isFullScreen`. CLR default false.
+        private var isFullScreenPreference = false
+
+        /// `preferMultiSampling`. CLR default false.
+        private var preferMultiSamplingPreference = false
+
+        /// `synchronizeWithVerticalRetrace`, assigned `ldc.i4.1` — true. It is
+        /// the `.ctor`'s very first instruction.
+        private var synchronizeWithVerticalRetracePreference = true
+
+        /// `supportedOrientations`. CLR default, the empty `DisplayOrientation`.
+        private var supportedOrientationsPreference: Microsoft.Xna.Framework.DisplayOrientation = []
+
+        /// `isDeviceDirty`, set by every setter and read by `ApplyChanges`.
+        private var isDeviceDirty = false
+
+        /// `useResizedBackBuffer`, which only the two dimension setters clear.
+        /// Nothing reads it yet: `GameWindow` is not projected, and XNA's own
+        /// readers of this field are all inside `ChangeDevice`'s window
+        /// negotiation. It is stored because the setters store it, and its
+        /// absence of readers is recorded rather than hidden by leaving it out.
+        private var useResizedBackBuffer = false
+
+        /// `GraphicsDeviceManager.GraphicsProfile`.
+        ///
+        /// Every setter below is `stfld` followed by `isDeviceDirty = true`,
+        /// and every getter is the matching `ldfld`. The setters are
+        /// infallible, so they project as Swift `set` accessors — the two
+        /// exceptions are `PreferredBackBufferWidth` and `Height`, whose CLR
+        /// setters throw and therefore become writer methods.
+        public var GraphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile {
+            get { graphicsProfile }
+            set { graphicsProfile = newValue; isDeviceDirty = true }
+        }
+
+        /// `GraphicsDeviceManager.PreferredBackBufferFormat`.
+        public var PreferredBackBufferFormat: Microsoft.Xna.Framework.Graphics.SurfaceFormat {
+            get { backBufferFormat }
+            set { backBufferFormat = newValue; isDeviceDirty = true }
+        }
+
+        /// `GraphicsDeviceManager.PreferredDepthStencilFormat`.
+        public var PreferredDepthStencilFormat: Microsoft.Xna.Framework.Graphics.DepthFormat {
+            get { depthStencilFormat }
+            set { depthStencilFormat = newValue; isDeviceDirty = true }
+        }
+
+        /// `GraphicsDeviceManager.IsFullScreen`.
+        public var IsFullScreen: Bool {
+            get { isFullScreenPreference }
+            set { isFullScreenPreference = newValue; isDeviceDirty = true }
+        }
+
+        /// `GraphicsDeviceManager.PreferMultiSampling`.
+        public var PreferMultiSampling: Bool {
+            get { preferMultiSamplingPreference }
+            set { preferMultiSamplingPreference = newValue; isDeviceDirty = true }
+        }
+
+        /// `GraphicsDeviceManager.SynchronizeWithVerticalRetrace`.
+        public var SynchronizeWithVerticalRetrace: Bool {
+            get { synchronizeWithVerticalRetracePreference }
+            set { synchronizeWithVerticalRetracePreference = newValue; isDeviceDirty = true }
+        }
+
+        /// `GraphicsDeviceManager.SupportedOrientations`.
+        public var SupportedOrientations: Microsoft.Xna.Framework.DisplayOrientation {
+            get { supportedOrientationsPreference }
+            set { supportedOrientationsPreference = newValue; isDeviceDirty = true }
+        }
+
+        /// `GraphicsDeviceManager.PreferredBackBufferWidth`.
+        ///
+        /// The reader only; the CLR setter is fallible and Swift has no
+        /// throwing setter, so it is `SetPreferredBackBufferWidth` below.
+        public var PreferredBackBufferWidth: Int32 { backBufferWidth }
+
+        /// `GraphicsDeviceManager.set_PreferredBackBufferWidth(Int32 value)`.
+        ///
+        /// ```text
+        /// if (value <= 0)
+        ///     throw new ArgumentOutOfRangeException(
+        ///         "value", Resources.BackBufferDimMustBePositive);
+        /// backBufferWidth = value;
+        /// useResizedBackBuffer = false;
+        /// isDeviceDirty = true;
+        /// ```
+        ///
+        /// `bgt` against zero, so zero is rejected along with every negative.
+        /// CNA would have taken either: its own setter "records whatever it is
+        /// given, including a value that no adapter can present", and
+        /// `build-probe/f51_manager_prefs.c` watched it accept `-5`. The
+        /// validation is XNA's and belongs here.
+        public func SetPreferredBackBufferWidth(_ value: Int32) throws {
+            guard value > 0 else {
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "value",
+                    message: GraphicsDeviceManager.backBufferDimMustBePositiveMessage)
+            }
+            backBufferWidth = value
+            useResizedBackBuffer = false
+            isDeviceDirty = true
+        }
+
+        /// `GraphicsDeviceManager.PreferredBackBufferHeight`.
+        public var PreferredBackBufferHeight: Int32 { backBufferHeight }
+
+        /// `GraphicsDeviceManager.set_PreferredBackBufferHeight(Int32 value)`,
+        /// which is `set_PreferredBackBufferWidth` with one field changed —
+        /// including the shared `"value"` parameter name and the shared
+        /// message.
+        public func SetPreferredBackBufferHeight(_ value: Int32) throws {
+            guard value > 0 else {
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "value",
+                    message: GraphicsDeviceManager.backBufferDimMustBePositiveMessage)
+            }
+            backBufferHeight = value
+            useResizedBackBuffer = false
+            isDeviceDirty = true
+        }
+
+        /// The exact `BackBufferDimMustBePositive` message, read out of
+        /// `Microsoft.Xna.Framework.Game.dll`'s own resource table. It names
+        /// both dimensions whichever setter raised it.
+        internal static let backBufferDimMustBePositiveMessage =
+            "BackBufferWidth and BackBufferHeight must be greater than zero."
+
+        /// `GraphicsDeviceManager.ToggleFullScreen()`.
+        ///
+        /// ```text
+        /// this.IsFullScreen = !this.IsFullScreen;
+        /// this.ChangeDevice(false);
+        /// ```
+        ///
+        /// Written as XNA writes it — through the property, then a device
+        /// change — rather than through CNA's own
+        /// `cna_graphics_device_manager_toggle_full_screen`, which stays
+        /// unbound. The two reach the same state: the probe toggles natively
+        /// and then set-and-applies to the same values, and CNA reports the
+        /// same `is_full_screen` either way. Going through the property is
+        /// what keeps the managed field, which every getter reads, correct.
+        public func ToggleFullScreen() throws {
+            IsFullScreen = !IsFullScreen
+            try changeDevice()
+        }
+
+        /// XNA's `ChangeDevice`, reduced to what this binding owns: hand CNA
+        /// the recorded preferences and let it apply them.
+        ///
+        /// XNA's own body enumerates adapters, ranks candidate device
+        /// configurations, and creates a Direct3D device. CNA does all of that
+        /// and is not Direct3D, which is why the seven messages that body
+        /// raises are recorded as `native-owned` in
+        /// `tools/api_compat/recorded-message-absences.json` rather than
+        /// invented here.
+        private func changeDevice() throws {
+            let handle = try storage.validatedHandle("GraphicsDeviceManager.ChangeDevice")
+            try pushPreferences(handle: handle)
+            try storage.runtime.functions.check(
+                storage.runtime.functions.graphicsManagerApplyChanges(handle),
+                operation: "cna_graphics_device_manager_apply_changes")
+            isDeviceDirty = false
+        }
+
+        /// The nine recorded preferences, handed to CNA in one place so that
+        /// `CreateDevice` and `ChangeDevice` cannot drift apart.
+        private func pushPreferences(handle: UInt64) throws {
+            let functions = storage.runtime.functions
+            try functions.check(
+                functions.graphicsManagerSetGraphicsProfile(
+                    handle, UInt32(bitPattern: graphicsProfile.rawValue)),
+                operation: "cna_graphics_device_manager_set_graphics_profile")
+            try functions.check(
+                functions.graphicsManagerSetPreferredBackBufferFormat(
+                    handle, UInt32(bitPattern: backBufferFormat.rawValue)),
+                operation: "cna_graphics_device_manager_set_preferred_back_buffer_format")
+            try functions.check(
+                functions.graphicsManagerSetPreferredDepthStencilFormat(
+                    handle, UInt32(bitPattern: depthStencilFormat.rawValue)),
+                operation: "cna_graphics_device_manager_set_preferred_depth_stencil_format")
+            try functions.check(
+                functions.graphicsManagerSetPreferredBackBufferWidth(handle, backBufferWidth),
+                operation: "cna_graphics_device_manager_set_preferred_back_buffer_width")
+            try functions.check(
+                functions.graphicsManagerSetPreferredBackBufferHeight(handle, backBufferHeight),
+                operation: "cna_graphics_device_manager_set_preferred_back_buffer_height")
+            try functions.check(
+                functions.graphicsManagerSetIsFullScreen(handle, isFullScreenPreference ? 1 : 0),
+                operation: "cna_graphics_device_manager_set_is_full_screen")
+            try functions.check(
+                functions.graphicsManagerSetPreferMultiSampling(
+                    handle, preferMultiSamplingPreference ? 1 : 0),
+                operation: "cna_graphics_device_manager_set_prefer_multi_sampling")
+            try functions.check(
+                functions.graphicsManagerSetSynchronizeWithVerticalRetrace(
+                    handle, synchronizeWithVerticalRetracePreference ? 1 : 0),
+                operation: "cna_graphics_device_manager_set_synchronize_with_vertical_retrace")
+            try functions.check(
+                functions.graphicsManagerSetSupportedOrientations(
+                    handle, UInt32(bitPattern: supportedOrientationsPreference.rawValue)),
+                operation: "cna_graphics_device_manager_set_supported_orientations")
+        }
+
         /// `IGraphicsDeviceManager.CreateDevice()`.
         ///
         /// `Game.RunGame` calls this on the registered manager before
         /// `Initialize`, which is what makes a device exist at all.
         public func CreateDevice() throws {
             let handle = try storage.validatedHandle("GraphicsDeviceManager.CreateDevice")
+            // XNA's `IGraphicsDeviceManager.CreateDevice` reaches
+            // `ChangeDevice(true)`, so the preferences recorded before the
+            // first device exists are the ones it is created with. Pushing
+            // them here is what makes a game that sets
+            // `PreferredBackBufferWidth` in its constructor get that width.
+            try pushPreferences(handle: handle)
             try storage.runtime.functions.check(
                 storage.runtime.functions.graphicsManagerCreateDevice(handle),
                 operation: "cna_graphics_device_manager_create_device"
             )
+            isDeviceDirty = false
         }
 
         /// `IGraphicsDeviceManager.BeginDraw()`.
@@ -180,12 +430,26 @@ extension Microsoft.Xna.Framework {
             )
         }
 
+        /// `GraphicsDeviceManager.ApplyChanges()`.
+        ///
+        /// ```text
+        /// if (device != null && !isDeviceDirty) return;
+        /// ChangeDevice(false);
+        /// ```
+        ///
+        /// Twenty-five bytes, and the first fourteen are the short-circuit
+        /// this projection did not have: with a device already made and no
+        /// preference touched since, `ApplyChanges` does **nothing**. It used
+        /// to call CNA unconditionally, which is a device reconfiguration on
+        /// every call.
+        ///
+        /// `device != null` is `GraphicsDevice != nil` here, which is only
+        /// true inside a lifecycle callback — so outside one the branch falls
+        /// through to the device change, exactly as it does in XNA before the
+        /// device exists.
         public func ApplyChanges() throws {
-            let handle = try storage.validatedHandle("GraphicsDeviceManager.ApplyChanges")
-            try storage.runtime.functions.check(
-                storage.runtime.functions.graphicsManagerApplyChanges(handle),
-                operation: "cna_graphics_device_manager_apply_changes"
-            )
+            if GraphicsDevice != nil, !isDeviceDirty { return }
+            try changeDevice()
         }
 
         public func Dispose() throws {
@@ -219,6 +483,13 @@ extension Microsoft.Xna.Framework {
         internal static let eventDeviceDisposing: UInt32 = 2
         internal static let eventDeviceReset: UInt32 = 3
         internal static let eventDeviceResetting: UInt32 = 4
+
+        /// The native manager handle, for the tests that check what CNA holds
+        /// against what the managed fields say. Internal, and used only to
+        /// observe: nothing in the projection reads a preference back.
+        internal func nativeHandleForTests() throws -> UInt64 {
+            try storage.validatedHandle("GraphicsDeviceManager test observation")
+        }
 
         /// How many manager subscriptions are live, for the test that asserts
         /// they are real and are released.

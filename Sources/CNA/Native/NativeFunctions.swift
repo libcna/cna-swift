@@ -60,6 +60,15 @@ internal final class NativeFunctions {
     typealias GameGetGraphicsDeviceRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceManagerCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceManagerApplyChangesRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsDeviceManagerSetGraphicsProfileRoute = @convention(c) (UInt64, UInt32) -> UInt32
+    typealias GraphicsDeviceManagerSetIsFullScreenRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias GraphicsDeviceManagerSetPreferMultiSamplingRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias GraphicsDeviceManagerSetPreferredBackBufferFormatRoute = @convention(c) (UInt64, UInt32) -> UInt32
+    typealias GraphicsDeviceManagerSetPreferredBackBufferWidthRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias GraphicsDeviceManagerSetPreferredBackBufferHeightRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias GraphicsDeviceManagerSetPreferredDepthStencilFormatRoute = @convention(c) (UInt64, UInt32) -> UInt32
+    typealias GraphicsDeviceManagerSetSynchronizeWithVerticalRetraceRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias GraphicsDeviceManagerSetSupportedOrientationsRoute = @convention(c) (UInt64, UInt32) -> UInt32
     typealias GraphicsDeviceManagerDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceGetViewportRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Viewport>?) -> UInt32
     typealias Texture2dCreateFromEncodedMemoryRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, UnsafePointer<CNASwift_Texture2DDecodeInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
@@ -142,6 +151,15 @@ internal final class NativeFunctions {
     let gameGetGraphicsDevice: GameGetGraphicsDeviceRoute
     let graphicsManagerCreate: GraphicsDeviceManagerCreateRoute
     let graphicsManagerApplyChanges: GraphicsDeviceManagerApplyChangesRoute
+    let graphicsManagerSetGraphicsProfile: GraphicsDeviceManagerSetGraphicsProfileRoute
+    let graphicsManagerSetIsFullScreen: GraphicsDeviceManagerSetIsFullScreenRoute
+    let graphicsManagerSetPreferMultiSampling: GraphicsDeviceManagerSetPreferMultiSamplingRoute
+    let graphicsManagerSetPreferredBackBufferFormat: GraphicsDeviceManagerSetPreferredBackBufferFormatRoute
+    let graphicsManagerSetPreferredBackBufferWidth: GraphicsDeviceManagerSetPreferredBackBufferWidthRoute
+    let graphicsManagerSetPreferredBackBufferHeight: GraphicsDeviceManagerSetPreferredBackBufferHeightRoute
+    let graphicsManagerSetPreferredDepthStencilFormat: GraphicsDeviceManagerSetPreferredDepthStencilFormatRoute
+    let graphicsManagerSetSynchronizeWithVerticalRetrace: GraphicsDeviceManagerSetSynchronizeWithVerticalRetraceRoute
+    let graphicsManagerSetSupportedOrientations: GraphicsDeviceManagerSetSupportedOrientationsRoute
     let graphicsManagerDestroy: GraphicsDeviceManagerDestroyRoute
     let graphicsDeviceGetViewport: GraphicsDeviceGetViewportRoute
     let textureCreateMemory: Texture2dCreateFromEncodedMemoryRoute
@@ -244,6 +262,15 @@ internal final class NativeFunctions {
         gameGetGraphicsDevice = try library.resolve("cna_game_get_graphics_device", as: GameGetGraphicsDeviceRoute.self)
         graphicsManagerCreate = try library.resolve("cna_graphics_device_manager_create", as: GraphicsDeviceManagerCreateRoute.self)
         graphicsManagerApplyChanges = try library.resolve("cna_graphics_device_manager_apply_changes", as: GraphicsDeviceManagerApplyChangesRoute.self)
+        graphicsManagerSetGraphicsProfile = try library.resolve("cna_graphics_device_manager_set_graphics_profile", as: GraphicsDeviceManagerSetGraphicsProfileRoute.self)
+        graphicsManagerSetIsFullScreen = try library.resolve("cna_graphics_device_manager_set_is_full_screen", as: GraphicsDeviceManagerSetIsFullScreenRoute.self)
+        graphicsManagerSetPreferMultiSampling = try library.resolve("cna_graphics_device_manager_set_prefer_multi_sampling", as: GraphicsDeviceManagerSetPreferMultiSamplingRoute.self)
+        graphicsManagerSetPreferredBackBufferFormat = try library.resolve("cna_graphics_device_manager_set_preferred_back_buffer_format", as: GraphicsDeviceManagerSetPreferredBackBufferFormatRoute.self)
+        graphicsManagerSetPreferredBackBufferWidth = try library.resolve("cna_graphics_device_manager_set_preferred_back_buffer_width", as: GraphicsDeviceManagerSetPreferredBackBufferWidthRoute.self)
+        graphicsManagerSetPreferredBackBufferHeight = try library.resolve("cna_graphics_device_manager_set_preferred_back_buffer_height", as: GraphicsDeviceManagerSetPreferredBackBufferHeightRoute.self)
+        graphicsManagerSetPreferredDepthStencilFormat = try library.resolve("cna_graphics_device_manager_set_preferred_depth_stencil_format", as: GraphicsDeviceManagerSetPreferredDepthStencilFormatRoute.self)
+        graphicsManagerSetSynchronizeWithVerticalRetrace = try library.resolve("cna_graphics_device_manager_set_synchronize_with_vertical_retrace", as: GraphicsDeviceManagerSetSynchronizeWithVerticalRetraceRoute.self)
+        graphicsManagerSetSupportedOrientations = try library.resolve("cna_graphics_device_manager_set_supported_orientations", as: GraphicsDeviceManagerSetSupportedOrientationsRoute.self)
         graphicsManagerDestroy = try library.resolve("cna_graphics_device_manager_destroy", as: GraphicsDeviceManagerDestroyRoute.self)
         graphicsDeviceGetViewport = try library.resolve("cna_graphics_device_get_viewport", as: GraphicsDeviceGetViewportRoute.self)
         textureCreateMemory = try library.resolve("cna_texture2d_create_from_encoded_memory", as: Texture2dCreateFromEncodedMemoryRoute.self)

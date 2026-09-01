@@ -11,7 +11,7 @@ package enforces the same thing with `COMPATIBILITY SameMajorVersion`. Under
 the generation this binding was measured against.
 
 A later minor is admitted by that rule. The protection against a later minor
-that removed a route is not a version number: every one of the 74 bound symbols
+that removed a route is not a version number: every one of the 83 bound symbols
 must resolve by name before the runtime starts, and a missing one throws
 `CNAError.missingNativeSymbol`.
 
@@ -55,8 +55,8 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=74  ROUTE_PAIRINGS=74  PROTOTYPE_TYPE_POSITIONS=231
-CANONICAL_DECLARATION_CHECKS=231  C_SWIFT_MEASUREMENTS=231
+BOUND_FUNCTIONS=83  ROUTE_PAIRINGS=83  PROTOTYPE_TYPE_POSITIONS=258
+CANONICAL_DECLARATION_CHECKS=258  C_SWIFT_MEASUREMENTS=258
 LAYOUTS=26  LAYOUT_FIELDS=222  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
@@ -183,6 +183,17 @@ from 212 to 215. They are compiled rather than tested because no runtime
 observation on a HEADLESS device can see which buffers a clear touched;
 `docs/foundation-48-clear-evidence.md` records that and the one realistic
 defect that consequently has no mutation control.
+
+## The manager preference routes
+
+Foundation 51 bound the nine `cna_graphics_device_manager_set_*` preference
+routes and **none** of the nine matching getters. XNA keeps every preference in
+a managed field — which is what makes each of its getters
+`IL_NO_FAILURE_PATH` — and applies them at `ChangeDevice`, so the projection
+has a member that consumes each setter and no member that would consume a
+getter. `cna_graphics_device_manager_toggle_full_screen` is unbound for the
+same reason: `ToggleFullScreen` is projected as XNA writes it, through the
+property and a device change, and the probe shows the two reach the same state.
 
 `cna_blend_state_init` and its three neighbours are still **not** bound. They
 are CNA's own preset descriptors, and the Swift presets come from the pinned

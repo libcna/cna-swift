@@ -83,6 +83,70 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 51: the GraphicsDeviceManager preferences ------------
+    (
+        "vsync-default-taken-from-the-clr",
+        "SynchronizeWithVerticalRetrace defaulting to false, not the ctor's ldc.i4.1",
+        MANAGER,
+        "        private var synchronizeWithVerticalRetracePreference = true",
+        "        private var synchronizeWithVerticalRetracePreference = false",
+    ),
+    (
+        "depth-preference-default-taken-from-the-clr",
+        "PreferredDepthStencilFormat defaulting to None, not the ctor's ldc.i4.2",
+        MANAGER,
+        "        private var depthStencilFormat: Microsoft.Xna.Framework.Graphics.DepthFormat = .Depth24",
+        "        private var depthStencilFormat: Microsoft.Xna.Framework.Graphics.DepthFormat = .None",
+    ),
+    (
+        "dimension-setter-accepts-zero",
+        "the dimension guard written as `>= 0`, so zero is accepted",
+        MANAGER,
+        "        public func SetPreferredBackBufferWidth(_ value: Int32) throws {\n"
+        "            guard value > 0 else {",
+        "        public func SetPreferredBackBufferWidth(_ value: Int32) throws {\n"
+        "            guard value >= 0 else {",
+    ),
+    (
+        "dimension-refusal-still-stores",
+        "the width stored before the guard, so a refused value takes effect",
+        MANAGER,
+        "            backBufferWidth = value\n"
+        "            useResizedBackBuffer = false",
+        "            backBufferWidth = max(value, backBufferWidth)\n"
+        "            useResizedBackBuffer = false",
+    ),
+    (
+        "apply-changes-loses-its-short-circuit",
+        "ApplyChanges reconfiguring the device on every call again",
+        MANAGER,
+        "            if GraphicsDevice != nil, !isDeviceDirty { return }",
+        "            if GraphicsDevice != nil, isDeviceDirty { return }",
+    ),
+    (
+        "a-preference-setter-forgets-the-dirty-flag",
+        "a setter that stores without marking the device dirty",
+        MANAGER,
+        "            set { preferMultiSamplingPreference = newValue; isDeviceDirty = true }",
+        "            set { preferMultiSamplingPreference = newValue }",
+    ),
+    (
+        "toggle-full-screen-does-not-apply",
+        "ToggleFullScreen flipping the field and never changing the device",
+        MANAGER,
+        "            IsFullScreen = !IsFullScreen\n"
+        "            try changeDevice()",
+        "            IsFullScreen = !IsFullScreen",
+    ),
+    (
+        "a-pushed-preference-is-dropped",
+        "the back-buffer height never handed to CNA",
+        MANAGER,
+        "            try functions.check(\n"
+        "                functions.graphicsManagerSetPreferredBackBufferHeight(handle, backBufferHeight),\n"
+        "                operation: \"cna_graphics_device_manager_set_preferred_back_buffer_height\")",
+        "            _ = backBufferHeight",
+    ),
     # ---- Foundation 50: the messages implemented members raise -----------
     (
         "sprite-batch-second-begin-unguarded",

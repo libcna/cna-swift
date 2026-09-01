@@ -79,13 +79,13 @@
       "type": "Microsoft.Xna.Framework.Input.GamePad",
       "key": "InvalidController",
       "kind": "deferred",
-      "reason": "XNA raises InvalidOperationException(InvalidController) when XInput returns any error other than ERROR_DEVICE_NOT_CONNECTED (0x48f). The projection surfaces CNA's own failure on the runtime channel instead. This is a real error-channel difference and not an unreachable branch: deciding it needs CNA's gamepad failure modes measured against XInput's two-case split, which is its own milestone."
+      "reason": "XNA splits XInput's result in two: ERROR_DEVICE_NOT_CONNECTED (0x48f) returns a GamePadState with IsConnected false, and every other error raises InvalidOperationException(InvalidController). CNA already matches the first half -- cna_gamepad_get_state answers SUCCESS for a disconnected pad and reports its real disconnected state, measured in docs/generated/gamepad-native-report.json. The second half has no input that reaches it here: PlayerIndex is a closed Swift enum, the handle is validated before the call, and no HEADLESS failure of this route has been produced. Projecting the diagnosis would add a branch no test could reach and no mutation could falsify -- the rule Foundation 45's withdrawn dirty-flag mutation and Foundation 48's unfalsifiable clear mask both follow. Revisit when a controller is attached, or when a CNA input failure can be induced."
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Keyboard",
       "key": "CouldNotReadKeyboard",
       "kind": "deferred",
-      "reason": "XNA formats this with the Win32 GetLastError value when GetKeyboardState fails. The projection surfaces CNA's failure on the runtime channel. Same open question as GamePad.InvalidController and the same milestone."
+      "reason": "XNA formats this with the Win32 GetLastError value when GetKeyboardState fails. Same shape and same blocker as GamePad.InvalidController: cna_keyboard_get_state does not fail on the qualified HEADLESS artifact, so the branch has no reachable input, no test and no possible mutation control. The message's own placeholder says 'result code' rather than 'Win32 error', so CNA's result would be an honest substitution the day the branch is reachable."
     }
   ]
 }
