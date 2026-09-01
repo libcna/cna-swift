@@ -256,6 +256,19 @@ typedef struct CNASwift_SpriteBatchBeginInfo {
     uint32_t reserved;
 } CNASwift_SpriteBatchBeginInfo;
 
+typedef struct CNASwift_SpriteCommand {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Handle texture;
+    CNASwift_Rectangle destination;
+    CNASwift_Rectangle source;
+    CNASwift_Color color;
+    float rotation;
+    CNASwift_Vector2 origin;
+    uint32_t effects;
+    float layer_depth;
+} CNASwift_SpriteCommand;
+
 typedef struct CNASwift_SpriteScaledCommand {
     uint32_t struct_size;
     uint32_t struct_version;

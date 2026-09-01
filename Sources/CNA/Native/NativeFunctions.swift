@@ -77,6 +77,7 @@ internal final class NativeFunctions {
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchBeginRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteBatchBeginInfo>?) -> UInt32
     typealias SpriteBatchSubmitScaledManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteScaledCommand>?, UInt64) -> UInt32
+    typealias SpriteBatchSubmitManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteCommand>?, UInt64) -> UInt32
     typealias SpriteBatchEndRoute = @convention(c) (UInt64) -> UInt32
     typealias SpriteBatchDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias KeyboardGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_KeyboardState>?) -> UInt32
@@ -168,6 +169,7 @@ internal final class NativeFunctions {
     let spriteBatchCreate: SpriteBatchCreateRoute
     let spriteBatchBegin: SpriteBatchBeginRoute
     let spriteBatchSubmitScaled: SpriteBatchSubmitScaledManyRoute
+    let spriteBatchSubmit: SpriteBatchSubmitManyRoute
     let spriteBatchEnd: SpriteBatchEndRoute
     let spriteBatchDestroy: SpriteBatchDestroyRoute
     let keyboardGetState: KeyboardGetStateRoute
@@ -279,6 +281,7 @@ internal final class NativeFunctions {
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
         spriteBatchBegin = try library.resolve("cna_sprite_batch_begin", as: SpriteBatchBeginRoute.self)
         spriteBatchSubmitScaled = try library.resolve("cna_sprite_batch_submit_scaled_many", as: SpriteBatchSubmitScaledManyRoute.self)
+        spriteBatchSubmit = try library.resolve("cna_sprite_batch_submit_many", as: SpriteBatchSubmitManyRoute.self)
         spriteBatchEnd = try library.resolve("cna_sprite_batch_end", as: SpriteBatchEndRoute.self)
         spriteBatchDestroy = try library.resolve("cna_sprite_batch_destroy", as: SpriteBatchDestroyRoute.self)
         keyboardGetState = try library.resolve("cna_keyboard_get_state", as: KeyboardGetStateRoute.self)

@@ -37,7 +37,8 @@ CNA source revision `0a6158e4ff764907065cd7259e3d29e331a52088`, library SHA-256
 | GraphicsDevice | VERIFIED_NATIVE | Callback-scoped borrowed device returned by cna_game_get_graphics_device. |
 | Clear | VERIFIED_NATIVE | All three XNA overloads execute through cna_graphics_device_clear_options; the manager-created device reports DepthFormat.Depth24, so Clear(Color) forwards Target\|DepthBuffer. |
 | Texture2D stream load | VERIFIED_NATIVE | Foundation.InputStream bytes decode through CNA; logo reports native 128x128 and stress fixture reports 1x1. |
-| SpriteBatch Begin/Draw/End | VERIFIED_NATIVE | Begin, scaled submit, and end execute for 60/600 template frames and 20 ownership cycles. |
+| SpriteBatch Begin/Draw/End | VERIFIED_NATIVE | Begin, both submit shapes -- scaled and destination-rectangle -- and end execute for 60/600 template frames and 20 ownership cycles; all seven XNA Draw overloads execute inside a pair. |
+| Pixel readback | UNSUPPORTED_BY_RENDERER | Cna_graphics_device_get_backbuffer_data_window and cna_texture2d_get_data_rgba8 both answer CNA_RESULT_NOT_SUPPORTED on the qualified HEADLESS artifact, so no test here can assert that a pixel ended up anywhere: build-probe/f53_readback.c and build-probe/f53_rtread.c. |
 | Keyboard | VERIFIED_NATIVE | Native HEADLESS state route executes; empty state is observed backend evidence, not fabricated. |
 | ButtonState | VERIFIED_MANAGED | Exact non-flags Int32 values and managed value behavior. |
 | Buttons | VERIFIED_MANAGED | Exact Int32 OptionSet constants, arbitrary combinations, and verifier flags coverage. |
@@ -83,5 +84,5 @@ CNA source revision `0a6158e4ff764907065cd7259e3d29e331a52088`, library SHA-256
 | Applying a graphics state to a live device | VERIFIED_NATIVE | The first state this binding has applied to anything. Assigning BlendState.Additive inside a LoadContent callback reaches CNA through cna_graphics_device_set_blend_state, the device caches the caller's own instance, the state comes back bound and refuses later writes, and set_BlendState's copied BlendFactor and MultiSampleMask move with it. SamplerStateCollection applies through cna_graphics_device_set_sampler_state on both stages. Eight routes bound, four PODs mirrored and compiler-verified field for field. Recorded divergences: both collections are 16 slots long because CNA accepts 0-15 on both stages while XNA's vertex collection is 0 under Reach and 4 under HiDef, and blendStateDirty/depthStencilStateDirty are transcribed but permanently false because neither a device reset nor an effect pass is projected. |
 | Viewport, scissor rectangle and device status | VERIFIED_NATIVE | A viewport written through SetViewport reaches CNA and reads back through the reader that already existed (8,16 320x240 0.25..0.75 from an 800x480 default); a scissor rectangle round trips; the device reports Normal. GraphicsDeviceStatus is mapped explicitly even though CNA and XNA agree on all three values, because Foundation 45 found eight of nine state enums agreeing and the ninth swapped. On the qualified HEADLESS renderer the device is never lost, so Normal is the only value this environment can produce and no claim is made about Lost or NotReset. |
 
-69 operations. The machine-readable source is
+70 operations. The machine-readable source is
 `docs/runtime-capabilities.json`.

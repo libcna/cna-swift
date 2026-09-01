@@ -142,6 +142,109 @@ extension Microsoft.Xna.Framework.Graphics {
             )
         }
 
+        /// `Draw(Texture2D, Vector2, Nullable<Rectangle>, Color)`.
+        ///
+        /// Every `Draw` overload builds a `Vector4` and calls `InternalDraw`
+        /// with a `scaleDestination` flag:
+        ///
+        /// ```text
+        /// position family:    (X, Y, scaleX, scaleY)   scaleDestination = 1
+        /// destination family: (X, Y, Width,  Height)   scaleDestination = 0
+        /// ```
+        ///
+        /// That flag is the whole difference between the two families, and CNA
+        /// splits its commands along the same line: `CNA_SpriteScaledCommand`
+        /// carries position and scale, `CNA_SpriteCommand` carries a
+        /// destination rectangle. So each family maps onto its own command
+        /// with no arithmetic invented in between — no dividing a destination
+        /// rectangle by a source size to fabricate a scale.
+        ///
+        /// This overload's own literals are `ldc.r4 1` twice for the scale,
+        /// `ldc.r4 0.0` for the rotation and depth, `vector2Zero` for the
+        /// origin and `ldc.i4.0` for the effects.
+        public func Draw(
+            _ texture: Texture2D,
+            position: Microsoft.Xna.Framework.Vector2,
+            sourceRectangle: Microsoft.Xna.Framework.Rectangle?,
+            color: Microsoft.Xna.Framework.Color
+        ) throws {
+            try Draw(
+                texture, position: position, sourceRectangle: sourceRectangle,
+                color: color, rotation: 0, origin: .Zero,
+                scale: Microsoft.Xna.Framework.Vector2(1, 1),
+                effects: .None, layerDepth: 0)
+        }
+
+        /// `Draw(Texture2D, Vector2, Nullable<Rectangle>, Color, Single,
+        /// Vector2, Vector2, SpriteEffects, Single)` — the per-axis scale.
+        public func Draw(
+            _ texture: Texture2D,
+            position: Microsoft.Xna.Framework.Vector2,
+            sourceRectangle: Microsoft.Xna.Framework.Rectangle?,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            scale: Microsoft.Xna.Framework.Vector2,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            try submitScaled(
+                texture, position: position, sourceRectangle: sourceRectangle,
+                color: color, rotation: rotation, origin: origin, scale: scale,
+                effects: effects, layerDepth: layerDepth)
+        }
+
+        /// `Draw(Texture2D, Rectangle, Color)`.
+        public func Draw(
+            _ texture: Texture2D,
+            destinationRectangle: Microsoft.Xna.Framework.Rectangle,
+            color: Microsoft.Xna.Framework.Color
+        ) throws {
+            try submitDestination(
+                texture, destinationRectangle: destinationRectangle,
+                sourceRectangle: nil, color: color, rotation: 0,
+                origin: .Zero, effects: .None, layerDepth: 0)
+        }
+
+        /// `Draw(Texture2D, Rectangle, Nullable<Rectangle>, Color)`.
+        public func Draw(
+            _ texture: Texture2D,
+            destinationRectangle: Microsoft.Xna.Framework.Rectangle,
+            sourceRectangle: Microsoft.Xna.Framework.Rectangle?,
+            color: Microsoft.Xna.Framework.Color
+        ) throws {
+            try submitDestination(
+                texture, destinationRectangle: destinationRectangle,
+                sourceRectangle: sourceRectangle, color: color, rotation: 0,
+                origin: .Zero, effects: .None, layerDepth: 0)
+        }
+
+        /// `Draw(Texture2D, Rectangle, Nullable<Rectangle>, Color, Single,
+        /// Vector2, SpriteEffects, Single)`.
+        ///
+        /// The destination family has **no scale parameter at all** — the
+        /// rectangle is the size — which is why it is eight parameters where
+        /// the position family is nine.
+        public func Draw(
+            _ texture: Texture2D,
+            destinationRectangle: Microsoft.Xna.Framework.Rectangle,
+            sourceRectangle: Microsoft.Xna.Framework.Rectangle?,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            try submitDestination(
+                texture, destinationRectangle: destinationRectangle,
+                sourceRectangle: sourceRectangle, color: color,
+                rotation: rotation, origin: origin, effects: effects,
+                layerDepth: layerDepth)
+        }
+
+        /// `Draw(Texture2D, Vector2, Nullable<Rectangle>, Color, Single,
+        /// Vector2, Single, SpriteEffects, Single)` — the uniform scale, which
+        /// XNA writes into both components of the `Vector4`.
         public func Draw(
             _ texture: Texture2D,
             position: Microsoft.Xna.Framework.Vector2,
@@ -150,6 +253,24 @@ extension Microsoft.Xna.Framework.Graphics {
             rotation: Float,
             origin: Microsoft.Xna.Framework.Vector2,
             scale: Float,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            try submitScaled(
+                texture, position: position, sourceRectangle: sourceRectangle,
+                color: color, rotation: rotation, origin: origin,
+                scale: Microsoft.Xna.Framework.Vector2(scale, scale),
+                effects: effects, layerDepth: layerDepth)
+        }
+
+        private func submitScaled(
+            _ texture: Texture2D,
+            position: Microsoft.Xna.Framework.Vector2,
+            sourceRectangle: Microsoft.Xna.Framework.Rectangle?,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            scale: Microsoft.Xna.Framework.Vector2,
             effects: SpriteEffects,
             layerDepth: Float
         ) throws {
@@ -192,12 +313,64 @@ extension Microsoft.Xna.Framework.Graphics {
             command.color = color.native
             command.rotation = rotation
             command.origin = CNASwift_Vector2(x: origin.X, y: origin.Y)
-            command.scale = CNASwift_Vector2(x: scale, y: scale)
+            command.scale = CNASwift_Vector2(x: scale.X, y: scale.Y)
             command.effects = effects.rawValue
             command.layer_depth = layerDepth
             try nativeStorage.runtime.functions.check(
                 nativeStorage.runtime.functions.spriteBatchSubmitScaled(batchHandle, &command, 1),
                 operation: "cna_sprite_batch_submit_scaled_many"
+            )
+        }
+
+        /// The `scaleDestination = 0` family, on CNA's own destination-rectangle
+        /// command. The same two checks in the same order as the scaled funnel.
+        private func submitDestination(
+            _ texture: Texture2D,
+            destinationRectangle: Microsoft.Xna.Framework.Rectangle,
+            sourceRectangle: Microsoft.Xna.Framework.Rectangle?,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            guard inBeginEndPair else {
+                throw CNAInvalidOperationException(
+                    message: beginMustBeCalledBeforeDrawMessage)
+            }
+            let batchHandle = try validatedHandle("SpriteBatch.Draw")
+            let textureHandle = try texture.validatedHandle("SpriteBatch.Draw texture")
+            guard texture.runtimeState === nativeStorage.runtime else {
+                throw CNAError.staleRuntimeGeneration(
+                    expected: nativeStorage.generation,
+                    actual: texture.runtimeState.generation)
+            }
+            var command = CNASwift_SpriteCommand()
+            command.struct_size = UInt32(MemoryLayout<CNASwift_SpriteCommand>.size)
+            command.struct_version = 1
+            command.texture = textureHandle
+            command.destination = CNASwift_Rectangle(
+                x: destinationRectangle.X, y: destinationRectangle.Y,
+                width: destinationRectangle.Width, height: destinationRectangle.Height)
+            // A zero-by-zero source is CNA's own spelling of "the whole
+            // texture", which is what an absent Nullable<Rectangle> means to
+            // the canonical call -- its header says so. An XNA caller who
+            // passes a *present* rectangle of zero size means something else,
+            // and CNA cannot be told the difference through this command; that
+            // divergence is recorded rather than papered over.
+            if let sourceRectangle {
+                command.source = CNASwift_Rectangle(
+                    x: sourceRectangle.X, y: sourceRectangle.Y,
+                    width: sourceRectangle.Width, height: sourceRectangle.Height)
+            }
+            command.color = color.native
+            command.rotation = rotation
+            command.origin = CNASwift_Vector2(x: origin.X, y: origin.Y)
+            command.effects = effects.rawValue
+            command.layer_depth = layerDepth
+            try nativeStorage.runtime.functions.check(
+                nativeStorage.runtime.functions.spriteBatchSubmit(batchHandle, &command, 1),
+                operation: "cna_sprite_batch_submit_many"
             )
         }
 

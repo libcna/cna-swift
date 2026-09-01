@@ -83,6 +83,49 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 53: the SpriteBatch Draw family ----------------------
+    #
+    # Only one control here, and the reason is measured rather than assumed.
+    # Three more were written -- a uniform scale written to one axis, a
+    # transposed destination rectangle, and an absent source rectangle sent as
+    # something other than CNA's zero-by-zero -- and all three survived a full
+    # run, because NOTHING IN THIS ENVIRONMENT CAN SEE WHAT A SPRITE COMMAND
+    # CONTAINS. The qualified HEADLESS artifact has no pixel readback of any
+    # kind:
+    #
+    #   build-probe/f53_readback.c  back buffer      -> CNA_RESULT_NOT_SUPPORTED
+    #   build-probe/f53_rtread.c    render target    -> CNA_RESULT_NOT_SUPPORTED
+    #
+    # and CNA accepts every field value those mutations produce, so the call
+    # returns zero either way. The three are withdrawn rather than left here
+    # claiming coverage they cannot have. What IS covered is the structure:
+    # which command shape each overload uses, and the begin/end rule they all
+    # obey.
+    (
+        "destination-draw-unguarded",
+        "the destination family skipping the begin/end rule the position family keeps",
+        BATCH,
+        "            guard inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeDrawMessage)\n"
+        "            }\n"
+        "            let batchHandle = try validatedHandle(\"SpriteBatch.Draw\")\n"
+        "            let textureHandle = try texture.validatedHandle(\"SpriteBatch.Draw texture\")\n"
+        "            guard texture.runtimeState === nativeStorage.runtime else {\n"
+        "                throw CNAError.staleRuntimeGeneration(\n"
+        "                    expected: nativeStorage.generation,\n"
+        "                    actual: texture.runtimeState.generation)\n"
+        "            }\n"
+        "            var command = CNASwift_SpriteCommand()",
+        "            let batchHandle = try validatedHandle(\"SpriteBatch.Draw\")\n"
+        "            let textureHandle = try texture.validatedHandle(\"SpriteBatch.Draw texture\")\n"
+        "            guard texture.runtimeState === nativeStorage.runtime else {\n"
+        "                throw CNAError.staleRuntimeGeneration(\n"
+        "                    expected: nativeStorage.generation,\n"
+        "                    actual: texture.runtimeState.generation)\n"
+        "            }\n"
+        "            var command = CNASwift_SpriteCommand()",
+    ),
     # ---- Foundation 52: the manager's raisers and its disposal -----------
     (
         "raiser-substitutes-itself-for-the-sender",
@@ -246,16 +289,25 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            }",
     ),
     (
+        # Anchored on the scaled funnel's own next line: Foundation 53 gave the
+        # destination funnel the identical guard, and an anchor that matches
+        # both is a stale site, which the precondition catches before a run.
         "sprite-batch-draw-unguarded",
         "Draw outside a pair left to CNA",
         BATCH,
         "            guard inBeginEndPair else {\n"
         "                throw CNAInvalidOperationException(\n"
         "                    message: beginMustBeCalledBeforeDrawMessage)\n"
+        "            }\n"
+        "            let batchHandle = try validatedHandle(\"SpriteBatch.Draw\")\n"
+        "            let textureHandle = try texture.validatedHandle(\"SpriteBatch.Draw texture\")\n"
+        "            guard texture.runtimeState === nativeStorage.runtime else {\n"
+        "                throw CNAError.staleRuntimeGeneration(expected: nativeStorage.generation, actual: texture.runtimeState.generation)\n"
         "            }",
-        "            if false {\n"
-        "                throw CNAInvalidOperationException(\n"
-        "                    message: beginMustBeCalledBeforeDrawMessage)\n"
+        "            let batchHandle = try validatedHandle(\"SpriteBatch.Draw\")\n"
+        "            let textureHandle = try texture.validatedHandle(\"SpriteBatch.Draw texture\")\n"
+        "            guard texture.runtimeState === nativeStorage.runtime else {\n"
+        "                throw CNAError.staleRuntimeGeneration(expected: nativeStorage.generation, actual: texture.runtimeState.generation)\n"
         "            }",
     ),
     (

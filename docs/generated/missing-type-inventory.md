@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1958
-TOTAL_DIAGNOSTICS=191
+TARGET_MEMBERS=1963
+TOTAL_DIAGNOSTICS=181
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
 MISSING_TYPE=100
-MISSING_MEMBER=78
+MISSING_MEMBER=73
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=13
+OVERLOAD_MAPPING_MISMATCH=8
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -311,7 +311,7 @@ Expected members: 56; emitted members: 15.
 
 ### `Microsoft.Xna.Framework.Graphics.SpriteBatch`
 
-Expected members: 21; emitted members: 5.
+Expected members: 21; emitted members: 10.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState)`: mapped member is absent
@@ -322,16 +322,6 @@ Expected members: 21; emitted members: 5.
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState,effect:Microsoft.Xna.Framework.Graphics.Effect)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,position:Microsoft.Xna.Framework.Vector2,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,position:Microsoft.Xna.Framework.Vector2,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,position:Microsoft.Xna.Framework.Vector2,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,position:Microsoft.Xna.Framework.Vector2,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,destinationRectangle:Microsoft.Xna.Framework.Rectangle,color:Microsoft.Xna.Framework.Color)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,destinationRectangle:Microsoft.Xna.Framework.Rectangle,color:Microsoft.Xna.Framework.Color)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,destinationRectangle:Microsoft.Xna.Framework.Rectangle,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,destinationRectangle:Microsoft.Xna.Framework.Rectangle,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,destinationRectangle:Microsoft.Xna.Framework.Rectangle,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Draw(_:Microsoft.Xna.Framework.Graphics.Texture2D,destinationRectangle:Microsoft.Xna.Framework.Rectangle,sourceRectangle:Microsoft.Xna.Framework.Rectangle?,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: mapped member is absent

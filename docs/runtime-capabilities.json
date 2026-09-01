@@ -135,7 +135,12 @@
   {
    "operation": "SpriteBatch Begin/Draw/End",
    "status": "VERIFIED_NATIVE",
-   "evidence": "begin, scaled submit, and end execute for 60/600 template frames and 20 ownership cycles"
+   "evidence": "begin, both submit shapes -- scaled and destination-rectangle -- and end execute for 60/600 template frames and 20 ownership cycles; all seven XNA Draw overloads execute inside a pair"
+  },
+  {
+   "operation": "Pixel readback",
+   "status": "UNSUPPORTED_BY_RENDERER",
+   "evidence": "cna_graphics_device_get_backbuffer_data_window and cna_texture2d_get_data_rgba8 both answer CNA_RESULT_NOT_SUPPORTED on the qualified HEADLESS artifact, so no test here can assert that a pixel ended up anywhere: build-probe/f53_readback.c and build-probe/f53_rtread.c"
   },
   {
    "operation": "Keyboard",
