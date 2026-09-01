@@ -40,6 +40,100 @@ internal final class RuntimeState {
     private var callbackError: Error?
     private var children: [WeakRuntimeChild] = []
 
+    // ------------------------------------------------------------------
+    // Device-owned managed state.
+    //
+    // XNA's `GraphicsDevice` is one long-lived object per device, and its
+    // `cachedBlendState`, its two `SamplerStateCollection`s and the values it
+    // copies out of a state on assignment all live as long as the device does.
+    // `set_BlendState`'s early-out is REFERENCE equality against that field.
+    //
+    // CNA's device handle cannot carry that: measured with
+    // `build-probe/f42b_identity.c`, `cna_game_get_graphics_device` answers a
+    // handle that is stable within one lifecycle callback and DIFFERENT in
+    // every callback, so it is a per-callback capability token rather than the
+    // device's identity. The Swift `GraphicsDevice` facade is built fresh on
+    // every access to match, and anything cached on it would be lost.
+    //
+    // The object that does have the device's lifetime is the game, and this is
+    // its runtime state. So the cache lives here and the facade reads and
+    // writes through it. That is a divergence in where the storage physically
+    // sits, which is not observable, decided by a measurement rather than by
+    // convenience.
+    var cachedBlendState: Microsoft.Xna.Framework.Graphics.BlendState?
+    var cachedDepthStencilState: Microsoft.Xna.Framework.Graphics.DepthStencilState?
+    var cachedRasterizerState: Microsoft.Xna.Framework.Graphics.RasterizerState?
+
+    // `set_BlendState` copies these two out of the state it accepts, and
+    // `set_DepthStencilState` copies the third. They are separate fields on
+    // XNA's device, not reads through the cached state, so a later mutation of
+    // a state object would not move them -- which is moot for a bound state
+    // but is the shape being reproduced.
+    var cachedBlendFactor = Microsoft.Xna.Framework.Color.White
+    var cachedMultiSampleMask: Int32 = -1
+    var cachedReferenceStencil: Int32 = 0
+
+    // XNA re-applies when the flag is set even if the same instance is
+    // assigned again. `set_RasterizerState` has NO such flag: an identical
+    // instance is always a no-op there, with no escape hatch.
+    //
+    // **Both flags are permanently false today**, because the two things that
+    // set them in XNA -- a device reset and an effect pass ending -- are not
+    // projected yet. They are transcribed rather than omitted so that the
+    // setters are the algorithm XNA runs and not a simplification of it, but
+    // nothing in this binding can currently observe the difference between
+    // having a flag and not having one. That is why the mutation aimed at the
+    // rasterizer's *absence* of a flag was withdrawn as unfalsifiable rather
+    // than left in the harness claiming coverage it does not have: see
+    // `docs/foundation-45-device-state-evidence.md`.
+    var blendStateDirty = false
+    var depthStencilStateDirty = false
+
+    // XNA builds both collections in the GraphicsDevice constructor, with
+    // `ProfileCapabilities.MaxSamplers` (16 in both profiles) and
+    // `MaxVertexSamplers` (0 under Reach, 4 under HiDef) slots and offsets 0
+    // and 0x101. They are created lazily here because `RuntimeState` exists
+    // before any device does, and creating them eagerly would claim a lifetime
+    // this binding cannot justify.
+    private var pixelSamplerStates: Microsoft.Xna.Framework.Graphics.SamplerStateCollection?
+    private var vertexSamplerStates: Microsoft.Xna.Framework.Graphics.SamplerStateCollection?
+
+    /// `CNA_MAX_SAMPLERS`, measured with `build-probe/f42_states.c`: CNA
+    /// accepts slots 0 through 15 on **both** stages and answers
+    /// `CNA_RESULT_INVALID_ARGUMENT` for 16 and above.
+    ///
+    /// A recorded divergence. XNA's vertex collection is 0 long under Reach
+    /// and 4 under HiDef, and this binding has no profile selection, so both
+    /// collections are the length CNA actually accepts. The bounds check is
+    /// observable, so this is a behaviour decision and is recorded in
+    /// `docs/runtime-capabilities.json` rather than left implicit.
+    static let maxSamplers = 16
+
+    func samplerStates(
+        for device: Microsoft.Xna.Framework.Graphics.GraphicsDevice, vertex: Bool
+    ) -> Microsoft.Xna.Framework.Graphics.SamplerStateCollection {
+        if vertex {
+            if let existing = vertexSamplerStates {
+                existing.rebind(to: device)
+                return existing
+            }
+            let created = Microsoft.Xna.Framework.Graphics.SamplerStateCollection(
+                device: device, samplerOffset: 0x101, stage: 1,
+                count: RuntimeState.maxSamplers)
+            vertexSamplerStates = created
+            return created
+        }
+        if let existing = pixelSamplerStates {
+            existing.rebind(to: device)
+            return existing
+        }
+        let created = Microsoft.Xna.Framework.Graphics.SamplerStateCollection(
+            device: device, samplerOffset: 0, stage: 0,
+            count: RuntimeState.maxSamplers)
+        pixelSamplerStates = created
+        return created
+    }
+
     init(functions: NativeFunctions) {
         self.functions = functions
         generation = GenerationSequence.next()

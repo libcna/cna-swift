@@ -11,7 +11,7 @@ package enforces the same thing with `COMPATIBILITY SameMajorVersion`. Under
 the generation this binding was measured against.
 
 A later minor is admitted by that rule. The protection against a later minor
-that removed a route is not a version number: every one of the 55 bound symbols
+that removed a route is not a version number: every one of the 63 bound symbols
 must resolve by name before the runtime starts, and a missing one throws
 `CNAError.missingNativeSymbol`.
 
@@ -55,9 +55,9 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=55  ROUTE_PAIRINGS=55  PROTOTYPE_TYPE_POSITIONS=170
-CANONICAL_DECLARATION_CHECKS=170  C_SWIFT_MEASUREMENTS=170
-LAYOUTS=21  LAYOUT_FIELDS=157  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
+BOUND_FUNCTIONS=63  ROUTE_PAIRINGS=63  PROTOTYPE_TYPE_POSITIONS=198
+CANONICAL_DECLARATION_CHECKS=198  C_SWIFT_MEASUREMENTS=198
+LAYOUTS=25  LAYOUT_FIELDS=209  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
 
@@ -152,12 +152,34 @@ the only thing preventing a dangling handle — which is why the mutation that
 removed it was withdrawn as unfalsifiable rather than left in the harness
 claiming coverage it did not have.
 
-## What the state objects deliberately did not add
+## The device-state routes
 
 Foundation 41 added the four graphics state objects and bound **no** route for
-them. CNA publishes `cna_blend_state_init` and
-`cna_graphics_device_set_blend_state` and their neighbours in
-`graphics_state.h`; none is bound, because the milestone projected the managed
-types and did not implement `GraphicsDevice.BlendState`. Binding a route for
-count, without a member that uses it, is the thing this boundary exists to
-prevent.
+them, because the milestone projected the managed types and did not implement
+`GraphicsDevice.BlendState`. Binding a route for count, without a member that
+uses it, is the thing this boundary exists to prevent.
+
+Foundation 45 added the members and, with them, eight routes: get and set for
+blend, depth-stencil and rasterizer state, and get and set for one sampler slot
+of one shader stage. Four more mirrored structures came with them, taking the
+layout wall from 21 structures and 157 fields to 25 and 209.
+
+`cna_blend_state_init` and its three neighbours are still **not** bound. They
+are CNA's own preset descriptors, and the Swift presets come from the pinned
+`.cctor`; binding them would add a route no member consumes and would put a
+native value where XNA authority belongs.
+
+The first verification run of the eight failed on two positions:
+
+```text
+cna_graphics_device_get_sampler_state: parameters
+  ['uint64_t', 'uint32_t', 'uint32_t', 'CNA_SamplerState*'] !=
+  ['uint64_t', 'CNA_ShaderStage', 'uint32_t', 'CNA_SamplerState*']
+```
+
+`CNA_ShaderStage` — `typedef uint32_t` at `graphics_state.h:214` — was missing
+from the alias table the type-compatibility comparison uses. The textual
+canonical-declaration check had already passed on all 198 positions, because the
+manifest keeps CNA's own spelling, and an alias never weakens that check. Same
+class of gap as the two `RenderTarget2D` positions in Foundation 38, and the
+same conclusion: the check working on the first surface added since it existed.

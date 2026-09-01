@@ -82,6 +82,14 @@ internal final class NativeFunctions {
     typealias RenderTargetGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RenderTargetInfo>?) -> UInt32
     typealias RenderTargetDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias GraphicsDeviceGetBlendStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_BlendState>?) -> UInt32
+    typealias GraphicsDeviceSetBlendStateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_BlendState>?) -> UInt32
+    typealias GraphicsDeviceGetDepthStencilStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_DepthStencilState>?) -> UInt32
+    typealias GraphicsDeviceSetDepthStencilStateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_DepthStencilState>?) -> UInt32
+    typealias GraphicsDeviceGetRasterizerStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RasterizerState>?) -> UInt32
+    typealias GraphicsDeviceSetRasterizerStateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
+    typealias GraphicsDeviceGetSamplerStateRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<CNASwift_SamplerState>?) -> UInt32
+    typealias GraphicsDeviceSetSamplerStateRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafePointer<CNASwift_SamplerState>?) -> UInt32
     typealias RenderTargetSubscribeContentLostRoute = @convention(c) (UInt64, CNASwift_RenderTargetContentLostCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias RenderTargetUnsubscribeContentLostRoute = @convention(c) (UInt64) -> UInt32
     typealias GameTickRoute = @convention(c) (UInt64) -> UInt32
@@ -145,6 +153,14 @@ internal final class NativeFunctions {
     let renderTargetGetInfo: RenderTargetGetInfoRoute
     let renderTargetDestroy: RenderTargetDestroyRoute
     let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
+    let graphicsDeviceGetBlendState: GraphicsDeviceGetBlendStateRoute
+    let graphicsDeviceSetBlendState: GraphicsDeviceSetBlendStateRoute
+    let graphicsDeviceGetDepthStencilState: GraphicsDeviceGetDepthStencilStateRoute
+    let graphicsDeviceSetDepthStencilState: GraphicsDeviceSetDepthStencilStateRoute
+    let graphicsDeviceGetRasterizerState: GraphicsDeviceGetRasterizerStateRoute
+    let graphicsDeviceSetRasterizerState: GraphicsDeviceSetRasterizerStateRoute
+    let graphicsDeviceGetSamplerState: GraphicsDeviceGetSamplerStateRoute
+    let graphicsDeviceSetSamplerState: GraphicsDeviceSetSamplerStateRoute
     let renderTargetSubscribeContentLost: RenderTargetSubscribeContentLostRoute
     let renderTargetUnsubscribeContentLost: RenderTargetUnsubscribeContentLostRoute
     let gameTick: GameTickRoute
@@ -228,6 +244,14 @@ internal final class NativeFunctions {
         renderTargetGetInfo = try library.resolve("cna_render_target_get_info", as: RenderTargetGetInfoRoute.self)
         renderTargetDestroy = try library.resolve("cna_render_target_destroy", as: RenderTargetDestroyRoute.self)
         graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)
+        graphicsDeviceGetBlendState = try library.resolve("cna_graphics_device_get_blend_state", as: GraphicsDeviceGetBlendStateRoute.self)
+        graphicsDeviceSetBlendState = try library.resolve("cna_graphics_device_set_blend_state", as: GraphicsDeviceSetBlendStateRoute.self)
+        graphicsDeviceGetDepthStencilState = try library.resolve("cna_graphics_device_get_depth_stencil_state", as: GraphicsDeviceGetDepthStencilStateRoute.self)
+        graphicsDeviceSetDepthStencilState = try library.resolve("cna_graphics_device_set_depth_stencil_state", as: GraphicsDeviceSetDepthStencilStateRoute.self)
+        graphicsDeviceGetRasterizerState = try library.resolve("cna_graphics_device_get_rasterizer_state", as: GraphicsDeviceGetRasterizerStateRoute.self)
+        graphicsDeviceSetRasterizerState = try library.resolve("cna_graphics_device_set_rasterizer_state", as: GraphicsDeviceSetRasterizerStateRoute.self)
+        graphicsDeviceGetSamplerState = try library.resolve("cna_graphics_device_get_sampler_state", as: GraphicsDeviceGetSamplerStateRoute.self)
+        graphicsDeviceSetSamplerState = try library.resolve("cna_graphics_device_set_sampler_state", as: GraphicsDeviceSetSamplerStateRoute.self)
         renderTargetSubscribeContentLost = try library.resolve("cna_render_target_subscribe_content_lost", as: RenderTargetSubscribeContentLostRoute.self)
         renderTargetUnsubscribeContentLost = try library.resolve("cna_render_target_unsubscribe_content_lost", as: RenderTargetUnsubscribeContentLostRoute.self)
         gameTick = try library.resolve("cna_game_tick", as: GameTickRoute.self)

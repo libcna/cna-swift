@@ -346,6 +346,11 @@
    "operation": "IVertexType and the four vertex structs",
    "status": "VERIFIED_MANAGED_WITH_A_TOOLCHAIN_LIMITATION",
    "evidence": "All five are complete managed Swift. The four static VertexDeclaration fields are built by the same one-argument constructor XNA's class constructors use, so their strides (16/24/32/20) are computed by Foundation 43's rule rather than transcribed. The limitation is the Swift 6.0.3 toolchain, not the projection: opening an `any Microsoft.Xna.Framework.Graphics.IVertexType` existential and reading its property crashes swift-frontend in IR generation with \"Forming a CanType out of a non-canonical type!\". Concrete access, the static field and a generic constraint all compile, and `any IGraphicsDeviceService` and `any IPackedVector` open fine, so it is neither existentials in general nor this binding's nested namespaces. A consumer on this toolchain must use a generic constraint."
+  },
+  {
+   "operation": "Applying a graphics state to a live device",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "The first state this binding has applied to anything. Assigning BlendState.Additive inside a LoadContent callback reaches CNA through cna_graphics_device_set_blend_state, the device caches the caller's own instance, the state comes back bound and refuses later writes, and set_BlendState's copied BlendFactor and MultiSampleMask move with it. SamplerStateCollection applies through cna_graphics_device_set_sampler_state on both stages. Eight routes bound, four PODs mirrored and compiler-verified field for field. Recorded divergences: both collections are 16 slots long because CNA accepts 0-15 on both stages while XNA's vertex collection is 0 under Reach and 4 under HiDef, and blendStateDirty/depthStencilStateDirty are transcribed but permanently false because neither a device reset nor an effect pass is projected."
   }
  ]
 }

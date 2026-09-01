@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -33,10 +34,14 @@ CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
 STATES = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStates.swift"
+RUNTIME_STATE = ROOT / "Sources/CNA/Runtime/RuntimeState.swift"
 BATCH = ROOT / "Sources/CNA/Xna/Graphics/SpriteBatch.swift"
 VERTEXDECL = ROOT / "Sources/CNA/Xna/Graphics/VertexDeclaration.swift"
 VERTEXCOLOR = ROOT / "Sources/CNA/Xna/Graphics/VertexPositionColor.swift"
 VERTEXNORMAL = ROOT / "Sources/CNA/Xna/Graphics/VertexPositionNormalTexture.swift"
+DEVICE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDevice.swift"
+STATEBRIDGE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStateNativeBridge.swift"
+SAMPLERS = ROOT / "Sources/CNA/Xna/Graphics/SamplerStateCollection.swift"
 
 # The WHOLE suite runs for every mutation, deliberately.
 #
@@ -349,8 +354,12 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "the parameterless constructor binding, freezing a brand-new state",
         STATES,
         "        internal var isBound = false\n"
+        "        internal weak var attachedDevice: "
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice?\n"
         "        internal static let boundStateTypeName = \"SamplerState\"",
         "        internal var isBound = true\n"
+        "        internal weak var attachedDevice: "
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice?\n"
         "        internal static let boundStateTypeName = \"SamplerState\"",
     ),
     (
@@ -486,6 +495,60 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                && lhs.Normal == rhs.Normal",
     ),
     (
+        "blend-function-passed-through-raw",
+        "the one enum CNA numbers differently, cast instead of mapped",
+        STATEBRIDGE,
+        "            case .Min: return 4\n"
+        "            case .Max: return 3",
+        "            case .Min: return 3\n"
+        "            case .Max: return 4",
+    ),
+    (
+        "blend-descriptor-channels-transposed",
+        "the colour and alpha channels written to each other's POD fields",
+        STATEBRIDGE,
+        "        native.alpha_destination_blend = Codes.blend(AlphaDestinationBlend)\n"
+        "        native.alpha_source_blend = Codes.blend(AlphaSourceBlend)",
+        "        native.alpha_destination_blend = Codes.blend(ColorDestinationBlend)\n"
+        "        native.alpha_source_blend = Codes.blend(ColorSourceBlend)",
+    ),
+    (
+        "device-setter-skips-the-attachment",
+        "a state cached without being bound, so it stays writable afterwards",
+        DEVICE,
+        "            try value.attach(to: self)\n"
+        "            var native = value.nativeDescriptor()\n"
+        "            try runtime.functions.check(\n"
+        "                runtime.functions.graphicsDeviceSetDepthStencilState(handle, &native),",
+        "            var native = value.nativeDescriptor()\n"
+        "            try runtime.functions.check(\n"
+        "                runtime.functions.graphicsDeviceSetDepthStencilState(handle, &native),",
+    ),
+    (
+        "device-setter-forgets-the-copied-value",
+        "set_BlendState caching the state but not the value it copies out",
+        DEVICE,
+        "            runtime.cachedBlendFactor = value.BlendFactor",
+        "",
+    ),
+    (
+        "sampler-slot-identity-lost",
+        "the collection storing a copy rather than the caller's own instance",
+        SAMPLERS,
+        "            slots[resolved] = value",
+        "            slots[resolved] = SamplerState()",
+    ),
+    (
+        "sampler-collection-rebuilt-per-access",
+        "a new collection per device read, losing every slot already written",
+        RUNTIME_STATE,
+        "        if let existing = pixelSamplerStates {\n"
+        "            existing.rebind(to: device)\n"
+        "            return existing\n"
+        "        }",
+        "",
+    ),
+    (
         "default-back-buffer-width-transcribed-wrong",
         "the GraphicsDeviceManager default back-buffer width off by a digit",
         MANAGER,
@@ -493,6 +556,27 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "        public static let DefaultBackBufferWidth: Int32 = 640",
     ),
 ]
+
+
+def restore_on_termination() -> None:
+    """Turn SIGTERM and SIGHUP into an exception, so `finally` still runs.
+
+    Every mutation is undone in a `finally`, which a normal exit or a Ctrl-C
+    honours -- but a `timeout`, a killed background job or a closed terminal
+    sends SIGTERM, whose default handler terminates the process outright and
+    leaves the planted defect in the working tree. That has happened twice, and
+    both times the next run reported the stranded mutation as an unrelated
+    failure somewhere else entirely.
+
+    Raising `KeyboardInterrupt` from the handler puts SIGTERM on the same
+    footing as Ctrl-C: the `finally` unwinds, the tree is restored, and the
+    caller still sees a nonzero exit. SIGKILL cannot be caught, which is why
+    the site-staleness precondition above exists as the backstop.
+    """
+    def handler(signum: int, _frame: object) -> None:
+        raise KeyboardInterrupt(f"terminated by signal {signum}")
+    for received in (signal.SIGTERM, signal.SIGHUP):
+        signal.signal(received, handler)
 
 
 def require_native_library() -> str | None:
@@ -523,6 +607,8 @@ def main() -> int:
     parser.add_argument("--swift-test", default="swift-test")
     args = parser.parse_args()
 
+    restore_on_termination()
+
     problem = require_native_library()
     if problem is not None:
         print(f"PROJECTION_MUTATION_PRECONDITION=FAILED — {problem}")
@@ -532,7 +618,25 @@ def main() -> int:
                  for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
                               RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
                               CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH,
-                              VERTEXDECL, VERTEXCOLOR, VERTEXNORMAL}}
+                              VERTEXDECL, VERTEXCOLOR, VERTEXNORMAL,
+                              DEVICE, STATEBRIDGE, SAMPLERS,
+                              RUNTIME_STATE}}
+
+    # Every mutation site is checked BEFORE the baseline runs. A site that has
+    # drifted is reported as a stale gate rather than as a survivor forty
+    # minutes later, and a run that would have been wasted is not started.
+    # Three sites had drifted at least once when the code they aimed at was
+    # legitimately edited, and each cost a full run to discover.
+    stale = [
+        f"{name}: the mutation site occurs {originals[path].count(old)} times, not once"
+        for name, _description, path, old, _new in MUTATIONS
+        if originals[path].count(old) != 1
+    ]
+    if stale:
+        print(f"PROJECTION_MUTATION_SITES=STALE COUNT={len(stale)}")
+        for item in stale:
+            print(f"  STALE {item}")
+        return 1
 
     if run_tests(args.swift_test) != 0:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")

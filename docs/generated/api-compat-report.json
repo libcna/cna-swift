@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 156,
-    "TARGET_MEMBERS": 1929,
-    "TOTAL_DIAGNOSTICS": 224,
-    "COMPLETE_TYPES": 149,
+    "TARGET_TYPES": 157,
+    "TARGET_MEMBERS": 1935,
+    "TOTAL_DIAGNOSTICS": 218,
+    "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 101,
-    "MISSING_TYPE": 101,
-    "MISSING_MEMBER": 106,
+    "MISSING_TYPES": 100,
+    "MISSING_TYPE": 100,
+    "MISSING_MEMBER": 101,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -63,19 +63,19 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 60,
-    "PENDING_ACCESSOR_PROJECTIONS": 53,
+    "MEASURED_ACCESSOR_PROJECTIONS": 61,
+    "PENDING_ACCESSOR_PROJECTIONS": 52,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 10,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 11,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 18,
-    "XNA_SEALED_CLASS_PROJECTIONS": 18,
+    "XNA_SEALED_CLASS_PROJECTIONS": 19,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 20,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 21,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 103,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 266,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 11
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 109,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 260,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 16
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -183,6 +183,7 @@
     "Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs",
     "Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs",
     "Microsoft.Xna.Framework.Graphics.SamplerState",
+    "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
     "Microsoft.Xna.Framework.Graphics.SetDataOptions",
     "Microsoft.Xna.Framework.Graphics.SpriteEffects",
     "Microsoft.Xna.Framework.Graphics.SpriteSortMode",
@@ -323,7 +324,6 @@
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
     "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
     "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
-    "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
     "Microsoft.Xna.Framework.Graphics.SpriteFont",
     "Microsoft.Xna.Framework.Graphics.Texture3D",
@@ -836,17 +836,7 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.RasterizerState()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ReferenceStencil()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DepthStencilState()",
       "detail": "mapped member is absent"
     },
     {
@@ -861,27 +851,12 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendState()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexTextures()",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Textures()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexSamplerStates()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SamplerStates()",
       "detail": "mapped member is absent"
     },
     {
@@ -997,11 +972,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2344,14 +2314,14 @@
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "RasterizerState",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.RasterizerState()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRasterizerState(_:Microsoft.Xna.Framework.Graphics.RasterizerState?)",
       "writerName": "SetRasterizerState",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2372,14 +2342,14 @@
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "DepthStencilState",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DepthStencilState()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetDepthStencilState(_:Microsoft.Xna.Framework.Graphics.DepthStencilState?)",
       "writerName": "SetDepthStencilState",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2414,14 +2384,14 @@
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "BlendState",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendState()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetBlendState(_:Microsoft.Xna.Framework.Graphics.BlendState?)",
       "writerName": "SetBlendState",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2615,6 +2585,20 @@
       "readerThrows": false,
       "writerSymbol": "Microsoft.Xna.Framework.Graphics.SamplerState.SetFilter(_:Microsoft.Xna.Framework.Graphics.TextureFilter)",
       "writerName": "SetFilter",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
+      "sourceProperty": "Item",
+      "indexed": true,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection.Item(_:Int32)",
+      "readerForm": "method",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.Graphics.SamplerState)",
+      "writerName": "SetItem",
       "writerThrows": true,
       "readerObserved": true,
       "writerObserved": true,
@@ -2995,16 +2979,6 @@
       "static": false
     },
     {
-      "ownerType": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
-      "sourceProperty": "Item",
-      "typeState": "missing",
-      "readerThrows": true,
-      "writerName": "SetItem",
-      "writerThrows": true,
-      "indexed": true,
-      "static": false
-    },
-    {
       "ownerType": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
       "sourceProperty": "SpecularColor",
       "typeState": "missing",
@@ -3226,6 +3200,13 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
       "clrSealed": true,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
@@ -4209,6 +4190,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NullNotAllowed",
+      "pinnedValue": "This method does not accept null for this parameter.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "OppositePlanes",
       "pinnedValue": "Near plane distance is larger than Far plane distance. Near plane distance must be smaller than Far plane distance.",
       "reproducedInSwiftSource": true
@@ -4533,6 +4520,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -6955,8 +6950,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.RasterizerState?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -6969,8 +6964,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.DepthStencilState?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -6983,8 +6978,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.BlendState?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -7025,8 +7020,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -7039,8 +7034,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsResource",
@@ -7915,14 +7910,14 @@
       "member": "Item",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.SamplerState",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.SamplerState",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.SamplerState"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
@@ -10967,7 +10962,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 3,
+      "targetMembers": 8,
       "diagnostics": [
         {
           "category": "PROPERTY_MAPPING_MISMATCH",
@@ -11176,17 +11171,7 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.RasterizerState()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ReferenceStencil()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DepthStencilState()",
           "detail": "mapped member is absent"
         },
         {
@@ -11201,27 +11186,12 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendState()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexTextures()",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Textures()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexSamplerStates()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SamplerStates()",
           "detail": "mapped member is absent"
         },
         {
@@ -11738,16 +11708,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SetDataOptions",

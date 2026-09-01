@@ -80,6 +80,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NullNotAllowed",
+      "value": "This method does not accept null for this parameter."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OppositePlanes",
       "value": "Near plane distance is larger than Far plane distance. Near plane distance must be smaller than Far plane distance."
     },

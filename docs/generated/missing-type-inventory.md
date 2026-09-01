@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=156
-TARGET_MEMBERS=1929
-TOTAL_DIAGNOSTICS=224
-COMPLETE_TYPES=149
+TARGET_TYPES=157
+TARGET_MEMBERS=1935
+TOTAL_DIAGNOSTICS=218
+COMPLETE_TYPES=150
 PARTIAL_TYPES=7
-MISSING_TYPES=101
-MISSING_TYPE=101
-MISSING_MEMBER=106
+MISSING_TYPES=100
+MISSING_TYPE=100
+MISSING_MEMBER=101
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -60,19 +60,19 @@ THROWING_WRITER_METHOD_PROJECTIONS=113
 INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
 GETTER_ONLY_PROJECTIONS=561
 WRITE_ONLY_PROJECTIONS=0
-MEASURED_ACCESSOR_PROJECTIONS=60
-PENDING_ACCESSOR_PROJECTIONS=53
+MEASURED_ACCESSOR_PROJECTIONS=61
+PENDING_ACCESSOR_PROJECTIONS=52
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=10
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=11
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=18
-XNA_SEALED_CLASS_PROJECTIONS=18
+XNA_SEALED_CLASS_PROJECTIONS=19
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=20
+XNA_RESOURCE_STRING_PROJECTIONS=21
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=103
-PENDING_RETURN_NULLABILITY_PROJECTIONS=266
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=109
+PENDING_RETURN_NULLABILITY_PROJECTIONS=260
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=16
 ```
 
 ## Complete types
@@ -182,6 +182,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=11
 - `Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs`
 - `Microsoft.Xna.Framework.Graphics.SamplerState`
+- `Microsoft.Xna.Framework.Graphics.SamplerStateCollection`
 - `Microsoft.Xna.Framework.Graphics.SetDataOptions`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
@@ -263,7 +264,7 @@ Expected members: 37; emitted members: 35.
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
-Expected members: 56; emitted members: 3.
+Expected members: 56; emitted members: 8.
 
 - `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()`: the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
@@ -306,16 +307,11 @@ Expected members: 56; emitted members: 3.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsProfile()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Adapter()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.PresentationParameters()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.RasterizerState()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.ReferenceStencil()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DepthStencilState()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.MultiSampleMask()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendFactor()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendState()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexTextures()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Textures()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexSamplerStates()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SamplerStates()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Disposing()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceDestroyed()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceCreated()`: mapped member is absent
@@ -474,7 +470,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetBinding`
 - `Microsoft.Xna.Framework.Graphics.RenderTargetCube`
-- `Microsoft.Xna.Framework.Graphics.SamplerStateCollection`
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`
 - `Microsoft.Xna.Framework.Graphics.Texture3D`

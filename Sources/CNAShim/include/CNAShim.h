@@ -154,6 +154,70 @@ typedef struct CNASwift_RenderTargetInfo {
     uint8_t reserved[2];
 } CNASwift_RenderTargetInfo;
 
+typedef struct CNASwift_BlendState {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t alpha_blend_function;
+    uint32_t alpha_destination_blend;
+    uint32_t alpha_source_blend;
+    uint32_t color_blend_function;
+    uint32_t color_destination_blend;
+    uint32_t color_source_blend;
+    uint32_t color_write_channels;
+    uint32_t color_write_channels1;
+    uint32_t color_write_channels2;
+    uint32_t color_write_channels3;
+    CNASwift_Color blend_factor;
+    int32_t multi_sample_mask;
+} CNASwift_BlendState;
+
+typedef struct CNASwift_DepthStencilState {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Bool depth_buffer_enable;
+    CNASwift_Bool depth_buffer_write_enable;
+    CNASwift_Bool stencil_enable;
+    CNASwift_Bool two_sided_stencil_mode;
+    uint32_t depth_buffer_function;
+    uint32_t stencil_function;
+    int32_t stencil_mask;
+    int32_t stencil_write_mask;
+    int32_t reference_stencil;
+    uint32_t stencil_fail;
+    uint32_t stencil_depth_buffer_fail;
+    uint32_t stencil_pass;
+    uint32_t counter_clockwise_stencil_function;
+    uint32_t counter_clockwise_stencil_fail;
+    uint32_t counter_clockwise_stencil_depth_buffer_fail;
+    uint32_t counter_clockwise_stencil_pass;
+    uint32_t reserved;
+} CNASwift_DepthStencilState;
+
+typedef struct CNASwift_RasterizerState {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t cull_mode;
+    uint32_t fill_mode;
+    float depth_bias;
+    float slope_scale_depth_bias;
+    CNASwift_Bool multi_sample_anti_alias;
+    CNASwift_Bool scissor_test_enable;
+    uint8_t reserved[2];
+} CNASwift_RasterizerState;
+
+typedef struct CNASwift_SamplerState {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t address_u;
+    uint32_t address_v;
+    uint32_t address_w;
+    uint32_t filter;
+    int32_t max_anisotropy;
+    int32_t max_mip_level;
+    float mip_map_level_of_detail_bias;
+    uint32_t reserved;
+} CNASwift_SamplerState;
+
 typedef void (*CNASwift_GameEventCallback)(void* context);
 
 typedef void (*CNASwift_RenderTargetContentLostCallback)(

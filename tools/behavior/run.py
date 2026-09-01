@@ -73,6 +73,7 @@ TEST_SOURCES = [
     ROOT / "Tests/CNATests/DisplayModeContractTests.swift",
     ROOT / "Tests/CNATests/Foundation43VertexDeclarationTests.swift",
     ROOT / "Tests/CNATests/Foundation44VertexTypeTests.swift",
+    ROOT / "Tests/CNATests/Foundation45DeviceStateTests.swift",
     ROOT / "Tests/CNATests/Foundation14GraphicsEnumContractTests.swift",
     ROOT / "Tests/CNATests/Foundation14ManagedTypeContractTests.swift",
     ROOT / "Tests/CNATests/PresentationParametersContractTests.swift",

@@ -24,6 +24,11 @@ extension Microsoft.Xna.Framework.Graphics {
         /// `isBound`. False until a device takes this object.
         var isBound: Bool { get set }
 
+        /// `GraphicsResource._parent` as `Apply` uses it: the device this
+        /// state was last attached to, which decides whether an `Apply`
+        /// rebinds or merely re-pushes.
+        var attachedDevice: Microsoft.Xna.Framework.Graphics.GraphicsDevice? { get set }
+
         /// The name `ThrowIfBound` formats into the message.
         ///
         /// XNA loads it from `ldtoken <the declaring class>` — the **static**
@@ -36,6 +41,7 @@ extension Microsoft.Xna.Framework.Graphics {
     /// The `Microsoft.Xna.Framework.Graphics.BlendState` projection.
     open class BlendState: GraphicsResource, GraphicsStateObject {
         internal var isBound = false
+        internal weak var attachedDevice: Microsoft.Xna.Framework.Graphics.GraphicsDevice?
         internal static let boundStateTypeName = "BlendState"
 
         /// `Dispose(Boolean)`. XNA declares its own override on each state
@@ -152,6 +158,7 @@ extension Microsoft.Xna.Framework.Graphics {
     /// The `Microsoft.Xna.Framework.Graphics.DepthStencilState` projection.
     open class DepthStencilState: GraphicsResource, GraphicsStateObject {
         internal var isBound = false
+        internal weak var attachedDevice: Microsoft.Xna.Framework.Graphics.GraphicsDevice?
         internal static let boundStateTypeName = "DepthStencilState"
 
         /// `Dispose(Boolean)`. XNA declares its own override on each state
@@ -283,6 +290,7 @@ extension Microsoft.Xna.Framework.Graphics {
     /// The `Microsoft.Xna.Framework.Graphics.RasterizerState` projection.
     open class RasterizerState: GraphicsResource, GraphicsStateObject {
         internal var isBound = false
+        internal weak var attachedDevice: Microsoft.Xna.Framework.Graphics.GraphicsDevice?
         internal static let boundStateTypeName = "RasterizerState"
 
         /// `Dispose(Boolean)`. XNA declares its own override on each state
@@ -354,6 +362,7 @@ extension Microsoft.Xna.Framework.Graphics {
     /// The `Microsoft.Xna.Framework.Graphics.SamplerState` projection.
     open class SamplerState: GraphicsResource, GraphicsStateObject {
         internal var isBound = false
+        internal weak var attachedDevice: Microsoft.Xna.Framework.Graphics.GraphicsDevice?
         internal static let boundStateTypeName = "SamplerState"
 
         /// `Dispose(Boolean)`. XNA declares its own override on each state
@@ -467,4 +476,39 @@ extension Microsoft.Xna.Framework.Graphics.GraphicsStateObject {
     /// Internal: a caller cannot bind a state object except by giving it to a
     /// device.
     internal func markBound() { isBound = true }
+
+    /// The shared prologue of `SamplerState.Apply(device, samplerIndex)` and
+    /// the three `Apply(device)` methods, which are identical:
+    ///
+    ///     if (isDisposed)
+    ///         throw new ObjectDisposedException(typeof(<declaring>).Name);
+    ///     if (_parent != device) { _parent = device; isBound = true; }
+    ///     ...push the state...
+    ///
+    /// The disposal message names the **declaring** class through `ldtoken`,
+    /// not `GetType()`, so it uses the same static name `ThrowIfBound` does.
+    /// The push itself is per-class and is the caller's business.
+    internal func attach(to device: Microsoft.Xna.Framework.Graphics.GraphicsDevice) throws {
+        guard !IsDisposed else {
+            throw CNAObjectDisposedException(objectName: Self.boundStateTypeName)
+        }
+        // `_parent != device` in the IL. A state object reaching a second
+        // device rebinds and stays bound; reaching the same one again pushes
+        // without touching `isBound`.
+        if !isAttached(to: device) {
+            attachedDevice = device
+            isBound = true
+        }
+    }
+
+    /// XNA compares `GraphicsResource._parent`, which the projection models as
+    /// `GraphicsResource.GraphicsDevice`. That property is set at construction
+    /// and a state object is constructed without one, so the attachment is
+    /// tracked separately rather than by mutating a resource field the rest of
+    /// the hierarchy treats as immutable.
+    internal func isAttached(
+        to device: Microsoft.Xna.Framework.Graphics.GraphicsDevice
+    ) -> Bool {
+        attachedDevice === device
+    }
 }

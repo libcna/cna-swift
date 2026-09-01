@@ -48,6 +48,7 @@ MIRRORED_STRUCTS = [
     "SpriteScaledCommand", "KeyboardState", "GamePadAnalogState",
     "GamePadState", "GamePadCapabilities", "TextureInfo",
     "RenderTarget2DCreateInfo", "RenderTargetInfo",
+    "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
 ]
 
 # The shim mirrors exactly these canonical callback types.
@@ -136,6 +137,13 @@ def canonical_type(value: str) -> str:
         "CNA_GraphicsResourceEventRegistrationHandle": "uint64_t",
         "CNA_GameEventRegistrationHandle": "uint64_t", "CNA_GameEvent": "uint32_t",
         "CNA_GraphicsDeviceManagerEvent": "uint32_t",
+        # `typedef uint32_t CNA_ShaderStage;` in graphics_state.h:214. The
+        # canonical-declaration check compares the manifest's TEXT with the
+        # header's, so the manifest keeps CNA's own spelling; this table is
+        # only for the separate type-compatibility comparison, which needs the
+        # underlying type. Adding an alias here never weakens the textual
+        # check.
+        "CNA_ShaderStage": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

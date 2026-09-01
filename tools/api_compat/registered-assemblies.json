@@ -103,6 +103,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NullNotAllowed",
+      "reason": "GraphicsDevice.set_BlendState, set_DepthStencilState and set_RasterizerState each raise ArgumentNullException(\"value\", NullNotAllowed) for a null state, as does SamplerStateCollection.set_Item."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OppositePlanes",
       "reason": "Matrix's four perspective factories raise ArgumentOutOfRangeException(\"nearPlaneDistance\", this) when the near plane is beyond the far plane."
     },

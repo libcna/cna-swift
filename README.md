@@ -98,13 +98,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=156
-TARGET_MEMBERS=1929
-TOTAL_DIAGNOSTICS=224
-COMPLETE_TYPES=149
+TARGET_TYPES=157
+TARGET_MEMBERS=1935
+TOTAL_DIAGNOSTICS=218
+COMPLETE_TYPES=150
 PARTIAL_TYPES=7
-MISSING_TYPES=101
-MISSING_MEMBER=106
+MISSING_TYPES=100
+MISSING_MEMBER=101
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=113
 PROVEN_NONNULL_RETURN_PROJECTIONS=133
@@ -567,7 +567,7 @@ constant and a wrong `Keys` literal — runs the unmodified verifier, requires i
 to fail every time, and proves the tree is byte-identical afterwards.
 
 `tools/projection_mutations/run.py` is the companion gate over the projected
-behavior. It plants fifty realistic defects one at a time — a
+behavior. It plants fifty-six realistic defects one at a time — a
 neighbouring exception class at a raise site, a message that reports the Swift
 class name to a user, a mirror that moves on a write the host refused, a
 disposal that leaks a native subscription, an IL-derived state default changed,
@@ -576,7 +576,10 @@ type instead of the declaring one — and requires the whole test suite to fail
 each time. It refuses to run without a selected `CNA_NATIVE_LIBRARY`: sixteen
 of its mutations are caught only by suites that start a CNA runtime, and those
 suites *skip* rather than fail when no library is selected, which would report
-a coverage loss as sixteen projection defects.
+a coverage loss as sixteen projection defects. It also counts every mutation
+site before starting, so a site that has drifted is reported in seconds rather
+than arriving disguised as a survivor, and it turns SIGTERM and SIGHUP into the
+same unwind Ctrl-C gets, so a killed run still restores the tree.
 
 `pinned_assembly_audit.py` decides whether an XNA assembly may be used as a
 behavior authority. It reconstructs each assembly's public metadata from
