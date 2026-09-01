@@ -676,32 +676,32 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
       "detail": "mapped member is absent"
     },
     {
@@ -726,17 +726,17 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[!!0],startIndex:Int32,elementCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[!!0])",
+      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T])",
       "detail": "mapped member is absent"
     },
     {
@@ -1011,32 +1011,32 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[!!0])",
+      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T])",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[!!0],startIndex:Int32,elementCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0])",
+      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T])",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0],startIndex:Int32,elementCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)",
+      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
@@ -10880,32 +10880,32 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
           "detail": "mapped member is absent"
         },
         {
@@ -10930,17 +10930,17 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[!!0],startIndex:Int32,elementCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T],startIndex:Int32,elementCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[!!0])",
+          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T])",
           "detail": "mapped member is absent"
         },
         {
@@ -11691,32 +11691,32 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[!!0])",
+          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T])",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[!!0],startIndex:Int32,elementCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T],startIndex:Int32,elementCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0])",
+          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T])",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0],startIndex:Int32,elementCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T],startIndex:Int32,elementCount:Int32)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)",
+          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
           "detail": "mapped member is absent"
         },
         {

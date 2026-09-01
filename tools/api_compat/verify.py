@@ -191,27 +191,39 @@ def map_clr_type(
     clr: str | None,
     rules: dict[str, Any],
     generic_parameters: tuple[str, ...] = (),
+    method_generic_parameters: tuple[str, ...] = (),
 ) -> str:
     if clr is None:
         return "Void"
     text = clr.rstrip("&")
+    # CIL spells a TYPE's generic parameter `!N` and a METHOD's `!!N`. Both are
+    # substituted from the names the contract records, and from the right list:
+    # `generic_parameters` is the owner's, `method_generic_parameters` the
+    # member's own. Until Foundation 56 only the first was substituted, so
+    # every generic METHOD in the contract expected a literal `!!0` that no
+    # Swift declaration could ever produce -- Texture2D.SetData and GetData sat
+    # in the missing list behind that, unimplementable rather than unimplemented.
+    method_placeholder = re.fullmatch(r"!!(\d+)", text)
+    if (method_placeholder
+            and int(method_placeholder.group(1)) < len(method_generic_parameters)):
+        return method_generic_parameters[int(method_placeholder.group(1))]
     placeholder = re.fullmatch(r"!(\d+)", text)
     if placeholder and int(placeholder.group(1)) < len(generic_parameters):
         return generic_parameters[int(placeholder.group(1))]
     if text.endswith("[]"):
-        return f"[{map_clr_type(text[:-2], rules, generic_parameters)}]"
+        return f"[{map_clr_type(text[:-2], rules, generic_parameters, method_generic_parameters)}]"
     direct = rules["typeMappings"].get(text)
     if direct:
         return direct
     nullable = re.fullmatch(r"System\.Nullable`1\[(.+)]", text)
     if nullable:
-        return f"{map_clr_type(nullable.group(1), rules, generic_parameters)}?"
+        return f"{map_clr_type(nullable.group(1), rules, generic_parameters, method_generic_parameters)}?"
     enumerable = re.fullmatch(r"System\.Collections\.Generic\.IEnumerable`1\[(.+)]", text)
     if enumerable:
-        return f"[{map_clr_type(enumerable.group(1), rules, generic_parameters)}]"
+        return f"[{map_clr_type(enumerable.group(1), rules, generic_parameters, method_generic_parameters)}]"
     enumerator = re.fullmatch(r"System\.Collections\.Generic\.IEnumerator`1\[(.+)]", text)
     if enumerator:
-        return f"CNAEnumerator<{map_clr_type(enumerator.group(1), rules, generic_parameters)}>"
+        return f"CNAEnumerator<{map_clr_type(enumerator.group(1), rules, generic_parameters, method_generic_parameters)}>"
     # Every public event in the pinned contract is System.EventHandler<TArgs>.
     # The delegate is not projected; the event is one get-only property of the
     # consumer view type. See `eventMapping`.
@@ -330,6 +342,14 @@ def expected_member(
     else:
         mapped_name = name
 
+    # The member's OWN generic parameters, in position order, so `!!N` in a
+    # parameter or return type resolves to the name the contract records.
+    method_generic_parameters = tuple(
+        item["name"] for item in sorted(
+            source.get("genericParameters", []),
+            key=lambda item: item.get("position", 0))
+    )
+
     parameters = source.get("parameters", [])
     labels: list[str] = []
     directions: list[str] = []
@@ -357,6 +377,7 @@ def expected_member(
         directions.append(direction)
         mapped_parameter_type = map_clr_type(
             parameter["type"], rules, owner_generic_parameters,
+            method_generic_parameters,
         )
         optional_reference = any(
             item.get("owner") == owner and
@@ -412,7 +433,8 @@ def expected_member(
                 raw = None
 
     clr_return = source.get("returnType") or source.get("type")
-    mapped_return = map_clr_type(clr_return, rules, owner_generic_parameters)
+    mapped_return = map_clr_type(
+        clr_return, rules, owner_generic_parameters, method_generic_parameters)
     # Optional is applied exactly where the pinned inventory proves XNA can
     # normally return null. `System.Object` and `System.Nullable<T>` already
     # arrive Optional from the type mapping and are not double-wrapped.
@@ -1800,6 +1822,41 @@ def self_test() -> None:
     nullable_out_member = expected_member("Microsoft.Xna.Framework.Ray", nullable_out_source, rules, "struct")
     if nullable_out_member.parameters != ("Float?",) or nullable_out_member.directions != ("inout",):
         failures.append("nullable out projection")
+
+    # A METHOD's own generic parameter, which CIL spells `!!N` and a type's
+    # `!N`. Both directions are checked: the substitution must happen when the
+    # member declares the parameter, and must NOT happen from the owner's list,
+    # which is a different list with a different spelling.
+    method_generic_source = {
+        "kind": "method", "name": "SetData", "static": False,
+        "returnType": "System.Void",
+        "genericParameters": [{"name": "T", "position": 0}],
+        "parameters": [
+            {"name": "data", "type": "!!0[]"},
+            {"name": "startIndex", "type": "System.Int32"},
+        ],
+    }
+    method_generic_member = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D", method_generic_source,
+        rules, "class")
+    if method_generic_member.parameters != ("[T]", "Int32"):
+        failures.append(
+            "a method's own generic parameter is not substituted into its "
+            f"parameter types: {method_generic_member.parameters}")
+    if map_clr_type("!!0[]", rules, ("TOwner",)) != "[!!0]":
+        failures.append("a method placeholder was substituted from the owner's list")
+    if map_clr_type("!0[]", rules, ("TOwner",), ("TMethod",)) != "[TOwner]":
+        failures.append("a type placeholder was substituted from the method's list")
+    if map_clr_type("System.Nullable`1[!!0]", rules, (), ("T",)) != "T?":
+        failures.append("a method placeholder is not substituted inside Nullable")
+    method_generic_return = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        {"kind": "method", "name": "Read", "static": False, "returnType": "!!0",
+         "genericParameters": [{"name": "T", "position": 0}], "parameters": []},
+        rules, "class")
+    if method_generic_return.return_type != "T":
+        failures.append("a method's generic parameter is not substituted into "
+                        "its return type")
 
     enumerable_type = "System.Collections.Generic.IEnumerable`1[Microsoft.Xna.Framework.Vector3]"
     if map_clr_type(enumerable_type, rules) != "[Microsoft.Xna.Framework.Vector3]":

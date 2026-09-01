@@ -275,19 +275,19 @@ Expected members: 56; emitted members: 15.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,startVertex:Int32,primitiveCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,baseVertex:Int32,minVertexIndex:Int32,numVertices:Int32,startIndex:Int32,primitiveCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawInstancedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,baseVertex:Int32,minVertexIndex:Int32,numVertices:Int32,startIndex:Int32,primitiveCount:Int32,instanceCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTargets(_:[Microsoft.Xna.Framework.Graphics.RenderTargetBinding])`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetRenderTargets()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[!!0])`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T])`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetVertexBuffers()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer,vertexOffset:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer)`: mapped member is absent
@@ -333,12 +333,12 @@ Expected members: 16; emitted members: 6.
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(_:Microsoft.Xna.Framework.Graphics.GraphicsDevice,stream:Foundation.InputStream,width:Int32,height:Int32,zoom:Bool)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsJpeg(_:Foundation.InputStream,width:Int32,height:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.InputStream,width:Int32,height:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[!!0])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[!!0],startIndex:Int32,elementCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T])`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T])`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
