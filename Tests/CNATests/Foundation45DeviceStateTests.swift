@@ -302,6 +302,75 @@ final class Foundation45DeviceStateTests: XCTestCase {
         XCTAssertThrowsError(try escaped.SetBlendFactor(F.Color.White))
     }
 
+    // MARK: - Viewport, scissor rectangle and device status
+
+    /// `SetViewport` is the projection of the CLR setter accessor, and its
+    /// absence was the last `PROPERTY_MAPPING_MISMATCH` in the scoreboard.
+    /// A written viewport is read back through the reader that already existed.
+    func testTheViewportRoundTripsThroughItsWriterMethod() throws {
+        try requireNative()
+        let game = try run { game, device in
+            let before = try device.Viewport
+            game.observations["before"] = "\(before.Width)x\(before.Height)"
+            var moved = before
+            moved.X = 8
+            moved.Y = 16
+            moved.Width = 320
+            moved.Height = 240
+            moved.MinDepth = 0.25
+            moved.MaxDepth = 0.75
+            try device.SetViewport(moved)
+            let after = try device.Viewport
+            game.observations["after"] =
+                "\(after.X),\(after.Y) \(after.Width)x\(after.Height) "
+                + "\(after.MinDepth)..\(after.MaxDepth)"
+        }
+        XCTAssertEqual(game.observations["before"], "800x480")
+        XCTAssertEqual(game.observations["after"], "8,16 320x240 0.25..0.75")
+    }
+
+    /// Both scissor accessors are `IL_DIRECT_THROW`, so the reader throws and
+    /// the writer is a throwing `SetScissorRectangle`.
+    func testTheScissorRectangleRoundTrips() throws {
+        try requireNative()
+        let game = try run { game, device in
+            try device.SetScissorRectangle(
+                Microsoft.Xna.Framework.Rectangle(4, 8, 100, 50))
+            let read = try device.ScissorRectangle
+            game.observations["scissor"] =
+                "\(read.X),\(read.Y) \(read.Width)x\(read.Height)"
+        }
+        XCTAssertEqual(game.observations["scissor"], "4,8 100x50")
+    }
+
+    /// `GraphicsDeviceStatus` has no setter and three declared values. On the
+    /// qualified HEADLESS renderer the device is never lost, so `Normal` is
+    /// the only value this environment can produce — which is stated rather
+    /// than dressed up as coverage of all three.
+    func testTheDeviceReportsItsStatus() throws {
+        try requireNative()
+        let game = try run { game, device in
+            game.observations["status"] =
+                String(describing: try device.GraphicsDeviceStatus)
+        }
+        XCTAssertEqual(game.observations["status"], "Normal")
+    }
+
+    /// All three refuse a facade outside the callback that produced it, which
+    /// is this binding's analogue of XNA's `Helpers.CheckDisposed`.
+    func testTheNewMembersRefuseAStaleFacade() throws {
+        try requireNative()
+        var escaped: G.GraphicsDevice?
+        try run { _, device in escaped = device }
+        guard let escaped else { return XCTFail("no device escaped") }
+        XCTAssertThrowsError(try escaped.SetViewport(
+            Microsoft.Xna.Framework.Graphics.Viewport()))
+        XCTAssertThrowsError(try escaped.ScissorRectangle)
+        XCTAssertThrowsError(try escaped.SetScissorRectangle(
+            Microsoft.Xna.Framework.Rectangle(0, 0, 1, 1)))
+        XCTAssertThrowsError(try escaped.GraphicsDeviceStatus)
+    }
+
     // MARK: - The sampler collection
 
     func testTheSamplerCollectionAppliesThroughTheNativeRoute() throws {

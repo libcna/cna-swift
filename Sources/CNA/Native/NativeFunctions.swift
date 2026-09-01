@@ -82,6 +82,10 @@ internal final class NativeFunctions {
     typealias RenderTargetGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RenderTargetInfo>?) -> UInt32
     typealias RenderTargetDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias GraphicsDeviceSetViewportRoute = @convention(c) (UInt64, CNASwift_Viewport) -> UInt32
+    typealias GraphicsDeviceGetScissorRectangleRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Rectangle>?) -> UInt32
+    typealias GraphicsDeviceSetScissorRectangleRoute = @convention(c) (UInt64, CNASwift_Rectangle) -> UInt32
+    typealias GraphicsDeviceGetStatusRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
     typealias GraphicsDeviceGetBlendFactorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Color>?) -> UInt32
     typealias GraphicsDeviceSetBlendFactorRoute = @convention(c) (UInt64, CNASwift_Color) -> UInt32
     typealias GraphicsDeviceGetMultiSampleMaskRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
@@ -159,6 +163,10 @@ internal final class NativeFunctions {
     let renderTargetGetInfo: RenderTargetGetInfoRoute
     let renderTargetDestroy: RenderTargetDestroyRoute
     let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
+    let graphicsDeviceSetViewport: GraphicsDeviceSetViewportRoute
+    let graphicsDeviceGetScissorRectangle: GraphicsDeviceGetScissorRectangleRoute
+    let graphicsDeviceSetScissorRectangle: GraphicsDeviceSetScissorRectangleRoute
+    let graphicsDeviceGetStatus: GraphicsDeviceGetStatusRoute
     let graphicsDeviceGetBlendFactor: GraphicsDeviceGetBlendFactorRoute
     let graphicsDeviceSetBlendFactor: GraphicsDeviceSetBlendFactorRoute
     let graphicsDeviceGetMultiSampleMask: GraphicsDeviceGetMultiSampleMaskRoute
@@ -256,6 +264,10 @@ internal final class NativeFunctions {
         renderTargetGetInfo = try library.resolve("cna_render_target_get_info", as: RenderTargetGetInfoRoute.self)
         renderTargetDestroy = try library.resolve("cna_render_target_destroy", as: RenderTargetDestroyRoute.self)
         graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)
+        graphicsDeviceSetViewport = try library.resolve("cna_graphics_device_set_viewport", as: GraphicsDeviceSetViewportRoute.self)
+        graphicsDeviceGetScissorRectangle = try library.resolve("cna_graphics_device_get_scissor_rectangle", as: GraphicsDeviceGetScissorRectangleRoute.self)
+        graphicsDeviceSetScissorRectangle = try library.resolve("cna_graphics_device_set_scissor_rectangle", as: GraphicsDeviceSetScissorRectangleRoute.self)
+        graphicsDeviceGetStatus = try library.resolve("cna_graphics_device_get_status", as: GraphicsDeviceGetStatusRoute.self)
         graphicsDeviceGetBlendFactor = try library.resolve("cna_graphics_device_get_blend_factor", as: GraphicsDeviceGetBlendFactorRoute.self)
         graphicsDeviceSetBlendFactor = try library.resolve("cna_graphics_device_set_blend_factor", as: GraphicsDeviceSetBlendFactorRoute.self)
         graphicsDeviceGetMultiSampleMask = try library.resolve("cna_graphics_device_get_multi_sample_mask", as: GraphicsDeviceGetMultiSampleMaskRoute.self)

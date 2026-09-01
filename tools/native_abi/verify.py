@@ -144,6 +144,8 @@ def canonical_type(value: str) -> str:
         # underlying type. Adding an alias here never weakens the textual
         # check.
         "CNA_ShaderStage": "uint32_t",
+        # `typedef uint32_t CNA_GraphicsDeviceStatus;` in graphics_device.h:34.
+        "CNA_GraphicsDeviceStatus": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

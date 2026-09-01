@@ -560,6 +560,43 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            runtime.cachedMultiSampleMask = value",
     ),
     (
+        "viewport-writer-does-not-reach-the-device",
+        "SetViewport accepted and discarded rather than pushed",
+        DEVICE,
+        "            try runtime.functions.check(\n"
+        "                runtime.functions.graphicsDeviceSetViewport(handle, native),\n"
+        "                operation: \"cna_graphics_device_set_viewport\")",
+        "            _ = native",
+    ),
+    (
+        "scissor-rectangle-fields-transposed",
+        "the scissor rectangle's origin and extent exchanged on the way out",
+        DEVICE,
+        "            native.x = value.X\n"
+        "            native.y = value.Y\n"
+        "            native.width = value.Width\n"
+        "            native.height = value.Height\n"
+        "            try runtime.functions.check(\n"
+        "                runtime.functions.graphicsDeviceSetScissorRectangle(handle, native),",
+        "            native.x = value.Width\n"
+        "            native.y = value.Height\n"
+        "            native.width = value.X\n"
+        "            native.height = value.Y\n"
+        "            try runtime.functions.check(\n"
+        "                runtime.functions.graphicsDeviceSetScissorRectangle(handle, native),",
+    ),
+    (
+        "device-status-values-shifted",
+        "the three GraphicsDeviceStatus values mapped one place along",
+        DEVICE,
+        "                case 0: return .Normal\n"
+        "                case 1: return .Lost\n"
+        "                case 2: return .NotReset",
+        "                case 0: return .Lost\n"
+        "                case 1: return .NotReset\n"
+        "                case 2: return .Normal",
+    ),
+    (
         "default-back-buffer-width-transcribed-wrong",
         "the GraphicsDeviceManager default back-buffer width off by a digit",
         MANAGER,

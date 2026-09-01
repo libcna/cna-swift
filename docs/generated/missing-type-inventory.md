@@ -9,20 +9,20 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1938
-TOTAL_DIAGNOSTICS=215
+TARGET_MEMBERS=1940
+TOTAL_DIAGNOSTICS=212
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
 MISSING_TYPE=100
-MISSING_MEMBER=98
+MISSING_MEMBER=96
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
 BASE_MAPPING_MISMATCH=0
 INTERFACE_MAPPING_MISMATCH=0
 FIELD_MAPPING_MISMATCH=0
-PROPERTY_MAPPING_MISMATCH=1
+PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
@@ -264,9 +264,8 @@ Expected members: 37; emitted members: 35.
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
-Expected members: 56; emitted members: 11.
+Expected members: 56; emitted members: 13.
 
-- `PROPERTY_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()`: the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present(_:Microsoft.Xna.Framework.Rectangle?,destinationRectangle:Microsoft.Xna.Framework.Rectangle?,overrideWindowHandle:Int)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present()`: mapped member is absent
@@ -300,10 +299,8 @@ Expected members: 56; emitted members: 11.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.IsDisposed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.ScissorRectangle()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Indices()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DisplayMode()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsDeviceStatus()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsProfile()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Adapter()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.PresentationParameters()`: mapped member is absent

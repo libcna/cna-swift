@@ -351,6 +351,11 @@
    "operation": "Applying a graphics state to a live device",
    "status": "VERIFIED_NATIVE",
    "evidence": "The first state this binding has applied to anything. Assigning BlendState.Additive inside a LoadContent callback reaches CNA through cna_graphics_device_set_blend_state, the device caches the caller's own instance, the state comes back bound and refuses later writes, and set_BlendState's copied BlendFactor and MultiSampleMask move with it. SamplerStateCollection applies through cna_graphics_device_set_sampler_state on both stages. Eight routes bound, four PODs mirrored and compiler-verified field for field. Recorded divergences: both collections are 16 slots long because CNA accepts 0-15 on both stages while XNA's vertex collection is 0 under Reach and 4 under HiDef, and blendStateDirty/depthStencilStateDirty are transcribed but permanently false because neither a device reset nor an effect pass is projected."
+  },
+  {
+   "operation": "Viewport, scissor rectangle and device status",
+   "status": "VERIFIED_NATIVE",
+   "evidence": "A viewport written through SetViewport reaches CNA and reads back through the reader that already existed (8,16 320x240 0.25..0.75 from an 800x480 default); a scissor rectangle round trips; the device reports Normal. GraphicsDeviceStatus is mapped explicitly even though CNA and XNA agree on all three values, because Foundation 45 found eight of nine state enums agreeing and the ninth swapped. On the qualified HEADLESS renderer the device is never lost, so Normal is the only value this environment can produce and no claim is made about Lost or NotReset."
   }
  ]
 }

@@ -53,6 +53,86 @@ extension Microsoft.Xna.Framework.Graphics {
             }
         }
 
+        /// `GraphicsDevice.set_Viewport(Viewport value)`.
+        ///
+        /// A writer method, not a Swift `set`: the CLR setter is fallible —
+        /// `Helpers.CheckDisposed` and then a push that can raise
+        /// `ArgumentException` — and Swift has no throwing setter. This is the
+        /// projection of the CLR setter accessor and not a new XNA member; the
+        /// verifier has been asking for it by name since the reader landed.
+        public func SetViewport(
+            _ value: Microsoft.Xna.Framework.Graphics.Viewport
+        ) throws {
+            let handle = try validatedHandle("GraphicsDevice.Viewport")
+            var native = CNASwift_Viewport()
+            native.x = value.X
+            native.y = value.Y
+            native.width = value.Width
+            native.height = value.Height
+            native.min_depth = value.MinDepth
+            native.max_depth = value.MaxDepth
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetViewport(handle, native),
+                operation: "cna_graphics_device_set_viewport")
+        }
+
+        /// `GraphicsDevice.ScissorRectangle`.
+        ///
+        /// Both accessors are `IL_DIRECT_THROW`, so the reader throws and the
+        /// writer is a throwing `SetScissorRectangle` — the same shape
+        /// `Viewport` has, for the same reason.
+        public var ScissorRectangle: Microsoft.Xna.Framework.Rectangle {
+            get throws {
+                let handle = try validatedHandle("GraphicsDevice.ScissorRectangle")
+                var native = CNASwift_Rectangle()
+                try runtime.functions.check(
+                    runtime.functions.graphicsDeviceGetScissorRectangle(handle, &native),
+                    operation: "cna_graphics_device_get_scissor_rectangle")
+                return Microsoft.Xna.Framework.Rectangle(
+                    native.x, native.y, native.width, native.height)
+            }
+        }
+
+        /// `GraphicsDevice.set_ScissorRectangle(Rectangle value)`.
+        public func SetScissorRectangle(
+            _ value: Microsoft.Xna.Framework.Rectangle
+        ) throws {
+            let handle = try validatedHandle("GraphicsDevice.ScissorRectangle")
+            var native = CNASwift_Rectangle()
+            native.x = value.X
+            native.y = value.Y
+            native.width = value.Width
+            native.height = value.Height
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetScissorRectangle(handle, native),
+                operation: "cna_graphics_device_set_scissor_rectangle")
+        }
+
+        /// `GraphicsDevice.GraphicsDeviceStatus`.
+        ///
+        /// `IL_DIRECT_THROW` and no setter, so a throwing reader only. CNA and
+        /// XNA agree on all three values — `Normal` 0, `Lost` 1, `NotReset` 2 —
+        /// and the conversion is still an explicit map: eight of the nine state
+        /// enums agreed in Foundation 45 too, and the ninth did not.
+        public var GraphicsDeviceStatus: Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus {
+            get throws {
+                let handle = try validatedHandle("GraphicsDevice.GraphicsDeviceStatus")
+                var native: UInt32 = 0
+                try runtime.functions.check(
+                    runtime.functions.graphicsDeviceGetStatus(handle, &native),
+                    operation: "cna_graphics_device_get_status")
+                switch native {
+                case 0: return .Normal
+                case 1: return .Lost
+                case 2: return .NotReset
+                default:
+                    throw CNAError.producerInvariant(
+                        "cna_graphics_device_get_status answered \(native), which is "
+                        + "outside the three values GraphicsDeviceStatus declares")
+                }
+            }
+        }
+
         public func Clear(_ color: Microsoft.Xna.Framework.Color) throws {
             let handle = try validatedHandle("GraphicsDevice.Clear")
             let scale: Float = 1 / 255

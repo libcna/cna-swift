@@ -12,20 +12,20 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1938,
-    "TOTAL_DIAGNOSTICS": 215,
+    "TARGET_MEMBERS": 1940,
+    "TOTAL_DIAGNOSTICS": 212,
     "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
     "MISSING_TYPES": 100,
     "MISSING_TYPE": 100,
-    "MISSING_MEMBER": 98,
+    "MISSING_MEMBER": 96,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
     "BASE_MAPPING_MISMATCH": 0,
     "INTERFACE_MAPPING_MISMATCH": 0,
     "FIELD_MAPPING_MISMATCH": 0,
-    "PROPERTY_MAPPING_MISMATCH": 1,
+    "PROPERTY_MAPPING_MISMATCH": 0,
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
@@ -630,11 +630,6 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "PROPERTY_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()",
-      "detail": "the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent"
-    },
-    {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)",
       "detail": "mapped member is absent"
@@ -801,22 +796,12 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ScissorRectangle()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Indices()",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DisplayMode()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsDeviceStatus()",
       "detail": "mapped member is absent"
     },
     {
@@ -2257,14 +2242,14 @@
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "ScissorRectangle",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ScissorRectangle()",
       "readerForm": "property",
       "readerThrows": true,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetScissorRectangle(_:Microsoft.Xna.Framework.Rectangle)",
       "writerName": "SetScissorRectangle",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2288,11 +2273,11 @@
       "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()",
       "readerForm": "property",
       "readerThrows": true,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetViewport(_:Microsoft.Xna.Framework.Graphics.Viewport)",
       "writerName": "SetViewport",
       "writerThrows": true,
       "readerObserved": true,
-      "writerObserved": false,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -10947,13 +10932,8 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 11,
+      "targetMembers": 13,
       "diagnostics": [
-        {
-          "category": "PROPERTY_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Viewport()",
-          "detail": "the CLR setter cannot be a Swift `set`, so the projection requires a SetViewport writer method; it is absent"
-        },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)",
@@ -11121,22 +11101,12 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ScissorRectangle()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Indices()",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DisplayMode()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsDeviceStatus()",
           "detail": "mapped member is absent"
         },
         {

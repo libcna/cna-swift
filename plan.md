@@ -1,7 +1,7 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 45 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 47 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
@@ -9,7 +9,8 @@ projected CLR/XNA exception payloads, the graphics resource hierarchy with
 graphics state objects, `System.ObjectDisposedException` as the seventh
 admitted BCL exception authority, `VertexDeclaration` with the validator behind
 it, `IVertexType` with the four vertex structs, and the graphics device's
-own state members over real CNA routes.
+own state members over real CNA routes, its viewport writer, scissor
+rectangle and status.
 
 This file states what is true **now**. The milestone-by-milestone progression
 lives in `NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md`
@@ -106,37 +107,44 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=157               TARGET_MEMBERS=1935
+TARGET_TYPES=157               TARGET_MEMBERS=1940
 COMPLETE_TYPES=150             PARTIAL_TYPES=7      MISSING_TYPE=100
-MISSING_MEMBER=98              TOTAL_DIAGNOSTICS=215
+MISSING_MEMBER=96              TOTAL_DIAGNOSTICS=212
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 XNA_RESOURCE_STRING_PROJECTIONS=21 API_COMPAT_SELF_TESTS=2420
 ```
 
-Mismatch categories that are not zero, each a recorded decision rather than an
-oversight: `PROPERTY_MAPPING_MISMATCH=1` (`GraphicsDevice.SetViewport`) and
-`OVERLOAD_MAPPING_MISMATCH=16`, spread over eight members that each wait on a
-type not yet projected — `SpriteBatch.Draw` (5), `SpriteBatch.Begin` (4),
-`GraphicsDevice.Clear` (2), and one each on `GraphicsDevice.SetRenderTarget`,
-`Texture2D.FromStream`, `GraphicsDeviceManager.Dispose` and the two
-serialization constructors of `ContentLoadException` and
-`StorageDeviceNotConnectedException`.
+**Every remaining diagnostic is an absence.** Three categories are non-zero —
+`MISSING_TYPE=100`, `MISSING_MEMBER=96`, and `OVERLOAD_MAPPING_MISMATCH=16`,
+whose every entry reads *required overload is absent* and is spread over eight
+members that each wait on a type not yet projected: `SpriteBatch.Draw` (5),
+`SpriteBatch.Begin` (4), `GraphicsDevice.Clear` (2), and one each on
+`GraphicsDevice.SetRenderTarget`, `Texture2D.FromStream`,
+`GraphicsDeviceManager.Dispose` and the two serialization constructors of
+`ContentLoadException` and `StorageDeviceNotConnectedException`.
 
-Every other mismatch and leak category is 0, including `UNEXPECTED_TYPE`,
-`UNEXPECTED_MEMBER`, `BASE_MAPPING_MISMATCH`, `FIELD_MAPPING_MISMATCH`,
-`INTERFACE_MAPPING_MISMATCH`, `INHERITANCE_MAPPING_MISMATCH`,
-`INTERNAL_TYPE_LEAK`, `RAW_HANDLE_LEAK` and `PUBLIC_NATIVE_FFI_LEAK`.
+Every category that would mean the projection **disagrees** with XNA is 0:
+`TYPE_KIND_MISMATCH`, `BASE_MAPPING_MISMATCH`, `INTERFACE_MAPPING_MISMATCH`,
+`FIELD_MAPPING_MISMATCH`, `PROPERTY_MAPPING_MISMATCH`,
+`METHOD_SIGNATURE_MAPPING_MISMATCH`, `PARAMETER_MAPPING_MISMATCH`,
+`RETURN_MAPPING_MISMATCH`, `GENERIC_MAPPING_MISMATCH`, `ENUM_VALUE_MISMATCH`,
+`FLAGS_MAPPING_MISMATCH`, `EVENT_MAPPING_MISMATCH`, `OPERATOR_MAPPING_MISMATCH`,
+`REF_OUT_MAPPING_MISMATCH`, `LANGUAGE_MAPPING_MISMATCH`,
+`INHERITANCE_MAPPING_MISMATCH`, `UNEXPECTED_TYPE`, `UNEXPECTED_MEMBER`,
+`UNMEASURED_STRUCTURAL_CATEGORY`, `INTERNAL_TYPE_LEAK`, `RAW_HANDLE_LEAK` and
+`PUBLIC_NATIVE_FFI_LEAK`. Wherever this binding has projected an XNA member it
+agrees with the pinned metadata; what remains is what has not been written.
 
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=69  ROUTE_PAIRINGS=69  PROTOTYPE_TYPE_POSITIONS=216
-CANONICAL_DECLARATION_CHECKS=216  C_SWIFT_MEASUREMENTS=216
+BOUND_FUNCTIONS=73  ROUTE_PAIRINGS=73  PROTOTYPE_TYPE_POSITIONS=228
+CANONICAL_DECLARATION_CHECKS=228  C_SWIFT_MEASUREMENTS=228
 LAYOUTS=25  LAYOUT_FIELDS=209  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=57  CAUGHT=57  SURVIVORS=0
+PROJECTION_MUTATIONS=60  CAUGHT=60  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected

@@ -99,12 +99,12 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1935
-TOTAL_DIAGNOSTICS=218
+TARGET_MEMBERS=1940
+TOTAL_DIAGNOSTICS=212
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
-MISSING_MEMBER=101
+MISSING_MEMBER=96
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=113
 PROVEN_NONNULL_RETURN_PROJECTIONS=133
@@ -118,10 +118,13 @@ BCL_SUPPORT_TYPE_MEASUREMENTS=18
 
 Normal strict verification remains red because deferred XNA types are genuinely
 absent. Leak-only is green: no internal type, pointer, native handle, or public
-FFI declaration leaks into the XNA surface. The remaining member diagnostics
-belong to GraphicsDevice, GraphicsDeviceManager, SpriteBatch, Game and the
-Texture family, and every one of them waits on an XNA type that is not yet
-projected. See `docs/generated/api-compat-report.json` and
+FFI declaration leaks into the XNA surface. Every remaining diagnostic is an ABSENCE: `MISSING_TYPE`, `MISSING_MEMBER`, and
+an `OVERLOAD_MAPPING_MISMATCH` count whose every entry reads "required overload
+is absent". Every category that would mean the projection *disagrees* with XNA —
+kind, base, interface, field, property, signature, parameter, return, generic,
+enum value, flags, event, operator, ref/out, inheritance, unexpected type or
+member, unmeasured category, and all three leak categories — is 0. The binding
+is incomplete, not incorrect. See `docs/generated/api-compat-report.json` and
 `docs/generated/missing-type-inventory.md` for the exact inventory.
 
 The strict-complete managed foundation includes MathHelper, Point, Rectangle,
@@ -567,7 +570,7 @@ constant and a wrong `Keys` literal — runs the unmodified verifier, requires i
 to fail every time, and proves the tree is byte-identical afterwards.
 
 `tools/projection_mutations/run.py` is the companion gate over the projected
-behavior. It plants fifty-seven realistic defects one at a time — a
+behavior. It plants sixty realistic defects one at a time — a
 neighbouring exception class at a raise site, a message that reports the Swift
 class name to a user, a mirror that moves on a write the host refused, a
 disposal that leaks a native subscription, an IL-derived state default changed,

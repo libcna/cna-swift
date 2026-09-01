@@ -11,7 +11,7 @@ package enforces the same thing with `COMPATIBILITY SameMajorVersion`. Under
 the generation this binding was measured against.
 
 A later minor is admitted by that rule. The protection against a later minor
-that removed a route is not a version number: every one of the 69 bound symbols
+that removed a route is not a version number: every one of the 73 bound symbols
 must resolve by name before the runtime starts, and a missing one throws
 `CNAError.missingNativeSymbol`.
 
@@ -55,8 +55,8 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=69  ROUTE_PAIRINGS=69  PROTOTYPE_TYPE_POSITIONS=216
-CANONICAL_DECLARATION_CHECKS=216  C_SWIFT_MEASUREMENTS=216
+BOUND_FUNCTIONS=73  ROUTE_PAIRINGS=73  PROTOTYPE_TYPE_POSITIONS=228
+CANONICAL_DECLARATION_CHECKS=228  C_SWIFT_MEASUREMENTS=228
 LAYOUTS=25  LAYOUT_FIELDS=209  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
@@ -181,7 +181,8 @@ cna_graphics_device_get_sampler_state: parameters
 ```
 
 `CNA_ShaderStage` — `typedef uint32_t` at `graphics_state.h:214` — was missing
-from the alias table the type-compatibility comparison uses. The textual
+from the alias table the type-compatibility comparison uses, and Foundation 47's
+four routes then found `CNA_GraphicsDeviceStatus` missing the same way. The textual
 canonical-declaration check had already passed on all 198 positions, because the
 manifest keeps CNA's own spelling, and an alias never weakens that check. Same
 class of gap as the two `RenderTarget2D` positions in Foundation 38, and the
