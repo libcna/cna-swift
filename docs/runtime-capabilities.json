@@ -125,7 +125,7 @@
   {
    "operation": "Clear",
    "status": "VERIFIED_NATIVE",
-   "evidence": "cna_graphics_device_clear_rgba executes on qualified HEADLESS device"
+   "evidence": "all three XNA overloads execute through cna_graphics_device_clear_options; the manager-created device reports DepthFormat.Depth24, so Clear(Color) forwards Target|DepthBuffer"
   },
   {
    "operation": "Texture2D stream load",

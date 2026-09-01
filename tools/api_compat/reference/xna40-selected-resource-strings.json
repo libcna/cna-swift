@@ -45,6 +45,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CannotClearNullDepth",
+      "value": "Cannot clear depth or stencil because the device does not have an active depth or stencil buffer."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "value": "Invalid VertexDeclaration. Duplicate element {0}{1}."
     },

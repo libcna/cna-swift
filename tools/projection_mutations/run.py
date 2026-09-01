@@ -15,6 +15,7 @@ the tree is proven byte-identical afterwards.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import os
 import signal
 import subprocess
@@ -43,6 +44,33 @@ DEVICE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDevice.swift"
 STATEBRIDGE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStateNativeBridge.swift"
 SAMPLERS = ROOT / "Sources/CNA/Xna/Graphics/SamplerStateCollection.swift"
 
+# Two mutation harnesses editing the same working tree at once corrupts both.
+# `tools/native_abi/mutations.py` mutates NativeManifest.swift,
+# NativeFunctions.swift, CNAShim.h and Keyboard.swift; this one mutates twenty
+# other files under Sources/ and runs the whole test suite for each. Run them
+# together and a `swift test` here can compile the other harness's planted
+# defect, reporting a CAUGHT the mutation under test did not earn -- a false
+# pass, which is the direction that hides a survivor. That happened once,
+# during Foundation 48, and cost a full re-run to be sure of the result.
+#
+# The lock is advisory and holds between these two scripts only. It is not a
+# claim that the tree is otherwise untouched.
+TREE_LOCK = ROOT / ".mutation-gate.lock"
+
+
+def acquire_tree_lock(name: str):
+    """Take the exclusive tree lock, or return None if another gate holds it."""
+    handle = TREE_LOCK.open("w", encoding="utf-8")
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        handle.close()
+        return None
+    handle.write(f"{os.getpid()} {name}\n")
+    handle.flush()
+    return handle
+
+
 # The WHOLE suite runs for every mutation, deliberately.
 #
 # The first version of this harness filtered to the suites that assert a
@@ -54,6 +82,62 @@ SAMPLERS = ROOT / "Sources/CNA/Xna/Graphics/SamplerStateCollection.swift"
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 48: Clear, and the DefaultClearOptions rule ----------
+    (
+        "default-clear-options-ignores-the-render-target",
+        "get_DefaultClearOptions always reading the presentation parameters",
+        DEVICE,
+        "                if let target = runtime.currentRenderTarget, !target.IsDisposed {",
+        "                if let target = runtime.currentRenderTarget, target.IsDisposed {",
+    ),
+    (
+        "default-clear-options-drops-stencil",
+        "Depth24Stencil8 clearing depth but not stencil",
+        DEVICE,
+        "                if format == .Depth24Stencil8 {\n"
+        "                    return [.Target, .DepthBuffer, .Stencil]\n"
+        "                }",
+        "                if format == .Depth24Stencil8 {\n"
+        "                    return [.Target, .DepthBuffer]\n"
+        "                }",
+    ),
+    (
+        "set-render-target-forgets-to-record",
+        "SetRenderTarget not recording the target DefaultClearOptions reads",
+        DEVICE,
+        "            runtime.currentRenderTarget = renderTarget",
+        "            _ = renderTarget",
+    ),
+    (
+        "null-depth-diagnosis-fires-on-every-failure",
+        "every failed clear blamed on an absent depth or stencil buffer",
+        DEVICE,
+        "            guard try defaultClearOptions.intersection(requested) == requested else {",
+        "            guard try defaultClearOptions.intersection(requested) != requested else {",
+    ),
+    (
+        "null-depth-diagnosis-never-fires",
+        "a clear of buffers the device lacks reported as a bare native failure",
+        DEVICE,
+        "                throw CNAInvalidOperationException(message: cannotClearNullDepthMessage)",
+        "                _ = cannotClearNullDepthMessage",
+    ),
+    (
+        "clear-options-drops-undeclared-bits",
+        "an option XNA does not declare silently narrowed away",
+        STATEBRIDGE,
+        "        native |= UInt32(bitPattern: value.rawValue & ~declared)",
+        "        native |= 0",
+    ),
+    (
+        "clear-options-swaps-depth-and-stencil",
+        "DepthBuffer and Stencil mapped to each other's canonical bits",
+        STATEBRIDGE,
+        "        if value.contains(.DepthBuffer) { native |= 2 }\n"
+        "        if value.contains(.Stencil) { native |= 4 }",
+        "        if value.contains(.DepthBuffer) { native |= 4 }\n"
+        "        if value.contains(.Stencil) { native |= 2 }",
+    ),
     (
         "wrong-exception-class", "a raise site throwing a neighbouring class",
         DICTIONARY,
@@ -654,6 +738,12 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--swift-test", default="swift-test")
     args = parser.parse_args()
+    tree_lock = acquire_tree_lock("projection_mutations")
+    if tree_lock is None:
+        print("MUTATION_GATE=BUSY — another mutation harness holds "
+              f"{TREE_LOCK.name}; these two gates cannot share a working tree")
+        return 1
+
 
     restore_on_termination()
 

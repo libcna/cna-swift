@@ -62,7 +62,6 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceManagerApplyChangesRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceManagerDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceGetViewportRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Viewport>?) -> UInt32
-    typealias GraphicsDeviceClearRgbaRoute = @convention(c) (UInt64, Float, Float, Float, Float) -> UInt32
     typealias Texture2dCreateFromEncodedMemoryRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, UnsafePointer<CNASwift_Texture2DDecodeInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias Texture2dGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Texture2DInfo>?) -> UInt32
     typealias Texture2dDestroyRoute = @convention(c) (UInt64) -> UInt32
@@ -82,6 +81,8 @@ internal final class NativeFunctions {
     typealias RenderTargetGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RenderTargetInfo>?) -> UInt32
     typealias RenderTargetDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias GraphicsDeviceClearOptionsRoute = @convention(c) (UInt64, UInt32, CNASwift_Color, Float, Int32) -> UInt32
+    typealias GraphicsDeviceGetPresentationParametersRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_PresentationParameters>?) -> UInt32
     typealias GraphicsDeviceSetViewportRoute = @convention(c) (UInt64, CNASwift_Viewport) -> UInt32
     typealias GraphicsDeviceGetScissorRectangleRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Rectangle>?) -> UInt32
     typealias GraphicsDeviceSetScissorRectangleRoute = @convention(c) (UInt64, CNASwift_Rectangle) -> UInt32
@@ -143,7 +144,6 @@ internal final class NativeFunctions {
     let graphicsManagerApplyChanges: GraphicsDeviceManagerApplyChangesRoute
     let graphicsManagerDestroy: GraphicsDeviceManagerDestroyRoute
     let graphicsDeviceGetViewport: GraphicsDeviceGetViewportRoute
-    let graphicsDeviceClearRGBA: GraphicsDeviceClearRgbaRoute
     let textureCreateMemory: Texture2dCreateFromEncodedMemoryRoute
     let textureGetInfo: Texture2dGetInfoRoute
     let textureDestroy: Texture2dDestroyRoute
@@ -163,6 +163,8 @@ internal final class NativeFunctions {
     let renderTargetGetInfo: RenderTargetGetInfoRoute
     let renderTargetDestroy: RenderTargetDestroyRoute
     let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
+    let graphicsDeviceClearOptions: GraphicsDeviceClearOptionsRoute
+    let graphicsDeviceGetPresentationParameters: GraphicsDeviceGetPresentationParametersRoute
     let graphicsDeviceSetViewport: GraphicsDeviceSetViewportRoute
     let graphicsDeviceGetScissorRectangle: GraphicsDeviceGetScissorRectangleRoute
     let graphicsDeviceSetScissorRectangle: GraphicsDeviceSetScissorRectangleRoute
@@ -244,7 +246,6 @@ internal final class NativeFunctions {
         graphicsManagerApplyChanges = try library.resolve("cna_graphics_device_manager_apply_changes", as: GraphicsDeviceManagerApplyChangesRoute.self)
         graphicsManagerDestroy = try library.resolve("cna_graphics_device_manager_destroy", as: GraphicsDeviceManagerDestroyRoute.self)
         graphicsDeviceGetViewport = try library.resolve("cna_graphics_device_get_viewport", as: GraphicsDeviceGetViewportRoute.self)
-        graphicsDeviceClearRGBA = try library.resolve("cna_graphics_device_clear_rgba", as: GraphicsDeviceClearRgbaRoute.self)
         textureCreateMemory = try library.resolve("cna_texture2d_create_from_encoded_memory", as: Texture2dCreateFromEncodedMemoryRoute.self)
         textureGetInfo = try library.resolve("cna_texture2d_get_info", as: Texture2dGetInfoRoute.self)
         textureDestroy = try library.resolve("cna_texture2d_destroy", as: Texture2dDestroyRoute.self)
@@ -264,6 +265,8 @@ internal final class NativeFunctions {
         renderTargetGetInfo = try library.resolve("cna_render_target_get_info", as: RenderTargetGetInfoRoute.self)
         renderTargetDestroy = try library.resolve("cna_render_target_destroy", as: RenderTargetDestroyRoute.self)
         graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)
+        graphicsDeviceClearOptions = try library.resolve("cna_graphics_device_clear_options", as: GraphicsDeviceClearOptionsRoute.self)
+        graphicsDeviceGetPresentationParameters = try library.resolve("cna_graphics_device_get_presentation_parameters", as: GraphicsDeviceGetPresentationParametersRoute.self)
         graphicsDeviceSetViewport = try library.resolve("cna_graphics_device_set_viewport", as: GraphicsDeviceSetViewportRoute.self)
         graphicsDeviceGetScissorRectangle = try library.resolve("cna_graphics_device_get_scissor_rectangle", as: GraphicsDeviceGetScissorRectangleRoute.self)
         graphicsDeviceSetScissorRectangle = try library.resolve("cna_graphics_device_set_scissor_rectangle", as: GraphicsDeviceSetScissorRectangleRoute.self)

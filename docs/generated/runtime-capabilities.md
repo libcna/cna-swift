@@ -35,7 +35,7 @@ CNA source revision `0a6158e4ff764907065cd7259e3d29e331a52088`, library SHA-256
 | Game callback error containment | VERIFIED_NATIVE | Initialize, LoadContent, Update, Draw and UnloadContent errors are caught in C trampolines and rethrown at controlled Swift boundaries. |
 | Game recreation | VERIFIED_NATIVE | 20 create/run/exit/destroy cycles pass; stale generations reject use. |
 | GraphicsDevice | VERIFIED_NATIVE | Callback-scoped borrowed device returned by cna_game_get_graphics_device. |
-| Clear | VERIFIED_NATIVE | Cna_graphics_device_clear_rgba executes on qualified HEADLESS device. |
+| Clear | VERIFIED_NATIVE | All three XNA overloads execute through cna_graphics_device_clear_options; the manager-created device reports DepthFormat.Depth24, so Clear(Color) forwards Target\|DepthBuffer. |
 | Texture2D stream load | VERIFIED_NATIVE | Foundation.InputStream bytes decode through CNA; logo reports native 128x128 and stress fixture reports 1x1. |
 | SpriteBatch Begin/Draw/End | VERIFIED_NATIVE | Begin, scaled submit, and end execute for 60/600 template frames and 20 ownership cycles. |
 | Keyboard | VERIFIED_NATIVE | Native HEADLESS state route executes; empty state is observed backend evidence, not fabricated. |

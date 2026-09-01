@@ -89,6 +89,28 @@ internal final class RuntimeState {
     var blendStateDirty = false
     var depthStencilStateDirty = false
 
+    /// `currentRenderTargets[0]`, as `get_DefaultClearOptions` reads it.
+    ///
+    /// XNA keeps an array and a count; this binding binds only the single
+    /// `SetRenderTarget(RenderTarget2D)` route, so one slot is the whole of
+    /// what it can honestly track. Nil means the backbuffer, which is XNA's
+    /// `currentRenderTargetCount == 0` branch. It lives here rather than on
+    /// the facade for the same reason the state cache does: the facade is a
+    /// per-callback token, not an identity.
+    ///
+    /// Weak, where XNA's array is a strong reference. A strong one here would
+    /// close a retain cycle -- runtime to target to device facade and back to
+    /// runtime -- that nothing would ever break, and the difference between
+    /// the two is confined to a target whose last reference the caller has
+    /// already dropped while it is still bound. CNA refuses to leave that
+    /// state cleanly: `cna_render_target_destroy` on a bound target answers
+    /// `CNA_RESULT_INVALID_STATE`, measured in `build-probe/f48b_params.c`,
+    /// so a caller who drops a bound target has already stranded the native
+    /// object whatever this reference does. Reporting the backbuffer's depth
+    /// format for a target that is no longer projected is the honest answer
+    /// of the two.
+    weak var currentRenderTarget: Microsoft.Xna.Framework.Graphics.RenderTarget2D?
+
     // XNA builds both collections in the GraphicsDevice constructor, with
     // `ProfileCapabilities.MaxSamplers` (16 in both profiles) and
     // `MaxVertexSamplers` (0 under Reach, 4 under HiDef) slots and offsets 0

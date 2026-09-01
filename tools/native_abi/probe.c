@@ -64,6 +64,13 @@ _Static_assert(CNA_GAMEPAD_BUTTON_LEFT_THUMBSTICK_DOWN == 536870912,
     "Buttons.LeftThumbstickDown");
 _Static_assert(CNA_GAMEPAD_BUTTON_LEFT_THUMBSTICK_RIGHT == 1073741824,
     "Buttons.LeftThumbstickRight");
+/* ClearOptions crosses the boundary as a bit mask, and no runtime observation
+ * can tell which buffers a HEADLESS clear touched -- so these three are the
+ * only evidence that NativeStateCodes.clearOptions maps the right bits. */
+_Static_assert(CNA_CLEAR_OPTION_TARGET == 1, "ClearOptions.Target");
+_Static_assert(CNA_CLEAR_OPTION_DEPTH_BUFFER == 2, "ClearOptions.DepthBuffer");
+_Static_assert(CNA_CLEAR_OPTION_STENCIL == 4, "ClearOptions.Stencil");
+
 _Static_assert(CNA_GAMEPAD_TYPE_UNKNOWN == 0, "GamePadType.Unknown");
 _Static_assert(CNA_GAMEPAD_TYPE_GAMEPAD == 1, "GamePadType.GamePad");
 _Static_assert(CNA_GAMEPAD_TYPE_WHEEL == 2, "GamePadType.Wheel");

@@ -14,6 +14,8 @@ tree is byte-identical to how it started.
 from __future__ import annotations
 
 import argparse
+import fcntl
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -25,6 +27,31 @@ SHIM = ROOT / "Sources/CNAShim/include/CNAShim.h"
 PROBE = ROOT / "tools/native_abi/probe.c"
 KEYS = ROOT / "Sources/CNA/Xna/Input/Keyboard.swift"
 VERIFY = ROOT / "tools/native_abi/verify.py"
+
+# Two mutation harnesses editing the same working tree at once corrupts both.
+# This one mutates NativeManifest.swift, NativeFunctions.swift, CNAShim.h and
+# Keyboard.swift; `tools/projection_mutations/run.py` mutates twenty other
+# files under Sources/ and runs the whole test suite for each. Run them
+# together and that harness's `swift test` can compile a defect planted here,
+# reporting a CAUGHT its own mutation did not earn -- a false pass, which is
+# the direction that hides a survivor. It happened once, during Foundation 48.
+#
+# The lock is advisory and holds between these two scripts only. It is not a
+# claim that the tree is otherwise untouched.
+TREE_LOCK = ROOT / ".mutation-gate.lock"
+
+
+def acquire_tree_lock(name: str):
+    """Take the exclusive tree lock, or return None if another gate holds it."""
+    handle = TREE_LOCK.open("w", encoding="utf-8")
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        handle.close()
+        return None
+    handle.write(f"{os.getpid()} {name}\n")
+    handle.flush()
+    return handle
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
     (
@@ -125,6 +152,12 @@ def main() -> int:
     parser.add_argument("--library", required=True, type=Path)
     parser.add_argument("--cc", default="cc")
     args = parser.parse_args()
+    tree_lock = acquire_tree_lock("native_abi_mutations")
+    if tree_lock is None:
+        print("MUTATION_GATE=BUSY — another mutation harness holds "
+              f"{TREE_LOCK.name}; these two gates cannot share a working tree")
+        return 1
+
 
     originals = {path: path.read_text(encoding="utf-8") for path in
                  {MANIFEST, FUNCTIONS, SHIM, PROBE, KEYS}}

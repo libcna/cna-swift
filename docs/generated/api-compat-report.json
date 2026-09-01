@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1940,
-    "TOTAL_DIAGNOSTICS": 212,
+    "TARGET_MEMBERS": 1942,
+    "TOTAL_DIAGNOSTICS": 208,
     "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
     "MISSING_TYPES": 100,
     "MISSING_TYPE": 100,
-    "MISSING_MEMBER": 96,
+    "MISSING_MEMBER": 94,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -29,7 +29,7 @@
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 16,
+    "OVERLOAD_MAPPING_MISMATCH": 14,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 21,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 22,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -703,26 +703,6 @@
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
       "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Vector4,depth:Float,stencil:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Vector4,depth:Float,stencil:Int32)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)",
-      "detail": "required overload is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -4114,6 +4094,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "BoundingSphereZeroPoints",
       "pinnedValue": "You should have at least one point in points.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "CannotClearNullDepth",
+      "pinnedValue": "Cannot clear depth or stencil because the device does not have an active depth or stencil buffer.",
       "reproducedInSwiftSource": true
     },
     {
@@ -10932,7 +10918,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 13,
+      "targetMembers": 15,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -11008,26 +10994,6 @@
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
           "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Vector4,depth:Float,stencil:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Vector4,depth:Float,stencil:Int32)",
-          "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)",
-          "detail": "required overload is absent"
         },
         {
           "category": "MISSING_MEMBER",

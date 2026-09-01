@@ -261,3 +261,34 @@ extension Microsoft.Xna.Framework.Graphics.SamplerState {
         return native
     }
 }
+
+extension Microsoft.Xna.Framework.Graphics.NativeStateCodes {
+    /// `ClearOptions` as `CNA_CLEAR_OPTION_*` bits.
+    ///
+    /// The three declared options are mapped one at a time, like every other
+    /// enum crossing this boundary, and `tools/native_abi/probe.c` compiles
+    /// the three canonical values so a renumbering upstream is a build
+    /// failure rather than a wrong clear. Bits XNA does not declare are
+    /// carried across untouched: XNA passes the raw word to D3D9 and lets the
+    /// driver refuse it, and CNA refuses it the same way — measured, in
+    /// `build-probe/f48_clear.c`, as `CNA_RESULT_INVALID_ARGUMENT` for bit
+    /// 0x10. Dropping them would turn a clear XNA fails into one that
+    /// silently succeeds.
+    static func clearOptions(
+        _ value: Microsoft.Xna.Framework.Graphics.ClearOptions
+    ) -> UInt32 {
+        var native: UInt32 = 0
+        if value.contains(.Target) { native |= 1 }
+        if value.contains(.DepthBuffer) { native |= 2 }
+        if value.contains(.Stencil) { native |= 4 }
+        let declared: Int32 = 1 | 2 | 4
+        native |= UInt32(bitPattern: value.rawValue & ~declared)
+        return native
+    }
+}
+
+/// `FrameworkResources.CannotClearNullDepth`, pinned from the embedded string
+/// table of the registered `Microsoft.Xna.Framework.dll`.
+internal let cannotClearNullDepthMessage =
+    "Cannot clear depth or stencil because the device does not have an "
+    + "active depth or stencil buffer."

@@ -49,6 +49,7 @@ MIRRORED_STRUCTS = [
     "GamePadState", "GamePadCapabilities", "TextureInfo",
     "RenderTarget2DCreateInfo", "RenderTargetInfo",
     "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
+    "PresentationParameters",
 ]
 
 # The shim mirrors exactly these canonical callback types.
@@ -146,6 +147,11 @@ def canonical_type(value: str) -> str:
         "CNA_ShaderStage": "uint32_t",
         # `typedef uint32_t CNA_GraphicsDeviceStatus;` in graphics_device.h:34.
         "CNA_GraphicsDeviceStatus": "uint32_t",
+        # graphics_device.h:24 and the display/surface typedefs the
+        # presentation parameters name.
+        "CNA_ClearOptions": "uint32_t", "CNA_SurfaceFormat": "uint32_t",
+        "CNA_DepthFormat": "uint32_t", "CNA_PresentInterval": "uint32_t",
+        "CNA_DisplayOrientation": "uint32_t", "CNA_RenderTargetUsage": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

@@ -36,21 +36,35 @@ milestone's own prose, that milestone's evidence file carries it still.
    pinned in `tools/api_compat/reference/xna40-selected-resource-strings.json`,
    and compared against the Swift source by the verifier.
 3. **A complete type does not imply runtime capability.** Profile selection,
-   presentation, device status, primitives, clear paths, vertex and index
-   buffers, cube textures, effects, content loading, windows, and audio
-   playback all remain unclaimed. Render targets are now created, bound and
-   consumed natively. The four state objects are complete managed types whose
-   values have never been **applied to a device**: no
-   `GraphicsDevice.BlendState` or sampler-collection route is bound yet, so
-   `isBound` is reachable only from inside the module. Two measured
-   divergences stand in the way of binding them and are recorded rather than
-   worked around: CNA's graphics-device handle is a per-callback capability
-   token and not a stable identity, so device-owned managed state must be
-   anchored to the game; and `BlendFunction.Min`/`.Max` are numbered the other
-   way round in CNA than in XNA, so every state enum must cross the boundary
-   through an explicit map. Both are measured, and both are stated with the
-   rest of that research in
+   presentation, primitives, vertex and index buffers, cube textures, effects,
+   content loading, windows, and audio playback all remain unclaimed. Render
+   targets are created, bound and consumed natively. The four state objects are
+   applied to a device as of Foundation 45, and device status, the viewport,
+   the scissor rectangle and all three `Clear` overloads followed in
+   Foundations 47 and 48. Two measured divergences shaped how that was done and
+   are recorded rather than worked around: CNA's graphics-device handle is a
+   per-callback capability token and not a stable identity, so device-owned
+   managed state is anchored to the game; and `BlendFunction.Min`/`.Max` are
+   numbered the other way round in CNA than in XNA, so every state enum crosses
+   the boundary through an explicit map. Both are stated with the rest of that
+   research in
    `docs/frontier-research-graphics-device-state-and-vertex-declaration.md`.
+
+   Foundation 48 is the reminder that this cuts both ways: `Clear(Color)` had
+   been *implemented* since the earliest graphics work and was **wrong**,
+   clearing colour where XNA also clears depth, on the only device
+   configuration a projected game ever gets (`DepthFormat.Depth24`, measured).
+   A member being present, tested and green is not evidence that it agrees with
+   the pinned IL; only reading the IL is. See
+   `docs/foundation-48-clear-evidence.md`.
+
+   Reading every implemented `GraphicsDevice` member's IL by size, which is how
+   that was found, immediately found two more: `set_Viewport` (387 bytes, five
+   `ArgumentException(ViewportInvalid)` branches) and `set_ScissorRectangle`
+   (300 bytes, three `ScissorInvalid` branches) are projected with none of
+   their validation. **That is the next milestone**, and it outranks
+   unprojected surface: a member that disagrees with XNA is worse than one that
+   is honestly absent.
 4. **A CLR field's writability is metadata, not convention.** `literal` and
    `initonly` are two different `FieldAttributes`, and neither is assignable, so
    both project to a Swift `let`. `readonly` is recorded on all 557 contract
@@ -107,19 +121,19 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=157               TARGET_MEMBERS=1940
+TARGET_TYPES=157               TARGET_MEMBERS=1942
 COMPLETE_TYPES=150             PARTIAL_TYPES=7      MISSING_TYPE=100
-MISSING_MEMBER=96              TOTAL_DIAGNOSTICS=212
+MISSING_MEMBER=94              TOTAL_DIAGNOSTICS=208
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
-XNA_RESOURCE_STRING_PROJECTIONS=21 API_COMPAT_SELF_TESTS=2420
+XNA_RESOURCE_STRING_PROJECTIONS=22 API_COMPAT_SELF_TESTS=2420
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=100`, `MISSING_MEMBER=96`, and `OVERLOAD_MAPPING_MISMATCH=16`,
-whose every entry reads *required overload is absent* and is spread over eight
+`MISSING_TYPE=100`, `MISSING_MEMBER=94`, and `OVERLOAD_MAPPING_MISMATCH=14`,
+whose every entry reads *required overload is absent* and is spread over seven
 members that each wait on a type not yet projected: `SpriteBatch.Draw` (5),
-`SpriteBatch.Begin` (4), `GraphicsDevice.Clear` (2), and one each on
+`SpriteBatch.Begin` (4), and one each on
 `GraphicsDevice.SetRenderTarget`, `Texture2D.FromStream`,
 `GraphicsDeviceManager.Dispose` and the two serialization constructors of
 `ContentLoadException` and `StorageDeviceNotConnectedException`.
@@ -139,12 +153,12 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=73  ROUTE_PAIRINGS=73  PROTOTYPE_TYPE_POSITIONS=228
-CANONICAL_DECLARATION_CHECKS=228  C_SWIFT_MEASUREMENTS=228
-LAYOUTS=25  LAYOUT_FIELDS=209  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
+BOUND_FUNCTIONS=74  ROUTE_PAIRINGS=74  PROTOTYPE_TYPE_POSITIONS=231
+CANONICAL_DECLARATION_CHECKS=231  C_SWIFT_MEASUREMENTS=231
+LAYOUTS=26  LAYOUT_FIELDS=222  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=60  CAUGHT=60  SURVIVORS=0
+PROJECTION_MUTATIONS=67  CAUGHT=67  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected
@@ -154,10 +168,16 @@ is selected, which would report a coverage loss as sixteen projection defects.
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
-(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=21`). The BCL authority
+(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=22`). The BCL authority
 carries `BCL_SENTINEL_CHECKS=433`, `BCL_MUTATION_SELF_TESTS=462`,
 `BCL_CROSS_CHECKS=141` against a second disassembler, and four negative
-controls that are still refused.
+controls that are still refused. The four are not the same four binaries as in
+earlier sessions -- this machine's Mono packages were upgraded since, and none
+of the previously recorded control digests exists on disk any more, so the set
+was rebuilt from what is here now. One of the four is the strongest control the
+gate has had: a **genuine Microsoft** `mscorlib.dll` from another .NET 4.0
+install, refused by 2 of 21 checks rather than by 12 to 16. A control that only
+just fails is worth more than three that fail obviously.
 `mscorlib` `5634668d…acc63` is the sole admitted BCL authority — 28 types and
 254 members across seven raised exception families and eleven support types.
 `System.dll` is available, its identity is established, and it is deliberately

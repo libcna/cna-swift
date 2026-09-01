@@ -99,12 +99,12 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1940
-TOTAL_DIAGNOSTICS=212
+TARGET_MEMBERS=1942
+TOTAL_DIAGNOSTICS=208
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
-MISSING_MEMBER=96
+MISSING_MEMBER=94
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=113
 PROVEN_NONNULL_RETURN_PROJECTIONS=133
@@ -250,6 +250,16 @@ reference-typed return positions. An unproven return keeps the non-Optional
 projection and is named individually rather than guessed either way. See
 `docs/xna-swift-mapping.md` and
 `docs/foundation-23-reference-return-nullability-evidence.md`.
+
+## Per-milestone records
+
+The sections from here to *Qualified runtime* were written when each type
+landed and are kept as that milestone's record. Their closing "remains
+deferred" lists were true on the day they were written and are **not**
+maintained: `GraphicsDevice.SetRenderTarget`, `GraphicsDevice.RasterizerState`,
+`RenderTarget2D` and the four state objects have all landed since, in
+Foundations 38, 41, 45, 47 and 48. `plan.md` and the diagnostic block above are
+the authority for what is true now.
 
 ## Foundation 14 pure managed batch
 
@@ -521,8 +531,20 @@ python3 tools/native_abi/verify.py \
 python3 tools/native_abi/mutations.py \
   --cna-include /path/to/cnanext/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY"
+# The two mutation harnesses take an exclusive lock on .mutation-gate.lock and
+# refuse to run at the same time: they both edit files under Sources/, and a
+# swift test here that compiles the other one's planted defect reports a CAUGHT
+# it did not earn. Run them one after the other, never in parallel.
 CNA_NATIVE_LIBRARY=/path/to/libcna_c_api.so \
   python3 tools/projection_mutations/run.py
+python3 tools/api_compat/bcl_authority_audit.py \
+  --assembly mscorlib.dll=/path/to/net4/mscorlib.dll \
+  --cross-check \
+  --negative-control mscorlib.dll=/usr/lib/mono/4.5/mscorlib.dll \
+  --negative-control mscorlib.dll=/usr/lib/mono/4.0/mscorlib.dll \
+  --negative-control mscorlib.dll=/usr/lib/mono/2.0-api/mscorlib.dll \
+  --negative-control mscorlib.dll=/path/to/another/net4/mscorlib.dll \
+  --output docs/generated/bcl-authority-audit.json
 python3 tools/runtime_capabilities/render.py --check
 python3 tools/gamepad_native/run.py \
   --library "$CNA_NATIVE_LIBRARY" \

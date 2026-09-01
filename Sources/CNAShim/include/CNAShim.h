@@ -218,6 +218,22 @@ typedef struct CNASwift_SamplerState {
     uint32_t reserved;
 } CNASwift_SamplerState;
 
+typedef struct CNASwift_PresentationParameters {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t back_buffer_format;
+    int32_t back_buffer_width;
+    int32_t back_buffer_height;
+    uint32_t depth_stencil_format;
+    int32_t multi_sample_count;
+    uint32_t presentation_interval;
+    uint32_t display_orientation;
+    uint32_t render_target_usage;
+    CNASwift_Bool is_full_screen;
+    CNASwift_Bool headless_ext;
+    uint8_t reserved[2];
+} CNASwift_PresentationParameters;
+
 typedef void (*CNASwift_GameEventCallback)(void* context);
 
 typedef void (*CNASwift_RenderTargetContentLostCallback)(

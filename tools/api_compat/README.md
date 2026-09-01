@@ -128,6 +128,9 @@ python3 tools/api_compat/bcl_authority_audit.py \
   --assembly mscorlib.dll=/path/to/mscorlib.dll \
   --cross-check \
   --negative-control mscorlib.dll=/usr/lib/mono/4.5/mscorlib.dll \
+  --negative-control mscorlib.dll=/usr/lib/mono/4.0/mscorlib.dll \
+  --negative-control mscorlib.dll=/usr/lib/mono/2.0-api/mscorlib.dll \
+  --negative-control mscorlib.dll=/path/to/another/net4/mscorlib.dll \
   --output docs/generated/bcl-authority-audit.json
 ```
 
@@ -137,6 +140,14 @@ exact identity including a **recomputed** strong-name token
 (`BCL_MANIFEST_CHECKS`), sentinel facts stated independently of the extractor
 (`BCL_SENTINEL_CHECKS`), mutation self-tests that must each be detected
 (`BCL_MUTATION_SELF_TESTS`), and agreement from `monodis`, an independent
+The fourth control is the one that matters most: a **genuine Microsoft**
+`mscorlib.dll` from a different .NET 4.0 install, refused by 2 of 21 checks
+where the Mono binaries are refused by 12 to 16. A control that only just fails
+tells you where the boundary actually is; three that fail obviously do not.
+The specific control binaries are not pinned — this machine's Mono packages
+have been upgraded at least once, retiring the digests an earlier session
+recorded — so reproduce the count, not the files.
+
 metadata reader (`BCL_CROSS_CHECKS`). `--negative-control NAME=PATH` offers a
 binary that must be **refused**, which is what keeps the gate honest; the Mono
 `mscorlib` builds are the standing controls. Authority is demand-driven: only

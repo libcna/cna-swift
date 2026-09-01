@@ -133,19 +133,94 @@ extension Microsoft.Xna.Framework.Graphics {
             }
         }
 
+        /// `GraphicsDevice.Clear(Color color)`.
+        ///
+        /// Twenty bytes of IL, and every one of them forwards:
+        ///
+        ///     this.Clear(this.DefaultClearOptions, color, 1.0f, 0)
+        ///
+        /// The `1.0f` and the `0` are pinned literals — `ldc.r4 1` and
+        /// `ldc.i4.0` — and `DefaultClearOptions` decides whether the depth
+        /// and stencil buffers are cleared along with the colour. Until
+        /// Foundation 48 this projection called CNA's colour-only route
+        /// directly, which silently dropped both. That was a real divergence
+        /// wherever a depth buffer existed, and this is its repair.
         public func Clear(_ color: Microsoft.Xna.Framework.Color) throws {
+            try Clear(try defaultClearOptions, color: color, depth: 1.0, stencil: 0)
+        }
+
+        /// `GraphicsDevice.Clear(ClearOptions options, Vector4 color, Single depth, Int32 stencil)`.
+        ///
+        /// Also pure forwarding: `new Color(vector4)` and then the Color
+        /// overload. The conversion is XNA's own `Color(Vector4)`
+        /// constructor, not a second rounding rule invented here.
+        public func Clear(
+            _ options: Microsoft.Xna.Framework.Graphics.ClearOptions,
+            color: Microsoft.Xna.Framework.Vector4,
+            depth: Float,
+            stencil: Int32
+        ) throws {
+            try Clear(options, color: Microsoft.Xna.Framework.Color(color),
+                      depth: depth, stencil: stencil)
+        }
+
+        /// `GraphicsDevice.Clear(ClearOptions options, Color color, Single depth, Int32 stencil)`.
+        ///
+        /// The 543-byte overload the other two reach. What survives
+        /// projection is its order of events, which is the part that is
+        /// observable: check disposed, clear, and only then — if the clear
+        /// *failed* — decide which exception that failure deserves.
+        ///
+        ///     hr = pComPtr->Clear(0, null, options, argb, depth, stencil);
+        ///     …
+        ///     if (hr < 0) {
+        ///         ClearOptions requested = options & 6;   // DepthBuffer|Stencil
+        ///         if ((this.DefaultClearOptions & requested) != requested)
+        ///             throw new InvalidOperationException(
+        ///                 FrameworkResources.CannotClearNullDepth);
+        ///         throw GraphicsHelpers.GetExceptionFromResult(hr);
+        ///     }
+        ///
+        /// `CannotClearNullDepth` is therefore a *diagnosis of a failure*, not
+        /// a pre-validation: XNA asks the device to clear buffers it may not
+        /// have, and only explains itself once the device has refused. A
+        /// projection that checked the mask up front would reject clears XNA
+        /// performs, which is why this one does not.
+        ///
+        /// XNA hands D3D9 the `ClearOptions` word unchanged — the three
+        /// declared bits share D3DCLEAR_TARGET/ZBUFFER/STENCIL's values — so
+        /// an undeclared bit reaches the driver and comes back as a failure.
+        /// The three declared bits are mapped explicitly here, per the
+        /// Foundation 45 rule, and any remaining bits are passed through
+        /// unchanged so that a caller who sets one still gets XNA's answer
+        /// rather than a silently narrowed clear.
+        ///
+        /// What does not survive: the D3D9 scissor-state save/restore around
+        /// the clear, the temporary full-target viewport, and the
+        /// `lazyClearFlags` bookkeeping. All three are below CNA's
+        /// abstraction — `cna_graphics_device_clear_options` is one call, not
+        /// a device-state sequence — and none is observable through any
+        /// projected member. `SetContentLost(false)` on each bound render
+        /// target is CNA's to decide for the same reason: it owns the
+        /// content-lost state that `RenderTarget2D.IsContentLost` reports.
+        public func Clear(
+            _ options: Microsoft.Xna.Framework.Graphics.ClearOptions,
+            color: Microsoft.Xna.Framework.Color,
+            depth: Float,
+            stencil: Int32
+        ) throws {
             let handle = try validatedHandle("GraphicsDevice.Clear")
-            let scale: Float = 1 / 255
+            let result = runtime.functions.graphicsDeviceClearOptions(
+                handle, NativeStateCodes.clearOptions(options), color.native,
+                depth, stencil)
+            guard result != 0 else { return }
+            let requested = options.intersection(
+                [.DepthBuffer, .Stencil])
+            guard try defaultClearOptions.intersection(requested) == requested else {
+                throw CNAInvalidOperationException(message: cannotClearNullDepthMessage)
+            }
             try runtime.functions.check(
-                runtime.functions.graphicsDeviceClearRGBA(
-                    handle,
-                    Float(color.R) * scale,
-                    Float(color.G) * scale,
-                    Float(color.B) * scale,
-                    Float(color.A) * scale
-                ),
-                operation: "cna_graphics_device_clear_rgba"
-            )
+                result, operation: "cna_graphics_device_clear_options")
         }
 
         /// `GraphicsDevice.SetRenderTarget(RenderTarget2D renderTarget)`.
@@ -164,6 +239,66 @@ extension Microsoft.Xna.Framework.Graphics {
                 runtime.functions.graphicsDeviceSetRenderTarget2D(deviceHandle, targetHandle),
                 operation: "cna_graphics_device_set_render_target2d"
             )
+            // `currentRenderTargets[0]` / `currentRenderTargetCount`, which
+            // `get_DefaultClearOptions` reads to decide which buffers a
+            // colour-only `Clear` also clears.
+            runtime.currentRenderTarget = renderTarget
+        }
+
+        /// The device's applied presentation parameters, as CNA reports them.
+        ///
+        /// Deliberately internal. XNA's public `PresentationParameters`
+        /// getter is `IL_NO_FAILURE_PATH` because it reads
+        /// `pInternalCachedParams`, a field written when the device was
+        /// created or reset. This binding has exactly one source for those
+        /// values — a fallible CNA route — and no device-creation moment it
+        /// observes at which to cache them infallibly, so the public property
+        /// stays absent rather than being projected as `get throws` against
+        /// the pinned verdict, or backed by an invented default XNA never
+        /// had. The route is bound because `defaultClearOptions` consumes it.
+        internal func nativePresentationParameters() throws -> CNASwift_PresentationParameters {
+            let handle = try validatedHandle("GraphicsDevice.PresentationParameters")
+            var native = CNASwift_PresentationParameters()
+            native.struct_size = UInt32(MemoryLayout<CNASwift_PresentationParameters>.size)
+            native.struct_version = 1
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceGetPresentationParameters(handle, &native),
+                operation: "cna_graphics_device_get_presentation_parameters")
+            return native
+        }
+
+        /// `GraphicsDevice.get_DefaultClearOptions`, which is `private` in XNA
+        /// and is what the colour-only `Clear` forwards with:
+        ///
+        ///     ClearOptions o = Target;
+        ///     DepthFormat f = currentRenderTargetCount > 0
+        ///         ? currentRenderTargets[0].depthFormat
+        ///         : pInternalCachedParams.DepthStencilFormat;
+        ///     if (f != DepthFormat.None) {
+        ///         o = Target | DepthBuffer;
+        ///         if (f == DepthFormat.Depth24Stencil8)
+        ///             o = Target | DepthBuffer | Stencil;
+        ///     }
+        ///
+        /// Both branches are reachable here: a set render target reports its
+        /// own `DepthStencilFormat`, and otherwise CNA's presentation
+        /// parameters report the backbuffer's.
+        internal var defaultClearOptions: ClearOptions {
+            get throws {
+                let format: DepthFormat
+                if let target = runtime.currentRenderTarget, !target.IsDisposed {
+                    format = target.DepthStencilFormat
+                } else {
+                    format = DepthFormat(
+                        rawValue: Int32(try nativePresentationParameters().depth_stencil_format))
+                        ?? .None
+                }
+                guard format != .None else { return .Target }
+                if format == .Depth24Stencil8 {
+                    return [.Target, .DepthBuffer, .Stencil]
+                }
+                return [.Target, .DepthBuffer]
+            }
         }
 
         // ------------------------------------------------------------------

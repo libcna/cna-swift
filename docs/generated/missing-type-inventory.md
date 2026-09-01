@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1940
-TOTAL_DIAGNOSTICS=212
+TARGET_MEMBERS=1942
+TOTAL_DIAGNOSTICS=208
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
 MISSING_TYPE=100
-MISSING_MEMBER=96
+MISSING_MEMBER=94
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=16
+OVERLOAD_MAPPING_MISMATCH=14
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -72,7 +72,7 @@ NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=21
+XNA_RESOURCE_STRING_PROJECTIONS=22
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -264,7 +264,7 @@ Expected members: 37; emitted members: 35.
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
-Expected members: 56; emitted members: 13.
+Expected members: 56; emitted members: 15.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present(_:Microsoft.Xna.Framework.Rectangle?,destinationRectangle:Microsoft.Xna.Framework.Rectangle?,overrideWindowHandle:Int)`: mapped member is absent
@@ -281,10 +281,6 @@ Expected members: 56; emitted members: 13.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[!!0],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Vector4,depth:Float,stencil:Int32)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Vector4,depth:Float,stencil:Int32)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Clear(_:Microsoft.Xna.Framework.Graphics.ClearOptions,color:Microsoft.Xna.Framework.Color,depth:Float,stencil:Int32)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTargets(_:[Microsoft.Xna.Framework.Graphics.RenderTargetBinding])`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)`: required overload is absent

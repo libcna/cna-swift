@@ -11,7 +11,7 @@ package enforces the same thing with `COMPATIBILITY SameMajorVersion`. Under
 the generation this binding was measured against.
 
 A later minor is admitted by that rule. The protection against a later minor
-that removed a route is not a version number: every one of the 73 bound symbols
+that removed a route is not a version number: every one of the 74 bound symbols
 must resolve by name before the runtime starts, and a missing one throws
 `CNAError.missingNativeSymbol`.
 
@@ -55,9 +55,9 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=73  ROUTE_PAIRINGS=73  PROTOTYPE_TYPE_POSITIONS=228
-CANONICAL_DECLARATION_CHECKS=228  C_SWIFT_MEASUREMENTS=228
-LAYOUTS=25  LAYOUT_FIELDS=209  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
+BOUND_FUNCTIONS=74  ROUTE_PAIRINGS=74  PROTOTYPE_TYPE_POSITIONS=231
+CANONICAL_DECLARATION_CHECKS=231  C_SWIFT_MEASUREMENTS=231
+LAYOUTS=26  LAYOUT_FIELDS=222  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
 
@@ -166,6 +166,23 @@ out — `blend_factor`, `multi_sample_mask` and `reference_stencil`, each of whi
 XNA exposes as a device property in its own right. Four more mirrored structures
 came with them, taking the layout wall from 21 structures and 157 fields to 25
 and 209.
+
+## The clear routes, and the one that was removed
+
+Foundation 48 bound `cna_graphics_device_clear_options` and
+`cna_graphics_device_get_presentation_parameters`, with
+`CNA_PresentationParameters` as the twenty-sixth mirrored structure, and
+**unbound** `cna_graphics_device_clear_rgba`. Once `Clear(Color)` forwards
+through `Clear(ClearOptions, Color, Single, Int32)` as the pinned IL does, no
+projected member consumes the colour-only route, and an unconsumed route is the
+thing this boundary exists to prevent. The net is 74, not 75.
+
+Three canonical constants joined the probe with them —
+`CNA_CLEAR_OPTION_TARGET`, `_DEPTH_BUFFER` and `_STENCIL`, taking `CONSTANTS`
+from 212 to 215. They are compiled rather than tested because no runtime
+observation on a HEADLESS device can see which buffers a clear touched;
+`docs/foundation-48-clear-evidence.md` records that and the one realistic
+defect that consequently has no mutation control.
 
 `cna_blend_state_init` and its three neighbours are still **not** bound. They
 are CNA's own preset descriptors, and the Swift presets come from the pinned
