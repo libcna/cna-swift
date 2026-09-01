@@ -82,6 +82,12 @@ internal final class NativeFunctions {
     typealias RenderTargetGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RenderTargetInfo>?) -> UInt32
     typealias RenderTargetDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias GraphicsDeviceGetBlendFactorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Color>?) -> UInt32
+    typealias GraphicsDeviceSetBlendFactorRoute = @convention(c) (UInt64, CNASwift_Color) -> UInt32
+    typealias GraphicsDeviceGetMultiSampleMaskRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias GraphicsDeviceSetMultiSampleMaskRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias GraphicsDeviceGetReferenceStencilRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias GraphicsDeviceSetReferenceStencilRoute = @convention(c) (UInt64, Int32) -> UInt32
     typealias GraphicsDeviceGetBlendStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_BlendState>?) -> UInt32
     typealias GraphicsDeviceSetBlendStateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_BlendState>?) -> UInt32
     typealias GraphicsDeviceGetDepthStencilStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_DepthStencilState>?) -> UInt32
@@ -153,6 +159,12 @@ internal final class NativeFunctions {
     let renderTargetGetInfo: RenderTargetGetInfoRoute
     let renderTargetDestroy: RenderTargetDestroyRoute
     let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
+    let graphicsDeviceGetBlendFactor: GraphicsDeviceGetBlendFactorRoute
+    let graphicsDeviceSetBlendFactor: GraphicsDeviceSetBlendFactorRoute
+    let graphicsDeviceGetMultiSampleMask: GraphicsDeviceGetMultiSampleMaskRoute
+    let graphicsDeviceSetMultiSampleMask: GraphicsDeviceSetMultiSampleMaskRoute
+    let graphicsDeviceGetReferenceStencil: GraphicsDeviceGetReferenceStencilRoute
+    let graphicsDeviceSetReferenceStencil: GraphicsDeviceSetReferenceStencilRoute
     let graphicsDeviceGetBlendState: GraphicsDeviceGetBlendStateRoute
     let graphicsDeviceSetBlendState: GraphicsDeviceSetBlendStateRoute
     let graphicsDeviceGetDepthStencilState: GraphicsDeviceGetDepthStencilStateRoute
@@ -244,6 +256,12 @@ internal final class NativeFunctions {
         renderTargetGetInfo = try library.resolve("cna_render_target_get_info", as: RenderTargetGetInfoRoute.self)
         renderTargetDestroy = try library.resolve("cna_render_target_destroy", as: RenderTargetDestroyRoute.self)
         graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)
+        graphicsDeviceGetBlendFactor = try library.resolve("cna_graphics_device_get_blend_factor", as: GraphicsDeviceGetBlendFactorRoute.self)
+        graphicsDeviceSetBlendFactor = try library.resolve("cna_graphics_device_set_blend_factor", as: GraphicsDeviceSetBlendFactorRoute.self)
+        graphicsDeviceGetMultiSampleMask = try library.resolve("cna_graphics_device_get_multi_sample_mask", as: GraphicsDeviceGetMultiSampleMaskRoute.self)
+        graphicsDeviceSetMultiSampleMask = try library.resolve("cna_graphics_device_set_multi_sample_mask", as: GraphicsDeviceSetMultiSampleMaskRoute.self)
+        graphicsDeviceGetReferenceStencil = try library.resolve("cna_graphics_device_get_reference_stencil", as: GraphicsDeviceGetReferenceStencilRoute.self)
+        graphicsDeviceSetReferenceStencil = try library.resolve("cna_graphics_device_set_reference_stencil", as: GraphicsDeviceSetReferenceStencilRoute.self)
         graphicsDeviceGetBlendState = try library.resolve("cna_graphics_device_get_blend_state", as: GraphicsDeviceGetBlendStateRoute.self)
         graphicsDeviceSetBlendState = try library.resolve("cna_graphics_device_set_blend_state", as: GraphicsDeviceSetBlendStateRoute.self)
         graphicsDeviceGetDepthStencilState = try library.resolve("cna_graphics_device_get_depth_stencil_state", as: GraphicsDeviceGetDepthStencilStateRoute.self)

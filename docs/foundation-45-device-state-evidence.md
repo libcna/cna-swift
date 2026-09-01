@@ -160,7 +160,7 @@ and it is the check working, not failing.
 
 ## 7. Falsifiability, one test the gate rejected and one mutation withdrawn
 
-Six mutations, all caught:
+Seven mutations, all caught:
 
 | Planted defect |
 | --- |
@@ -170,6 +170,7 @@ Six mutations, all caught:
 | `set_BlendState` caching the state but not the value it copies out |
 | the collection storing a copy rather than the caller's instance |
 | the collection rebuilt per access, losing every slot already written |
+| a direct write cached without reaching the device it must push to |
 
 ### The copied-value test was blind, for a reason worth stating
 
@@ -231,15 +232,36 @@ An uncommitted deletion of an `HResult` assignment is the kind of thing that
 gets committed by accident. A gate that exists to catch defects was introducing
 one.
 
-## 9. Measurement
+## 9. The three values the state setters copy out
+
+`set_BlendState` copies `BlendFactor` and `MultiSampleMask` out of the state it
+accepts; `set_DepthStencilState` copies `ReferenceStencil`. All three are also
+public properties of the device in their own right, and all three getters are
+bare field reads of exactly the fields this milestone added — so the readers
+came free with the cache.
+
+The setters did not. Each is ~2,000 bytes of IL that opens with
+`Helpers.CheckDisposed(this, pComPtr)` and then pushes to the device
+independently of any state object, and each carries the verdict
+`IL_REACHABLE_THROW` with `ObjectDisposedException`. CNA publishes a dedicated
+route for every one of them —
+`cna_graphics_device_set_blend_factor`, `…set_multi_sample_mask`,
+`…set_reference_stencil` — so they are real writes rather than mirrors, and six
+more routes came with them.
+
+The ordering is observable and is tested: a direct write to `BlendFactor` is
+overwritten by the next `SetBlendState`, because that setter copies the value
+out of the state it was handed. Read without the IL that looks like a bug.
+
+## 10. Measurement
 
 ```text
-BOUND_FUNCTIONS=63  (was 55)       PROTOTYPE_TYPE_POSITIONS=198 (was 170)
+BOUND_FUNCTIONS=69  (was 55)       PROTOTYPE_TYPE_POSITIONS=216 (was 170)
 LAYOUTS=25  (was 21)               LAYOUT_FIELDS=209 (was 157)
 ABI_MISMATCHES=0                   NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 COMPLETE_TYPES=150  (was 149)      MISSING_TYPE=100  (was 101)
-MISSING_MEMBER=101  (was 106)      TOTAL_DIAGNOSTICS=218 (was 224)
+MISSING_MEMBER=98   (was 106)      TOTAL_DIAGNOSTICS=215 (was 224)
 XNA_RESOURCE_STRING_PROJECTIONS=21 (was 20)
-539 tests, 0 failures
-PROJECTION_MUTATIONS=56 CAUGHT=56 SURVIVORS=0  (was 50)
+541 tests, 0 failures      PURE_XNA_DERIVED=2314
+PROJECTION_MUTATIONS=57 CAUGHT=57 SURVIVORS=0  (was 50)
 ```

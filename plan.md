@@ -108,7 +108,7 @@ REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157               TARGET_MEMBERS=1935
 COMPLETE_TYPES=150             PARTIAL_TYPES=7      MISSING_TYPE=100
-MISSING_MEMBER=101             TOTAL_DIAGNOSTICS=218
+MISSING_MEMBER=98              TOTAL_DIAGNOSTICS=215
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 XNA_RESOURCE_STRING_PROJECTIONS=21 API_COMPAT_SELF_TESTS=2420
@@ -131,12 +131,12 @@ Every other mismatch and leak category is 0, including `UNEXPECTED_TYPE`,
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=63  ROUTE_PAIRINGS=63  PROTOTYPE_TYPE_POSITIONS=198
-CANONICAL_DECLARATION_CHECKS=198  C_SWIFT_MEASUREMENTS=198
+BOUND_FUNCTIONS=69  ROUTE_PAIRINGS=69  PROTOTYPE_TYPE_POSITIONS=216
+CANONICAL_DECLARATION_CHECKS=216  C_SWIFT_MEASUREMENTS=216
 LAYOUTS=25  LAYOUT_FIELDS=209  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=56  CAUGHT=56  SURVIVORS=0
+PROJECTION_MUTATIONS=57  CAUGHT=57  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected
@@ -176,14 +176,28 @@ types; the widest reach after Foundation 45 is `GraphicsAdapter` (35), then
 `ContentManager` (6). The rest are audio and media types of reach 3 or less.
 
 `TextureCollection` is the natural successor to Foundation 45 and is a larger
-job than `SamplerStateCollection` was: its `get_Item` queries the live device
-for the bound texture and reconstructs a managed one through three branches
-rather than reading a managed array, and its `set_Item` accepts null. A faithful
-getter needs a handle-to-managed-`Texture` identity map this binding does not
-have, and returning a freshly wrapped `Texture` per read would break the
-reference identity the sampler collection's own early-out shows XNA relies on.
+job than `SamplerStateCollection` was. Its `get_Item` queries the live device
+for the bound texture rather than reading a managed array, and its `set_Item`
+accepts null. Two facts about it were read out of the IL and the CNA headers
+rather than assumed:
 
-The remaining member diagnostics belong to `GraphicsDevice` (47),
+* **The identity map is not an invention.** `Texture2D.GetManagedObject` calls
+  `pDevice.Resources.GetCachedObject(pInterface)` — XNA keeps its own
+  native-pointer-to-managed-object cache in `DeviceResourceManager`, the same
+  internal type `GraphicsResource.set_Name` already routes through. Reproducing
+  a handle-keyed equivalent is faithful, not an addition, and it would be
+  complete by construction here because `set_Item` is the only way a texture
+  becomes bound.
+* **CNA cannot say which kind a bound handle is.** `CNA_TextureSlotInfo` carries
+  `bound` and a raw `CNA_Handle` and no discriminator, where XNA's getter
+  QueryInterfaces the COM pointer against `IID_IDirect3DTexture9`,
+  `IID_IDirect3DCubeTexture9` and `IID_IDirect3DVolumeTexture9` to choose
+  between `Texture2D`, `TextureCube` and `Texture3D`. The latter two are not
+  projected, so a getter written today could serve only one of three branches,
+  and reporting a `Texture2D` for a bound cube map would be worse than not
+  answering.
+
+The remaining member diagnostics belong to `GraphicsDevice` (44),
 `GraphicsDeviceManager` (21), `SpriteBatch` (16), `Texture2D` (12) and `Game`
 (2), and every one of them waits on an XNA type that is not yet projected.
 

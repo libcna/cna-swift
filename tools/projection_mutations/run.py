@@ -549,6 +549,17 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "",
     ),
     (
+        "copied-value-writer-skips-the-device",
+        "a direct write cached without reaching the device it must push to",
+        DEVICE,
+        "            let handle = try validatedHandle(\"GraphicsDevice.MultiSampleMask\")\n"
+        "            try runtime.functions.check(\n"
+        "                runtime.functions.graphicsDeviceSetMultiSampleMask(handle, value),\n"
+        "                operation: \"cna_graphics_device_set_multi_sample_mask\")\n"
+        "            runtime.cachedMultiSampleMask = value",
+        "            runtime.cachedMultiSampleMask = value",
+    ),
+    (
         "default-back-buffer-width-transcribed-wrong",
         "the GraphicsDeviceManager default back-buffer width off by a digit",
         MANAGER,

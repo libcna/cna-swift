@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1935,
-    "TOTAL_DIAGNOSTICS": 218,
+    "TARGET_MEMBERS": 1938,
+    "TOTAL_DIAGNOSTICS": 215,
     "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
     "MISSING_TYPES": 100,
     "MISSING_TYPE": 100,
-    "MISSING_MEMBER": 101,
+    "MISSING_MEMBER": 98,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -832,21 +832,6 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.PresentationParameters()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ReferenceStencil()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.MultiSampleMask()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendFactor()",
       "detail": "mapped member is absent"
     },
     {
@@ -2328,14 +2313,14 @@
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "ReferenceStencil",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ReferenceStencil()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetReferenceStencil(_:Int32)",
       "writerName": "SetReferenceStencil",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2356,28 +2341,28 @@
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "MultiSampleMask",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.MultiSampleMask()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetMultiSampleMask(_:Int32)",
       "writerName": "SetMultiSampleMask",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "BlendFactor",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendFactor()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetBlendFactor(_:Microsoft.Xna.Framework.Color)",
       "writerName": "SetBlendFactor",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -10962,7 +10947,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 8,
+      "targetMembers": 11,
       "diagnostics": [
         {
           "category": "PROPERTY_MAPPING_MISMATCH",
@@ -11167,21 +11152,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.PresentationParameters()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ReferenceStencil()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.MultiSampleMask()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.BlendFactor()",
           "detail": "mapped member is absent"
         },
         {

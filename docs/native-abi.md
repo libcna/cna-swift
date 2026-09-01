@@ -11,7 +11,7 @@ package enforces the same thing with `COMPATIBILITY SameMajorVersion`. Under
 the generation this binding was measured against.
 
 A later minor is admitted by that rule. The protection against a later minor
-that removed a route is not a version number: every one of the 63 bound symbols
+that removed a route is not a version number: every one of the 69 bound symbols
 must resolve by name before the runtime starts, and a missing one throws
 `CNAError.missingNativeSymbol`.
 
@@ -55,8 +55,8 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=63  ROUTE_PAIRINGS=63  PROTOTYPE_TYPE_POSITIONS=198
-CANONICAL_DECLARATION_CHECKS=198  C_SWIFT_MEASUREMENTS=198
+BOUND_FUNCTIONS=69  ROUTE_PAIRINGS=69  PROTOTYPE_TYPE_POSITIONS=216
+CANONICAL_DECLARATION_CHECKS=216  C_SWIFT_MEASUREMENTS=216
 LAYOUTS=25  LAYOUT_FIELDS=209  CALLBACKS=4  CONSTANTS=212  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
@@ -159,10 +159,13 @@ them, because the milestone projected the managed types and did not implement
 `GraphicsDevice.BlendState`. Binding a route for count, without a member that
 uses it, is the thing this boundary exists to prevent.
 
-Foundation 45 added the members and, with them, eight routes: get and set for
-blend, depth-stencil and rasterizer state, and get and set for one sampler slot
-of one shader stage. Four more mirrored structures came with them, taking the
-layout wall from 21 structures and 157 fields to 25 and 209.
+Foundation 45 added the members and, with them, fourteen routes: get and set for
+blend, depth-stencil and rasterizer state, get and set for one sampler slot of
+one shader stage, and get and set for the three values those state setters copy
+out — `blend_factor`, `multi_sample_mask` and `reference_stencil`, each of which
+XNA exposes as a device property in its own right. Four more mirrored structures
+came with them, taking the layout wall from 21 structures and 157 fields to 25
+and 209.
 
 `cna_blend_state_init` and its three neighbours are still **not** bound. They
 are CNA's own preset descriptors, and the Swift presets come from the pinned

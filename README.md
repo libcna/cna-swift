@@ -567,7 +567,7 @@ constant and a wrong `Keys` literal — runs the unmodified verifier, requires i
 to fail every time, and proves the tree is byte-identical afterwards.
 
 `tools/projection_mutations/run.py` is the companion gate over the projected
-behavior. It plants fifty-six realistic defects one at a time — a
+behavior. It plants fifty-seven realistic defects one at a time — a
 neighbouring exception class at a raise site, a message that reports the Swift
 class name to a user, a mirror that moves on a write the host refused, a
 disposal that leaks a native subscription, an IL-derived state default changed,

@@ -213,6 +213,59 @@ extension Microsoft.Xna.Framework.Graphics {
             return runtime.samplerStates(for: self, vertex: true)
         }
 
+        /// `GraphicsDevice.BlendFactor`.
+        ///
+        /// `ldflda cachedBlendFactor; ldobj; ret` — the same field
+        /// `set_BlendState` copies out of the state it accepts, read directly.
+        /// No failure path, so the reader does not throw.
+        public var BlendFactor: Microsoft.Xna.Framework.Color {
+            runtime.cachedBlendFactor
+        }
+
+        /// `GraphicsDevice.set_BlendFactor(Color value)`.
+        ///
+        /// A throwing writer method: the recorded verdict is
+        /// `IL_REACHABLE_THROW` with `ObjectDisposedException`, because the
+        /// setter opens with `Helpers.CheckDisposed(this, pComPtr)` and then
+        /// pushes to the device. Reproduced with the same guard —
+        /// `validatedHandle` raises the projected class — and CNA's own
+        /// `cna_graphics_device_set_blend_factor`.
+        public func SetBlendFactor(_ value: Microsoft.Xna.Framework.Color) throws {
+            let handle = try validatedHandle("GraphicsDevice.BlendFactor")
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetBlendFactor(
+                    handle,
+                    CNASwift_Color(r: value.R, g: value.G, b: value.B, a: value.A)),
+                operation: "cna_graphics_device_set_blend_factor")
+            runtime.cachedBlendFactor = value
+        }
+
+        /// `GraphicsDevice.MultiSampleMask`, the other value `set_BlendState`
+        /// copies out.
+        public var MultiSampleMask: Int32 { runtime.cachedMultiSampleMask }
+
+        /// `GraphicsDevice.set_MultiSampleMask(Int32 value)`.
+        public func SetMultiSampleMask(_ value: Int32) throws {
+            let handle = try validatedHandle("GraphicsDevice.MultiSampleMask")
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetMultiSampleMask(handle, value),
+                operation: "cna_graphics_device_set_multi_sample_mask")
+            runtime.cachedMultiSampleMask = value
+        }
+
+        /// `GraphicsDevice.ReferenceStencil`, the value
+        /// `set_DepthStencilState` copies out.
+        public var ReferenceStencil: Int32 { runtime.cachedReferenceStencil }
+
+        /// `GraphicsDevice.set_ReferenceStencil(Int32 value)`.
+        public func SetReferenceStencil(_ value: Int32) throws {
+            let handle = try validatedHandle("GraphicsDevice.ReferenceStencil")
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetReferenceStencil(handle, value),
+                operation: "cna_graphics_device_set_reference_stencil")
+            runtime.cachedReferenceStencil = value
+        }
+
         /// The exact `NullNotAllowed` message, read out of
         /// `Microsoft.Xna.Framework.dll`'s own resource table. All three
         /// setters raise `ArgumentNullException("value", NullNotAllowed)` —

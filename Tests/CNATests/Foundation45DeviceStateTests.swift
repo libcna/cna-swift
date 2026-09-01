@@ -241,6 +241,67 @@ final class Foundation45DeviceStateTests: XCTestCase {
         }
     }
 
+    // MARK: - The three values the state setters copy out
+
+    /// `BlendFactor`, `MultiSampleMask` and `ReferenceStencil` are the fields
+    /// `set_BlendState` and `set_DepthStencilState` copy out of the state they
+    /// accept, and each is separately settable through a route of its own. A
+    /// later state assignment overwrites what a direct write put there, which
+    /// is the ordering XNA has.
+    func testTheCopiedValuesAreAlsoSettableOnTheirOwn() throws {
+        try requireNative()
+        let game = try run { game, device in
+            game.observations["factorBefore"] = String(device.BlendFactor.PackedValue)
+            game.observations["maskBefore"] = String(device.MultiSampleMask)
+            game.observations["stencilBefore"] = String(device.ReferenceStencil)
+
+            try device.SetBlendFactor(F.Color.CornflowerBlue)
+            try device.SetMultiSampleMask(0x00FF)
+            try device.SetReferenceStencil(7)
+            game.observations["factorAfter"] = String(device.BlendFactor.PackedValue)
+            game.observations["maskAfter"] = String(device.MultiSampleMask)
+            game.observations["stencilAfter"] = String(device.ReferenceStencil)
+
+            // A state assignment overwrites all three from the state.
+            let blend = G.BlendState()
+            try blend.SetBlendFactor(F.Color.White)
+            try blend.SetMultiSampleMask(-1)
+            try device.SetBlendState(blend)
+            game.observations["factorAfterState"] = String(device.BlendFactor.PackedValue)
+            game.observations["maskAfterState"] = String(device.MultiSampleMask)
+            try device.SetDepthStencilState(G.DepthStencilState.Default)
+            game.observations["stencilAfterState"] = String(device.ReferenceStencil)
+        }
+        XCTAssertEqual(game.observations["factorBefore"],
+                       String(F.Color.White.PackedValue))
+        XCTAssertEqual(game.observations["maskBefore"], "-1")
+        XCTAssertEqual(game.observations["stencilBefore"], "0")
+        XCTAssertEqual(game.observations["factorAfter"],
+                       String(F.Color.CornflowerBlue.PackedValue))
+        XCTAssertEqual(game.observations["maskAfter"], String(0x00FF))
+        XCTAssertEqual(game.observations["stencilAfter"], "7")
+        XCTAssertEqual(game.observations["factorAfterState"],
+                       String(F.Color.White.PackedValue),
+                       "a state assignment overwrites a direct write")
+        XCTAssertEqual(game.observations["maskAfterState"], "-1")
+        XCTAssertEqual(game.observations["stencilAfterState"], "0",
+                       "DepthStencilState.Default carries ReferenceStencil 0")
+    }
+
+    /// Each writer's recorded verdict is `IL_REACHABLE_THROW` with
+    /// `ObjectDisposedException`, because XNA's setter opens with
+    /// `Helpers.CheckDisposed`. Outside the callback that produced the facade
+    /// there is no device to push to, which is this binding's analogue.
+    func testTheWritersRefuseAFacadeOutsideItsCallback() throws {
+        try requireNative()
+        var escaped: G.GraphicsDevice?
+        try run { _, device in escaped = device }
+        guard let escaped else { return XCTFail("no device escaped") }
+        XCTAssertThrowsError(try escaped.SetMultiSampleMask(1))
+        XCTAssertThrowsError(try escaped.SetReferenceStencil(1))
+        XCTAssertThrowsError(try escaped.SetBlendFactor(F.Color.White))
+    }
+
     // MARK: - The sampler collection
 
     func testTheSamplerCollectionAppliesThroughTheNativeRoute() throws {
