@@ -122,6 +122,11 @@ class Member:
     # access keyword, so `open` is only visible here -- and a protected virtual
     # BCL hook that is not `open` is not an override point at all.
     access: str = ""
+    # Whether the CLR member declares generic parameters of its own. A METHOD
+    # generic is invisible in the mapped type spellings -- `!!0[]` maps to
+    # `[T]`, which carries no angle bracket -- so genericity is recorded here
+    # rather than sniffed out of the spelling afterwards.
+    method_generic: bool = False
 
     @property
     def display(self) -> str:
@@ -349,6 +354,7 @@ def expected_member(
             source.get("genericParameters", []),
             key=lambda item: item.get("position", 0))
     )
+    member_is_generic = bool(method_generic_parameters)
 
     parameters = source.get("parameters", [])
     labels: list[str] = []
@@ -367,10 +373,22 @@ def expected_member(
                 for item in owner_direct_interfaces
             )
         )
+        # A CLR array parameter the member WRITES THROUGH becomes a Swift
+        # `inout Array`, because a Swift array is a value. Two spellings of the
+        # same rule: a parameter NAME that always means a destination
+        # (`destinationArray`, `corners`), and a member-scoped entry for the
+        # cases where the name alone cannot decide -- `Texture2D.GetData` and
+        # `SetData` both call their array `data`, and only one of them writes.
+        member_scoped_mutation = any(
+            entry["owner"] == owner and entry["member"] == name
+            and entry["parameter"] == parameter.get("name")
+            for entry in rules.get("arrayMutationMembers", [])
+        )
         direction = "inout" if (
             parameter.get("ref") or parameter.get("out") or
             (
-                parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
+                (parameter.get("name") in rules.get("arrayMutationParameterNames", ["destinationArray"])
+                 or member_scoped_mutation)
                 and parameter.get("type", "").endswith("[]")
             ) or collection_copy_destination
         ) else ""
@@ -446,6 +464,7 @@ def expected_member(
         owner=owner,
         kind=kind,
         name=mapped_name,
+        method_generic=member_is_generic,
         static=bool(source.get("static")),
         parameters=tuple(types),
         labels=tuple(labels),
@@ -1664,7 +1683,17 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
                     result.append(diagnostic("ENUM_VALUE_MISMATCH", subject, f"expected {expected_member_model.raw_value}, found {candidate.raw_value}"))
             if expected_member_model.name.startswith("op_") and candidate.kind != "method":
                 result.append(diagnostic("OPERATOR_MAPPING_MISMATCH", subject, "operator did not map to a Swift operator function"))
-            if ("<" in expected_member_model.return_type or any("<" in item for item in expected_member_model.parameters)) != ("<" in candidate.declaration):
+            # A member is generic if the CLR says so -- either through a
+            # generic type in its signature, or through its OWN generic
+            # parameters, which map to a Swift `<T>` that leaves no angle
+            # bracket in any mapped type. Sniffing the spellings alone
+            # reported every correctly projected generic METHOD as a mismatch.
+            expected_generic = (
+                expected_member_model.method_generic
+                or "<" in expected_member_model.return_type
+                or any("<" in item for item in expected_member_model.parameters)
+            )
+            if expected_generic != ("<" in candidate.declaration):
                 result.append(diagnostic("GENERIC_MAPPING_MISMATCH", subject, "generic member shape differs"))
 
         for member in actual_type.members:
@@ -1857,6 +1886,89 @@ def self_test() -> None:
     if method_generic_return.return_type != "T":
         failures.append("a method's generic parameter is not substituted into "
                         "its return type")
+
+    # A generic METHOD leaves no angle bracket in any mapped type, so the
+    # expected side has to know it is generic from the contract. Both
+    # directions again: a generic member must match a Swift `<T>` declaration
+    # and must NOT match one without it.
+    generic_method_member = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        {"kind": "method", "name": "SetData", "static": False,
+         "returnType": "System.Void",
+         "genericParameters": [{"name": "T", "position": 0}],
+         "parameters": [{"name": "data", "type": "!!0[]"}]},
+        rules, "class")
+    if not generic_method_member.method_generic:
+        failures.append("a member's own generic parameters are not recorded")
+    plain_member = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        {"kind": "method", "name": "Plain", "static": False,
+         "returnType": "System.Void",
+         "parameters": [{"name": "data", "type": "System.Int32[]"}]},
+        rules, "class")
+    if plain_member.method_generic:
+        failures.append("a non-generic member is recorded as generic")
+
+    # And the comparison must USE it. A generic member matched against a Swift
+    # declaration that carries `<T>` is correct; the same member matched
+    # against one that does not is a GENERIC_MAPPING_MISMATCH. Recording the
+    # flag without consulting it would pass the two assertions above and fail
+    # these two.
+    generic_expected_model = {
+        "Microsoft.Xna.Framework.Graphics.Texture2D": TypeModel(
+            "Microsoft.Xna.Framework.Graphics.Texture2D", "class",
+            members=[generic_method_member]),
+    }
+    def generic_actual(declaration: str) -> dict[str, TypeModel]:
+        return {
+            "Microsoft.Xna.Framework.Graphics.Texture2D": TypeModel(
+                "Microsoft.Xna.Framework.Graphics.Texture2D", "class",
+                members=[dataclasses.replace(
+                    generic_method_member, declaration=declaration,
+                    identifier="setdata")]),
+        }
+    generic_good = {item["category"] for item in compare(
+        generic_expected_model, generic_actual("func SetData<T>(_ data: [T]) throws"))}
+    if "GENERIC_MAPPING_MISMATCH" in generic_good:
+        failures.append(
+            "a generic method projected with `<T>` is reported as a generic "
+            "shape mismatch")
+    generic_bad = {item["category"] for item in compare(
+        generic_expected_model, generic_actual("func SetData(_ data: [Color]) throws"))}
+    if "GENERIC_MAPPING_MISMATCH" not in generic_bad:
+        failures.append(
+            "a generic method projected without a generic parameter is not "
+            "reported")
+
+    # The array a member WRITES THROUGH is inout; the one it reads is not.
+    # Texture2D calls both `data`, so the name alone cannot decide.
+    get_data_member = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        {"kind": "method", "name": "GetData", "static": False,
+         "returnType": "System.Void",
+         "genericParameters": [{"name": "T", "position": 0}],
+         "parameters": [{"name": "data", "type": "!!0[]"}]},
+        rules, "class")
+    if get_data_member.directions != ("inout",):
+        failures.append("a member-scoped array destination is not inout")
+    set_data_member = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        {"kind": "method", "name": "SetData", "static": False,
+         "returnType": "System.Void",
+         "genericParameters": [{"name": "T", "position": 0}],
+         "parameters": [{"name": "data", "type": "!!0[]"}]},
+        rules, "class")
+    if set_data_member.directions != ("",):
+        failures.append("a source array of the same name was made inout")
+    other_owner = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture3D",
+        {"kind": "method", "name": "GetData", "static": False,
+         "returnType": "System.Void",
+         "genericParameters": [{"name": "T", "position": 0}],
+         "parameters": [{"name": "data", "type": "!!0[]"}]},
+        rules, "class")
+    if other_owner.directions != ("",):
+        failures.append("the member-scoped rule leaked to another owner")
 
     enumerable_type = "System.Collections.Generic.IEnumerable`1[Microsoft.Xna.Framework.Vector3]"
     if map_clr_type(enumerable_type, rules) != "[Microsoft.Xna.Framework.Vector3]":

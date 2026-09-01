@@ -207,6 +207,217 @@ extension Microsoft.Xna.Framework.Graphics {
             }
         }
 
+        // ------------------------------------------------------------------
+        // SetData and GetData.
+        //
+        // XNA's are generic over any `T : struct` and blit `sizeof(T)` bytes;
+        // the surface's format decides what those bytes mean. Three helpers
+        // guard every overload, and each raises its own message:
+        //
+        //   GetAndValidateSizes<T>  InvalidDataSize    sizeof(T) against the format
+        //   GetAndValidateRect      InvalidRectangle   the region against the surface
+        //   ValidateTotalSize       InvalidTotalSize   the array against the region
+        //
+        // All three are transcribed below. CNA's transfer asks for an element
+        // TYPE rather than a byte count, so the projection names the one that
+        // matches the texture's own format and converts the element count into
+        // that type's units -- which is the same reinterpretation XNA performs
+        // implicitly. `build-probe/f56_texdata.c` measures the round trip, and
+        // measures that a byte-typed transfer into a Color texture is refused,
+        // which is why the conversion goes through the format's type and never
+        // through `CNA_TEXTURE_DATA_BYTE`.
+
+        /// `SetData<T>(T[] data)`.
+        public func SetData<T>(_ data: [T]) throws {
+            try SetData(0, rect: nil, data: data, startIndex: 0,
+                        elementCount: Int32(data.count))
+        }
+
+        /// `SetData<T>(T[] data, Int32 startIndex, Int32 elementCount)`.
+        public func SetData<T>(
+            _ data: [T], startIndex: Int32, elementCount: Int32
+        ) throws {
+            try SetData(0, rect: nil, data: data, startIndex: startIndex,
+                        elementCount: elementCount)
+        }
+
+        /// `SetData<T>(Int32 level, Nullable<Rectangle> rect, T[] data,
+        /// Int32 startIndex, Int32 elementCount)`.
+        public func SetData<T>(
+            _ level: Int32,
+            rect: Microsoft.Xna.Framework.Rectangle?,
+            data: [T],
+            startIndex: Int32,
+            elementCount: Int32
+        ) throws {
+            let plan = try transferPlan(
+                T.self, level: level, rect: rect, arrayCount: data.count,
+                startIndex: startIndex, elementCount: elementCount)
+            try data.withUnsafeBytes { bytes in
+                guard let base = bytes.baseAddress else { return }
+                try nativeStorage.runtime.functions.check(
+                    withUnsafePointer(to: plan.transfer) { transfer in
+                        nativeStorage.runtime.functions.textureSetData(
+                            try nativeStorage.validatedHandle("Texture2D.SetData"),
+                            plan.dataType, transfer,
+                            base + plan.byteOffset, plan.nativeElementCount)
+                    },
+                    operation: "cna_texture2d_set_data")
+            }
+        }
+
+        /// `GetData<T>(T[] data)`.
+        public func GetData<T>(_ data: inout [T]) throws {
+            try GetData(0, rect: nil, data: &data, startIndex: 0,
+                        elementCount: Int32(data.count))
+        }
+
+        /// `GetData<T>(T[] data, Int32 startIndex, Int32 elementCount)`.
+        public func GetData<T>(
+            _ data: inout [T], startIndex: Int32, elementCount: Int32
+        ) throws {
+            try GetData(0, rect: nil, data: &data, startIndex: startIndex,
+                        elementCount: elementCount)
+        }
+
+        /// `GetData<T>(Int32 level, Nullable<Rectangle> rect, T[] data,
+        /// Int32 startIndex, Int32 elementCount)`.
+        ///
+        /// The array is `inout` because CLR array parameters that a method
+        /// writes through project that way here -- the same
+        /// `arrayMutationParameterNames` rule `Vector3.Transform`'s
+        /// `destinationArray` follows.
+        public func GetData<T>(
+            _ level: Int32,
+            rect: Microsoft.Xna.Framework.Rectangle?,
+            data: inout [T],
+            startIndex: Int32,
+            elementCount: Int32
+        ) throws {
+            let plan = try transferPlan(
+                T.self, level: level, rect: rect, arrayCount: data.count,
+                startIndex: startIndex, elementCount: elementCount)
+            let handle = try nativeStorage.validatedHandle("Texture2D.GetData")
+            try data.withUnsafeMutableBytes { bytes in
+                guard let base = bytes.baseAddress else { return }
+                var required: UInt64 = 0
+                try nativeStorage.runtime.functions.check(
+                    withUnsafePointer(to: plan.transfer) { transfer in
+                        nativeStorage.runtime.functions.textureGetData(
+                            handle, plan.dataType, transfer,
+                            base + plan.byteOffset, plan.nativeElementCount,
+                            &required)
+                    },
+                    operation: "cna_texture2d_get_data")
+            }
+        }
+
+        private struct TransferPlan {
+            var transfer: CNASwift_Texture2DTransfer
+            var dataType: UInt32
+            var byteOffset: Int
+            var nativeElementCount: UInt64
+        }
+
+        /// The three XNA validations, then the conversion into CNA's units.
+        private func transferPlan<T>(
+            _ element: T.Type,
+            level: Int32,
+            rect: Microsoft.Xna.Framework.Rectangle?,
+            arrayCount: Int,
+            startIndex: Int32,
+            elementCount: Int32
+        ) throws -> TransferPlan {
+            // `GetAndValidateSizes<T>`:
+            //     if (elementSize == formatSize) ok
+            //     else if (formatSize <= elementSize) throw InvalidDataSize
+            //     else if (formatSize % elementSize != 0) throw InvalidDataSize
+            // -- so T may be exactly the format's size, or a size that divides
+            // it exactly. `sizeof` in CIL is the unpadded size, which is what
+            // `MemoryLayout<T>.size` reports.
+            guard let formatSize = Microsoft.Xna.Framework.Graphics
+                .expectedByteSize(of: Format) else {
+                throw CNAError.producerInvariant(
+                    "block-compressed transfers are not projected")
+            }
+            let elementSize = Int32(MemoryLayout<T>.size)
+            if elementSize != formatSize {
+                guard formatSize > elementSize, formatSize % elementSize == 0 else {
+                    throw CNAArgumentException(message: invalidDataSizeMessage)
+                }
+            }
+
+            // `GetAndValidateRect`: the region defaults to the whole surface,
+            // and a supplied rectangle is checked twice -- once for a negative
+            // origin or a non-positive extent, once for an edge past the
+            // surface. That second comparison is `bgt.un`, UNSIGNED, so an
+            // origin plus extent that overflows wraps to a huge value and is
+            // caught there rather than slipping through.
+            var regionWidth = Width
+            var regionHeight = Height
+            if let rect {
+                guard rect.X >= 0, rect.Width > 0, rect.Y >= 0, rect.Height > 0 else {
+                    throw CNAArgumentException(
+                        message: invalidRectangleMessage, paramName: "rect")
+                }
+                let right = UInt32(bitPattern: rect.X &+ rect.Width)
+                let bottom = UInt32(bitPattern: rect.Y &+ rect.Height)
+                guard right <= UInt32(bitPattern: Width),
+                      bottom <= UInt32(bitPattern: Height) else {
+                    throw CNAArgumentException(
+                        message: invalidRectangleMessage, paramName: "rect")
+                }
+                regionWidth = rect.Width
+                regionHeight = rect.Height
+            }
+
+            // `ValidateTotalSize`: the region's byte count must equal the
+            // array window's, exactly.
+            let regionBytes = Int64(regionWidth) * Int64(regionHeight) * Int64(formatSize)
+            let windowBytes = Int64(elementSize) * Int64(elementCount)
+            guard regionBytes == windowBytes else {
+                throw CNAArgumentException(message: invalidTotalSizeMessage)
+            }
+            guard startIndex >= 0, elementCount >= 0,
+                  Int(startIndex) + Int(elementCount) <= arrayCount else {
+                throw CNAArgumentException(message: invalidTotalSizeMessage)
+            }
+
+            guard let dataType = Microsoft.Xna.Framework.Graphics
+                .nativeDataType(for: Format) else {
+                throw CNAError.producerInvariant(
+                    "CNA names no element type for \(Format)")
+            }
+
+            // CNA counts in elements of the FORMAT's type, and the array
+            // window is counted in T. The two agree in bytes, which is the
+            // only thing XNA guarantees, so the count converts through bytes.
+            // The offset must land on a format element; a T smaller than the
+            // format can otherwise start mid-texel, which CNA's element-indexed
+            // transfer cannot express. XNA can, so that input is refused here
+            // rather than silently rounded -- an honest refusal in place of a
+            // wrong write.
+            let byteOffset = Int(startIndex) * Int(elementSize)
+            guard byteOffset % Int(formatSize) == 0 else {
+                throw CNAArgumentException(message: invalidTotalSizeMessage)
+            }
+
+            var transfer = CNASwift_Texture2DTransfer()
+            transfer.struct_size = UInt32(MemoryLayout<CNASwift_Texture2DTransfer>.size)
+            transfer.struct_version = 1
+            transfer.level = level
+            if let rect {
+                transfer.has_rectangle = 1
+                transfer.rectangle = CNASwift_Rectangle(
+                    x: rect.X, y: rect.Y, width: rect.Width, height: rect.Height)
+            }
+            transfer.start_index = 0
+            transfer.element_count = UInt64(windowBytes / Int64(formatSize))
+            return TransferPlan(
+                transfer: transfer, dataType: dataType, byteOffset: byteOffset,
+                nativeElementCount: UInt64(windowBytes / Int64(formatSize)))
+        }
+
         public static func FromStream(
             _ graphicsDevice: GraphicsDevice,
             stream: InputStream

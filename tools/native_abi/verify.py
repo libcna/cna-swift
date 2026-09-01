@@ -44,7 +44,8 @@ KEYS = ROOT / "Sources/CNA/Xna/Input/Keyboard.swift"
 MIRRORED_STRUCTS = [
     "StringView", "Color", "Vector2", "Rectangle", "GameTime", "CallbackError",
     "GameCallbacks", "GameFrameHooks", "GameCreateInfo", "Viewport",
-    "Texture2DInfo", "Texture2DCreateInfo", "Texture2DDecodeInfo",
+    "Texture2DInfo", "Texture2DCreateInfo", "Texture2DTransfer",
+    "Texture2DDecodeInfo",
     "SpriteScaledCommand", "KeyboardState", "GamePadAnalogState",
     "GamePadState", "GamePadCapabilities", "TextureInfo",
     "RenderTarget2DCreateInfo", "RenderTargetInfo",
@@ -154,6 +155,7 @@ def canonical_type(value: str) -> str:
         "CNA_DepthFormat": "uint32_t", "CNA_PresentInterval": "uint32_t",
         "CNA_DisplayOrientation": "uint32_t", "CNA_RenderTargetUsage": "uint32_t",
         "CNA_GraphicsProfile": "uint32_t", "CNA_SpriteSortMode": "uint32_t",
+        "CNA_TextureDataType": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

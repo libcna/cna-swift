@@ -11,7 +11,7 @@ package enforces the same thing with `COMPATIBILITY SameMajorVersion`. Under
 the generation this binding was measured against.
 
 A later minor is admitted by that rule. The protection against a later minor
-that removed a route is not a version number: every one of the 85 bound symbols
+that removed a route is not a version number: every one of the 87 bound symbols
 must resolve by name before the runtime starts, and a missing one throws
 `CNAError.missingNativeSymbol`.
 
@@ -55,9 +55,9 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=85  ROUTE_PAIRINGS=85  PROTOTYPE_TYPE_POSITIONS=270
-CANONICAL_DECLARATION_CHECKS=270  C_SWIFT_MEASUREMENTS=270
-LAYOUTS=27  LAYOUT_FIELDS=235  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
+BOUND_FUNCTIONS=87  ROUTE_PAIRINGS=87  PROTOTYPE_TYPE_POSITIONS=283
+CANONICAL_DECLARATION_CHECKS=283  C_SWIFT_MEASUREMENTS=283
+LAYOUTS=28  LAYOUT_FIELDS=243  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
 

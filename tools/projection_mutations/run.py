@@ -44,6 +44,7 @@ DEVICE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDevice.swift"
 STATEBRIDGE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStateNativeBridge.swift"
 SAMPLERS = ROOT / "Sources/CNA/Xna/Graphics/SamplerStateCollection.swift"
 DRAWABLE_COMPONENT = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
+TEXTUREDATA = ROOT / "Sources/CNA/Xna/Graphics/TextureDataTransfer.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -83,6 +84,66 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 57: SetData and GetData ------------------------------
+    (
+        "format-byte-size-wrong-for-color",
+        "the one format this artifact can create given the wrong byte size",
+        TEXTUREDATA,
+        "        case .Color: return 4\n"
+        "        case .Bgr565: return 2",
+        "        case .Color: return 2\n"
+        "        case .Bgr565: return 2",
+    ),
+    (
+        "element-size-rule-demands-an-exact-match",
+        "a T that divides the format's size refused, where XNA accepts it",
+        TEXTURE2D,
+        "                guard formatSize > elementSize, formatSize % elementSize == 0 else {",
+        "                guard false else {",
+    ),
+    (
+        "rectangle-origin-test-loosened",
+        "a negative rectangle origin accepted",
+        TEXTURE2D,
+        "                guard rect.X >= 0, rect.Width > 0, rect.Y >= 0, rect.Height > 0 else {",
+        "                guard rect.X >= -1, rect.Width > 0, rect.Y >= 0, rect.Height > 0 else {",
+    ),
+    (
+        "rectangle-edge-test-signed",
+        "the edge comparison made signed, so an overflowing rectangle slips through",
+        TEXTURE2D,
+        "                let right = UInt32(bitPattern: rect.X &+ rect.Width)\n"
+        "                let bottom = UInt32(bitPattern: rect.Y &+ rect.Height)\n"
+        "                guard right <= UInt32(bitPattern: Width),\n"
+        "                      bottom <= UInt32(bitPattern: Height) else {",
+        "                let right = rect.X &+ rect.Width\n"
+        "                let bottom = rect.Y &+ rect.Height\n"
+        "                guard right <= Width,\n"
+        "                      bottom <= Height else {",
+    ),
+    (
+        "total-size-allows-a-short-window",
+        "a window smaller than the region accepted",
+        TEXTURE2D,
+        "            guard regionBytes == windowBytes else {",
+        "            guard regionBytes >= windowBytes else {",
+    ),
+    (
+        "array-window-offset-ignored",
+        "startIndex dropped, so the transfer always reads from the array's front",
+        TEXTURE2D,
+        "            let byteOffset = Int(startIndex) * Int(elementSize)",
+        "            let byteOffset = 0 * Int(elementSize)",
+    ),
+    (
+        "rectangle-never-reaches-the-transfer",
+        "the region validated and then not sent, so the whole surface moves",
+        TEXTURE2D,
+        "            if let rect {\n"
+        "                transfer.has_rectangle = 1",
+        "            if let rect, false {\n"
+        "                transfer.has_rectangle = 1",
+    ),
     # ---- Foundation 55: the Texture2D constructors -----------------------
     (
         "texture-dimension-guard-accepts-zero",
@@ -1189,7 +1250,7 @@ def main() -> int:
                               CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH,
                               VERTEXDECL, VERTEXCOLOR, VERTEXNORMAL,
                               DEVICE, STATEBRIDGE, SAMPLERS,
-                              DRAWABLE_COMPONENT, RUNTIME_STATE}}
+                              DRAWABLE_COMPONENT, TEXTUREDATA, RUNTIME_STATE}}
 
     # Every mutation site is checked BEFORE the baseline runs. A site that has
     # drifted is reported as a stale gate rather than as a survivor forty

@@ -105,8 +105,23 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidDataSize",
+      "value": "The type you are using for T in this method is an invalid size for this resource."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidEmitterDopplerScale",
       "value": "The doppler scale of an audio emitter must be greater than or equal to zero."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidRectangle",
+      "value": "The rectangle is too large or too small for this resource."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidTotalSize",
+      "value": "The size of the data passed in is too large or too small for this resource."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

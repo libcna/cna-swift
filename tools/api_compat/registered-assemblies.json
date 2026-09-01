@@ -143,8 +143,23 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidDataSize",
+      "reason": "Texture.GetAndValidateSizes<T> raises ArgumentException with this when sizeof(T) is neither the surface format's byte size nor a size that divides it exactly."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidEmitterDopplerScale",
       "reason": "AudioEmitter.set_DopplerScale raises ArgumentOutOfRangeException(\"value\", this) for a negative or NaN scale."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidRectangle",
+      "reason": "Texture.GetAndValidateRect raises ArgumentException with this, naming the parameter `rect`, for a negative origin, a non-positive extent, or an edge past the surface."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidTotalSize",
+      "reason": "Texture.ValidateTotalSize raises ArgumentException with this when the array window's byte count does not equal the region's."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

@@ -159,7 +159,7 @@
     "Microsoft.Xna.Framework.GraphicsDeviceManager.EndDraw"
   ],
   "protocolWitnessMapping": "A public Swift conformance witness forced by a CLR explicit interface implementation is compiler-measured through sourceOrigin and excluded from the concrete type member count. GraphicsDeviceManager's three IGraphicsDeviceManager members are the first non-PackedVector entries: the pinned contract declares no CreateDevice, BeginDraw or EndDraw on the class, because XNA implements all three EXPLICITLY and they are therefore private on its own surface. Swift has no explicit conformance: a witness must be at least as visible as the protocol, so the three are public here. That is a language widening, recorded rather than hidden, and it is the same shape as the PackedVector witnesses above.",
-  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots",
+  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots. Where the parameter NAME cannot decide -- Texture2D.SetData and GetData both call their array `data`, and only GetData writes through it -- the member is listed in arrayMutationMembers instead.",
   "arrayMutationParameterNames": [
     "destinationArray",
     "corners"
@@ -1110,5 +1110,12 @@
     "System.Collections.Generic.ICollection`1",
     "System.Collections.Generic.IList`1"
   ],
-  "referenceContractSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d"
+  "referenceContractSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d",
+  "arrayMutationMembers": [
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.Texture2D",
+      "member": "GetData",
+      "parameter": "data"
+    }
+  ]
 }

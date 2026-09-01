@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1967,
-    "TOTAL_DIAGNOSTICS": 175,
+    "TARGET_MEMBERS": 1973,
+    "TOTAL_DIAGNOSTICS": 169,
     "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
     "MISSING_TYPES": 100,
     "MISSING_TYPE": 100,
-    "MISSING_MEMBER": 69,
+    "MISSING_MEMBER": 63,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 35,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 38,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -1007,36 +1007,6 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.InputStream,width:Int32,height:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T])",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T],startIndex:Int32,elementCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T])",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T],startIndex:Int32,elementCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
     {
@@ -4005,8 +3975,26 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "InvalidDataSize",
+      "pinnedValue": "The type you are using for T in this method is an invalid size for this resource.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "InvalidEmitterDopplerScale",
       "pinnedValue": "The doppler scale of an audio emitter must be greater than or equal to zero.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "InvalidRectangle",
+      "pinnedValue": "The rectangle is too large or too small for this resource.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "InvalidTotalSize",
+      "pinnedValue": "The size of the data passed in is too large or too small for this resource.",
       "reproducedInSwiftSource": true
     },
     {
@@ -11667,7 +11655,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "status": "PARTIAL",
       "expectedMembers": 16,
-      "targetMembers": 6,
+      "targetMembers": 12,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -11687,36 +11675,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.InputStream,width:Int32,height:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T])",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:[T],startIndex:Int32,elementCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T])",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:[T],startIndex:Int32,elementCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.GetData(_:Int32,rect:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
           "detail": "mapped member is absent"
         },
         {

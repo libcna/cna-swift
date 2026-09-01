@@ -127,6 +127,17 @@ typedef struct CNASwift_Texture2DCreateInfo {
     uint32_t format;
 } CNASwift_Texture2DCreateInfo;
 
+typedef struct CNASwift_Texture2DTransfer {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t level;
+    CNASwift_Bool has_rectangle;
+    uint8_t reserved[3];
+    CNASwift_Rectangle rectangle;
+    uint64_t start_index;
+    uint64_t element_count;
+} CNASwift_Texture2DTransfer;
+
 typedef struct CNASwift_TextureInfo {
     uint32_t struct_size;
     uint32_t struct_version;
