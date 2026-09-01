@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "profile": "messages reachable from implemented members",
+  "summary": {
+    "MESSAGE_COVERAGE_TYPES": 157,
+    "RESOLVED_TYPES": 145,
+    "UNRESOLVED_TYPES": 12,
+    "STRING_TABLES_READ": 2,
+    "MEMBERS_READ": 1230,
+    "MESSAGES_REPRODUCED": 98,
+    "MESSAGES_UNREACHABLE": 6,
+    "MESSAGES_NATIVE_OWNED": 7,
+    "MESSAGES_DEFERRED": 4,
+    "MESSAGE_COVERAGE_FINDINGS": 0
+  },
+  "findings": [],
+  "unresolved": [
+    "Microsoft.Xna.Framework.Audio.AudioStopOptions",
+    "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT",
+    "Microsoft.Xna.Framework.Input.Touch.GestureSample",
+    "Microsoft.Xna.Framework.Input.Touch.GestureType",
+    "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
+    "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
+    "Microsoft.Xna.Framework.Input.Touch.TouchLocation",
+    "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
+    "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",
+    "Microsoft.Xna.Framework.Media.Video",
+    "Microsoft.Xna.Framework.Media.VideoSoundtrackType",
+    "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
+  ]
+}

@@ -73,6 +73,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "PropertyCannotBeCalledBeforeInitialize",
+      "reason": "DrawableGameComponent.get_GraphicsDevice raises InvalidOperationException with this before Initialize has run. Its sibling Initialize raises MissingGraphicsDeviceService, and Game.get_GraphicsDevice raises NoGraphicsDeviceService: three keys, three meanings, and this projection used the wrong one until Foundation 50."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "ServiceAlreadyPresent",
       "reason": "GameServiceContainer.AddService raises ArgumentException with this when the container already holds the type."
     },
@@ -90,6 +95,16 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "TargetElaspedCannotBeZero",
       "reason": "Game.set_TargetElapsedTime raises ArgumentOutOfRangeException with this. The key's own spelling is Microsoft's typo -- 'Elasped' -- and is reproduced as found."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BeginMustBeCalledBeforeDraw",
+      "reason": "SpriteBatch.InternalDraw, which every public Draw overload funnels through, raises InvalidOperationException with this outside an interval."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BeginMustBeCalledBeforeEnd",
+      "reason": "SpriteBatch.End raises InvalidOperationException with this outside an interval."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -115,6 +130,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "reason": "VertexElementValidator.Validate raises ArgumentException with this when two elements share a VertexElementUsage and UsageIndex, formatted with the later element's own pair."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "EndMustBeCalledBeforeBegin",
+      "reason": "SpriteBatch.Begin raises InvalidOperationException with this when an interval is already open."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

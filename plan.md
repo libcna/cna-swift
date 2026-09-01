@@ -61,12 +61,18 @@ milestone's own prose, that milestone's evidence file carries it still.
    `docs/foundation-48-clear-evidence.md`.
 
    Reading every implemented `GraphicsDevice` member's IL by size, which is how
-   that was found, immediately found two more: `set_Viewport` (387 bytes, five
-   `ArgumentException(ViewportInvalid)` branches) and `set_ScissorRectangle`
-   (300 bytes, three `ScissorInvalid` branches) are projected with none of
-   their validation. **That is the next milestone**, and it outranks
-   unprojected surface: a member that disagrees with XNA is worse than one that
-   is honestly absent.
+   that was found, immediately found two more: `set_Viewport` and
+   `set_ScissorRectangle` were projected with none of their validation
+   (Foundation 49). Generalising the reading into a gate found a fourth,
+   `DrawableGameComponent.GraphicsDevice` raising its sibling's message, and
+   `SpriteBatch`'s whole begin/end rule (Foundation 50).
+
+   Four defects in three milestones, none found by a failing test, is why
+   `tools/api_compat/message_coverage.py` exists: for every implemented member,
+   every message its pinned IL can raise is either reproduced or recorded with
+   a reason and a kind. A member that disagrees with XNA is worse than one that
+   is honestly absent, and the gate is what keeps the fifth one from being
+   found by a user.
 4. **A CLR field's writability is metadata, not convention.** `literal` and
    `initonly` are two different `FieldAttributes`, and neither is assignable, so
    both project to a Swift `let`. `readonly` is recorded on all 557 contract
@@ -170,7 +176,7 @@ is selected, which would report a coverage loss as sixteen projection defects.
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
-(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=22`). The BCL authority
+(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=33`). The BCL authority
 carries `BCL_SENTINEL_CHECKS=433`, `BCL_MUTATION_SELF_TESTS=462`,
 `BCL_CROSS_CHECKS=141` against a second disassembler, and four negative
 controls that are still refused. The four are not the same four binaries as in

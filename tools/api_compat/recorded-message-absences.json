@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "profile": "messages an implemented member can raise that this binding does not reproduce",
+  "note": "Every entry is a resource key reachable from a member this binding implements whose message is NOT in the Swift sources, with the reason. tools/api_compat/message_coverage.py fails on any reachable key that is neither reproduced nor listed here. `kind` is `unreachable` (no input reaches the branch through the projected surface), `native-owned` (the failure is CNA's and is reported on the runtime channel, and XNA's message describes something that did not happen), or `deferred` (an acknowledged gap that names the work). Deferred entries are counted separately in the summary so they cannot hide inside a total.",
+  "absences": [
+    {
+      "type": "Microsoft.Xna.Framework.GameServiceContainer",
+      "key": "ServiceTypeCannotBeNull",
+      "kind": "unreachable",
+      "reason": "The service type is a Swift metatype parameter and cannot be nil, so the null-Type branch of GetService has no input that reaches it. Same rule as SamplerStateCollection.SetItem's null check: an unreachable branch is recorded, not written as code that cannot run."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
+      "key": "DeviceCannotBeNullOnResourceCreate",
+      "kind": "unreachable",
+      "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+      "key": "DeviceCannotBeNullOnResourceCreate",
+      "kind": "unreachable",
+      "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+      "key": "DeviceCannotBeNullOnResourceCreate",
+      "kind": "unreachable",
+      "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "Direct3DCreateError",
+      "kind": "native-owned",
+      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "Direct3DInvalidCreateParameters",
+      "kind": "native-owned",
+      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "GameCannotBeNull",
+      "kind": "unreachable",
+      "reason": "`game` is a non-Optional Swift class parameter. The constructor's own documentation already records this branch as unreachable."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "GraphicsComponentNotAttachedToGame",
+      "kind": "native-owned",
+      "reason": "Raised from ChangeDevice when the manager's game reference is gone. The projected manager holds its game weakly and CNA owns the device, so the condition XNA tests for is not the condition this binding can be in; the runtime channel reports a stale generation instead."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "NoCompatibleDevices",
+      "kind": "native-owned",
+      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "NoCompatibleDevicesAfterRanking",
+      "kind": "native-owned",
+      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "ValidateBackBufferDimsFullScreen",
+      "kind": "native-owned",
+      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+      "key": "ValidateBackBufferDimsModeFullScreen",
+      "kind": "native-owned",
+      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Input.GamePad",
+      "key": "InvalidController",
+      "kind": "deferred",
+      "reason": "XNA raises InvalidOperationException(InvalidController) when XInput returns any error other than ERROR_DEVICE_NOT_CONNECTED (0x48f). The projection surfaces CNA's own failure on the runtime channel instead. This is a real error-channel difference and not an unreachable branch: deciding it needs CNA's gamepad failure modes measured against XInput's two-case split, which is its own milestone."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Input.Keyboard",
+      "key": "CouldNotReadKeyboard",
+      "kind": "deferred",
+      "reason": "XNA formats this with the Win32 GetLastError value when GetKeyboardState fails. The projection surfaces CNA's failure on the runtime channel. Same open question as GamePad.InvalidController and the same milestone."
+    }
+  ]
+}

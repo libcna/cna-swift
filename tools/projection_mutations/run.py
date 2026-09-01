@@ -43,6 +43,7 @@ VERTEXNORMAL = ROOT / "Sources/CNA/Xna/Graphics/VertexPositionNormalTexture.swif
 DEVICE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDevice.swift"
 STATEBRIDGE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStateNativeBridge.swift"
 SAMPLERS = ROOT / "Sources/CNA/Xna/Graphics/SamplerStateCollection.swift"
+DRAWABLE_COMPONENT = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -82,6 +83,88 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 50: the messages implemented members raise -----------
+    (
+        "sprite-batch-second-begin-unguarded",
+        "a second Begin left to CNA, which reports a result code and not XNA's rule",
+        BATCH,
+        "            guard !inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: endMustBeCalledBeforeBeginMessage)\n"
+        "            }",
+        "            if false {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: endMustBeCalledBeforeBeginMessage)\n"
+        "            }",
+    ),
+    (
+        "sprite-batch-rule-checked-after-the-handle",
+        "the begin/end rule decided after the handle, so a disposed batch "
+        "reports its disposal rather than the rule it broke",
+        BATCH,
+        "            guard inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeEndMessage)\n"
+        "            }\n"
+        "            let handle = try validatedHandle(\"SpriteBatch.End\")",
+        "            let handle = try validatedHandle(\"SpriteBatch.End\")\n"
+        "            guard inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeEndMessage)\n"
+        "            }",
+    ),
+    (
+        "sprite-batch-end-guard-inverted",
+        "End refusing inside a pair and accepting outside one",
+        BATCH,
+        "            guard inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeEndMessage)\n"
+        "            }",
+        "            guard !inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeEndMessage)\n"
+        "            }",
+    ),
+    (
+        "sprite-batch-draw-unguarded",
+        "Draw outside a pair left to CNA",
+        BATCH,
+        "            guard inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeDrawMessage)\n"
+        "            }",
+        "            if false {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeDrawMessage)\n"
+        "            }",
+    ),
+    (
+        "sprite-batch-pair-never-closes",
+        "End leaving the pair open, so the next Begin is refused",
+        BATCH,
+        "            inBeginEndPair = false\n"
+        "        }",
+        "        }",
+    ),
+    (
+        "sprite-batch-draw-and-end-messages-collapsed",
+        "the Draw and End messages made the same string",
+        BATCH,
+        'internal let beginMustBeCalledBeforeDrawMessage =\n'
+        '    "Begin must be called successfully before a Draw can be called."',
+        'internal let beginMustBeCalledBeforeDrawMessage =\n'
+        '    "Begin must be called successfully before End can be called."',
+    ),
+    (
+        "drawable-device-getter-uses-its-siblings-message",
+        "the defect Foundation 50 repaired, put back",
+        DRAWABLE_COMPONENT,
+        "                        message: DrawableGameComponent\n"
+        "                            .propertyCannotBeCalledBeforeInitializeMessage)",
+        "                        message: DrawableGameComponent\n"
+        "                            .missingGraphicsDeviceServiceMessage)",
+    ),
     # ---- Foundation 49: the validation Foundation 47 dropped -------------
     (
         "viewport-origin-test-loosened",
@@ -842,7 +925,7 @@ def main() -> int:
                               CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH,
                               VERTEXDECL, VERTEXCOLOR, VERTEXNORMAL,
                               DEVICE, STATEBRIDGE, SAMPLERS,
-                              RUNTIME_STATE}}
+                              DRAWABLE_COMPONENT, RUNTIME_STATE}}
 
     # Every mutation site is checked BEFORE the baseline runs. A site that has
     # drifted is reported as a stale gate rather than as a survivor forty

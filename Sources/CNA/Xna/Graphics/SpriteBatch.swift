@@ -2,6 +2,19 @@
 
 import CNAShim
 
+/// The three `SpriteBatch` begin/end messages, read out of the embedded string
+/// table of the registered `Microsoft.Xna.Framework.dll`. Each says "called
+/// **successfully**": XNA's rule is about a begin that completed, which is why
+/// the projected flag is set after the native call rather than before it.
+internal let endMustBeCalledBeforeBeginMessage =
+    "Begin cannot be called again until End has been successfully called."
+
+internal let beginMustBeCalledBeforeEndMessage =
+    "Begin must be called successfully before End can be called."
+
+internal let beginMustBeCalledBeforeDrawMessage =
+    "Begin must be called successfully before a Draw can be called."
+
 extension Microsoft.Xna.Framework.Graphics {
     public enum SpriteSortMode: UInt32 {
         case Deferred = 0
@@ -49,7 +62,56 @@ extension Microsoft.Xna.Framework.Graphics {
             runtime.register(self)
         }
 
+        /// `SpriteBatch.inBeginEndPair`, the managed flag the begin/end rule
+        /// is written in terms of.
+        ///
+        /// CNA enforces the same sequence natively —
+        /// `cna_sprite_batch_begin` answers `CNA_RESULT_INVALID_STATE` when an
+        /// interval is already open, and `_end` and `_submit_many` do the same
+        /// outside one — so this flag is not what *prevents* a bad sequence.
+        /// It is what makes the failure XNA's: a caller who ends without
+        /// beginning has broken an XNA rule and must see
+        /// `InvalidOperationException` with XNA's message, not a
+        /// `CNAError.nativeFailure` carrying a CNA result code. That is the
+        /// error-channel line this binding draws — what caused the failure,
+        /// not which layer noticed it.
+        private var inBeginEndPair = false
+
+        /// `SpriteBatch.Begin()`, which forwards to
+        /// `Begin(SpriteSortMode.Deferred, null, null, null, null, null,
+        /// Matrix.Identity)`.
+        ///
+        /// ```text
+        /// if (inBeginEndPair)
+        ///     throw new InvalidOperationException(EndMustBeCalledBeforeBegin);
+        /// … store the six state fields …
+        /// if (sortMode == Immediate) {
+        ///     if (_parent.spriteBeginCount > 0)
+        ///         throw new InvalidOperationException(CannotNextSpriteBeginImmediate);
+        ///     SetRenderState(); _parent.spriteImmediateBeginCount++;
+        /// }
+        /// inBeginEndPair = true; _parent.spriteBeginCount++;
+        /// ```
+        ///
+        /// The `Immediate` branch is unreachable through this projection: the
+        /// parameterless overload is the only one implemented and it passes
+        /// `Deferred`. `CannotNextSpriteBeginImmediate` and the two device
+        /// counters that serve it are therefore not projected — recorded
+        /// here, not written as code that cannot run.
+        ///
+        /// The flag is set only after the native begin succeeds, which is
+        /// where XNA sets it too: everything that can fail in XNA's body
+        /// happens before the assignment.
         public func Begin() throws {
+            // The pair check comes first because XNA's does: `Begin` has no
+            // `Helpers.CheckDisposed` at all, and its very first instruction
+            // is `ldfld inBeginEndPair`. The order is observable —
+            // `Begin(); Dispose(); Begin()` raises XNA's rule violation, not
+            // a disposal error — so the handle is resolved after the rule.
+            guard !inBeginEndPair else {
+                throw CNAInvalidOperationException(
+                    message: endMustBeCalledBeforeBeginMessage)
+            }
             let handle = try validatedHandle("SpriteBatch.Begin")
             var info = CNASwift_SpriteBatchBeginInfo()
             info.struct_size = UInt32(MemoryLayout<CNASwift_SpriteBatchBeginInfo>.size)
@@ -59,6 +121,7 @@ extension Microsoft.Xna.Framework.Graphics {
                 nativeStorage.runtime.functions.spriteBatchBegin(handle, &info),
                 operation: "cna_sprite_batch_begin"
             )
+            inBeginEndPair = true
         }
 
         public func Draw(
@@ -90,6 +153,24 @@ extension Microsoft.Xna.Framework.Graphics {
             effects: SpriteEffects,
             layerDepth: Float
         ) throws {
+            // `SpriteBatch.InternalDraw`, which every public `Draw` overload
+            // funnels through, opens with two checks and nothing else:
+            //
+            //     if (texture == null)
+            //         throw new ArgumentNullException("texture", NullNotAllowed);
+            //     if (!inBeginEndPair)
+            //         throw new InvalidOperationException(BeginMustBeCalledBeforeDraw);
+            //
+            // The first is unreachable here — `texture` is a non-Optional
+            // class parameter — and is recorded rather than written. The
+            // second is therefore the first reachable check, and it comes
+            // before the handles are resolved: XNA has no `CheckDisposed`
+            // anywhere in this path, so a disposed batch outside a pair
+            // reports the rule it broke, not its disposal.
+            guard inBeginEndPair else {
+                throw CNAInvalidOperationException(
+                    message: beginMustBeCalledBeforeDrawMessage)
+            }
             let batchHandle = try validatedHandle("SpriteBatch.Draw")
             let textureHandle = try texture.validatedHandle("SpriteBatch.Draw texture")
             guard texture.runtimeState === nativeStorage.runtime else {
@@ -120,12 +201,34 @@ extension Microsoft.Xna.Framework.Graphics {
             )
         }
 
+        /// `SpriteBatch.End()`.
+        ///
+        /// ```text
+        /// if (!inBeginEndPair)
+        ///     throw new InvalidOperationException(BeginMustBeCalledBeforeEnd);
+        /// if (spriteSortMode != Immediate) SetRenderState();
+        /// else _parent.spriteImmediateBeginCount--;
+        /// if (spriteQueueCount > 0) Flush();
+        /// inBeginEndPair = false;
+        /// _parent.spriteBeginCount--;
+        /// ```
+        ///
+        /// XNA clears the flag *after* the flush, so a failing flush leaves
+        /// the pair open; the native end is this projection's flush, and the
+        /// flag is cleared after it succeeds for the same reason.
         public func End() throws {
+            // Same order as `Begin`, and for the same reason: `End`'s first
+            // instruction is the flag test, not a disposal check.
+            guard inBeginEndPair else {
+                throw CNAInvalidOperationException(
+                    message: beginMustBeCalledBeforeEndMessage)
+            }
             let handle = try validatedHandle("SpriteBatch.End")
             try nativeStorage.runtime.functions.check(
                 nativeStorage.runtime.functions.spriteBatchEnd(handle),
                 operation: "cna_sprite_batch_end"
             )
+            inBeginEndPair = false
         }
 
     }

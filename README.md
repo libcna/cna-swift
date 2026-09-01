@@ -562,6 +562,14 @@ python3 tools/api_compat/pinned_assembly_audit.py \
   --require-exact Microsoft.Xna.Framework.dll \
   --require-exact Microsoft.Xna.Framework.Graphics.dll \
   --output docs/generated/pinned-assembly-audit.json
+python3 tools/api_compat/message_coverage.py --self-test \
+  --assembly-dir /path/to/xna/redistributable --il-cache ~/deps/xna-il-cache
+python3 tools/api_compat/message_coverage.py --mutations \
+  --assembly-dir /path/to/xna/redistributable --il-cache ~/deps/xna-il-cache
+python3 tools/api_compat/message_coverage.py \
+  --assembly-dir /path/to/xna/redistributable \
+  --il-cache ~/deps/xna-il-cache \
+  --output docs/generated/message-coverage.json
 python3 tools/api_compat/accessor_fallibility.py \
   --assembly-dir /path/to/xna/redistributable \
   --output tools/api_compat/reference/xna40-accessor-fallibility.json \

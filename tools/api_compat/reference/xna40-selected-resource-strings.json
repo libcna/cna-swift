@@ -35,6 +35,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "PropertyCannotBeCalledBeforeInitialize",
+      "value": "The GraphicsDevice property cannot be used before Initialize has been called."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "ServiceAlreadyPresent",
       "value": "Container already contains a service of this type."
     },
@@ -52,6 +57,16 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "TargetElaspedCannotBeZero",
       "value": "The target elapsed time must be greater than zero.  Specify a non-zero positive value."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BeginMustBeCalledBeforeDraw",
+      "value": "Begin must be called successfully before a Draw can be called."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BeginMustBeCalledBeforeEnd",
+      "value": "Begin must be called successfully before End can be called."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -77,6 +92,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "value": "Invalid VertexDeclaration. Duplicate element {0}{1}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "EndMustBeCalledBeforeBegin",
+      "value": "Begin cannot be called again until End has been successfully called."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

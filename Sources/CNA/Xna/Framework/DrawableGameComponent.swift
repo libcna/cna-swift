@@ -25,6 +25,14 @@ extension Microsoft.Xna.Framework {
         /// `Microsoft.Xna.Framework.Game.dll`'s own resource table. It is a
         /// **different** string from `Game.GraphicsDevice`'s
         /// `NoGraphicsDeviceService`, and the two are not interchangeable.
+        /// The exact `PropertyCannotBeCalledBeforeInitialize` message, read
+        /// out of `Microsoft.Xna.Framework.Game.dll`'s own resource table.
+        /// `GraphicsDevice` raises this one; `Initialize` raises
+        /// `MissingGraphicsDeviceService`. Three keys, three meanings.
+        internal static let propertyCannotBeCalledBeforeInitializeMessage =
+            "The GraphicsDevice property cannot be used before Initialize "
+            + "has been called."
+
         internal static let missingGraphicsDeviceServiceMessage =
             "Drawable components require a graphics device service in the game "
             + "service container."
@@ -76,9 +84,15 @@ extension Microsoft.Xna.Framework {
         public var GraphicsDevice: Microsoft.Xna.Framework.Graphics.GraphicsDevice? {
             get throws {
                 guard let deviceService else {
+                    // `PropertyCannotBeCalledBeforeInitialize`, not
+                    // `MissingGraphicsDeviceService`. The type raises exactly
+                    // two messages and this projection used the same one at
+                    // both sites until Foundation 50; the pinned IL gives
+                    // `get_GraphicsDevice` this key and `Initialize` the
+                    // other, and they say different things to a user.
                     throw CNAInvalidOperationException(
                         message: DrawableGameComponent
-                            .missingGraphicsDeviceServiceMessage)
+                            .propertyCannotBeCalledBeforeInitializeMessage)
                 }
                 return deviceService.GraphicsDevice
             }

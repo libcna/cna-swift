@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 29,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 33,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -4086,6 +4086,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "PropertyCannotBeCalledBeforeInitialize",
+      "pinnedValue": "The GraphicsDevice property cannot be used before Initialize has been called.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "resourceKey": "ServiceAlreadyPresent",
       "pinnedValue": "Container already contains a service of this type.",
       "reproducedInSwiftSource": true
@@ -4106,6 +4112,18 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "resourceKey": "TargetElaspedCannotBeZero",
       "pinnedValue": "The target elapsed time must be greater than zero.  Specify a non-zero positive value.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BeginMustBeCalledBeforeDraw",
+      "pinnedValue": "Begin must be called successfully before a Draw can be called.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BeginMustBeCalledBeforeEnd",
+      "pinnedValue": "Begin must be called successfully before End can be called.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4136,6 +4154,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "DuplicateVertexElement",
       "pinnedValue": "Invalid VertexDeclaration. Duplicate element {0}{1}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "EndMustBeCalledBeforeBegin",
+      "pinnedValue": "Begin cannot be called again until End has been successfully called.",
       "reproducedInSwiftSource": true
     },
     {
