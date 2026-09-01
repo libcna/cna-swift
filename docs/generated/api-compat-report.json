@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 22,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 29,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -4062,6 +4062,30 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "GraphicsDeviceManagerAlreadyPresent",
+      "pinnedValue": "A graphics device manager is already registered.  The graphics device manager cannot be changed once it is set.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "InactiveSleepTimeCannotBeZero",
+      "pinnedValue": "The inactive sleep time must be greater than or equal to zero.  Specify zero or a positive value.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "MissingGraphicsDeviceService",
+      "pinnedValue": "Drawable components require a graphics device service in the game service container.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "NoGraphicsDeviceService",
+      "pinnedValue": "This property requires a graphics device service in the game service container.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "resourceKey": "ServiceAlreadyPresent",
       "pinnedValue": "Container already contains a service of this type.",
       "reproducedInSwiftSource": true
@@ -4076,6 +4100,12 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "resourceKey": "ServiceProviderCannotBeNull",
       "pinnedValue": "The service provider instance cannot be null.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "resourceKey": "TargetElaspedCannotBeZero",
+      "pinnedValue": "The target elapsed time must be greater than zero.  Specify a non-zero positive value.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4164,6 +4194,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ScissorInvalid",
+      "pinnedValue": "The scissor rectangle is invalid. The scissor rectangle cannot be larger than or outside of the current render target bounds.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "VertexElementOffsetNotMultipleFour",
       "pinnedValue": "Invalid VertexDeclaration. Vertex stride and VertexElement.Offset must be multiples of four.",
       "reproducedInSwiftSource": true
@@ -4178,6 +4214,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "VertexElementsOverlap",
       "pinnedValue": "Invalid VertexDeclaration. Elements {0}{1} and {2}{3} are overlapping.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ViewportInvalid",
+      "pinnedValue": "The viewport is invalid. The viewport cannot be larger than or outside of the current render target bounds. The MinDepth and MaxDepth must be between 0 and 1.",
       "reproducedInSwiftSource": true
     }
   ],

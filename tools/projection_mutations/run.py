@@ -82,6 +82,90 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 49: the validation Foundation 47 dropped -------------
+    (
+        "viewport-origin-test-loosened",
+        "a negative viewport origin accepted",
+        DEVICE,
+        "            guard value.X >= 0, value.Y >= 0, value.Width > 0, value.Height > 0 else {",
+        "            guard value.X >= -1, value.Y >= 0, value.Width > 0, value.Height > 0 else {",
+    ),
+    (
+        "viewport-extent-test-uses-blt",
+        "a zero-width viewport accepted, as `blt` rather than `ble` would",
+        DEVICE,
+        "            guard value.X >= 0, value.Y >= 0, value.Width > 0, value.Height > 0 else {",
+        "            guard value.X >= 0, value.Y >= 0, value.Width >= 0, value.Height > 0 else {",
+    ),
+    (
+        "viewport-bounds-checked-additively",
+        "the viewport's extent compared without its origin",
+        DEVICE,
+        "            guard value.X &+ value.Width <= bounds.width,\n"
+        "                  value.Y &+ value.Height <= bounds.height else {",
+        "            guard value.Width <= bounds.width,\n"
+        "                  value.Height <= bounds.height else {",
+    ),
+    (
+        "viewport-depth-comparison-ordered",
+        "MaxDepth >= MinDepth compared as an ordered branch, so NaN passes",
+        DEVICE,
+        "            if !(Double(value.MaxDepth) >= Double(value.MinDepth)) {",
+        "            if Double(value.MaxDepth) < Double(value.MinDepth) {",
+    ),
+    # WITHDRAWN: "viewport-depth-range-rejects-nan-early". Rewriting the depth
+    # RANGE test as a requirement rejects NaN one branch early — but it throws
+    # the same exception with the same message, so which branch rejected it is
+    # not observable from outside. The restructuring that this mutation was
+    # written to protect is still worth having: it is what makes
+    # "viewport-depth-comparison-ordered" catchable at all, and that one is a
+    # real behavioural difference. This one was tried, survived, and is
+    # recorded here rather than deleted quietly.
+    (
+        "viewport-bounds-always-the-backbuffer",
+        "the bounds read from the presentation parameters even with a target bound",
+        DEVICE,
+        "            if let target = runtime.currentRenderTarget, !target.IsDisposed {\n"
+        "                return (target.Width, target.Height)\n"
+        "            }",
+        "            if let target = runtime.currentRenderTarget, target.IsDisposed {\n"
+        "                return (target.Width, target.Height)\n"
+        "            }",
+    ),
+    (
+        "scissor-negative-test-uses-ble",
+        "an empty scissor rectangle rejected, as `ble` rather than `blt` would",
+        DEVICE,
+        "            guard value.X >= 0, value.Width >= 0,\n"
+        "                  value.Y >= 0, value.Height >= 0 else {",
+        "            guard value.X >= 0, value.Width > 0,\n"
+        "                  value.Y >= 0, value.Height >= 0 else {",
+    ),
+    # WITHDRAWN: "scissor-edge-test-drops-the-origin". Removing XNA's
+    # `X <= targetW` / `Y <= targetH` comparisons changes nothing observable —
+    # with X and Width already known non-negative, `right <= targetW` implies
+    # `X <= targetW`, and the overflowing width that breaks the implication is
+    # rejected by the following pair regardless. It survived a full run, which
+    # is what a gate that cannot fail looks like. The comparisons stay in the
+    # projection because XNA has them; the mutation does not stay here.
+    (
+        "scissor-overflow-pair-dropped",
+        "the pair of tests only an int32 overflow reaches, removed as redundant",
+        DEVICE,
+        "            guard right &- value.X <= bounds.width,\n"
+        "                  bottom &- value.Y <= bounds.height else {",
+        "            guard right &- value.X <= Int32.max,\n"
+        "                  bottom &- value.Y <= Int32.max else {",
+    ),
+    (
+        "invalid-bounds-messages-exchanged",
+        "the viewport and scissor messages swapped",
+        STATEBRIDGE,
+        'internal let scissorInvalidMessage =\n'
+        '    "The scissor rectangle is invalid. The scissor rectangle cannot be larger "',
+        'internal let scissorInvalidMessage =\n'
+        '    "The viewport is invalid. The scissor rectangle cannot be larger "',
+    ),
     # ---- Foundation 48: Clear, and the DefaultClearOptions rule ----------
     (
         "default-clear-options-ignores-the-render-target",

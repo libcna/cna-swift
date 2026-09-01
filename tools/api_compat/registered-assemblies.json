@@ -53,6 +53,26 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "GraphicsDeviceManagerAlreadyPresent",
+      "reason": "GraphicsDeviceManager..ctor raises ArgumentException with this when the game already has an IGraphicsDeviceManager registered. It contains two consecutive spaces after the first sentence, which is why transcribing it is not safe."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "InactiveSleepTimeCannotBeZero",
+      "reason": "Game.set_InactiveSleepTime raises ArgumentOutOfRangeException with this for a non-positive value."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "MissingGraphicsDeviceService",
+      "reason": "DrawableGameComponent.Initialize raises InvalidOperationException with this. It is a different key from NoGraphicsDeviceService, which Game.GraphicsDevice raises, and the two are not interchangeable."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "NoGraphicsDeviceService",
+      "reason": "Game.get_GraphicsDevice raises InvalidOperationException with this when no IGraphicsDeviceService is registered."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "ServiceAlreadyPresent",
       "reason": "GameServiceContainer.AddService raises ArgumentException with this when the container already holds the type."
     },
@@ -65,6 +85,11 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "ServiceProviderCannotBeNull",
       "reason": "GameServiceContainer.AddService raises the two-argument ArgumentNullException(\"provider\", this) for a null provider. It was deliberately unregistered while argument failures came out of CNAError; the projected ArgumentNullException reproduces the message, so it is registered now."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "TargetElaspedCannotBeZero",
+      "reason": "Game.set_TargetElapsedTime raises ArgumentOutOfRangeException with this. The key's own spelling is Microsoft's typo -- 'Elasped' -- and is reproduced as found."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -138,6 +163,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ScissorInvalid",
+      "reason": "GraphicsDevice.set_ScissorRectangle raises ArgumentException with this from three branches: a negative field, an edge past the current render target's bounds, and an extent past them that only an int32 overflow can reach."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "VertexElementOffsetNotMultipleFour",
       "reason": "VertexElementValidator.Validate raises ArgumentException with this for a vertex stride that is not a multiple of four, and again for an element offset that is not \u2014 which is why the one message names both."
     },
@@ -150,6 +180,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "VertexElementsOverlap",
       "reason": "VertexElementValidator.Validate raises ArgumentException with this when two elements claim the same byte of the vertex, formatted with the usage and index of the element that already owned the byte and then of the element that collided with it."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ViewportInvalid",
+      "reason": "GraphicsDevice.set_Viewport raises ArgumentException with this from five separate branches: a negative origin, a non-positive extent, an extent past the current render target's bounds, a depth outside 0 through 1, and MaxDepth below MinDepth."
     }
   ]
 }

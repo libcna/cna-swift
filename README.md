@@ -514,6 +514,14 @@ swift build
 swift build -c release
 swift test
 swift test -c release
+# ASan is the memory-error gate: use-after-free and out-of-bounds, which it
+# reports as `ERROR:`. LeakSanitizer is disabled because what it reports here
+# is the toolchain's own process-lifetime allocation -- the suite that never
+# starts the CNA runtime leaks twelve times what the one that starts a whole
+# game does, and no frame is in Sources/. Measured in
+# docs/foundation-49-viewport-scissor-evidence.md.
+ASAN_OPTIONS=detect_leaks=0 swift test --sanitize=address --scratch-path build-asan
+swift test --sanitize=thread --scratch-path build-tsan
 swift package dump-symbol-graph
 python3 tools/api_compat/verify.py --self-test
 python3 tools/api_compat/verify.py --graph-self-test \

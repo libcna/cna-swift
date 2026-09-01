@@ -34,7 +34,9 @@ milestone's own prose, that milestone's evidence file carries it still.
    resource key and the runtime resolves it against the assembly's own string
    table, so every reproduced message is read out of the registered binary,
    pinned in `tools/api_compat/reference/xna40-selected-resource-strings.json`,
-   and compared against the Swift source by the verifier.
+   and compared against the Swift source by the verifier. Foundation 49 made
+   that literally true: five messages were byte-identical to the assembly's own
+   and yet unpinned, so nothing was comparing them. All 29 are pinned now.
 3. **A complete type does not imply runtime capability.** Profile selection,
    presentation, primitives, vertex and index buffers, cube textures, effects,
    content loading, windows, and audio playback all remain unclaimed. Render

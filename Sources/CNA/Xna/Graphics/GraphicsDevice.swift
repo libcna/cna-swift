@@ -55,15 +55,72 @@ extension Microsoft.Xna.Framework.Graphics {
 
         /// `GraphicsDevice.set_Viewport(Viewport value)`.
         ///
-        /// A writer method, not a Swift `set`: the CLR setter is fallible —
-        /// `Helpers.CheckDisposed` and then a push that can raise
-        /// `ArgumentException` — and Swift has no throwing setter. This is the
-        /// projection of the CLR setter accessor and not a new XNA member; the
-        /// verifier has been asking for it by name since the reader landed.
+        /// A writer method, not a Swift `set`: the CLR setter is fallible and
+        /// Swift has no throwing setter. This is the projection of the CLR
+        /// setter accessor and not a new XNA member.
+        ///
+        /// The 387-byte body is mostly validation, and Foundation 47 shipped
+        /// none of it — the projection packed six fields and pushed. Five
+        /// separate branches raise the same exception:
+        ///
+        /// ```text
+        /// Helpers.CheckDisposed(this, pComPtr)
+        /// if (X < 0 || Y < 0 || Width <= 0 || Height <= 0)      throw   // IL_0172
+        /// (targetW, targetH) = currentRenderTargetCount > 0
+        ///     ? (currentRenderTargets[0].width, .height)
+        ///     : (pInternalCachedParams.BackBufferWidth, .BackBufferHeight)
+        /// if (X + Width > targetW || Y + Height > targetH)      throw   // IL_0162
+        /// if (MinDepth < 0f || MinDepth > 1f)                   throw   // IL_0152
+        /// if (MaxDepth < 0f || MaxDepth > 1f)                   throw   // IL_0142
+        /// if (!(MaxDepth >= MinDepth))                          throw   // IL_0104
+        /// ```
+        ///
+        /// Two details the IL settles and prose would not. The origin
+        /// comparisons are `blt` against zero while the extent comparisons are
+        /// `ble`, so `X = 0` is legal and `Width = 0` is not. And the last
+        /// comparison is `bge.un` on `float64`, an *unordered* branch: it
+        /// throws when `MaxDepth < MinDepth` **and** when either is NaN, which
+        /// `MaxDepth < MinDepth` alone would not.
+        ///
+        /// `X + Width` is CIL `add` — unchecked — so it is `&+` here. A
+        /// checked `+` would trap where XNA wraps and then rejects.
         public func SetViewport(
             _ value: Microsoft.Xna.Framework.Graphics.Viewport
         ) throws {
             let handle = try validatedHandle("GraphicsDevice.Viewport")
+            guard value.X >= 0, value.Y >= 0, value.Width > 0, value.Height > 0 else {
+                throw CNAArgumentException(
+                    message: viewportInvalidMessage, paramName: "value")
+            }
+            let bounds = try currentTargetBounds()
+            guard value.X &+ value.Width <= bounds.width,
+                  value.Y &+ value.Height <= bounds.height else {
+                throw CNAArgumentException(
+                    message: viewportInvalidMessage, paramName: "value")
+            }
+            // Written as three rejections rather than one `guard` chain of
+            // requirements, because the IL's branch *shapes* differ and a
+            // chain of requirements silently unifies them. The range tests are
+            // `blt`/`bgt` — "throw if below zero", "throw if above one" — and
+            // neither is true of NaN, so a NaN depth passes both and is
+            // rejected by the ordering test alone. Requiring `MinDepth >= 0`
+            // instead would reject NaN one branch early, reach the same
+            // outcome, and make the ordering test unreachable for the one
+            // input that distinguishes `bge.un` from an ordered comparison.
+            // The mutation harness found exactly that: the ordered rewrite
+            // survived until this was restructured.
+            if value.MinDepth < 0 || value.MinDepth > 1 {
+                throw CNAArgumentException(
+                    message: viewportInvalidMessage, paramName: "value")
+            }
+            if value.MaxDepth < 0 || value.MaxDepth > 1 {
+                throw CNAArgumentException(
+                    message: viewportInvalidMessage, paramName: "value")
+            }
+            if !(Double(value.MaxDepth) >= Double(value.MinDepth)) {
+                throw CNAArgumentException(
+                    message: viewportInvalidMessage, paramName: "value")
+            }
             var native = CNASwift_Viewport()
             native.x = value.X
             native.y = value.Y
@@ -94,10 +151,65 @@ extension Microsoft.Xna.Framework.Graphics {
         }
 
         /// `GraphicsDevice.set_ScissorRectangle(Rectangle value)`.
+        ///
+        /// The same shape as `set_Viewport` and, until Foundation 49, the same
+        /// omission. The 300-byte body first rewrites its own copy of the
+        /// rectangle into a D3DRECT — `Width` becomes the right edge and
+        /// `Height` the bottom — and every comparison after that is on edges,
+        /// not extents:
+        ///
+        /// ```text
+        /// Helpers.CheckDisposed(this, pComPtr)
+        /// if (X < 0 || Width < 0 || Y < 0 || Height < 0)        throw   // IL_011b
+        /// value.Width  = value.X + value.Width;    // right
+        /// value.Height = value.Y + value.Height;   // bottom
+        /// (targetW, targetH) = the same render-target-or-backbuffer pair
+        /// if (X > targetW || right > targetW ||
+        ///     Y > targetH || bottom > targetH)                  throw   // IL_010b
+        /// if (right - X > targetW || bottom - Y > targetH)      throw   // IL_00fb
+        /// ```
+        ///
+        /// The last pair looks redundant — with `X >= 0` and
+        /// `X + Width <= targetW`, `Width <= targetW` follows. It is not:
+        /// `add` and `sub` are unchecked, so `X = 2, Width = Int32.max` wraps
+        /// the right edge negative, slips past the edge test, and wraps back
+        /// to a width that this test catches. That is why the arithmetic here
+        /// is `&+` and `&-`, and why the pair is transcribed rather than
+        /// dropped as unreachable.
+        ///
+        /// A negative extent is rejected here where the viewport rejects a
+        /// zero one: `blt` against zero, not `ble`. An empty scissor rectangle
+        /// is legal.
         public func SetScissorRectangle(
             _ value: Microsoft.Xna.Framework.Rectangle
         ) throws {
             let handle = try validatedHandle("GraphicsDevice.ScissorRectangle")
+            guard value.X >= 0, value.Width >= 0,
+                  value.Y >= 0, value.Height >= 0 else {
+                throw CNAArgumentException(
+                    message: scissorInvalidMessage, paramName: "value")
+            }
+            let right = value.X &+ value.Width
+            let bottom = value.Y &+ value.Height
+            let bounds = try currentTargetBounds()
+            // `X <= targetW` and `Y <= targetH` are XNA's own comparisons and
+            // are kept, but no mutation covers them: with `X >= 0` and
+            // `Width >= 0` already established, `right <= targetW` implies
+            // `X <= targetW`, and the one input that breaks that implication
+            // — an overflowing width — is rejected by the pair below anyway.
+            // Removing them changes no observable behaviour, so the mutation
+            // that removed them was withdrawn rather than left in the harness
+            // claiming coverage it cannot have.
+            guard value.X <= bounds.width, right <= bounds.width,
+                  value.Y <= bounds.height, bottom <= bounds.height else {
+                throw CNAArgumentException(
+                    message: scissorInvalidMessage, paramName: "value")
+            }
+            guard right &- value.X <= bounds.width,
+                  bottom &- value.Y <= bounds.height else {
+                throw CNAArgumentException(
+                    message: scissorInvalidMessage, paramName: "value")
+            }
             var native = CNASwift_Rectangle()
             native.x = value.X
             native.y = value.Y
@@ -221,6 +333,22 @@ extension Microsoft.Xna.Framework.Graphics {
             }
             try runtime.functions.check(
                 result, operation: "cna_graphics_device_clear_options")
+        }
+
+        /// The width and height `set_Viewport` and `set_ScissorRectangle`
+        /// validate against, and the same `currentRenderTargetCount > 0`
+        /// branch `get_DefaultClearOptions` takes for the depth format.
+        ///
+        /// XNA writes the branch out three times; it is written once here
+        /// because all three read the same two fields of the same two
+        /// sources, and a single reading is easier to keep honest than three
+        /// copies of it.
+        internal func currentTargetBounds() throws -> (width: Int32, height: Int32) {
+            if let target = runtime.currentRenderTarget, !target.IsDisposed {
+                return (target.Width, target.Height)
+            }
+            let native = try nativePresentationParameters()
+            return (native.back_buffer_width, native.back_buffer_height)
         }
 
         /// `GraphicsDevice.SetRenderTarget(RenderTarget2D renderTarget)`.

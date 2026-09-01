@@ -292,3 +292,15 @@ extension Microsoft.Xna.Framework.Graphics.NativeStateCodes {
 internal let cannotClearNullDepthMessage =
     "Cannot clear depth or stencil because the device does not have an "
     + "active depth or stencil buffer."
+
+/// `FrameworkResources.ViewportInvalid`, pinned from the embedded string table
+/// of the registered `Microsoft.Xna.Framework.dll`.
+internal let viewportInvalidMessage =
+    "The viewport is invalid. The viewport cannot be larger than or outside "
+    + "of the current render target bounds. The MinDepth and MaxDepth must be "
+    + "between 0 and 1."
+
+/// `FrameworkResources.ScissorInvalid`, from the same table.
+internal let scissorInvalidMessage =
+    "The scissor rectangle is invalid. The scissor rectangle cannot be larger "
+    + "than or outside of the current render target bounds."

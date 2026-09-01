@@ -15,6 +15,26 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "GraphicsDeviceManagerAlreadyPresent",
+      "value": "A graphics device manager is already registered.  The graphics device manager cannot be changed once it is set."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "InactiveSleepTimeCannotBeZero",
+      "value": "The inactive sleep time must be greater than or equal to zero.  Specify zero or a positive value."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "MissingGraphicsDeviceService",
+      "value": "Drawable components require a graphics device service in the game service container."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "NoGraphicsDeviceService",
+      "value": "This property requires a graphics device service in the game service container."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "ServiceAlreadyPresent",
       "value": "Container already contains a service of this type."
     },
@@ -27,6 +47,11 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "ServiceProviderCannotBeNull",
       "value": "The service provider instance cannot be null."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "TargetElaspedCannotBeZero",
+      "value": "The target elapsed time must be greater than zero.  Specify a non-zero positive value."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -100,6 +125,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ScissorInvalid",
+      "value": "The scissor rectangle is invalid. The scissor rectangle cannot be larger than or outside of the current render target bounds."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "VertexElementOffsetNotMultipleFour",
       "value": "Invalid VertexDeclaration. Vertex stride and VertexElement.Offset must be multiples of four."
     },
@@ -112,6 +142,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "VertexElementsOverlap",
       "value": "Invalid VertexDeclaration. Elements {0}{1} and {2}{3} are overlapping."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ViewportInvalid",
+      "value": "The viewport is invalid. The viewport cannot be larger than or outside of the current render target bounds. The MinDepth and MaxDepth must be between 0 and 1."
     }
   ]
 }
