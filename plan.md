@@ -129,22 +129,22 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=157               TARGET_MEMBERS=1952
+TARGET_TYPES=157               TARGET_MEMBERS=1958
 COMPLETE_TYPES=150             PARTIAL_TYPES=7      MISSING_TYPE=100
-MISSING_MEMBER=84              TOTAL_DIAGNOSTICS=198
+MISSING_MEMBER=78              TOTAL_DIAGNOSTICS=191
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 XNA_RESOURCE_STRING_PROJECTIONS=34 API_COMPAT_SELF_TESTS=2420
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=100`, `MISSING_MEMBER=84`, and `OVERLOAD_MAPPING_MISMATCH=14`,
-whose every entry reads *required overload is absent* and is spread over seven
+`MISSING_TYPE=100`, `MISSING_MEMBER=78`, and `OVERLOAD_MAPPING_MISMATCH=13`,
+whose every entry reads *required overload is absent* and is spread over six
 members that each wait on a type not yet projected: `SpriteBatch.Draw` (5),
-`SpriteBatch.Begin` (4), and one each on
-`GraphicsDevice.SetRenderTarget`, `Texture2D.FromStream`,
-`GraphicsDeviceManager.Dispose` and the two serialization constructors of
+`SpriteBatch.Begin` (4), and one each on `GraphicsDevice.SetRenderTarget`,
+`Texture2D.FromStream` and the two serialization constructors of
 `ContentLoadException` and `StorageDeviceNotConnectedException`.
+`GraphicsDeviceManager.Dispose` left this list in Foundation 52.
 
 Every category that would mean the projection **disagrees** with XNA is 0:
 `TYPE_KIND_MISMATCH`, `BASE_MAPPING_MISMATCH`, `INTERFACE_MAPPING_MISMATCH`,
@@ -166,7 +166,7 @@ CANONICAL_DECLARATION_CHECKS=258  C_SWIFT_MEASUREMENTS=258
 LAYOUTS=26  LAYOUT_FIELDS=222  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=90  CAUGHT=90  SURVIVORS=0
+PROJECTION_MUTATIONS=96  CAUGHT=96  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected

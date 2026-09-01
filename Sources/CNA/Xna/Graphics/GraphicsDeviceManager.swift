@@ -36,6 +36,7 @@ extension Microsoft.Xna.Framework {
         private let deviceDisposingSource = CNAEventSource<CNAEventArgs>()
         private let deviceResetSource = CNAEventSource<CNAEventArgs>()
         private let deviceResettingSource = CNAEventSource<CNAEventArgs>()
+        private let disposedSource = CNAEventSource<CNAEventArgs>()
         private var eventRegistrations: [UInt32: UInt64] = [:]
         private var eventBoxes: [Unmanaged<GraphicsDeviceManagerEventBox>] = []
 
@@ -147,6 +148,44 @@ extension Microsoft.Xna.Framework {
 
         /// `IGraphicsDeviceService.DeviceResetting`.
         public var DeviceResetting: CNAEvent<CNAEventArgs> { deviceResettingSource.Event }
+
+        /// `GraphicsDeviceManager.Disposed`.
+        ///
+        /// Not an `IGraphicsDeviceService` member: the four above are the
+        /// service's, and this one is the manager's own, raised at the end of
+        /// `Dispose(true)`. It is a plain `EventHandler<EventArgs>` field with
+        /// the ordinary `Delegate.Combine`/`Remove` accessors.
+        public var Disposed: CNAEvent<CNAEventArgs> { disposedSource.Event }
+
+        /// `protected virtual void OnDeviceCreated(object sender, EventArgs args)`.
+        ///
+        /// ```text
+        /// if (deviceCreated != null) deviceCreated(sender, args);
+        /// ```
+        ///
+        /// `ldarg.1` then `ldarg.2`: the manager's raisers forward the
+        /// **caller's** sender, where `Game.OnActivated` pushes `ldarg.0` and
+        /// ignores its own `sender` parameter. Two raisers of the same shape
+        /// in the same framework that do different things with the argument,
+        /// so each is transcribed from its own IL.
+        open func OnDeviceCreated(_ sender: Any?, args: CNAEventArgs) throws {
+            try deviceCreatedSource.Raise(sender, args: args)
+        }
+
+        /// `protected virtual void OnDeviceDisposing(object sender, EventArgs args)`.
+        open func OnDeviceDisposing(_ sender: Any?, args: CNAEventArgs) throws {
+            try deviceDisposingSource.Raise(sender, args: args)
+        }
+
+        /// `protected virtual void OnDeviceReset(object sender, EventArgs args)`.
+        open func OnDeviceReset(_ sender: Any?, args: CNAEventArgs) throws {
+            try deviceResetSource.Raise(sender, args: args)
+        }
+
+        /// `protected virtual void OnDeviceResetting(object sender, EventArgs args)`.
+        open func OnDeviceResetting(_ sender: Any?, args: CNAEventArgs) throws {
+            try deviceResettingSource.Raise(sender, args: args)
+        }
 
         // ------------------------------------------------------------------
         // The preferences.
@@ -452,22 +491,80 @@ extension Microsoft.Xna.Framework {
             try changeDevice()
         }
 
+        /// `IDisposable.Dispose()`, which is `Dispose(true)` and then
+        /// `GC.SuppressFinalize(this)`. There is no finalizer to suppress in
+        /// Swift, so the second instruction has no counterpart; `deinit` is
+        /// the finalizer's projection and the idempotence below is what stands
+        /// in for the suppression.
         public func Dispose() throws {
+            try Dispose(true)
+        }
+
+        /// `protected virtual void Dispose(bool disposing)`.
+        ///
+        /// ```text
+        /// if (!disposing) return;
+        /// if (game != null) {
+        ///     if (game.Services.GetService(IGraphicsDeviceService) == this)
+        ///         game.Services.RemoveService(IGraphicsDeviceService);
+        ///     game.Window.ClientSizeChanged      -= GameWindowClientSizeChanged;
+        ///     game.Window.ScreenDeviceNameChanged -= GameWindowScreenDeviceNameChanged;
+        ///     game.Window.OrientationChanged     -= GameWindowOrientationChanged;
+        /// }
+        /// if (device != null) { device.Dispose(); device = null; }
+        /// if (Disposed != null) Disposed(this, EventArgs.Empty);
+        /// ```
+        ///
+        /// Three things about that body are worth stating rather than leaving
+        /// to be inferred.
+        ///
+        /// It removes `IGraphicsDeviceService` and **not**
+        /// `IGraphicsDeviceManager`, and only when the registered service is
+        /// this manager — a second manager cannot unregister the first.
+        ///
+        /// The three window unsubscriptions have no counterpart: `GameWindow`
+        /// is not projected, so there was never a subscription to remove. The
+        /// constructor records the same absence at the other end.
+        ///
+        /// `device.Dispose()` has none either. XNA's manager owns a device it
+        /// created; CNA owns this one, hands it out per callback, and destroys
+        /// it with the game. Disposing the facade would be disposing a
+        /// borrowed token. The native manager's own destruction is what
+        /// `storage.dispose` performs, and that is the honest counterpart.
+        ///
+        /// `Disposed` is raised last, after everything else, with `this` as
+        /// the sender — `ldarg.0`, unlike the four device raisers above.
+        open func Dispose(_ disposing: Bool) throws {
+            guard disposing else { return }
+            if let game {
+                if (game.Services.GetService(
+                        Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService.self)
+                    as AnyObject?) === self {
+                    game.Services.RemoveService(
+                        Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService.self)
+                }
+            }
             releaseManagerEventSubscriptions()
             try storage.dispose(operation: "GraphicsDeviceManager.Dispose")
+            try disposedSource.Raise(self, args: CNAEventArgs.Empty)
         }
 
         internal func nativeManagerEventFired(_ event: UInt32) {
             do {
                 switch event {
+                // Through the virtual raisers, not around them. XNA's own
+                // device path calls `OnDeviceCreated` and its three
+                // neighbours rather than touching the delegate fields, so a
+                // subclass that overrides one sees the device events it
+                // overrode for.
                 case GraphicsDeviceManager.eventDeviceCreated:
-                    try deviceCreatedSource.Raise(self, args: CNAEventArgs.Empty)
+                    try OnDeviceCreated(self, args: CNAEventArgs.Empty)
                 case GraphicsDeviceManager.eventDeviceDisposing:
-                    try deviceDisposingSource.Raise(self, args: CNAEventArgs.Empty)
+                    try OnDeviceDisposing(self, args: CNAEventArgs.Empty)
                 case GraphicsDeviceManager.eventDeviceReset:
-                    try deviceResetSource.Raise(self, args: CNAEventArgs.Empty)
+                    try OnDeviceReset(self, args: CNAEventArgs.Empty)
                 case GraphicsDeviceManager.eventDeviceResetting:
-                    try deviceResettingSource.Raise(self, args: CNAEventArgs.Empty)
+                    try OnDeviceResetting(self, args: CNAEventArgs.Empty)
                 default:
                     // CNA_GRAPHICS_DEVICE_MANAGER_EVENT_DISPOSED has no
                     // IGraphicsDeviceService counterpart and is deliberately

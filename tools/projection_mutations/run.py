@@ -83,6 +83,61 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 52: the manager's raisers and its disposal -----------
+    (
+        "raiser-substitutes-itself-for-the-sender",
+        "a device raiser passing `self` where the IL passes its argument",
+        MANAGER,
+        "        open func OnDeviceCreated(_ sender: Any?, args: CNAEventArgs) throws {\n"
+        "            try deviceCreatedSource.Raise(sender, args: args)",
+        "        open func OnDeviceCreated(_ sender: Any?, args: CNAEventArgs) throws {\n"
+        "            try deviceCreatedSource.Raise(self, args: args)",
+    ),
+    (
+        "two-raisers-crossed",
+        "OnDeviceReset raising the resetting event",
+        MANAGER,
+        "        open func OnDeviceReset(_ sender: Any?, args: CNAEventArgs) throws {\n"
+        "            try deviceResetSource.Raise(sender, args: args)",
+        "        open func OnDeviceReset(_ sender: Any?, args: CNAEventArgs) throws {\n"
+        "            try deviceResettingSource.Raise(sender, args: args)",
+    ),
+    (
+        "native-events-bypass-the-raisers",
+        "the native device events raising the delegates directly, so an "
+        "override never runs",
+        MANAGER,
+        "                case GraphicsDeviceManager.eventDeviceCreated:\n"
+        "                    try OnDeviceCreated(self, args: CNAEventArgs.Empty)",
+        "                case GraphicsDeviceManager.eventDeviceCreated:\n"
+        "                    try deviceCreatedSource.Raise(self, args: CNAEventArgs.Empty)",
+    ),
+    (
+        "dispose-false-still-disposes",
+        "Dispose(false) doing the work `disposing` guards",
+        MANAGER,
+        "            guard disposing else { return }",
+        "            guard !disposing || true else { return }",
+    ),
+    (
+        "dispose-removes-the-manager-service",
+        "Dispose removing IGraphicsDeviceManager, which XNA leaves registered",
+        MANAGER,
+        "                    game.Services.RemoveService(\n"
+        "                        Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService.self)",
+        "                    game.Services.RemoveService(\n"
+        "                        Microsoft.Xna.Framework.IGraphicsDeviceManager.self)",
+    ),
+    (
+        "disposed-raised-before-the-removal",
+        "Disposed raised first, so a handler sees a service still registered",
+        MANAGER,
+        "            guard disposing else { return }\n"
+        "            if let game {",
+        "            guard disposing else { return }\n"
+        "            try disposedSource.Raise(self, args: CNAEventArgs.Empty)\n"
+        "            if let game {",
+    ),
     # ---- Foundation 51: the GraphicsDeviceManager preferences ------------
     (
         "vsync-default-taken-from-the-clr",

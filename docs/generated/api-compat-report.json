@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1952,
-    "TOTAL_DIAGNOSTICS": 198,
+    "TARGET_MEMBERS": 1958,
+    "TOTAL_DIAGNOSTICS": 191,
     "COMPLETE_TYPES": 150,
     "PARTIAL_TYPES": 7,
     "MISSING_TYPES": 100,
     "MISSING_TYPE": 100,
-    "MISSING_MEMBER": 84,
+    "MISSING_MEMBER": 78,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -29,7 +29,7 @@
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 14,
+    "OVERLOAD_MAPPING_MISMATCH": 13,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -1171,47 +1171,12 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceCreated(_:Any?,args:CNAEventArgs)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceDisposing(_:Any?,args:CNAEventArgs)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceReset(_:Any?,args:CNAEventArgs)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceResetting(_:Any?,args:CNAEventArgs)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.Dispose(_:Bool)",
-      "detail": "mapped overload is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.Dispose(_:Bool)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnPreparingDeviceSettings(_:Any?,args:Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs)",
       "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.Disposed()",
       "detail": "mapped member is absent"
     },
     {
@@ -12074,7 +12039,7 @@
       "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "status": "PARTIAL",
       "expectedMembers": 30,
-      "targetMembers": 20,
+      "targetMembers": 26,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -12093,47 +12058,12 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceCreated(_:Any?,args:CNAEventArgs)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceDisposing(_:Any?,args:CNAEventArgs)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceReset(_:Any?,args:CNAEventArgs)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceResetting(_:Any?,args:CNAEventArgs)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.Dispose(_:Bool)",
-          "detail": "mapped overload is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.Dispose(_:Bool)",
-          "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnPreparingDeviceSettings(_:Any?,args:Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs)",
           "detail": "mapped member is absent"
         },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.Disposed()",
           "detail": "mapped member is absent"
         }
       ]

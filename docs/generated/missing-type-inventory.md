@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1952
-TOTAL_DIAGNOSTICS=198
+TARGET_MEMBERS=1958
+TOTAL_DIAGNOSTICS=191
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
 MISSING_TYPE=100
-MISSING_MEMBER=84
+MISSING_MEMBER=78
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=14
+OVERLOAD_MAPPING_MISMATCH=13
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -359,20 +359,13 @@ Expected members: 16; emitted members: 4.
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 
-Expected members: 30; emitted members: 20.
+Expected members: 30; emitted members: 26.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.CanResetDevice(_:Microsoft.Xna.Framework.GraphicsDeviceInformation)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceCreated(_:Any?,args:CNAEventArgs)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceDisposing(_:Any?,args:CNAEventArgs)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceReset(_:Any?,args:CNAEventArgs)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnDeviceResetting(_:Any?,args:CNAEventArgs)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.Dispose(_:Bool)`: mapped overload is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.GraphicsDeviceManager.Dispose(_:Bool)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.OnPreparingDeviceSettings(_:Any?,args:Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.Disposed()`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
 
