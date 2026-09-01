@@ -1,10 +1,201 @@
 # CNA-Swift continuation handoff
 
-> **This file is the handoff written at the end of the Foundation 30-36
-> session, kept as that session's record.** It is not the current state and is
-> not maintained: Foundation Milestones 37 through 48 have landed since, and
-> `plan.md` is the authority for what is true now. Nothing here is deleted,
-> because the measurements it records were real when it was written.
+> **Current as of Foundation 57.** The Foundation 30–36 handoff that used to be
+> this file is kept below, under its own heading, because the measurements it
+> records were real when it was written. `plan.md` remains the authority for
+> project rules; this file is the *state of the work* and *what is left*.
+
+## Where the work stands
+
+Twenty-two local commits on `develop`. Reproduce the numbers rather than trust
+them:
+
+```bash
+git rev-list --count origin/develop..HEAD
+python3 tools/api_compat/verify.py --symbol-graph \
+  .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json
+```
+
+```text
+609 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=169   COMPLETE_TYPES=150   PARTIAL_TYPES=7
+MISSING_TYPE=100  MISSING_MEMBER=63  OVERLOAD_MAPPING_MISMATCH=6
+every category that would mean DISAGREEMENT with XNA: 0
+BOUND_FUNCTIONS=87  PROTOTYPE_TYPE_POSITIONS=283  LAYOUTS=28  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=114 CAUGHT=114   NATIVE_ABI_MUTATIONS=14 CAUGHT=14
+MESSAGE_COVERAGE_FINDINGS=0 over 1,258 implemented members
+API_COMPAT_SELF_TESTS=2420  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+RESOURCE_STRINGS_REPRODUCED=38
+```
+
+**Every remaining diagnostic is an absence.** Nothing implemented disagrees
+with the pinned metadata.
+
+## Five facts that bound everything below
+
+Measured, not assumed. A plan that ignores one of these will produce work that
+cannot be verified.
+
+1. **No pixel readback exists.** `cna_graphics_device_get_backbuffer_data_window`
+   and `cna_texture2d_get_data_rgba8` both answer `CNA_RESULT_NOT_SUPPORTED` on
+   a render target and the back buffer alike — `build-probe/f53_readback.c`,
+   `build-probe/f53_rtread.c`. **No test here can assert that a pixel ended up
+   anywhere.** Geometry, blending, sampling and sort order are unverifiable in
+   this environment and must be recorded as such, never asserted from a call
+   that returned zero.
+2. **Texture *data* is observable.** A typed transfer round-trips exactly
+   (`build-probe/f56_texdata.c`), which is why Foundation 57's tests assert
+   texel values. This is the one place pixel-level evidence exists.
+3. **Only `SurfaceFormat.Color` can be created.** Nineteen of the twenty
+   formats answer `NOT_SUPPORTED` — `build-probe/f55_grants.c`. Anything
+   depending on another format is unreachable here.
+4. **A `GraphicsDevice` is a per-callback capability token**, not an identity
+   (`build-probe/f42b_identity.c`). Device-owned state belongs on
+   `RuntimeState`; a stored facade goes stale between callbacks. Foundation 54
+   learned this again the hard way.
+5. **CNA's device is only real inside a lifecycle callback.** Outside one,
+   `cna_graphics_device_manager_get_device` answers `INVALID_STATE`.
+
+## What is left, classified
+
+### ACTIONABLE_LOCAL — upstream support exists, the managed side is the work
+
+CNA has far more than the projection uses. Route counts, measured:
+
+```text
+cna_effect_*            138 routes
+cna_content_manager_*    33 routes
+cna_vertex_buffer_*      16 routes
+cna_index_buffer_*       10 routes
+cna_sprite_font_*         9 routes
+cna_graphics_device_draw* 7 routes
+```
+
+So the following are **not** blocked upstream. The blocker is that the managed
+type is not projected yet, which is ordinary work:
+
+| Next | Closes | Notes |
+|---|---|---|
+| `Texture2D.SaveAsPng`/`SaveAsJpeg`, `FromStream(width:height:zoom:)`, `Dispose(Bool)` | 4 members | `cna_texture2d_save_file`, `_copy_encoded`, `_get_encoded_byte_count` exist. Smallest next step. |
+| `VertexBuffer` / `IndexBuffer` (+ `DynamicVertexBuffer`, `DynamicIndexBuffer`, `VertexBufferBinding`) | 5 types, ~8 `GraphicsDevice` members | 26 CNA routes. `VertexDeclaration` and the four vertex types already land (Foundations 43–44). |
+| `GraphicsDevice` drawing (`DrawPrimitives`, `DrawIndexedPrimitives`, `DrawUserPrimitives`, …) | ~8 members | 7 CNA routes. **Verifiable only as "the call was accepted"** — see fact 1. Say so in the evidence rather than implying more. |
+| `Effect` family (`Effect`, `EffectParameter`, `EffectPass`, `EffectTechnique`, the collections, `BasicEffect` and friends) | ~14 types, 2 `SpriteBatch.Begin` overloads, 1 `GraphicsDevice` member | 138 routes. Large but well supported. `cna_sprite_batch_begin_with_effect` is already there, unbound. |
+| `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
+| `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
+| `TextureCollection` (`GraphicsDevice.Textures`, `VertexTextures`) | 1 type, 2 members | Previously judged blocked: `CNA_TextureSlotInfo` has no kind discriminator and `TextureCube`/`Texture3D` are unprojected. **Re-measure before believing that** — the same assumption was wrong twice. |
+| `SpriteBatch.Dispose(Bool)` | 1 member | Trivial; the pattern is `GraphicsDeviceManager.Dispose(Bool)` from Foundation 52. |
+
+### BLOCKED — and why
+
+* **`GraphicsAdapter`, `DisplayMode`, `GraphicsDeviceInformation`,
+  `PreparingDeviceSettingsEventArgs`** — host facts a HEADLESS renderer cannot
+  supply. These hold up `GraphicsDeviceManager`'s last five members
+  (`FindBestDevice`, `CanResetDevice`, `RankDevices`,
+  `OnPreparingDeviceSettings`, `PreparingDeviceSettings`).
+* **`GameWindow`** (and `Game.Window`) — no window exists under HEADLESS. Its
+  absence is already recorded at both ends of
+  `GraphicsDeviceManager`'s constructor and `Dispose(Bool)`.
+* **`GraphicsDevice.Present`, `Reset`, `GetBackBufferData`** — presentation and
+  readback, neither of which this renderer performs.
+* **`Texture2D`'s GraphicsProfile validation** (six messages) — the checks read
+  the *device's* profile and `GraphicsDevice.GraphicsProfile` is not projected.
+  Recorded as `deferred` in `recorded-message-absences.json`.
+* **`GamePad.InvalidController`, `Keyboard.CouldNotReadKeyboard`** — the
+  error-channel halves that need a native input failure this environment cannot
+  produce. CNA already matches the "not connected" half.
+* **Audio (10 types), Media (19), Touch, Storage, GamerServices** — unmeasured
+  here; check CNA's route inventory before assuming either way.
+
+### DELIBERATE_OUT_OF_SCOPE
+
+* **`Microsoft.Xna.Framework.Design` (13 types)** — design-time IDE converters,
+  unreachable from a running game. `System.dll` is available, its identity is
+  established, and it is deliberately unadmitted because no implemented
+  projection needs a family it declares.
+
+## Rules a next session must not quietly break
+
+These are the ones that cost the most to relearn:
+
+1. **A gate not demonstrated to fail is not evidence.** Every mutation must be
+   shown to be caught; one that survives is either a missing test or an
+   unfalsifiable claim, and an unfalsifiable one is **withdrawn with the reason
+   written where it stood**. Foundations 45, 48, 53 and 55 each have one.
+2. **Run a baseline first.** An ad-hoc mutation check against a tree that does
+   not compile reports CAUGHT for everything. That happened in Foundation 51
+   and the result was believed for a minute.
+3. **The two mutation harnesses take `.mutation-gate.lock`.** They both edit
+   files under `Sources/`; running them together makes one compile the other's
+   defect and report a CAUGHT it did not earn.
+4. **Grep the neighbouring symbols before calling something upstream-blocked.**
+   `cna_sprite_batch_begin`'s doc comment describes that route, not the API;
+   `begin_with_states` was there all along and Foundation 53 wrote the wrong
+   verdict because of it.
+5. **A route with no consuming member is not bound**, and a mirrored structure
+   with no route is the same unearned count. Three have been *un*bound so far.
+6. **Read the IL of every member you implement, including the ones already
+   implemented.** Four defects in three milestones were found that way and none
+   by a failing test. `tools/api_compat/message_coverage.py` now catches the
+   message half of it automatically; nothing yet catches the rest.
+7. **`plan.md` and the diagnostic block in `README.md` must move with the
+   numbers.** They are updated in the same commit as the work, never after.
+
+## The gates, and what each is for
+
+```bash
+swift build && swift build -c release && swift test && swift test -c release
+ASAN_OPTIONS=detect_leaks=0 swift test --sanitize=address --scratch-path build-asan
+swift test --sanitize=thread --scratch-path build-tsan
+swift package dump-symbol-graph
+python3 tools/api_compat/verify.py --self-test
+python3 tools/api_compat/verify.py --graph-self-test --symbol-graph …
+python3 tools/api_compat/verify.py --symbol-graph … --output docs/generated/api-compat-report.json
+python3 tools/api_compat/dependency_graph.py --report … --output …
+python3 tools/native_abi/verify.py     --cna-include … --library "$CNA_NATIVE_LIBRARY"
+python3 tools/native_abi/mutations.py  --cna-include … --library "$CNA_NATIVE_LIBRARY"
+CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~40 min, 114 mutations
+python3 tools/api_compat/message_coverage.py --self-test|--mutations|(report)
+python3 tools/api_compat/pinned_assembly_audit.py …
+python3 tools/api_compat/bcl_authority_audit.py … --cross-check --negative-control …×4
+python3 tools/runtime_capabilities/render.py --check
+python3 tools/gamepad_native/run.py --library … --output …
+cd ../cna-swift-template && swift run HelloGame --frames 600
+```
+
+`README.md`'s *Verification* section is the maintained copy of this list.
+
+Two operational notes worth the seconds they save:
+
+* **Every run must be headless.** `$SCRATCH/env.sh` exports
+  `CNA_RENDERER=HEADLESS`, `SDL_VIDEODRIVER=dummy` and a private `DISPLAY`, so
+  nothing can paint on the real desktop even if one layer is forgotten.
+* **If the template canary fails with compile errors in code that is fine**,
+  delete the consumer's `.build/build.db`: SwiftPM caches a path dependency's
+  source file list, and a new file in the library is invisible until it is
+  cleared. Foundation 57 lost time to this.
+
+## Open items carried forward
+
+* One ThreadSanitizer run in Foundation 49 reported a single failure whose
+  identity was not captured. Eleven runs since — three under saturating CPU
+  load — have been clean. Recorded as unreproduced, not as a pass.
+* `GraphicsDevice.PresentationParameters` is deliberately absent: XNA's getter
+  is `IL_NO_FAILURE_PATH` because it reads a field cached at device creation,
+  and this binding has no infallible source. `IGraphicsDeviceManager.CreateDevice`
+  and the native `DeviceCreated`/`DeviceReset` events are the two candidate
+  caching points if it is ever wanted.
+* `useResizedBackBuffer` is stored by the two dimension setters and read by
+  nothing: XNA's readers are inside `ChangeDevice`'s window negotiation, which
+  needs `GameWindow`.
+
+---
+
+# Historical: the Foundation 30–36 handoff
+
+> **The handoff written at the end of the Foundation 30-36 session, kept as
+> that session's record.** It is not the current state and is not maintained:
+> Foundation Milestones 37 through 57 have landed since. Nothing here is
+> deleted, because the measurements it records were real when it was written.
 
 **Foundation Milestones 30 through 36: COMPLETE.** Eleven local commits, none
 pushed.
