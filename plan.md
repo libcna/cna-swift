@@ -129,21 +129,23 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=157               TARGET_MEMBERS=1963
+TARGET_TYPES=157               TARGET_MEMBERS=1965
 COMPLETE_TYPES=150             PARTIAL_TYPES=7      MISSING_TYPE=100
-MISSING_MEMBER=73              TOTAL_DIAGNOSTICS=181
+MISSING_MEMBER=71              TOTAL_DIAGNOSTICS=177
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 XNA_RESOURCE_STRING_PROJECTIONS=34 API_COMPAT_SELF_TESTS=2420
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=100`, `MISSING_MEMBER=73`, and `OVERLOAD_MAPPING_MISMATCH=8`,
-whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (4),
-and one each on `GraphicsDevice.SetRenderTarget`, `Texture2D.FromStream` and
-the two serialization constructors of `ContentLoadException` and
-`StorageDeviceNotConnectedException`. `GraphicsDeviceManager.Dispose` left this
-list in Foundation 52 and all five `SpriteBatch.Draw` entries in Foundation 53.
+`MISSING_TYPE=100`, `MISSING_MEMBER=71`, and `OVERLOAD_MAPPING_MISMATCH=6`,
+whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
+both taking an `Effect`), and one each on `GraphicsDevice.SetRenderTarget`,
+`Texture2D.FromStream` and the two serialization constructors of
+`ContentLoadException` and `StorageDeviceNotConnectedException`.
+`GraphicsDeviceManager.Dispose` left this list in Foundation 52, all five
+`SpriteBatch.Draw` entries in Foundation 53, and two of the four
+`SpriteBatch.Begin` entries in Foundation 54.
 
 Every category that would mean the projection **disagrees** with XNA is 0:
 `TYPE_KIND_MISMATCH`, `BASE_MAPPING_MISMATCH`, `INTERFACE_MAPPING_MISMATCH`,
@@ -160,12 +162,12 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=84  ROUTE_PAIRINGS=84  PROTOTYPE_TYPE_POSITIONS=262
-CANONICAL_DECLARATION_CHECKS=262  C_SWIFT_MEASUREMENTS=262
-LAYOUTS=27  LAYOUT_FIELDS=232  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
+BOUND_FUNCTIONS=84  ROUTE_PAIRINGS=84  PROTOTYPE_TYPE_POSITIONS=266
+CANONICAL_DECLARATION_CHECKS=266  C_SWIFT_MEASUREMENTS=266
+LAYOUTS=26  LAYOUT_FIELDS=228  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=97  CAUGHT=97  SURVIVORS=0
+PROJECTION_MUTATIONS=103  CAUGHT=103  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected

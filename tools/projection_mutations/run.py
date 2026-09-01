@@ -83,6 +83,53 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 54: Begin's states and when they are applied ---------
+    (
+        "deferred-batch-applies-its-states-at-begin",
+        "SetRenderState called from Begin for every sort mode, not just Immediate",
+        BATCH,
+        "            if sortMode == .Immediate {\n"
+        "                try setRenderState()\n"
+        "            }",
+        "            try setRenderState()",
+    ),
+    (
+        "immediate-batch-defers-its-states",
+        "SetRenderState called from End for every sort mode, not just the deferred ones",
+        BATCH,
+        "            if spriteSortMode != .Immediate {\n"
+        "                try setRenderState()\n"
+        "            }",
+        "            try setRenderState()",
+    ),
+    (
+        "null-blend-state-defaults-to-opaque",
+        "the blend default taken as Opaque, not SetRenderState's AlphaBlend",
+        BATCH,
+        "        private var resolvedBlendState: BlendState { blendState ?? .AlphaBlend }",
+        "        private var resolvedBlendState: BlendState { blendState ?? .Opaque }",
+    ),
+    (
+        "null-depth-state-defaults-to-default",
+        "the depth default taken as DepthStencilState.Default, not None",
+        BATCH,
+        "            depthStencilState ?? .None",
+        "            depthStencilState ?? .Default",
+    ),
+    (
+        "sampler-applied-to-the-wrong-slot",
+        "SetRenderState writing the sampler to slot one",
+        BATCH,
+        "            try device.SamplerStates?.SetItem(0, resolvedSamplerState)",
+        "            try device.SamplerStates?.SetItem(1, resolvedSamplerState)",
+    ),
+    (
+        "render-state-applied-around-the-device-members",
+        "the states pushed to CNA without going through the device, so nothing binds",
+        BATCH,
+        "            try device.SetBlendState(resolvedBlendState)",
+        "            _ = resolvedBlendState",
+    ),
     # ---- Foundation 53: the SpriteBatch Draw family ----------------------
     #
     # Only one control here, and the reason is measured rather than assumed.

@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1963
-TOTAL_DIAGNOSTICS=181
+TARGET_MEMBERS=1965
+TOTAL_DIAGNOSTICS=177
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
 MISSING_TYPE=100
-MISSING_MEMBER=73
+MISSING_MEMBER=71
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=8
+OVERLOAD_MAPPING_MISMATCH=6
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -311,17 +311,13 @@ Expected members: 56; emitted members: 15.
 
 ### `Microsoft.Xna.Framework.Graphics.SpriteBatch`
 
-Expected members: 21; emitted members: 10.
+Expected members: 21; emitted members: 12.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState,effect:Microsoft.Xna.Framework.Graphics.Effect)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState,effect:Microsoft.Xna.Framework.Graphics.Effect)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)`: required overload is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)`: mapped member is absent
+- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)`: required overload is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
+- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: mapped member is absent

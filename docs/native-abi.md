@@ -55,9 +55,9 @@ a route type, and no strict XNA type exposes a handle or function pointer.
 Qualified result on CNA 0.21.0:
 
 ```text
-BOUND_FUNCTIONS=84  ROUTE_PAIRINGS=84  PROTOTYPE_TYPE_POSITIONS=262
-CANONICAL_DECLARATION_CHECKS=262  C_SWIFT_MEASUREMENTS=262
-LAYOUTS=27  LAYOUT_FIELDS=232  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
+BOUND_FUNCTIONS=84  ROUTE_PAIRINGS=84  PROTOTYPE_TYPE_POSITIONS=266
+CANONICAL_DECLARATION_CHECKS=266  C_SWIFT_MEASUREMENTS=266
+LAYOUTS=26  LAYOUT_FIELDS=228  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 ```
 
@@ -166,6 +166,20 @@ out — `blend_factor`, `multi_sample_mask` and `reference_stencil`, each of whi
 XNA exposes as a device property in its own right. Four more mirrored structures
 came with them, taking the layout wall from 21 structures and 157 fields to 25
 and 209.
+
+## The sprite routes, and the two that were removed
+
+Foundation 53 bound `cna_sprite_batch_submit_many` with its mirrored
+`CNA_SpriteCommand`, because XNA's destination-rectangle `Draw` overloads carry
+a rectangle where the scaled ones carry position and scale, and CNA splits its
+commands along the identical line.
+
+Foundation 54 bound `cna_sprite_batch_begin_with_states` and **unbound**
+`cna_sprite_batch_begin`, whose consumer disappeared when `Begin()` began
+forwarding through the state overload. `CNA_SpriteBatchBeginInfo` went with it:
+a mirrored structure with no route is the same unearned count as a route with
+no member. `cna_sprite_batch_begin_with_effect` stays unbound because `Effect`
+is not projected.
 
 ## The clear routes, and the one that was removed
 

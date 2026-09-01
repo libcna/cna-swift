@@ -180,14 +180,20 @@ final class Foundation50MessageCoverageTests: XCTestCase {
             let batch = try G.SpriteBatch(graphicsDevice: device)
             let handle = try batch.validatedHandle("test")
             let runtime = batch.nativeStorage.runtime
-            var info = CNASwift_SpriteBatchBeginInfo()
-            info.struct_size = UInt32(MemoryLayout<CNASwift_SpriteBatchBeginInfo>.size)
-            info.struct_version = 1
-            info.sort_mode = G.SpriteSortMode.Deferred.rawValue
-            game.observations["firstBegin"] =
-                String(runtime.functions.spriteBatchBegin(handle, &info))
-            game.observations["secondBegin"] =
-                String(runtime.functions.spriteBatchBegin(handle, &info))
+            // Through the route the projection itself uses. The plain
+            // `cna_sprite_batch_begin` was unbound in Foundation 54 once no
+            // member consumed it, and a test is not a member.
+            var blend = G.BlendState.AlphaBlend.nativeDescriptor()
+            var sampler = G.SamplerState.LinearClamp.nativeDescriptor()
+            var depth = G.DepthStencilState.None.nativeDescriptor()
+            var raster = G.RasterizerState.CullCounterClockwise.nativeDescriptor()
+            func begin() -> UInt32 {
+                runtime.functions.spriteBatchBeginWithStates(
+                    handle, G.SpriteSortMode.Deferred.rawValue,
+                    &blend, &sampler, &depth, &raster)
+            }
+            game.observations["firstBegin"] = String(begin())
+            game.observations["secondBegin"] = String(begin())
             game.observations["end"] = String(runtime.functions.spriteBatchEnd(handle))
             game.observations["secondEnd"] = String(runtime.functions.spriteBatchEnd(handle))
             try batch.Dispose()

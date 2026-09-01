@@ -93,3 +93,23 @@ rule — null there is an observable selected operation, exactly like
 
 Nothing in the selected nine was found inconsistent, and no parameter rule was
 changed.
+
+
+## Addendum, Foundation 54: four more selected parameters
+
+`SpriteBatch.Begin`'s `blendState`, `samplerState`, `depthStencilState` and
+`rasterizerState` join the registry, taking `optionalReferenceParameters` from
+26 entries to 30. They pass the same test the four `GraphicsDevice` members
+passed: `SetRenderState` `brfalse`-tests each one and the null branch reaches a
+normal `ldsfld` of a preset, not a `throw`.
+
+```text
+IL_0001:  ldfld      SpriteBatch::blendState
+IL_0006:  brfalse.s  IL_001b
+IL_0008:  …          _parent.BlendState = this.blendState
+IL_0019:  br.s       IL_002b
+IL_001b:  …          _parent.BlendState = BlendState.AlphaBlend
+```
+
+Null selects a different, well-defined state, and a caller can see which one
+the device ends up with — which is exactly the line this rule draws.

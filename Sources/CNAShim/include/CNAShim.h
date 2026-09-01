@@ -249,13 +249,6 @@ typedef struct CNASwift_Texture2DDecodeInfo {
     uint8_t reserved[7];
 } CNASwift_Texture2DDecodeInfo;
 
-typedef struct CNASwift_SpriteBatchBeginInfo {
-    uint32_t struct_size;
-    uint32_t struct_version;
-    uint32_t sort_mode;
-    uint32_t reserved;
-} CNASwift_SpriteBatchBeginInfo;
-
 typedef struct CNASwift_SpriteCommand {
     uint32_t struct_size;
     uint32_t struct_version;

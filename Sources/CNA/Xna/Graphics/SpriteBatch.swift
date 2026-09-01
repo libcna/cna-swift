@@ -102,26 +102,140 @@ extension Microsoft.Xna.Framework.Graphics {
         /// The flag is set only after the native begin succeeds, which is
         /// where XNA sets it too: everything that can fail in XNA's body
         /// happens before the assignment.
+        /// The five fields `Begin` stores and `SetRenderState` reads. All four
+        /// state fields are Optional because XNA's are null when the caller
+        /// did not pass one, and "null" is not the same as "the default": the
+        /// default is chosen later, in `SetRenderState`.
+        private var spriteSortMode: SpriteSortMode = .Deferred
+        private var blendState: BlendState?
+        private var samplerState: SamplerState?
+        private var depthStencilState: DepthStencilState?
+        private var rasterizerState: RasterizerState?
+
+        /// `SpriteBatch.Begin()`, which is
+        /// `ldc.i4.0; ldnull x5; Matrix.Identity` -- Deferred and five nulls.
         public func Begin() throws {
-            // The pair check comes first because XNA's does: `Begin` has no
-            // `Helpers.CheckDisposed` at all, and its very first instruction
-            // is `ldfld inBeginEndPair`. The order is observable —
-            // `Begin(); Dispose(); Begin()` raises XNA's rule violation, not
-            // a disposal error — so the handle is resolved after the rule.
+            try Begin(.Deferred, blendState: nil, samplerState: nil,
+                      depthStencilState: nil, rasterizerState: nil)
+        }
+
+        /// `Begin(SpriteSortMode sortMode, BlendState blendState)`, which
+        /// forwards with three more nulls.
+        public func Begin(
+            _ sortMode: SpriteSortMode,
+            blendState: BlendState?
+        ) throws {
+            try Begin(sortMode, blendState: blendState, samplerState: nil,
+                      depthStencilState: nil, rasterizerState: nil)
+        }
+
+        /// `Begin(SpriteSortMode, BlendState, SamplerState, DepthStencilState,
+        /// RasterizerState)`.
+        ///
+        /// The pair check comes first because XNA's does: `Begin` has no
+        /// `Helpers.CheckDisposed` at all, and its very first instruction is
+        /// `ldfld inBeginEndPair`. The order is observable --
+        /// `Begin(); Dispose(); Begin()` raises XNA's rule violation, not a
+        /// disposal error.
+        ///
+        /// XNA then stores the six state fields and, **only for `Immediate`**,
+        /// calls `SetRenderState`. For every other sort mode the states are
+        /// applied at `End`. That timing is reproduced rather than simplified:
+        /// between `Begin` and `End`, a Deferred batch has not touched the
+        /// device, and `GraphicsDevice.BlendState` still reads what it read
+        /// before.
+        ///
+        /// CNA has to be told at begin time regardless, because
+        /// `cna_sprite_batch_begin` **overwrites** the device's blend state
+        /// with its own default: `build-probe/f54_beginstate.c` sets an
+        /// unmistakable custom state, calls the plain begin, and reads a
+        /// different one back. So the resolved descriptors cross the boundary
+        /// through `cna_sprite_batch_begin_with_states`, and the *managed*
+        /// device state moves at XNA's own moment. The two stay consistent
+        /// because the managed device state is a cache on `RuntimeState`,
+        /// which is what `GraphicsDevice.BlendState` reads.
+        public func Begin(
+            _ sortMode: SpriteSortMode,
+            blendState: BlendState?,
+            samplerState: SamplerState?,
+            depthStencilState: DepthStencilState?,
+            rasterizerState: RasterizerState?
+        ) throws {
             guard !inBeginEndPair else {
                 throw CNAInvalidOperationException(
                     message: endMustBeCalledBeforeBeginMessage)
             }
             let handle = try validatedHandle("SpriteBatch.Begin")
-            var info = CNASwift_SpriteBatchBeginInfo()
-            info.struct_size = UInt32(MemoryLayout<CNASwift_SpriteBatchBeginInfo>.size)
-            info.struct_version = 1
-            info.sort_mode = SpriteSortMode.Deferred.rawValue
+            self.spriteSortMode = sortMode
+            self.blendState = blendState
+            self.samplerState = samplerState
+            self.depthStencilState = depthStencilState
+            self.rasterizerState = rasterizerState
+
+            var blend = resolvedBlendState.nativeDescriptor()
+            var sampler = resolvedSamplerState.nativeDescriptor()
+            var depth = resolvedDepthStencilState.nativeDescriptor()
+            var raster = resolvedRasterizerState.nativeDescriptor()
             try nativeStorage.runtime.functions.check(
-                nativeStorage.runtime.functions.spriteBatchBegin(handle, &info),
-                operation: "cna_sprite_batch_begin"
+                nativeStorage.runtime.functions.spriteBatchBeginWithStates(
+                    handle, sortMode.rawValue, &blend, &sampler, &depth, &raster),
+                operation: "cna_sprite_batch_begin_with_states"
             )
+            if sortMode == .Immediate {
+                try setRenderState()
+            }
             inBeginEndPair = true
+        }
+
+        /// The four `??` defaults, each an `ldsfld` of the preset in
+        /// `SetRenderState`'s null branch: `BlendState.AlphaBlend`,
+        /// `SamplerState.LinearClamp`, `DepthStencilState.None` and
+        /// `RasterizerState.CullCounterClockwise`.
+        private var resolvedBlendState: BlendState { blendState ?? .AlphaBlend }
+        private var resolvedSamplerState: SamplerState { samplerState ?? .LinearClamp }
+        private var resolvedDepthStencilState: DepthStencilState {
+            depthStencilState ?? .None
+        }
+        private var resolvedRasterizerState: RasterizerState {
+            rasterizerState ?? .CullCounterClockwise
+        }
+
+        /// `SpriteBatch.SetRenderState()`.
+        ///
+        /// ```text
+        /// _parent.BlendState        = blendState        ?? BlendState.AlphaBlend
+        /// _parent.DepthStencilState = depthStencilState ?? DepthStencilState.None
+        /// _parent.RasterizerState   = rasterizerState   ?? RasterizerState.CullCounterClockwise
+        /// _parent.SamplerStates[0]  = samplerState      ?? SamplerState.LinearClamp
+        /// ```
+        ///
+        /// Through the projected device members rather than around them, so
+        /// the state objects are bound and the device's cache moves exactly as
+        /// if a caller had assigned them -- which is why a custom state passed
+        /// to `Begin` is read-only afterwards, in XNA and here.
+        ///
+        /// The device is `GraphicsResource._parent`, Optional because no XNA
+        /// constructor assigns it; a batch with no device applies nothing,
+        /// which is the projection of a null `_parent` and not a new failure.
+        ///
+        /// The stored facade is **not** the one used. XNA's `_parent` is the
+        /// device and lives as long as the batch; here a `GraphicsDevice` is a
+        /// per-callback capability token, measured in
+        /// `build-probe/f42b_identity.c`, so a batch created in `LoadContent`
+        /// holds a token that is stale by the time `End` runs in `Draw`. The
+        /// first version of this applied state through the stored facade and
+        /// the sixty-frame canary failed with "requires an active Game
+        /// lifecycle callback" -- correctly. A current token is borrowed
+        /// instead: there is one device per game, so it is the same device
+        /// XNA's `_parent` would have been.
+        private func setRenderState() throws {
+            guard GraphicsDevice != nil else { return }
+            let device = try Microsoft.Xna.Framework.Graphics.GraphicsDevice
+                .borrow(from: nativeStorage.runtime)
+            try device.SetBlendState(resolvedBlendState)
+            try device.SetDepthStencilState(resolvedDepthStencilState)
+            try device.SetRasterizerState(resolvedRasterizerState)
+            try device.SamplerStates?.SetItem(0, resolvedSamplerState)
         }
 
         public func Draw(
@@ -397,6 +511,16 @@ extension Microsoft.Xna.Framework.Graphics {
                     message: beginMustBeCalledBeforeEndMessage)
             }
             let handle = try validatedHandle("SpriteBatch.End")
+            // `if (spriteSortMode != Immediate) SetRenderState();` -- the
+            // states a Deferred batch was given reach the device here, not at
+            // Begin. An Immediate batch applied them already and decrements
+            // the device's immediate counter instead, which this projection
+            // does not keep: that counter's only reader is the
+            // `CannotNextSpriteBeginImmediate` guard, on a branch no projected
+            // overload can reach.
+            if spriteSortMode != .Immediate {
+                try setRenderState()
+            }
             try nativeStorage.runtime.functions.check(
                 nativeStorage.runtime.functions.spriteBatchEnd(handle),
                 operation: "cna_sprite_batch_end"
