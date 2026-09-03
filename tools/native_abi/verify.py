@@ -52,6 +52,8 @@ MIRRORED_STRUCTS = [
     "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
     "SpriteCommand",
     "PresentationParameters",
+    "VertexElement", "VertexBufferCreateInfo",
+    "IndexBufferCreateInfo", "IndexBufferTransfer",
 ]
 
 # The shim mirrors exactly these canonical callback types.
@@ -159,6 +161,15 @@ def canonical_type(value: str) -> str:
         # `typedef uint32_t CNA_TextureImageFormat;` in texture.h:54,
         # which names PNG and JPEG.
         "CNA_TextureImageFormat": "uint32_t",
+        # graphics3d.h's buffer and vertex-element typedefs, and the two
+        # buffer-handle aliases in vertex_resources.h and index_resources.h.
+        "CNA_BufferUsage": "uint32_t", "CNA_IndexElementSize": "uint32_t",
+        "CNA_SetDataOptions": "uint32_t",
+        "CNA_VertexElementFormat": "uint32_t",
+        "CNA_VertexElementUsage": "uint32_t",
+        "CNA_VertexDeclarationHandle": "uint64_t",
+        "CNA_VertexBufferHandle": "uint64_t",
+        "CNA_IndexBufferHandle": "uint64_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

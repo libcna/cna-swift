@@ -80,6 +80,16 @@ internal final class NativeFunctions {
     typealias Texture2dGetEncodedByteCountRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias Texture2dCopyEncodedRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias Texture2dCreateCpuOnlyRgba8Route = @convention(c) (UInt32, UInt32, UInt32, UnsafePointer<CNASwift_Color>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias VertexDeclarationCreateWithStrideRoute = @convention(c) (Int32, UnsafePointer<CNASwift_VertexElement>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias VertexDeclarationDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias VertexBufferCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_VertexBufferCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias VertexBufferDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias VertexBufferSetDataRawAtRoute = @convention(c) (UInt64, UInt64, UnsafeRawPointer?, UInt64, UInt64, UInt32) -> UInt32
+    typealias VertexBufferGetDataRawRoute = @convention(c) (UInt64, UInt64, UnsafeMutableRawPointer?, UInt64, UInt64, UInt32) -> UInt32
+    typealias IndexBufferCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_IndexBufferCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias IndexBufferDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias IndexBufferSetDataAtRoute = @convention(c) (UInt64, UInt64, UnsafePointer<CNASwift_IndexBufferTransfer>?, UnsafeRawPointer?, UInt64) -> UInt32
+    typealias IndexBufferGetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_IndexBufferTransfer>?, UnsafeMutableRawPointer?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchBeginWithStatesRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
     typealias SpriteBatchSubmitScaledManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteScaledCommand>?, UInt64) -> UInt32
@@ -178,6 +188,16 @@ internal final class NativeFunctions {
     let textureGetEncodedByteCount: Texture2dGetEncodedByteCountRoute
     let textureCopyEncoded: Texture2dCopyEncodedRoute
     let textureCreateCpuOnly: Texture2dCreateCpuOnlyRgba8Route
+    let vertexDeclarationCreateWithStride: VertexDeclarationCreateWithStrideRoute
+    let vertexDeclarationDestroy: VertexDeclarationDestroyRoute
+    let vertexBufferCreate: VertexBufferCreateRoute
+    let vertexBufferDestroy: VertexBufferDestroyRoute
+    let vertexBufferSetDataRawAt: VertexBufferSetDataRawAtRoute
+    let vertexBufferGetDataRaw: VertexBufferGetDataRawRoute
+    let indexBufferCreate: IndexBufferCreateRoute
+    let indexBufferDestroy: IndexBufferDestroyRoute
+    let indexBufferSetDataAt: IndexBufferSetDataAtRoute
+    let indexBufferGetData: IndexBufferGetDataRoute
     let spriteBatchCreate: SpriteBatchCreateRoute
     let spriteBatchBeginWithStates: SpriteBatchBeginWithStatesRoute
     let spriteBatchSubmitScaled: SpriteBatchSubmitScaledManyRoute
@@ -296,6 +316,16 @@ internal final class NativeFunctions {
         textureGetEncodedByteCount = try library.resolve("cna_texture2d_get_encoded_byte_count", as: Texture2dGetEncodedByteCountRoute.self)
         textureCopyEncoded = try library.resolve("cna_texture2d_copy_encoded", as: Texture2dCopyEncodedRoute.self)
         textureCreateCpuOnly = try library.resolve("cna_texture2d_create_cpu_only_rgba8", as: Texture2dCreateCpuOnlyRgba8Route.self)
+        vertexDeclarationCreateWithStride = try library.resolve("cna_vertex_declaration_create_with_stride", as: VertexDeclarationCreateWithStrideRoute.self)
+        vertexDeclarationDestroy = try library.resolve("cna_vertex_declaration_destroy", as: VertexDeclarationDestroyRoute.self)
+        vertexBufferCreate = try library.resolve("cna_vertex_buffer_create", as: VertexBufferCreateRoute.self)
+        vertexBufferDestroy = try library.resolve("cna_vertex_buffer_destroy", as: VertexBufferDestroyRoute.self)
+        vertexBufferSetDataRawAt = try library.resolve("cna_vertex_buffer_set_data_raw_at", as: VertexBufferSetDataRawAtRoute.self)
+        vertexBufferGetDataRaw = try library.resolve("cna_vertex_buffer_get_data_raw", as: VertexBufferGetDataRawRoute.self)
+        indexBufferCreate = try library.resolve("cna_index_buffer_create", as: IndexBufferCreateRoute.self)
+        indexBufferDestroy = try library.resolve("cna_index_buffer_destroy", as: IndexBufferDestroyRoute.self)
+        indexBufferSetDataAt = try library.resolve("cna_index_buffer_set_data_at", as: IndexBufferSetDataAtRoute.self)
+        indexBufferGetData = try library.resolve("cna_index_buffer_get_data", as: IndexBufferGetDataRoute.self)
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
         spriteBatchBeginWithStates = try library.resolve("cna_sprite_batch_begin_with_states", as: SpriteBatchBeginWithStatesRoute.self)
         spriteBatchSubmitScaled = try library.resolve("cna_sprite_batch_submit_scaled_many", as: SpriteBatchSubmitScaledManyRoute.self)

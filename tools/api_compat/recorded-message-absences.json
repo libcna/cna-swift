@@ -1,133 +1,151 @@
 {
-  "schemaVersion": 1,
-  "profile": "messages an implemented member can raise that this binding does not reproduce",
-  "note": "Every entry is a resource key reachable from a member this binding implements whose message is NOT in the Swift sources, with the reason. tools/api_compat/message_coverage.py fails on any reachable key that is neither reproduced nor listed here. `kind` is `unreachable` (no input reaches the branch through the projected surface), `native-owned` (the failure is CNA's and is reported on the runtime channel, and XNA's message describes something that did not happen), or `deferred` (an acknowledged gap that names the work). Deferred entries are counted separately in the summary so they cannot hide inside a total.",
-  "absences": [
-    {
-      "type": "Microsoft.Xna.Framework.GameServiceContainer",
-      "key": "ServiceTypeCannotBeNull",
-      "kind": "unreachable",
-      "reason": "The service type is a Swift metatype parameter and cannot be nil, so the null-Type branch of GetService has no input that reaches it. Same rule as SamplerStateCollection.SetItem's null check: an unreachable branch is recorded, not written as code that cannot run."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
-      "key": "DeviceCannotBeNullOnResourceCreate",
-      "kind": "unreachable",
-      "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-      "key": "DeviceCannotBeNullOnResourceCreate",
-      "kind": "unreachable",
-      "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "DeviceCannotBeNullOnResourceCreate",
-      "kind": "unreachable",
-      "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "DxtNotMultipleOfFour",
-      "kind": "deferred",
-      "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "ProfileAspectRatio",
-      "kind": "deferred",
-      "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "ProfileFormatNotSupported",
-      "kind": "deferred",
-      "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "ProfileNotPowerOfTwoDXT",
-      "kind": "deferred",
-      "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "ProfileNotPowerOfTwoMipped",
-      "kind": "deferred",
-      "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "ProfileTooBig",
-      "kind": "deferred",
-      "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "key": "StreamNotSeekable",
-      "kind": "unreachable",
-      "reason": "Raised by the Stream constructor, which seeks the stream back after probing it. This projection's FromStream reads the stream forward-only into memory and never seeks, so there is no seek to fail; Foundation.InputStream has no seek to offer either. The condition XNA tests for cannot arise here."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "Direct3DCreateError",
-      "kind": "native-owned",
-      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "Direct3DInvalidCreateParameters",
-      "kind": "native-owned",
-      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "GameCannotBeNull",
-      "kind": "unreachable",
-      "reason": "`game` is a non-Optional Swift class parameter. The constructor's own documentation already records this branch as unreachable."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "GraphicsComponentNotAttachedToGame",
-      "kind": "native-owned",
-      "reason": "Raised from ChangeDevice when the manager's game reference is gone. The projected manager holds its game weakly and CNA owns the device, so the condition XNA tests for is not the condition this binding can be in; the runtime channel reports a stale generation instead."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "NoCompatibleDevices",
-      "kind": "native-owned",
-      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "NoCompatibleDevicesAfterRanking",
-      "kind": "native-owned",
-      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "ValidateBackBufferDimsFullScreen",
-      "kind": "native-owned",
-      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
-      "key": "ValidateBackBufferDimsModeFullScreen",
-      "kind": "native-owned",
-      "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Input.GamePad",
-      "key": "InvalidController",
-      "kind": "deferred",
-      "reason": "XNA splits XInput's result in two: ERROR_DEVICE_NOT_CONNECTED (0x48f) returns a GamePadState with IsConnected false, and every other error raises InvalidOperationException(InvalidController). CNA already matches the first half -- cna_gamepad_get_state answers SUCCESS for a disconnected pad and reports its real disconnected state, measured in docs/generated/gamepad-native-report.json. The second half has no input that reaches it here: PlayerIndex is a closed Swift enum, the handle is validated before the call, and no HEADLESS failure of this route has been produced. Projecting the diagnosis would add a branch no test could reach and no mutation could falsify -- the rule Foundation 45's withdrawn dirty-flag mutation and Foundation 48's unfalsifiable clear mask both follow. Revisit when a controller is attached, or when a CNA input failure can be induced."
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Input.Keyboard",
-      "key": "CouldNotReadKeyboard",
-      "kind": "deferred",
-      "reason": "XNA formats this with the Win32 GetLastError value when GetKeyboardState fails. Same shape and same blocker as GamePad.InvalidController: cna_keyboard_get_state does not fail on the qualified HEADLESS artifact, so the branch has no reachable input, no test and no possible mutation control. The message's own placeholder says 'result code' rather than 'Win32 error', so CNA's result would be an honest substitution the day the branch is reachable."
-    }
-  ]
+ "schemaVersion": 1,
+ "profile": "messages an implemented member can raise that this binding does not reproduce",
+ "note": "Every entry is a resource key reachable from a member this binding implements whose message is NOT in the Swift sources, with the reason. tools/api_compat/message_coverage.py fails on any reachable key that is neither reproduced nor listed here. `kind` is `unreachable` (no input reaches the branch through the projected surface), `native-owned` (the failure is CNA's and is reported on the runtime channel, and XNA's message describes something that did not happen), or `deferred` (an acknowledged gap that names the work). Deferred entries are counted separately in the summary so they cannot hide inside a total.",
+ "absences": [
+  {
+   "type": "Microsoft.Xna.Framework.GameServiceContainer",
+   "key": "ServiceTypeCannotBeNull",
+   "kind": "unreachable",
+   "reason": "The service type is a Swift metatype parameter and cannot be nil, so the null-Type branch of GetService has no input that reaches it. Same rule as SamplerStateCollection.SetItem's null check: an unreachable branch is recorded, not written as code that cannot run."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
+   "key": "DeviceCannotBeNullOnResourceCreate",
+   "kind": "unreachable",
+   "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+   "key": "DeviceCannotBeNullOnResourceCreate",
+   "kind": "unreachable",
+   "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "DeviceCannotBeNullOnResourceCreate",
+   "kind": "unreachable",
+   "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "DxtNotMultipleOfFour",
+   "kind": "deferred",
+   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "ProfileAspectRatio",
+   "kind": "deferred",
+   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "ProfileFormatNotSupported",
+   "kind": "deferred",
+   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "ProfileNotPowerOfTwoDXT",
+   "kind": "deferred",
+   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "ProfileNotPowerOfTwoMipped",
+   "kind": "deferred",
+   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "ProfileTooBig",
+   "kind": "deferred",
+   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "StreamNotSeekable",
+   "kind": "unreachable",
+   "reason": "Raised by the Stream constructor, which seeks the stream back after probing it. This projection's FromStream reads the stream forward-only into memory and never seeks, so there is no seek to fail; Foundation.InputStream has no seek to offer either. The condition XNA tests for cannot arise here."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "Direct3DCreateError",
+   "kind": "native-owned",
+   "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "Direct3DInvalidCreateParameters",
+   "kind": "native-owned",
+   "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "GameCannotBeNull",
+   "kind": "unreachable",
+   "reason": "`game` is a non-Optional Swift class parameter. The constructor's own documentation already records this branch as unreachable."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "GraphicsComponentNotAttachedToGame",
+   "kind": "native-owned",
+   "reason": "Raised from ChangeDevice when the manager's game reference is gone. The projected manager holds its game weakly and CNA owns the device, so the condition XNA tests for is not the condition this binding can be in; the runtime channel reports a stale generation instead."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "NoCompatibleDevices",
+   "kind": "native-owned",
+   "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "NoCompatibleDevicesAfterRanking",
+   "kind": "native-owned",
+   "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "ValidateBackBufferDimsFullScreen",
+   "kind": "native-owned",
+   "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
+   "key": "ValidateBackBufferDimsModeFullScreen",
+   "kind": "native-owned",
+   "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Input.GamePad",
+   "key": "InvalidController",
+   "kind": "deferred",
+   "reason": "XNA splits XInput's result in two: ERROR_DEVICE_NOT_CONNECTED (0x48f) returns a GamePadState with IsConnected false, and every other error raises InvalidOperationException(InvalidController). CNA already matches the first half -- cna_gamepad_get_state answers SUCCESS for a disconnected pad and reports its real disconnected state, measured in docs/generated/gamepad-native-report.json. The second half has no input that reaches it here: PlayerIndex is a closed Swift enum, the handle is validated before the call, and no HEADLESS failure of this route has been produced. Projecting the diagnosis would add a branch no test could reach and no mutation could falsify -- the rule Foundation 45's withdrawn dirty-flag mutation and Foundation 48's unfalsifiable clear mask both follow. Revisit when a controller is attached, or when a CNA input failure can be induced."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Input.Keyboard",
+   "key": "CouldNotReadKeyboard",
+   "kind": "deferred",
+   "reason": "XNA formats this with the Win32 GetLastError value when GetKeyboardState fails. Same shape and same blocker as GamePad.InvalidController: cna_keyboard_get_state does not fail on the qualified HEADLESS artifact, so the branch has no reachable input, no test and no possible mutation control. The message's own placeholder says 'result code' rather than 'Win32 error', so CNA's result would be an honest substitution the day the branch is reachable."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
+   "key": "ProfileTooBig",
+   "kind": "deferred",
+   "reason": "Raised by the buffer constructors from the GraphicsProfile capability family, the same family six Texture2D messages are deferred behind. The check reads the DEVICE's profile against ProfileCapabilities, an internal table of per-profile limits (MaxPrimitiveCount, MaxVertexBufferSize, MaxIndexBufferSize, MaxIndexElementSize and the rest), and neither GraphicsDevice.GraphicsProfile nor that table is projected yet. What changed at Foundation 60 is that the fact is no longer unknowable: cna_graphics_device_get_graphics_profile answers Reach on the qualified artifact (docs/frontier-remeasurement-foundation-60.md). So this is deferred behind ordinary work -- projecting GraphicsProfile and reading the pinned capability table out of the IL -- and not behind a missing host fact. CNA refuses what it cannot create, and that refusal reaches the caller on the runtime channel meanwhile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
+   "key": "ProfileTooBig",
+   "kind": "deferred",
+   "reason": "Raised by the buffer constructors from the GraphicsProfile capability family, the same family six Texture2D messages are deferred behind. The check reads the DEVICE's profile against ProfileCapabilities, an internal table of per-profile limits (MaxPrimitiveCount, MaxVertexBufferSize, MaxIndexBufferSize, MaxIndexElementSize and the rest), and neither GraphicsDevice.GraphicsProfile nor that table is projected yet. What changed at Foundation 60 is that the fact is no longer unknowable: cna_graphics_device_get_graphics_profile answers Reach on the qualified artifact (docs/frontier-remeasurement-foundation-60.md). So this is deferred behind ordinary work -- projecting GraphicsProfile and reading the pinned capability table out of the IL -- and not behind a missing host fact. CNA refuses what it cannot create, and that refusal reaches the caller on the runtime channel meanwhile."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
+   "key": "ProfileNoIndexElementSize32",
+   "kind": "deferred",
+   "reason": "Raised by the buffer constructors from the GraphicsProfile capability family, the same family six Texture2D messages are deferred behind. The check reads the DEVICE's profile against ProfileCapabilities, an internal table of per-profile limits (MaxPrimitiveCount, MaxVertexBufferSize, MaxIndexBufferSize, MaxIndexElementSize and the rest), and neither GraphicsDevice.GraphicsProfile nor that table is projected yet. What changed at Foundation 60 is that the fact is no longer unknowable: cna_graphics_device_get_graphics_profile answers Reach on the qualified artifact (docs/frontier-remeasurement-foundation-60.md). So this is deferred behind ordinary work -- projecting GraphicsProfile and reading the pinned capability table out of the IL -- and not behind a missing host fact. CNA refuses what it cannot create, and that refusal reaches the caller on the runtime channel meanwhile."
+  }
+ ]
 }

@@ -70,6 +70,22 @@ FACT_REPORTS = [
     "message-coverage.json",
 ]
 
+# A category whose non-zero value would mean the projection DISAGREES with the
+# pinned metadata, rather than merely lacking something. Every summary key that
+# ends in one of these suffixes, or is named outright, is required to be zero.
+#
+# `OVERLOAD_MAPPING_MISMATCH` is the one exclusion, and it is an exclusion of
+# meaning rather than of convenience: every entry it can carry reads "required
+# overload is absent", which is an absence like `MISSING_MEMBER` and is counted
+# with them. Nothing else is excluded, so a category that appears in the report
+# for the first time is policed the moment it is non-zero.
+DISAGREEMENT_SUFFIXES = ("_MISMATCH", "_LEAK")
+DISAGREEMENT_NAMED = (
+    "UNEXPECTED_TYPE", "UNEXPECTED_MEMBER", "UNMEASURED_STRUCTURAL_CATEGORY",
+    "ALLOWLIST_ENTRIES", "APPLIED_ALLOWLIST_ENTRIES",
+)
+DISAGREEMENT_EXCLUDED = ("OVERLOAD_MAPPING_MISMATCH",)
+
 HISTORICAL_OPEN = "<!-- status-gate:historical -->"
 HISTORICAL_CLOSE = "<!-- status-gate:/historical -->"
 
@@ -149,6 +165,22 @@ def api_compat_self_tests(root: Path = ROOT) -> dict[str, int]:
     for match in TOKEN.finditer(completed.stdout):
         found[match.group(1)] = int(match.group(2))
     return {"API_COMPAT_SELF_TESTS": found["API_COMPAT_SELF_TESTS"]}
+
+
+def disagreements(summary: dict[str, int]) -> dict[str, int]:
+    """Every disagreement category the strict report reports as non-zero.
+
+    Foundation 59 shipped with `PARAMETER_MAPPING_MISMATCH=2` because the prose
+    claim -- "every category that would mean DISAGREEMENT with XNA: 0" -- names
+    the categories without their values, so no `KEY=VALUE` token existed for the
+    gate to check. This reads the report instead of the prose.
+    """
+    return {
+        key: value for key, value in summary.items()
+        if key not in DISAGREEMENT_EXCLUDED
+        and (key.endswith(DISAGREEMENT_SUFFIXES) or key in DISAGREEMENT_NAMED)
+        and value != 0
+    }
 
 
 def flatten(document: Any, into: dict[str, int]) -> None:
@@ -412,6 +444,25 @@ def self_test() -> int:
         expect(len(findings) == 1 and "COMPLETE_TYPES=135" in findings[0],
                f"naming the marker in prose must not disable policing, got {findings}")
 
+        # A disagreement category must be reported the moment it is non-zero,
+        # and an absence must not be. This is the check that would have stopped
+        # Foundation 59 shipping PARAMETER_MAPPING_MISMATCH=2.
+        expect(disagreements({"PARAMETER_MAPPING_MISMATCH": 2}) ==
+               {"PARAMETER_MAPPING_MISMATCH": 2},
+               "a non-zero mismatch category must be reported")
+        expect(disagreements({"RAW_HANDLE_LEAK": 1}) == {"RAW_HANDLE_LEAK": 1},
+               "a non-zero leak category must be reported")
+        expect(disagreements({"UNEXPECTED_MEMBER": 3}) == {"UNEXPECTED_MEMBER": 3},
+               "a non-zero named category must be reported")
+        expect(disagreements({"A_BRAND_NEW_MISMATCH": 1}) == {"A_BRAND_NEW_MISMATCH": 1},
+               "a category this gate has never seen must still be policed")
+        expect(disagreements({"MISSING_MEMBER": 58, "MISSING_TYPE": 97}) == {},
+               "an absence must not be reported as a disagreement")
+        expect(disagreements({"OVERLOAD_MAPPING_MISMATCH": 5}) == {},
+               "the one documented exclusion must stay excluded")
+        expect(disagreements({"PARAMETER_MAPPING_MISMATCH": 0}) == {},
+               "a zero category must not be reported")
+
         # A key no generated report derives is not invented into a claim.
         unpoliced = temporary / "unpoliced.md"
         unpoliced.write_text(
@@ -476,11 +527,20 @@ def main() -> int:
         ROOT, args.symbol_graph, args.cna_include, args.library)
     findings += fresh_findings
 
+    summary = json.loads(
+        (GENERATED / "api-compat-report.json").read_text(encoding="utf-8"))["summary"]
+    nonzero = disagreements(summary)
+    findings += [
+        f"the projection disagrees with the pinned metadata: {key}={value}"
+        for key, value in sorted(nonzero.items())
+    ]
+
     for finding in findings:
         print(f"  {finding}")
     print(f"STATUS_GATE_FOUNDATION={facts['FOUNDATION']} "
           f"STATUS_GATE_DERIVED_FACTS={len(facts)} "
           f"STATUS_GATE_CLAIMS_CHECKED={checked} "
+          f"STATUS_GATE_DISAGREEMENTS={len(nonzero)} "
           f"STATUS_GATE_REPORTS_COMPARED={compared} "
           f"STATUS_GATE_FINDINGS={len(findings)} "
           f"STATUS_GATE_STATUS={'PASS' if not findings else 'FAIL'}")

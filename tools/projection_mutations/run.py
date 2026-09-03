@@ -45,6 +45,10 @@ STATEBRIDGE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsStateNativeBridge.swift"
 SAMPLERS = ROOT / "Sources/CNA/Xna/Graphics/SamplerStateCollection.swift"
 DRAWABLE_COMPONENT = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
 TEXTUREDATA = ROOT / "Sources/CNA/Xna/Graphics/TextureDataTransfer.swift"
+VERTEXBUFFER = ROOT / "Sources/CNA/Xna/Graphics/VertexBuffer.swift"
+INDEXBUFFER = ROOT / "Sources/CNA/Xna/Graphics/IndexBuffer.swift"
+BUFFERSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/BufferSupport.swift"
+BUFFERBINDING = ROOT / "Sources/CNA/Xna/Graphics/VertexBufferBinding.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -84,6 +88,133 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 60: the vertex and index buffers ---------------------
+    (
+        "copy-parameters-name-the-callers-parameter",
+        "ValidateCopyParameters naming startIndex where the helper names dataIndex",
+        BUFFERSUPPORT,
+        '                paramName: "dataIndex", message: BufferResources.mustBeValidIndex)',
+        '                paramName: "startIndex", message: BufferResources.mustBeValidIndex)',
+    ),
+    (
+        "copy-parameters-blame-the-count-not-the-index",
+        "the window test moved ahead of the index test, so an index past the end is blamed on elementCount",
+        BUFFERSUPPORT,
+        "        if dataIndex < 0 || Int(dataIndex) > dataLength {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        '                paramName: "dataIndex", message: BufferResources.mustBeValidIndex)\n'
+        "        }\n"
+        "        if Int(elementCount) + Int(dataIndex) > dataLength {",
+        "        if Int(elementCount) + Int(dataIndex) > dataLength {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        '                paramName: "elementCount", message: BufferResources.mustBeValidIndex)\n'
+        "        }\n"
+        "        if dataIndex < 0 || Int(dataIndex) > dataLength {",
+    ),
+    (
+        "empty-array-not-reported-as-null",
+        "a zero-length array raising ArgumentException where XNA's ldlen branch raises ArgumentNullException",
+        VERTEXBUFFER,
+        "            guard arrayCount > 0 else {\n"
+        "                throw CNAArgumentNullException(",
+        "            guard arrayCount > 0 else {\n"
+        "                throw CNAArgumentException(",
+    ),
+    (
+        "write-only-buffer-allows-getdata",
+        "the WriteOnly guard dropped, so GetData reaches a buffer XNA refuses",
+        VERTEXBUFFER,
+        "            if !isSetting, BufferUsage.contains(.WriteOnly) {",
+        "            if false, BufferUsage.contains(.WriteOnly) {",
+    ),
+    (
+        "vertex-stride-too-small-accepted",
+        "a vertexStride below sizeof(T) accepted",
+        VERTEXBUFFER,
+        "                guard slack >= 0 else {",
+        "                guard slack >= -64 else {",
+    ),
+    (
+        "buffer-size-comparison-off-by-one",
+        "a transfer that exactly fills the buffer refused",
+        VERTEXBUFFER,
+        "            guard bytes + Int(offsetInBytes) <= sizeInBytes else {",
+        "            guard bytes + Int(offsetInBytes) < sizeInBytes else {",
+    ),
+    (
+        "vertex-array-window-offset-ignored",
+        "startIndex dropped, so the transfer always reads from the array's front",
+        VERTEXBUFFER,
+        "                byteOffset: Int(startIndex) * elementSize,",
+        "                byteOffset: 0,",
+    ),
+    (
+        "vertex-buffer-offset-ignored",
+        "offsetInBytes dropped, so a windowed write lands at the buffer's front",
+        VERTEXBUFFER,
+        "                offsetInBytes: Int(offsetInBytes),",
+        "                offsetInBytes: 0,",
+    ),
+    (
+        "index-element-width-transposed",
+        "SixteenBits measured as four bytes and ThirtyTwoBits as two",
+        INDEXBUFFER,
+        "            size == .SixteenBits ? 2 : 4",
+        "            size == .SixteenBits ? 4 : 2",
+    ),
+    (
+        "index-type-overload-maps-the-wrong-width",
+        "typeof(short) mapped to a 32-bit index buffer",
+        INDEXBUFFER,
+        "            case ObjectIdentifier(Int16.self), ObjectIdentifier(UInt16.self):\n"
+        "                return 2",
+        "            case ObjectIdentifier(Int16.self), ObjectIdentifier(UInt16.self):\n"
+        "                return 4",
+    ),
+    (
+        "index-window-offset-ignored",
+        "a windowed index write landing at the buffer's front",
+        INDEXBUFFER,
+        "                            plan.handle, UInt64(plan.offsetInBytes), pointer,",
+        "                            plan.handle, 0, pointer,",
+    ),
+    (
+        "binding-offset-compared-signed",
+        "the vertex-offset bound compared signed, where the IL's bge.un is unsigned",
+        BUFFERBINDING,
+        "                  UInt32(bitPattern: vertexOffset)\n"
+        "                    < UInt32(bitPattern: vertexBuffer.VertexCount) else {",
+        "                  vertexOffset <= vertexBuffer.VertexCount else {",
+    ),
+    (
+        "binding-blames-the-frequency-first",
+        "the instance frequency checked before the offset, so the wrong one is blamed",
+        BUFFERBINDING,
+        "            guard vertexOffset >= 0,\n"
+        "                  UInt32(bitPattern: vertexOffset)\n"
+        "                    < UInt32(bitPattern: vertexBuffer.VertexCount) else {\n"
+        '                throw CNAArgumentOutOfRangeException(paramName: "vertexOffset")\n'
+        "            }\n"
+        "            guard instanceFrequency >= 0 else {\n"
+        '                throw CNAArgumentOutOfRangeException(paramName: "instanceFrequency")\n'
+        "            }",
+        "            guard instanceFrequency >= 0 else {\n"
+        '                throw CNAArgumentOutOfRangeException(paramName: "instanceFrequency")\n'
+        "            }\n"
+        "            guard vertexOffset >= 0,\n"
+        "                  UInt32(bitPattern: vertexOffset)\n"
+        "                    < UInt32(bitPattern: vertexBuffer.VertexCount) else {\n"
+        '                throw CNAArgumentOutOfRangeException(paramName: "vertexOffset")\n'
+        "            }",
+    ),
+    (
+        "from-type-size-test-reads-the-wrong-size",
+        "a registered vertex type's measured size disagreeing with its declared stride, which FromType must refuse",
+        VERTEXDECL,
+        "                    size: MemoryLayout<VertexPositionColor>.size),",
+        "                    size: MemoryLayout<VertexPositionColor>.size + 4),",
+    ),
+
     # ---- Foundation 59: the image members and the disposal chain ---------
     (
         "disposing-flag-ignored-on-the-finalizer-path",
@@ -1328,13 +1459,14 @@ def main() -> int:
         print(f"PROJECTION_MUTATION_PRECONDITION=FAILED — {problem}")
         return 1
 
+    # Derived from MUTATIONS rather than listed beside it. The list used to be
+    # written out by hand and drifted the moment Foundation 60 added mutations
+    # in three new files: the run died on a KeyError instead of reporting a
+    # stale site, which is the one failure this pre-check exists to avoid. A
+    # file with no mutation does not need reading, and a file with one cannot
+    # be forgotten.
     originals = {path: path.read_text(encoding="utf-8")
-                 for path in {EXCEPTIONS, COLLECTIONS, DICTIONARY, SERVICES,
-                              RESOURCE, TEXTURE2D, RENDER_TARGET, GAME,
-                              CALLBACK_STATE, MANAGER, DRAWABLE, STATES, BATCH,
-                              VERTEXDECL, VERTEXCOLOR, VERTEXNORMAL,
-                              DEVICE, STATEBRIDGE, SAMPLERS,
-                              DRAWABLE_COMPONENT, TEXTUREDATA, RUNTIME_STATE}}
+                 for path in {item[2] for item in MUTATIONS}}
 
     # Every mutation site is checked BEFORE the baseline runs. A site that has
     # drifted is reported as a stale gate rather than as a survivor forty

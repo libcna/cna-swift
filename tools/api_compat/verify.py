@@ -576,8 +576,13 @@ def normalize_swift_type(text: str) -> str:
     # opaque result type is a different type from the existential a CLR
     # interface-typed member requires, and must still be diagnosed.
     value = re.sub(r"\bany\s+", "", value)
-    if value == "InputStream":
-        value = "Foundation.InputStream"
+    # The compiler emits Foundation's two stream classes unqualified, and the
+    # mapping names them qualified. Both directions of `System.IO.Stream` are
+    # normalized here; only `InputStream` was until Foundation 60, and the
+    # consequence was two live PARAMETER_MAPPING_MISMATCHes on SaveAsPng and
+    # SaveAsJpeg that shipped in the Foundation 59 commit.
+    if value in ("InputStream", "OutputStream"):
+        value = "Foundation." + value
     value = value.replace("()", "Void") if value == "()" else value
     return value
 

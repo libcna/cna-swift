@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 157,
-    "TARGET_MEMBERS": 1978,
-    "TOTAL_DIAGNOSTICS": 165,
-    "COMPLETE_TYPES": 150,
-    "PARTIAL_TYPES": 7,
-    "MISSING_TYPES": 100,
-    "MISSING_TYPE": 100,
+    "TARGET_TYPES": 160,
+    "TARGET_MEMBERS": 2009,
+    "TOTAL_DIAGNOSTICS": 160,
+    "COMPLETE_TYPES": 154,
+    "PARTIAL_TYPES": 6,
+    "MISSING_TYPES": 97,
+    "MISSING_TYPE": 97,
     "MISSING_MEMBER": 58,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -27,7 +27,7 @@
     "FIELD_MAPPING_MISMATCH": 0,
     "PROPERTY_MAPPING_MISMATCH": 0,
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
-    "PARAMETER_MAPPING_MISMATCH": 2,
+    "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
     "OVERLOAD_MAPPING_MISMATCH": 5,
     "GENERIC_MAPPING_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 38,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 46,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 110,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 259,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 16
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 112,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 257,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 17
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -153,6 +153,7 @@
     "Microsoft.Xna.Framework.Graphics.IEffectMatrices",
     "Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService",
     "Microsoft.Xna.Framework.Graphics.IVertexType",
+    "Microsoft.Xna.Framework.Graphics.IndexBuffer",
     "Microsoft.Xna.Framework.Graphics.IndexElementSize",
     "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
     "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8",
@@ -190,8 +191,11 @@
     "Microsoft.Xna.Framework.Graphics.StencilOperation",
     "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
     "Microsoft.Xna.Framework.Graphics.Texture",
+    "Microsoft.Xna.Framework.Graphics.Texture2D",
     "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
     "Microsoft.Xna.Framework.Graphics.TextureFilter",
+    "Microsoft.Xna.Framework.Graphics.VertexBuffer",
+    "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
     "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
     "Microsoft.Xna.Framework.Graphics.VertexElement",
     "Microsoft.Xna.Framework.Graphics.VertexElementFormat",
@@ -252,7 +256,6 @@
     "Microsoft.Xna.Framework.Game",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
     "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-    "Microsoft.Xna.Framework.Graphics.Texture2D",
     "Microsoft.Xna.Framework.GraphicsDeviceManager",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ],
@@ -308,7 +311,6 @@
     "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
     "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
     "Microsoft.Xna.Framework.Graphics.IEffectLights",
-    "Microsoft.Xna.Framework.Graphics.IndexBuffer",
     "Microsoft.Xna.Framework.Graphics.Model",
     "Microsoft.Xna.Framework.Graphics.ModelBone",
     "Microsoft.Xna.Framework.Graphics.ModelBoneCollection",
@@ -329,8 +331,6 @@
     "Microsoft.Xna.Framework.Graphics.Texture3D",
     "Microsoft.Xna.Framework.Graphics.TextureCollection",
     "Microsoft.Xna.Framework.Graphics.TextureCube",
-    "Microsoft.Xna.Framework.Graphics.VertexBuffer",
-    "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
@@ -846,11 +846,6 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.Model",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
@@ -985,16 +980,6 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "PARAMETER_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsJpeg(_:Foundation.OutputStream,width:Int32,height:Int32)",
-      "detail": "expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]"
-    },
-    {
-      "category": "PARAMETER_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.OutputStream,width:Int32,height:Int32)",
-      "detail": "expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]"
-    },
-    {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.Texture3D",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
@@ -1007,16 +992,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.TextureCube",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -3955,6 +3930,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "IndexBuffersMustBeSizedCorrectly",
+      "pinnedValue": "IndexBuffers may be created only with types that are 16 bit or 32 bit in size.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "InvalidDataSize",
       "pinnedValue": "The type you are using for T in this method is an invalid size for this resource.",
       "reproducedInSwiftSource": true
@@ -3975,6 +3956,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "InvalidTotalSize",
       "pinnedValue": "The size of the data passed in is too large or too small for this resource.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "MustBeValidIndex",
+      "pinnedValue": "This parameter must be a valid index within the array.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4027,6 +4014,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ResourceDataMustBeCorrectSize",
+      "pinnedValue": "The array is not the correct size for the amount of data requested.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "ResourcesMustBeGreaterThanZeroSize",
       "pinnedValue": "Resource size must be greater than zero.",
       "reproducedInSwiftSource": true
@@ -4057,8 +4050,38 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "VertexStrideTooSmall",
+      "pinnedValue": "The vertex stride is too small for the type of data requested. This is not allowed.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "VertexTypeNotIVertexType",
+      "pinnedValue": "Invalid vertex type. {0} does not implement the IVertexType interface.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "VertexTypeNotValueType",
+      "pinnedValue": "Invalid vertex type. {0} is not a value type.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "VertexTypeWrongSize",
+      "pinnedValue": "Invalid vertex type. The size of {0} does not match the stride of its vertex declaration.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "ViewportInvalid",
       "pinnedValue": "The viewport is invalid. The viewport cannot be larger than or outside of the current render target bounds. The MinDepth and MaxDepth must be between 0 and 1.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "WriteOnlyGetNotSupported",
+      "pinnedValue": "Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported.",
       "reproducedInSwiftSource": true
     }
   ],
@@ -4304,6 +4327,14 @@
       "derivableInReferenceButNotInSwift": false
     },
     {
+      "type": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
       "type": "Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException",
       "clrSealed": true,
       "swiftFinal": true,
@@ -4385,6 +4416,14 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
       "clrSealed": false,
       "swiftFinal": false,
       "swiftAccess": "open",
@@ -7859,7 +7898,7 @@
       "member": "FromStream",
       "kind": "method",
       "static": true,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "optional": false,
@@ -7873,7 +7912,7 @@
       "member": "FromStream",
       "kind": "method",
       "static": true,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "optional": false,
@@ -7901,28 +7940,28 @@
       "member": "VertexDeclaration",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
       "member": "VertexBuffer",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.VertexBuffer"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",
@@ -11077,16 +11116,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 12,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 12,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.IndexElementSize",
@@ -11628,21 +11661,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-      "status": "PARTIAL",
+      "status": "COMPLETE",
       "expectedMembers": 16,
       "targetMembers": 16,
-      "diagnostics": [
-        {
-          "category": "PARAMETER_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsJpeg(_:Foundation.OutputStream,width:Int32,height:Int32)",
-          "detail": "expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]"
-        },
-        {
-          "category": "PARAMETER_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.OutputStream,width:Int32,height:Int32)",
-          "detail": "expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]"
-        }
-      ]
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture3D",
@@ -11699,29 +11721,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 12,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 12,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 7,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 7,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.VertexDeclaration",

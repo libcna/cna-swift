@@ -148,6 +148,26 @@
       "evidence": "GraphicsResource.Dispose(false) disposes and raises nothing, which is what the IL does: the disposing branch calls ~GraphicsResource() -- flag then Disposing -- and the finalizer branch calls !GraphicsResource() and Object.Finalize(), neither of which touches the delegate. Until Foundation 59 the projection raised the event on both paths, and Swift's lack of protected puts Dispose(false) within any consumer's reach. Texture2D and SpriteBatch now declare the override XNA declares, and RenderTarget2D's three-deep chain still releases its native content-lost subscription before the base disposes."
     },
     {
+      "operation": "Vertex and index buffer contents",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "VertexBuffer and IndexBuffer create through cna_vertex_buffer_create and cna_index_buffer_create and round-trip their contents: authored vertices come back vertex for vertex through cna_vertex_buffer_get_data_raw, indices at both widths through cna_index_buffer_get_data, and a windowed write at a byte offset leaves the rest of the buffer alone. A WriteOnly buffer refuses GetData with XNA's own NotSupportedException before the native call, which CNA also refuses natively. Nothing DRAWN with these buffers is claimed."
+    },
+    {
+      "operation": "Vertex transfer stride",
+      "status": "MEASURED_NATIVE_DIVERGENCE",
+      "evidence": "XNA's CopyData writes elementCount elements of sizeof(T) bytes spaced vertexStride apart and requires only vertexStride >= sizeof(T). CNA's raw transfer requires the stride to equal the buffer's declaration stride, the byte count to be exactly count*stride, and a windowed offset to be stride-aligned (build-probe/f60_stride.c, ten triples). Every packed transfer is expressible exactly; one that leaves a gap between elements is refused on the runtime channel AFTER every XNA validation, so a call XNA would reject still reports XNA's exception."
+    },
+    {
+      "operation": "Static buffer upload route",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "cna_vertex_buffer_set_data_raw_at_with_options answers NOT_SUPPORTED on a static vertex buffer for every option value including CNA_SET_DATA_NONE, and succeeds on a dynamic one; a dynamic index buffer accepts Discard through cna_index_buffer_set_data and refuses it through _set_data_at (build-probe/f60_options.c). So the static path uses the option-free routes and SetDataOptions reaches the family only through the dynamic buffers."
+    },
+    {
+      "operation": "System.Type-taking buffer constructors",
+      "status": "LANGUAGE_MAPPING_LIMITATION",
+      "evidence": "VertexBuffer(GraphicsDevice, Type, ...) needs Activator.CreateInstance and IndexBuffer(GraphicsDevice, Type, ...) needs Marshal.SizeOf, on a metatype. Swift has neither, and IVertexType.VertexDeclaration is an instance member, so the four vertex structs and the four CLR index widths are recognised by identity -- returning the same static declaration object XNA's FromType cache would hold -- and any other type reaches the VertexDeclaration- and IndexElementSize-taking constructors beside them. A type that IS an IVertexType but is not one of the four gets the limitation on the runtime channel, not XNA's VertexTypeNotIVertexType, because that message would be false."
+    },
+    {
       "operation": "SpriteBatch Begin/Draw/End",
       "status": "VERIFIED_NATIVE",
       "evidence": "begin, both submit shapes -- scaled and destination-rectangle -- and end execute for 60/600 template frames and 20 ownership cycles; all seven XNA Draw overloads execute inside a pair"

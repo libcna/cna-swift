@@ -174,7 +174,16 @@ extension Microsoft.Xna.Framework.Graphics {
         }
 
         internal static func clrTypeName(of value: Any) -> String {
-            let reflected = String(reflecting: type(of: value))
+            clrTypeName(ofType: type(of: value))
+        }
+
+        /// The same name for a metatype rather than a value.
+        ///
+        /// `System.Type` maps to the Swift metatype, and the three vertex-type
+        /// messages format one into a `{0}`; the CLR formats a `Type` with its
+        /// `ToString()`, which is the full name.
+        internal static func clrTypeName(ofType type: Any.Type) -> String {
+            let reflected = String(reflecting: type)
             let qualifier = moduleQualifier
             return reflected.hasPrefix(qualifier)
                 ? String(reflected.dropFirst(qualifier.count))

@@ -1132,6 +1132,16 @@
       "owner": "Microsoft.Xna.Framework.Graphics.Texture2D",
       "member": "GetData",
       "parameter": "data"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
+      "member": "GetData",
+      "parameter": "data"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
+      "member": "GetData",
+      "parameter": "data"
     }
   ]
 }

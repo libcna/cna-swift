@@ -270,6 +270,42 @@ typedef struct CNASwift_Texture2DDecodeInfo {
     uint8_t reserved[7];
 } CNASwift_Texture2DDecodeInfo;
 
+typedef struct CNASwift_VertexElement {
+    int32_t offset;
+    uint32_t format;
+    uint32_t usage;
+    int32_t usage_index;
+} CNASwift_VertexElement;
+
+typedef struct CNASwift_VertexBufferCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Handle vertex_declaration;
+    int32_t vertex_count;
+    uint32_t buffer_usage;
+    CNASwift_Bool dynamic;
+    uint8_t reserved[7];
+} CNASwift_VertexBufferCreateInfo;
+
+typedef struct CNASwift_IndexBufferCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t index_count;
+    uint32_t index_element_size;
+    uint32_t buffer_usage;
+    CNASwift_Bool dynamic;
+    uint8_t reserved[3];
+} CNASwift_IndexBufferCreateInfo;
+
+typedef struct CNASwift_IndexBufferTransfer {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t index_element_size;
+    uint32_t options;
+    uint64_t start_index;
+    uint64_t element_count;
+} CNASwift_IndexBufferTransfer;
+
 typedef struct CNASwift_SpriteCommand {
     uint32_t struct_size;
     uint32_t struct_version;

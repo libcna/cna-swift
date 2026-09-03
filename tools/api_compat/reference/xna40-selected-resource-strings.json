@@ -105,6 +105,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "IndexBuffersMustBeSizedCorrectly",
+      "value": "IndexBuffers may be created only with types that are 16 bit or 32 bit in size."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidDataSize",
       "value": "The type you are using for T in this method is an invalid size for this resource."
     },
@@ -122,6 +127,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidTotalSize",
       "value": "The size of the data passed in is too large or too small for this resource."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "MustBeValidIndex",
+      "value": "This parameter must be a valid index within the array."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -165,6 +175,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ResourceDataMustBeCorrectSize",
+      "value": "The array is not the correct size for the amount of data requested."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ResourcesMustBeGreaterThanZeroSize",
       "value": "Resource size must be greater than zero."
     },
@@ -190,8 +205,33 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexStrideTooSmall",
+      "value": "The vertex stride is too small for the type of data requested. This is not allowed."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexTypeNotIVertexType",
+      "value": "Invalid vertex type. {0} does not implement the IVertexType interface."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexTypeNotValueType",
+      "value": "Invalid vertex type. {0} is not a value type."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexTypeWrongSize",
+      "value": "Invalid vertex type. The size of {0} does not match the stride of its vertex declaration."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ViewportInvalid",
       "value": "The viewport is invalid. The viewport cannot be larger than or outside of the current render target bounds. The MinDepth and MaxDepth must be between 0 and 1."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "WriteOnlyGetNotSupported",
+      "value": "Calling GetData on a resource that was created with BufferUsage.WriteOnly is not supported."
     }
   ]
 }

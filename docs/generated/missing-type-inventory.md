@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=157
-TARGET_MEMBERS=1978
-TOTAL_DIAGNOSTICS=165
-COMPLETE_TYPES=150
-PARTIAL_TYPES=7
-MISSING_TYPES=100
-MISSING_TYPE=100
+TARGET_TYPES=160
+TARGET_MEMBERS=2009
+TOTAL_DIAGNOSTICS=160
+COMPLETE_TYPES=154
+PARTIAL_TYPES=6
+MISSING_TYPES=97
+MISSING_TYPE=97
 MISSING_MEMBER=58
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -24,7 +24,7 @@ INTERFACE_MAPPING_MISMATCH=0
 FIELD_MAPPING_MISMATCH=0
 PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
-PARAMETER_MAPPING_MISMATCH=2
+PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
 OVERLOAD_MAPPING_MISMATCH=5
 GENERIC_MAPPING_MISMATCH=0
@@ -72,7 +72,7 @@ NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=38
+XNA_RESOURCE_STRING_PROJECTIONS=46
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=110
-PENDING_RETURN_NULLABILITY_PROJECTIONS=259
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=16
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=112
+PENDING_RETURN_NULLABILITY_PROJECTIONS=257
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=17
 ```
 
 ## Complete types
@@ -152,6 +152,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=16
 - `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
 - `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
 - `Microsoft.Xna.Framework.Graphics.IVertexType`
+- `Microsoft.Xna.Framework.Graphics.IndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.IndexElementSize`
 - `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
@@ -189,8 +190,11 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=16
 - `Microsoft.Xna.Framework.Graphics.StencilOperation`
 - `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
 - `Microsoft.Xna.Framework.Graphics.Texture`
+- `Microsoft.Xna.Framework.Graphics.Texture2D`
 - `Microsoft.Xna.Framework.Graphics.TextureAddressMode`
 - `Microsoft.Xna.Framework.Graphics.TextureFilter`
+- `Microsoft.Xna.Framework.Graphics.VertexBuffer`
+- `Microsoft.Xna.Framework.Graphics.VertexBufferBinding`
 - `Microsoft.Xna.Framework.Graphics.VertexDeclaration`
 - `Microsoft.Xna.Framework.Graphics.VertexElement`
 - `Microsoft.Xna.Framework.Graphics.VertexElementFormat`
@@ -324,13 +328,6 @@ Expected members: 21; emitted members: 13.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)`: mapped member is absent
 
-### `Microsoft.Xna.Framework.Graphics.Texture2D`
-
-Expected members: 16; emitted members: 16.
-
-- `PARAMETER_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsJpeg(_:Foundation.OutputStream,width:Int32,height:Int32)`: expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]
-- `PARAMETER_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.OutputStream,width:Int32,height:Int32)`: expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]
-
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 
 Expected members: 30; emitted members: 26.
@@ -401,7 +398,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
 - `Microsoft.Xna.Framework.Graphics.IEffectLights`
-- `Microsoft.Xna.Framework.Graphics.IndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.Model`
 - `Microsoft.Xna.Framework.Graphics.ModelBone`
 - `Microsoft.Xna.Framework.Graphics.ModelBoneCollection`
@@ -422,8 +418,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.Texture3D`
 - `Microsoft.Xna.Framework.Graphics.TextureCollection`
 - `Microsoft.Xna.Framework.Graphics.TextureCube`
-- `Microsoft.Xna.Framework.Graphics.VertexBuffer`
-- `Microsoft.Xna.Framework.Graphics.VertexBufferBinding`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.Input.Mouse`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`

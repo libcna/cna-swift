@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+import CNAShim
+
 extension Microsoft.Xna.Framework.Graphics {
     /// The internal `VertexElementValidator`, which is where every
     /// `VertexDeclaration` argument failure comes from.
@@ -246,6 +248,151 @@ extension Microsoft.Xna.Framework.Graphics {
         /// reduces to the base call, and that is shown rather than assumed.
         open override func Dispose(_ disposing: Bool) throws {
             try super.Dispose(disposing)
+        }
+
+        // ------------------------------------------------------------------
+        // `VertexDeclaration.FromType(Type)`, and the native declaration a
+        // buffer is created from. Both are internal: XNA's `FromType` is
+        // `assembly` and CNA's declaration handle never leaves this file.
+
+        /// One vertex type's declaration and its compiler-measured size.
+        private struct RegisteredVertexType {
+            let declaration: Microsoft.Xna.Framework.Graphics.VertexDeclaration
+            /// `Marshal.SizeOf(vertexType)`, measured by the Swift compiler at
+            /// registration rather than asked of a metatype at run time.
+            let size: Int
+        }
+
+        /// The four `IVertexType` structs this binding projects, by identity.
+        ///
+        /// XNA's `FromType` calls `Activator.CreateInstance(vertexType)`, casts
+        /// to `IVertexType` and reads the instance property, then caches the
+        /// result per type. **Swift has no `Activator`**: a metatype cannot be
+        /// instantiated, and `IVertexType.VertexDeclaration` is an instance
+        /// member, so there is no way to reach a consumer's own declaration
+        /// from its metatype alone. Adding an `init()` requirement to the
+        /// projected `IVertexType` protocol would put a member on it that XNA's
+        /// interface does not have.
+        ///
+        /// So the four types XNA ships are registered here with the static
+        /// declaration each of them returns — the same object their own
+        /// `VertexDeclaration` property answers, which is the object XNA's
+        /// cache would hold — and a consumer's own vertex type reaches the
+        /// `VertexDeclaration`-taking constructor beside the `Type` one, which
+        /// has no such limit. Recorded as a language-mapping limitation.
+        private static let registeredVertexTypes:
+            [ObjectIdentifier: RegisteredVertexType] = [
+                ObjectIdentifier(VertexPositionColor.self): RegisteredVertexType(
+                    declaration: VertexPositionColor.VertexDeclaration,
+                    size: MemoryLayout<VertexPositionColor>.size),
+                ObjectIdentifier(VertexPositionColorTexture.self): RegisteredVertexType(
+                    declaration: VertexPositionColorTexture.VertexDeclaration,
+                    size: MemoryLayout<VertexPositionColorTexture>.size),
+                ObjectIdentifier(VertexPositionNormalTexture.self): RegisteredVertexType(
+                    declaration: VertexPositionNormalTexture.VertexDeclaration,
+                    size: MemoryLayout<VertexPositionNormalTexture>.size),
+                ObjectIdentifier(VertexPositionTexture.self): RegisteredVertexType(
+                    declaration: VertexPositionTexture.VertexDeclaration,
+                    size: MemoryLayout<VertexPositionTexture>.size),
+            ]
+
+        /// `VertexDeclaration.FromType(Type vertexType)`.
+        ///
+        /// ```text
+        /// if (vertexType == null)
+        ///     throw new ArgumentNullException("vertexType", NullNotAllowed);
+        /// if (!vertexType.IsValueType)
+        ///     throw new ArgumentException(Format(VertexTypeNotValueType, vertexType));
+        /// IVertexType instance = Activator.CreateInstance(vertexType) as IVertexType;
+        /// if (instance == null)
+        ///     throw new ArgumentException(Format(VertexTypeNotIVertexType, vertexType));
+        /// VertexDeclaration declaration = instance.VertexDeclaration;
+        /// if (declaration == null)
+        ///     throw new InvalidOperationException(
+        ///         Format(VertexTypeNullDeclaration, vertexType));
+        /// if (Marshal.SizeOf(vertexType) != declaration._vertexStride)
+        ///     throw new InvalidOperationException(
+        ///         Format(VertexTypeWrongSize, vertexType));
+        /// return declaration;
+        /// ```
+        ///
+        /// Four of the five tests are reproduced. The null type cannot be
+        /// reached through a Swift metatype parameter, and the null declaration
+        /// cannot be reached through a non-Optional Swift property; both are
+        /// recorded. The size test is real and is the one that catches a vertex
+        /// struct whose Swift layout has drifted from its declared stride.
+        internal static func fromVertexType(
+            _ vertexType: Any.Type
+        ) throws -> Microsoft.Xna.Framework.Graphics.VertexDeclaration {
+            guard !(vertexType is AnyClass) else {
+                throw CNAArgumentException(
+                    message: Microsoft.Xna.Framework.Graphics.BufferResources
+                        .formatted(
+                            Microsoft.Xna.Framework.Graphics.BufferResources
+                                .vertexTypeNotValueType, vertexType))
+            }
+            guard let registered = registeredVertexTypes[ObjectIdentifier(vertexType)] else {
+                // A type that is not an IVertexType at all gets XNA's own
+                // message. One that IS an IVertexType but is not registered
+                // gets the language limitation, on the runtime channel, because
+                // saying it does not implement the interface would be false.
+                if vertexType is any Microsoft.Xna.Framework.Graphics.IVertexType.Type {
+                    throw CNAError.producerInvariant(
+                        "\(GraphicsResource.clrTypeName(ofType: vertexType)) implements "
+                        + "IVertexType, but Swift cannot construct a value from a "
+                        + "metatype the way Activator.CreateInstance does, and "
+                        + "IVertexType.VertexDeclaration is an instance member. "
+                        + "Use the VertexDeclaration-taking constructor instead")
+                }
+                throw CNAArgumentException(
+                    message: Microsoft.Xna.Framework.Graphics.BufferResources
+                        .formatted(
+                            Microsoft.Xna.Framework.Graphics.BufferResources
+                                .vertexTypeNotIVertexType, vertexType))
+            }
+            guard Int32(registered.size) == registered.declaration.VertexStride else {
+                throw CNAInvalidOperationException(
+                    message: Microsoft.Xna.Framework.Graphics.BufferResources
+                        .formatted(
+                            Microsoft.Xna.Framework.Graphics.BufferResources
+                                .vertexTypeWrongSize, vertexType))
+            }
+            return registered.declaration
+        }
+
+        /// A native declaration matching this one, for the caller to destroy.
+        ///
+        /// `cna_vertex_buffer_create` takes a declaration handle and **copies**
+        /// the declaration into the buffer, so the handle is created for the
+        /// call and released immediately after. That is why `VertexDeclaration`
+        /// still holds no native storage of its own: Foundation 43 left it
+        /// managed because nothing in its public surface needed a handle, and
+        /// nothing here changes that.
+        ///
+        /// The explicit-stride route is the one used, because XNA's declaration
+        /// carries a stride that a caller may have supplied rather than one
+        /// computed from the elements, and the two can differ.
+        internal static func nativeDeclaration(
+            _ declaration: Microsoft.Xna.Framework.Graphics.VertexDeclaration,
+            runtime: RuntimeState
+        ) throws -> UInt64 {
+            let elements = try declaration.GetVertexElements()
+            let native = elements.map {
+                CNASwift_VertexElement(
+                    offset: $0.Offset,
+                    format: UInt32(bitPattern: $0.VertexElementFormat.rawValue),
+                    usage: UInt32(bitPattern: $0.VertexElementUsage.rawValue),
+                    usage_index: $0.UsageIndex)
+            }
+            var handle: UInt64 = 0
+            try runtime.functions.check(
+                native.withUnsafeBufferPointer { buffer in
+                    runtime.functions.vertexDeclarationCreateWithStride(
+                        declaration.VertexStride, buffer.baseAddress,
+                        UInt64(buffer.count), &handle)
+                },
+                operation: "cna_vertex_declaration_create_with_stride")
+            return handle
         }
     }
 }

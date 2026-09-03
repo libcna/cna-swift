@@ -143,6 +143,10 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "IndexBuffersMustBeSizedCorrectly"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidDataSize",
       "reason": "Texture.GetAndValidateSizes<T> raises ArgumentException with this when sizeof(T) is neither the surface format's byte size nor a size that divides it exactly."
     },
@@ -160,6 +164,10 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidTotalSize",
       "reason": "Texture.ValidateTotalSize raises ArgumentException with this when the array window's byte count does not equal the region's."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "MustBeValidIndex"
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -203,6 +211,10 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ResourceDataMustBeCorrectSize"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ResourcesMustBeGreaterThanZeroSize",
       "reason": "Texture2D.ValidateCreationParameters raises ArgumentOutOfRangeException with this for a non-positive width or height. One message, two parameter names, width tested first."
     },
@@ -214,7 +226,7 @@
     {
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "VertexElementOffsetNotMultipleFour",
-      "reason": "VertexElementValidator.Validate raises ArgumentException with this for a vertex stride that is not a multiple of four, and again for an element offset that is not \u2014 which is why the one message names both."
+      "reason": "VertexElementValidator.Validate raises ArgumentException with this for a vertex stride that is not a multiple of four, and again for an element offset that is not — which is why the one message names both."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -228,8 +240,28 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexStrideTooSmall"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexTypeNotIVertexType"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexTypeNotValueType"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "VertexTypeWrongSize"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ViewportInvalid",
       "reason": "GraphicsDevice.set_Viewport raises ArgumentException with this from five separate branches: a negative origin, a non-positive extent, an extent past the current render target's bounds, a depth outside 0 through 1, and MaxDepth below MinDepth."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "WriteOnlyGetNotSupported"
     }
   ]
 }

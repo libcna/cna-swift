@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 59.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 60.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,15 +22,15 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-622 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=165   COMPLETE_TYPES=150   PARTIAL_TYPES=7
-MISSING_TYPE=100  MISSING_MEMBER=58  OVERLOAD_MAPPING_MISMATCH=5
+641 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=160   COMPLETE_TYPES=154   PARTIAL_TYPES=6
+MISSING_TYPE=97  MISSING_MEMBER=58  OVERLOAD_MAPPING_MISMATCH=5
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=90  PROTOTYPE_TYPE_POSITIONS=304  LAYOUTS=28  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=123 CAUGHT=123   NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,263 implemented members
+BOUND_FUNCTIONS=100  PROTOTYPE_TYPE_POSITIONS=349  LAYOUTS=32  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=137 CAUGHT=137   NATIVE_ABI_MUTATIONS=14 CAUGHT=14
+MESSAGE_COVERAGE_FINDINGS=0 over 1,282 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
-RESOURCE_STRINGS_REPRODUCED=38
+RESOURCE_STRINGS_REPRODUCED=46
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -65,56 +65,65 @@ cannot be verified.
 
 ### ACTIONABLE_LOCAL — upstream support exists, the managed side is the work
 
-CNA has far more than the projection uses. Route counts, measured:
-
-```text
-cna_effect_*            138 routes
-cna_content_manager_*    33 routes
-cna_vertex_buffer_*      16 routes
-cna_index_buffer_*       10 routes
-cna_sprite_font_*         9 routes
-cna_graphics_device_draw* 7 routes
-```
-
-So the following are **not** blocked upstream. The blocker is that the managed
-type is not projected yet, which is ordinary work:
+CNA declares **4,076** distinct `cna_*` symbols. Mapping all 97 still-missing
+types onto their route families — `docs/generated/cna-route-map.txt`, and the
+reasoning in `docs/frontier-remeasurement-foundation-60.md` — leaves **no family
+without native support** except the ones that need none. Route existence is not
+capability; but nothing below is blocked upstream, and the blocker in every row
+is that the managed type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `VertexBuffer` / `IndexBuffer` (+ `DynamicVertexBuffer`, `DynamicIndexBuffer`, `VertexBufferBinding`) | 5 types, ~8 `GraphicsDevice` members | 26 CNA routes. `VertexDeclaration` and the four vertex types already land (Foundations 43–44). |
+| `DynamicVertexBuffer` / `DynamicIndexBuffer` | 2 types | The static halves landed in Foundation 60. `SetDataOptions` reaches the family only here: the option-taking upload refuses a static buffer for *every* option value, measured in `build-probe/f60_options.c`, and a dynamic index buffer accepts `Discard` through the whole-buffer route but not the windowed one. `IsContentLost` latches from `GraphicsDevice.IsDeviceLost`, which has no counterpart here — the same divergence `RenderTarget2D.ContentLost` already records. |
 | `GraphicsDevice` drawing (`DrawPrimitives`, `DrawIndexedPrimitives`, `DrawUserPrimitives`, …) | ~8 members | 7 CNA routes. **Verifiable only as "the call was accepted"** — see fact 1. Say so in the evidence rather than implying more. |
 | `Effect` family (`Effect`, `EffectParameter`, `EffectPass`, `EffectTechnique`, the collections, `BasicEffect` and friends) | ~14 types, 2 `SpriteBatch.Begin` overloads, 1 `GraphicsDevice` member | 138 routes. Large but well supported. `cna_sprite_batch_begin_with_effect` is already there, unbound. |
 | `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
 | `TextureCollection` (`GraphicsDevice.Textures`, `VertexTextures`) | 1 type, 2 members | Previously judged blocked: `CNA_TextureSlotInfo` has no kind discriminator and `TextureCube`/`Texture3D` are unprojected. **Re-measure before believing that** — the same assumption was wrong twice. |
 
-### BLOCKED — and why
+### The BLOCKED list, re-measured at Foundation 60
 
-* **`GraphicsAdapter`, `DisplayMode`, `GraphicsDeviceInformation`,
-  `PreparingDeviceSettingsEventArgs`** — host facts a HEADLESS renderer cannot
-  supply. These hold up `GraphicsDeviceManager`'s last five members
-  (`FindBestDevice`, `CanResetDevice`, `RankDevices`,
-  `OnPreparingDeviceSettings`, `PreparingDeviceSettings`).
-* **`GameWindow`** (and `Game.Window`) — no window exists under HEADLESS. Its
-  absence is already recorded at both ends of
-  `GraphicsDeviceManager`'s constructor and `Dispose(Bool)`.
-* **`GraphicsDevice.Present`, `Reset`, `GetBackBufferData`** — presentation and
-  readback, neither of which this renderer performs.
-* **`Texture2D`'s GraphicsProfile validation** (six messages) — the checks read
-  the *device's* profile and `GraphicsDevice.GraphicsProfile` is not projected.
-  Recorded as `deferred` in `recorded-message-absences.json`.
+Most of what stood here was **inference, not measurement**: "HEADLESS has no
+window" was carried into eight entries, three of which had never been asked.
+`docs/frontier-remeasurement-foundation-60.md` asks them.
+
+Not blocked, and now ordinary work:
+
+* **`GraphicsDevice.GraphicsProfile`** — `cna_graphics_device_get_graphics_profile`
+  answers `Reach`. It is the only blocker the six deferred `Texture2D` profile
+  messages, and the three new buffer ones, name. What is still needed is the
+  pinned `ProfileCapabilities` table, read out of the IL.
+* **`GraphicsAdapter`, `DisplayMode`, `PresentationParameters`** — the device
+  answers its adapter index, an 800x480 display mode, and its presentation
+  parameters. Whether a fallible route can serve `PresentationParameters`'
+  `IL_NO_FAILURE_PATH` getter is a question about *when* it is read, not about
+  whether the value exists.
+* **`GameWindow`** and `Game.Window` — nineteen routes, all taking the game
+  handle. Title and `AllowUserResizing` round-trip; the client rectangle is the
+  empty one a headless session has, which is what HEADLESS means.
+* **`GraphicsDevice.Present`, `Reset`** — both accepted.
+* **`TextureCollection`** — CNA's own header prescribes the fix: cache what you
+  bind and answer from the cache, using `bound` to tell "something else owns
+  this slot" from "the slot is empty". That is what XNA's `DeviceResourceManager`
+  cache does.
+* **Audio, Media, Touch, Storage, GamerServices** — no longer unmeasured: 20-45
+  routes per family, listed in `docs/generated/cna-route-map.txt`.
+
+Still blocked, and now measured rather than inferred:
+
+* **`GraphicsDevice.GetBackBufferData`** — the size query answers 384,000 with
+  `CNA_RESULT_CAPACITY` and the read answers `NOT_SUPPORTED`, before and after a
+  clear that succeeds. Foundation 53's first bounding fact stands.
 * **`GamePad.InvalidController`, `Keyboard.CouldNotReadKeyboard`** — the
   error-channel halves that need a native input failure this environment cannot
   produce. CNA already matches the "not connected" half.
-* **Audio (10 types), Media (19), Touch, Storage, GamerServices** — unmeasured
-  here; check CNA's route inventory before assuming either way.
 
-### DELIBERATE_OUT_OF_SCOPE
+### `Microsoft.Xna.Framework.Design` — no longer out of scope
 
-* **`Microsoft.Xna.Framework.Design` (13 types)** — design-time IDE converters,
-  unreachable from a running game. `System.dll` is available, its identity is
-  established, and it is deliberately unadmitted because no implemented
-  projection needs a family it declares.
+The thirteen converters are pure managed and need no CNA route at all. What they
+need is the minimal authentic `System.dll` `ComponentModel` closure, admitted to
+the same non-vacuous standard `mscorlib` was. `System.dll` is on disk and its
+identity is established.
 
 ## Rules a next session must not quietly break
 
@@ -209,7 +218,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 59 have landed since. Nothing here is
+> Foundation Milestones 37 through 60 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->
