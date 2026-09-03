@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 61.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 62.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,16 +22,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-647 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=158   COMPLETE_TYPES=156   PARTIAL_TYPES=6
-MISSING_TYPE=95  MISSING_MEMBER=58  OVERLOAD_MAPPING_MISMATCH=5
+654 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=157   COMPLETE_TYPES=156   PARTIAL_TYPES=6
+MISSING_TYPE=95  MISSING_MEMBER=57  OVERLOAD_MAPPING_MISMATCH=5
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=106  PROTOTYPE_TYPE_POSITIONS=376  LAYOUTS=32  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=143 (last full run 137, CAUGHT=135, 2 no-ops replaced)
+BOUND_FUNCTIONS=107  PROTOTYPE_TYPE_POSITIONS=379  LAYOUTS=32  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=149 (last full run 137, CAUGHT=135, 2 no-ops replaced)
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,292 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
-RESOURCE_STRINGS_REPRODUCED=46
+RESOURCE_STRINGS_REPRODUCED=55
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -177,6 +177,8 @@ python3 tools/api_compat/message_coverage.py --self-test|--mutations|(report)
 python3 tools/api_compat/pinned_assembly_audit.py …
 python3 tools/api_compat/bcl_authority_audit.py … --cross-check --negative-control …×4
 python3 tools/runtime_capabilities/render.py --check
+python3 tools/api_compat/profile_capabilities.py --check \
+  --assembly-dir /path/to/xna/redistributable --il-cache ~/deps/xna-il-cache
 python3 tools/status_gate/verify.py --self-test
 python3 tools/status_gate/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
@@ -218,7 +220,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 61 have landed since. Nothing here is
+> Foundation Milestones 37 through 62 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->

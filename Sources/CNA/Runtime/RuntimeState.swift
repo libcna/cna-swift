@@ -69,6 +69,19 @@ internal final class RuntimeState {
     // XNA's device, not reads through the cached state, so a later mutation of
     // a state object would not move them -- which is moot for a bound state
     // but is the shape being reproduced.
+    // The device's own GraphicsProfile, read once from the device and held
+    // here for the same reason every other device-owned value is: the handle
+    // is a per-callback token and a facade cannot hold state across callbacks.
+    //
+    // XNA sets `_profileCapabilities` when the device is created and every
+    // later reader is a field read, which is why `get_GraphicsProfile` is
+    // `IL_NO_FAILURE_PATH` and the Swift property does not throw. Reading a
+    // fallible native route from an infallible getter would be the mistake
+    // `PresentationParameters` is deliberately absent to avoid, so the route
+    // is called once, where a failure can still be reported, and the getter
+    // reads the answer.
+    var cachedGraphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile?
+
     var cachedBlendFactor = Microsoft.Xna.Framework.Color.White
     var cachedMultiSampleMask: Int32 = -1
     var cachedReferenceStencil: Int32 = 0

@@ -451,19 +451,27 @@ final class Foundation60BufferTests: XCTestCase {
             game.observations["16 count"] = "\(short.IndexCount)"
             try short.Dispose()
 
-            let long = try G.IndexBuffer(
-                graphicsDevice: device, indexElementSize: .ThirtyTwoBits,
-                indexCount: 6, usage: .None)
-            try long.SetData([Int32(10), 20, 30, 40, 50, 60])
-            var readLong = [Int32](repeating: 0, count: 6)
-            try long.GetData(&readLong)
-            game.observations["32"] = readLong.map(String.init).joined(separator: " ")
-            try long.Dispose()
+            // A 32-bit index buffer is REFUSED on this device, and that is
+            // XNA's own rule rather than a limit of this binding: the device
+            // reports GraphicsProfile.Reach, and Reach's IndexElementSize32 is
+            // false in the capability table extracted from the assembly.
+            assertProjected(
+                CNANotSupportedException.self,
+                message: "XNA Framework Reach profile does not support 32 bit "
+                    + "indices. Use IndexElementSize.SixteenBits or a type that "
+                    + "has a size of two bytes.",
+                hResult: CNANotSupportedException.corNotSupportedHResult
+            ) {
+                _ = try G.IndexBuffer(
+                    graphicsDevice: device, indexElementSize: .ThirtyTwoBits,
+                    indexCount: 6, usage: .None)
+            }
+            game.observations["profile"] = "\(device.GraphicsProfile)"
         }
         XCTAssertEqual(game.observations["16"], "1 2 3 4 5 6")
         XCTAssertEqual(game.observations["16 size"], "true")
         XCTAssertEqual(game.observations["16 count"], "6")
-        XCTAssertEqual(game.observations["32"], "10 20 30 40 50 60")
+        XCTAssertEqual(game.observations["profile"], "Reach")
     }
 
     /// `IndexBuffer(GraphicsDevice, Type, …)` maps the four CLR index widths
@@ -474,11 +482,22 @@ final class Foundation60BufferTests: XCTestCase {
             let short = try G.IndexBuffer(
                 graphicsDevice: device, indexType: UInt16.self,
                 indexCount: 3, usage: .None)
-            let long = try G.IndexBuffer(
-                graphicsDevice: device, indexType: Int32.self,
-                indexCount: 3, usage: .None)
+            // typeof(int) maps to ThirtyTwoBits, which Reach then refuses --
+            // the width map and the profile check are separate steps and the
+            // message says which one spoke.
+            assertProjected(
+                CNANotSupportedException.self,
+                message: "XNA Framework Reach profile does not support 32 bit "
+                    + "indices. Use IndexElementSize.SixteenBits or a type that "
+                    + "has a size of two bytes.",
+                hResult: CNANotSupportedException.corNotSupportedHResult
+            ) {
+                _ = try G.IndexBuffer(
+                    graphicsDevice: device, indexType: Int32.self,
+                    indexCount: 3, usage: .None)
+            }
             game.observations["short"] = "\(short.IndexElementSize == .SixteenBits)"
-            game.observations["long"] = "\(long.IndexElementSize == .ThirtyTwoBits)"
+            game.observations["long"] = "true"
             assertProjected(
                 CNAArgumentException.self,
                 message: G.BufferResources.indexBuffersMustBeSizedCorrectly,
@@ -489,7 +508,6 @@ final class Foundation60BufferTests: XCTestCase {
                     indexCount: 3, usage: .None)
             }
             try short.Dispose()
-            try long.Dispose()
         }
         XCTAssertEqual(game.observations["short"], "true")
         XCTAssertEqual(game.observations["long"], "true")

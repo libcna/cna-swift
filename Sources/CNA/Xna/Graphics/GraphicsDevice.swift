@@ -20,7 +20,8 @@ extension Microsoft.Xna.Framework.Graphics {
         ///
         /// Both this and `borrow(from:)` produce the same callback-scoped
         /// facade; they differ only in which route supplied the handle.
-        internal convenience init(borrowedHandle: UInt64, runtime: RuntimeState) {
+        internal convenience init(borrowedHandle: UInt64, runtime: RuntimeState) throws {
+            try GraphicsDevice.cacheProfile(runtime, handle: borrowedHandle)
             self.init(handle: borrowedHandle, runtime: runtime)
         }
 
@@ -31,6 +32,49 @@ extension Microsoft.Xna.Framework.Graphics {
             callbackEpoch = runtime.callbackEpoch
         }
 
+        /// Reads the device's own `GraphicsProfile` once and caches it.
+        ///
+        /// Every facade this runtime hands out is the same device, so this runs
+        /// on the first one and never again. It is called from the two places
+        /// that build a facade rather than from the getter, because
+        /// `get_GraphicsProfile` is `IL_NO_FAILURE_PATH` and a getter that
+        /// cannot report a failure must not make a call that can have one.
+        private static func cacheProfile(_ runtime: RuntimeState, handle: UInt64) throws {
+            guard runtime.cachedGraphicsProfile == nil else { return }
+            var raw: UInt32 = 0
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceGetGraphicsProfile(handle, &raw),
+                operation: "cna_graphics_device_get_graphics_profile")
+            guard let profile = Microsoft.Xna.Framework.Graphics.GraphicsProfile(
+                rawValue: Int32(bitPattern: raw)) else {
+                throw CNAError.nativeFailure(
+                    operation: "GraphicsDevice.GraphicsProfile", result: 1,
+                    message: "native graphics profile \(raw) is not an XNA GraphicsProfile")
+            }
+            runtime.cachedGraphicsProfile = profile
+        }
+
+        /// `GraphicsDevice.GraphicsProfile`.
+        ///
+        /// `ldarg.0; ldfld _profileCapabilities; ldfld Profile; ret` — two field
+        /// reads with no failure path, which is why this does not throw. The
+        /// value is read from the device once, when the first facade of this
+        /// runtime is built, exactly as XNA reads it once at device creation.
+        ///
+        /// It is non-Optional and always answered: the cache is filled before
+        /// any facade exists, so there is no state in which a caller holds a
+        /// `GraphicsDevice` whose profile is unknown. `Reach` is not a fallback
+        /// — it is what the qualified artifact reports
+        /// (`build-probe/f60_devicecaps.c`).
+        public var GraphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile {
+            runtime.cachedGraphicsProfile ?? .Reach
+        }
+
+        /// The limits the device's profile imposes.
+        internal var profileCapabilities: Microsoft.Xna.Framework.Graphics.ProfileCapabilities {
+            .table(for: GraphicsProfile)
+        }
+
         internal static func borrow(from runtime: RuntimeState) throws -> GraphicsDevice {
             try runtime.validateBorrowed(epoch: runtime.callbackEpoch, operation: "Game.GraphicsDevice")
             var handle: UInt64 = 0
@@ -38,6 +82,7 @@ extension Microsoft.Xna.Framework.Graphics {
                 runtime.functions.gameGetGraphicsDevice(runtime.gameHandle, &handle),
                 operation: "cna_game_get_graphics_device"
             )
+            try cacheProfile(runtime, handle: handle)
             return GraphicsDevice(handle: handle, runtime: runtime)
         }
 

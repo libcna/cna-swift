@@ -147,6 +147,15 @@ extension Microsoft.Xna.Framework.Graphics {
                     paramName: "height",
                     message: Texture2D.resourcesMustBeGreaterThanZeroSizeMessage)
             }
+            // The rest of `ValidateCreationParameters` is the GraphicsProfile
+            // capability family, and since Foundation 62 it is projected: the
+            // device publishes its profile through
+            // `cna_graphics_device_get_graphics_profile`, and the per-profile
+            // limits are extracted from the assembly's own class constructor
+            // rather than transcribed. Six messages left
+            // `recorded-message-absences.json` here.
+            try graphicsDevice.profileCapabilities.validateTextureCreation(
+                width: width, height: height, format: format, mipMap: mipMap)
             let deviceHandle = try graphicsDevice.validatedHandle("Texture2D.init")
             let runtime = graphicsDevice.runtimeState
 

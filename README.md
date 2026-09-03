@@ -99,12 +99,12 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=162
-TARGET_MEMBERS=2023
-TOTAL_DIAGNOSTICS=158
+TARGET_MEMBERS=2024
+TOTAL_DIAGNOSTICS=157
 COMPLETE_TYPES=156
 PARTIAL_TYPES=6
 MISSING_TYPES=95
-MISSING_MEMBER=58
+MISSING_MEMBER=57
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=113
 PROVEN_NONNULL_RETURN_PROJECTIONS=133
@@ -554,6 +554,8 @@ python3 tools/api_compat/bcl_authority_audit.py \
   --negative-control mscorlib.dll=/path/to/another/net4/mscorlib.dll \
   --output docs/generated/bcl-authority-audit.json
 python3 tools/runtime_capabilities/render.py --check
+python3 tools/api_compat/profile_capabilities.py --check \
+  --assembly-dir /path/to/xna/redistributable --il-cache ~/deps/xna-il-cache
 python3 tools/status_gate/verify.py --self-test
 python3 tools/status_gate/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \

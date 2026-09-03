@@ -154,6 +154,10 @@ extension Microsoft.Xna.Framework.Graphics {
                     message: Microsoft.Xna.Framework.Graphics.Texture2D
                         .resourcesMustBeGreaterThanZeroSizeMessage)
             }
+            // `CreateBuffer`'s own profile check, on the byte size the
+            // declaration and the count imply.
+            try graphicsDevice.profileCapabilities.validateVertexBufferSize(
+                Int(vertexCount) * Int(declaration.VertexStride))
             let deviceHandle = try graphicsDevice.validatedHandle("VertexBuffer.init")
             let runtime = graphicsDevice.runtimeState
             let native = try Microsoft.Xna.Framework.Graphics.VertexDeclaration

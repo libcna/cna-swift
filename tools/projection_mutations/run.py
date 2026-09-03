@@ -51,6 +51,7 @@ BUFFERSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/BufferSupport.swift"
 BUFFERBINDING = ROOT / "Sources/CNA/Xna/Graphics/VertexBufferBinding.swift"
 DYNAMICVERTEX = ROOT / "Sources/CNA/Xna/Graphics/DynamicVertexBuffer.swift"
 DYNAMICINDEX = ROOT / "Sources/CNA/Xna/Graphics/DynamicIndexBuffer.swift"
+PROFILECAPS = ROOT / "Sources/CNA/Xna/Graphics/ProfileCapabilities.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -90,6 +91,50 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 62: the profile and its capability table -------------
+    (
+        "profile-limit-read-from-the-wrong-profile",
+        "the capability table answering HiDef's limits for a Reach device",
+        PROFILECAPS,
+        "            profile == .Reach ? reach : hidef",
+        "            profile == .Reach ? hidef : reach",
+    ),
+    (
+        "max-texture-size-off-by-a-power",
+        "a single extracted limit changed, which the pinned table must refuse",
+        PROFILECAPS,
+        "            maxTextureSize: 2048,",
+        "            maxTextureSize: 4096,",
+    ),
+    (
+        "thirty-two-bit-indices-allowed-on-reach",
+        "the IndexElementSize32 refusal dropped, so Reach accepts what XNA refuses",
+        PROFILECAPS,
+        "            if elementSizeInBytes == 4, !indexElementSize32 {",
+        "            if false, !indexElementSize32 {",
+    ),
+    (
+        "aspect-ratio-divides-the-wrong-way",
+        "the ceiling division written as a floor, so a texture at the limit is refused",
+        PROFILECAPS,
+        "            guard (longer + shorter - 1) / shorter <= maxTextureAspectRatio else {",
+        "            guard (longer + shorter) / shorter <= maxTextureAspectRatio else {",
+    ),
+    (
+        "profile-message-omits-the-profile",
+        "ThrowNotSupportedException formatting the limit without naming the profile",
+        PROFILECAPS,
+        '                of: "{0}", with: "\\(profile)")',
+        '                of: "{0}", with: "")',
+    ),
+    (
+        "texture-size-limit-not-checked",
+        "a texture larger than the profile allows accepted",
+        PROFILECAPS,
+        "            guard width <= maxTextureSize, height <= maxTextureSize else {",
+        "            guard width <= maxTextureSize * 4, height <= maxTextureSize * 4 else {",
+    ),
+
     # ---- Foundation 61: the dynamic buffers ------------------------------
     (
         "static-upload-takes-the-option-route",

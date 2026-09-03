@@ -197,11 +197,14 @@ final class Foundation61DynamicBufferTests: XCTestCase {
             try buffer.Dispose()
             game.observations["released"] = "\(buffer.contentLostRegistration == 0)"
 
+            // typeof(ushort), because Reach refuses 32-bit indices -- the
+            // capability table says so and Foundation60BufferTests asserts the
+            // refusal itself.
             let byType = try G.DynamicIndexBuffer(
-                graphicsDevice: device, indexType: UInt32.self,
+                graphicsDevice: device, indexType: UInt16.self,
                 indexCount: 3, usage: .None)
             game.observations["by type"] =
-                "\(byType.IndexElementSize == G.IndexElementSize.ThirtyTwoBits)"
+                "\(byType.IndexElementSize == G.IndexElementSize.SixteenBits)"
             try byType.Dispose()
         }
         XCTAssertEqual(game.observations["is an index buffer"], "true")

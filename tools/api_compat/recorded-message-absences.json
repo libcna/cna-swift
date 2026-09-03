@@ -29,42 +29,6 @@
   },
   {
    "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-   "key": "DxtNotMultipleOfFour",
-   "kind": "deferred",
-   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-   "key": "ProfileAspectRatio",
-   "kind": "deferred",
-   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-   "key": "ProfileFormatNotSupported",
-   "kind": "deferred",
-   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-   "key": "ProfileNotPowerOfTwoDXT",
-   "kind": "deferred",
-   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-   "key": "ProfileNotPowerOfTwoMipped",
-   "kind": "deferred",
-   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
-   "key": "ProfileTooBig",
-   "kind": "deferred",
-   "reason": "Raised by Texture2D.ValidateCreationParameters from the GraphicsProfile capability family: DXT dimension alignment, the non-power-of-two rules, the maximum texture size for the profile in force, and per-profile format support. Every one of those checks reads the DEVICE's profile, and GraphicsDevice.GraphicsProfile is not a projected member -- so the fact the check depends on is not knowable here, and inventing one would fabricate it. CNA refuses what it cannot create on its own (CNA_RESULT_NOT_SUPPORTED for an unavailable format) and that refusal reaches the caller on the runtime channel. Revisit with GraphicsDevice.GraphicsProfile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
    "key": "StreamNotSeekable",
    "kind": "unreachable",
    "reason": "Raised by the Stream constructor, which seeks the stream back after probing it. This projection's FromStream reads the stream forward-only into memory and never seeks, so there is no seek to fail; Foundation.InputStream has no seek to offer either. The condition XNA tests for cannot arise here."
@@ -128,24 +92,6 @@
    "key": "CouldNotReadKeyboard",
    "kind": "deferred",
    "reason": "XNA formats this with the Win32 GetLastError value when GetKeyboardState fails. Same shape and same blocker as GamePad.InvalidController: cna_keyboard_get_state does not fail on the qualified HEADLESS artifact, so the branch has no reachable input, no test and no possible mutation control. The message's own placeholder says 'result code' rather than 'Win32 error', so CNA's result would be an honest substitution the day the branch is reachable."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
-   "key": "ProfileTooBig",
-   "kind": "deferred",
-   "reason": "Raised by the buffer constructors from the GraphicsProfile capability family, the same family six Texture2D messages are deferred behind. The check reads the DEVICE's profile against ProfileCapabilities, an internal table of per-profile limits (MaxPrimitiveCount, MaxVertexBufferSize, MaxIndexBufferSize, MaxIndexElementSize and the rest), and neither GraphicsDevice.GraphicsProfile nor that table is projected yet. What changed at Foundation 60 is that the fact is no longer unknowable: cna_graphics_device_get_graphics_profile answers Reach on the qualified artifact (docs/frontier-remeasurement-foundation-60.md). So this is deferred behind ordinary work -- projecting GraphicsProfile and reading the pinned capability table out of the IL -- and not behind a missing host fact. CNA refuses what it cannot create, and that refusal reaches the caller on the runtime channel meanwhile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-   "key": "ProfileTooBig",
-   "kind": "deferred",
-   "reason": "Raised by the buffer constructors from the GraphicsProfile capability family, the same family six Texture2D messages are deferred behind. The check reads the DEVICE's profile against ProfileCapabilities, an internal table of per-profile limits (MaxPrimitiveCount, MaxVertexBufferSize, MaxIndexBufferSize, MaxIndexElementSize and the rest), and neither GraphicsDevice.GraphicsProfile nor that table is projected yet. What changed at Foundation 60 is that the fact is no longer unknowable: cna_graphics_device_get_graphics_profile answers Reach on the qualified artifact (docs/frontier-remeasurement-foundation-60.md). So this is deferred behind ordinary work -- projecting GraphicsProfile and reading the pinned capability table out of the IL -- and not behind a missing host fact. CNA refuses what it cannot create, and that refusal reaches the caller on the runtime channel meanwhile."
-  },
-  {
-   "type": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-   "key": "ProfileNoIndexElementSize32",
-   "kind": "deferred",
-   "reason": "Raised by the buffer constructors from the GraphicsProfile capability family, the same family six Texture2D messages are deferred behind. The check reads the DEVICE's profile against ProfileCapabilities, an internal table of per-profile limits (MaxPrimitiveCount, MaxVertexBufferSize, MaxIndexBufferSize, MaxIndexElementSize and the rest), and neither GraphicsDevice.GraphicsProfile nor that table is projected yet. What changed at Foundation 60 is that the fact is no longer unknowable: cna_graphics_device_get_graphics_profile answers Reach on the qualified artifact (docs/frontier-remeasurement-foundation-60.md). So this is deferred behind ordinary work -- projecting GraphicsProfile and reading the pinned capability table out of the IL -- and not behind a missing host fact. CNA refuses what it cannot create, and that refusal reaches the caller on the runtime channel meanwhile."
   }
  ]
 }

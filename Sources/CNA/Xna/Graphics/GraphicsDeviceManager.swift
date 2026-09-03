@@ -133,7 +133,12 @@ extension Microsoft.Xna.Framework {
             var device: UInt64 = 0
             guard storage.runtime.functions.graphicsManagerGetGraphicsDevice(
                 handle, &device) == 0, device != 0 else { return nil }
-            return Microsoft.Xna.Framework.Graphics.GraphicsDevice(
+            // The facade caches the device's own GraphicsProfile the first
+            // time one is built. This getter is `IGraphicsDeviceService`'s and
+            // cannot throw, and it already answers nil for every other reason
+            // the device is not available, so a profile that cannot be read
+            // answers nil here too rather than inventing one.
+            return try? Microsoft.Xna.Framework.Graphics.GraphicsDevice(
                 borrowedHandle: device, runtime: storage.runtime)
         }
 

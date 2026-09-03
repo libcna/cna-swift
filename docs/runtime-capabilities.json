@@ -178,6 +178,16 @@
       "evidence": "cna_vertex_buffer_subscribe_content_lost and its index counterpart create a real registration that the tests assert non-zero while the buffer lives and zero after disposal, on both the disposing and the finalizer path. The event is never RAISED on this host: CNA's header says it raises ContentLost only on renderer families whose API can lose a device, and documents is_content_lost as currently always false. XNA additionally latches the flag from GraphicsDevice.IsDeviceLost, which has no counterpart here -- the same divergence RenderTarget2D.IsContentLost records."
     },
     {
+      "operation": "GraphicsDevice.GraphicsProfile",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "cna_graphics_device_get_graphics_profile answers GraphicsProfile.Reach on the qualified artifact. The route is called once, when the first facade of a runtime is built, and the answer is held on RuntimeState -- get_GraphicsProfile is IL_NO_FAILURE_PATH, so a fallible call must not sit behind it, which is the same reason GraphicsDevice.PresentationParameters is deliberately absent. XNA reads it once at device creation for the same reason."
+    },
+    {
+      "operation": "ProfileCapabilities table",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "Thirty-two values per profile extracted from the class constructor of the hash-registered Microsoft.Xna.Framework.Graphics.dll by tools/api_compat/profile_capabilities.py, pinned in reference/xna40-profile-capabilities.json, and compared back against the Swift table field for field by Foundation62ProfileCapabilityTests. Nine messages left recorded-message-absences.json: Texture2D's six and the two buffer constructors' three. Reach's IndexElementSize32 is false, so a 32-bit index buffer is refused on this device -- three tests written in Foundations 60 and 61 asserted behaviour XNA does not have and were corrected."
+    },
+    {
       "operation": "SpriteBatch Begin/Draw/End",
       "status": "VERIFIED_NATIVE",
       "evidence": "begin, both submit shapes -- scaled and destination-rectangle -- and end execute for 60/600 template frames and 20 ownership cycles; all seven XNA Draw overloads execute inside a pair"

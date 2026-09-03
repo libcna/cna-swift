@@ -138,6 +138,10 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "DxtNotMultipleOfFour"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "EndMustBeCalledBeforeBegin",
       "reason": "SpriteBatch.Begin raises InvalidOperationException with this when an interval is already open."
     },
@@ -208,6 +212,38 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OutRangeFieldOfView",
       "reason": "Matrix.CreatePerspectiveFieldOfView raises ArgumentOutOfRangeException(\"fieldOfView\", this) formatted with the parameter name."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileAspectRatio"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileFormatNotSupported"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileMaxPrimitiveCount"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileMaxVertexStreams"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileNoIndexElementSize32"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileNotPowerOfTwoDXT"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileNotPowerOfTwoMipped"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileTooBig"
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

@@ -152,6 +152,11 @@ extension Microsoft.Xna.Framework.Graphics {
                     message: Microsoft.Xna.Framework.Graphics.Texture2D
                         .resourcesMustBeGreaterThanZeroSizeMessage)
             }
+            // `CreateBuffer`'s two profile checks, in the IL's order: the
+            // 32-bit index refusal comes before the size comparison.
+            let width = IndexBuffer.byteWidth(of: elementSize)
+            try graphicsDevice.profileCapabilities.validateIndexBuffer(
+                elementSizeInBytes: width, size: Int(indexCount) * width)
             let deviceHandle = try graphicsDevice.validatedHandle("IndexBuffer.init")
             let runtime = graphicsDevice.runtimeState
 

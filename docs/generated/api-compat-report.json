@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 162,
-    "TARGET_MEMBERS": 2023,
-    "TOTAL_DIAGNOSTICS": 158,
+    "TARGET_MEMBERS": 2024,
+    "TOTAL_DIAGNOSTICS": 157,
     "COMPLETE_TYPES": 156,
     "PARTIAL_TYPES": 6,
     "MISSING_TYPES": 95,
     "MISSING_TYPE": 95,
-    "MISSING_MEMBER": 58,
+    "MISSING_MEMBER": 57,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 46,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 55,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -772,11 +772,6 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DisplayMode()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsProfile()",
       "detail": "mapped member is absent"
     },
     {
@@ -3914,6 +3909,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "DxtNotMultipleOfFour",
+      "pinnedValue": "DXT compressed texture sizes must be multiples of four.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "EndMustBeCalledBeforeBegin",
       "pinnedValue": "Begin cannot be called again until End has been successfully called.",
       "reproducedInSwiftSource": true
@@ -4000,6 +4001,54 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "OutRangeFieldOfView",
       "pinnedValue": "{0} takes a value between 0 and Pi (180 degrees) in radians.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileAspectRatio",
+      "pinnedValue": "XNA Framework {0} profile supports a maximum {1} aspect ratio of {2}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileFormatNotSupported",
+      "pinnedValue": "XNA Framework {0} profile does not support {1} format {2}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileMaxPrimitiveCount",
+      "pinnedValue": "XNA Framework {0} profile supports a maximum of {1} primitives per draw call.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileMaxVertexStreams",
+      "pinnedValue": "XNA Framework {0} profile supports a maximum of {1} simultaneous vertex buffers.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileNoIndexElementSize32",
+      "pinnedValue": "XNA Framework {0} profile does not support 32 bit indices. Use IndexElementSize.SixteenBits or a type that has a size of two bytes.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileNotPowerOfTwoDXT",
+      "pinnedValue": "XNA Framework {0} profile requires DXT compressed {1} sizes to be powers of two. To use a non power of two {1}, disable DXT compression.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileNotPowerOfTwoMipped",
+      "pinnedValue": "XNA Framework {0} profile requires mipmapped {1} sizes to be powers of two. To use a non power of two {1}, remove the mipmaps.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileTooBig",
+      "pinnedValue": "XNA Framework {0} profile supports a maximum {1} size of {2}.",
       "reproducedInSwiftSource": true
     },
     {
@@ -10832,7 +10881,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 15,
+      "targetMembers": 16,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -10987,11 +11036,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DisplayMode()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GraphicsProfile()",
           "detail": "mapped member is absent"
         },
         {

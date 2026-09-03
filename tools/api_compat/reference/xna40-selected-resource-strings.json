@@ -100,6 +100,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "DxtNotMultipleOfFour",
+      "value": "DXT compressed texture sizes must be multiples of four."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "EndMustBeCalledBeforeBegin",
       "value": "Begin cannot be called again until End has been successfully called."
     },
@@ -172,6 +177,46 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OutRangeFieldOfView",
       "value": "{0} takes a value between 0 and Pi (180 degrees) in radians."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileAspectRatio",
+      "value": "XNA Framework {0} profile supports a maximum {1} aspect ratio of {2}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileFormatNotSupported",
+      "value": "XNA Framework {0} profile does not support {1} format {2}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileMaxPrimitiveCount",
+      "value": "XNA Framework {0} profile supports a maximum of {1} primitives per draw call."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileMaxVertexStreams",
+      "value": "XNA Framework {0} profile supports a maximum of {1} simultaneous vertex buffers."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileNoIndexElementSize32",
+      "value": "XNA Framework {0} profile does not support 32 bit indices. Use IndexElementSize.SixteenBits or a type that has a size of two bytes."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileNotPowerOfTwoDXT",
+      "value": "XNA Framework {0} profile requires DXT compressed {1} sizes to be powers of two. To use a non power of two {1}, disable DXT compression."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileNotPowerOfTwoMipped",
+      "value": "XNA Framework {0} profile requires mipmapped {1} sizes to be powers of two. To use a non power of two {1}, remove the mipmaps."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileTooBig",
+      "value": "XNA Framework {0} profile supports a maximum {1} size of {2}."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
