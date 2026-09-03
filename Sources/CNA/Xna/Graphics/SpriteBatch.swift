@@ -528,5 +528,32 @@ extension Microsoft.Xna.Framework.Graphics {
             inBeginEndPair = false
         }
 
+        /// `protected override void Dispose(bool)`.
+        ///
+        /// ```text
+        /// try {
+        ///     if (disposing && !IsDisposed) {
+        ///         if (spriteEffect != null) spriteEffect.Dispose();
+        ///         DisposePlatformData();      // vertexBuffer?.Dispose();
+        ///                                     // indexBuffer?.Dispose();
+        ///     }
+        /// } finally { base.Dispose(disposing); }
+        /// ```
+        ///
+        /// All three objects it disposes are XNA's own internals — the sprite
+        /// shader it compiles at construction, and the `DynamicVertexBuffer`
+        /// and `DynamicIndexBuffer` it batches through. None is reachable from
+        /// the public surface, and here all three are inside CNA's sprite
+        /// batch, which `cna_sprite_batch_destroy` releases with it. The
+        /// disposing-only guard around them therefore has nothing to guard,
+        /// and what is left is the `finally`: the base call, with the flag
+        /// unchanged, which is where the disposal actually happens.
+        ///
+        /// The override exists because XNA declares it. It is `open` for the
+        /// same reason the base is: `protected virtual` maps to `open`, and a
+        /// consumer's subclass overriding it must reach this link of the chain.
+        open override func Dispose(_ disposing: Bool) throws {
+            try super.Dispose(disposing)
+        }
     }
 }

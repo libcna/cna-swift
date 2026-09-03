@@ -110,10 +110,38 @@ extension Microsoft.Xna.Framework.Graphics {
 
         /// `protected virtual void Dispose(bool)`.
         ///
-        /// The one override point of the family. The base body reproduces
-        /// `~GraphicsResource()` exactly: nothing at all when already
-        /// disposed, otherwise release the native resource and *then* raise
-        /// `Disposing`.
+        /// The one override point of the family, and the flag decides what
+        /// happens. The CLR body is two different paths, not one:
+        ///
+        /// ```text
+        /// if (disposing) {
+        ///     ~GraphicsResource();          // if (!isDisposed) {
+        ///                                   //     isDisposed = true;
+        ///                                   //     Disposing?.Invoke(this, EventArgs.Empty);
+        ///                                   // }
+        /// } else {
+        ///     try     { !GraphicsResource(); }   // isDisposed = true, unconditionally
+        ///     finally { Object.Finalize(); }
+        /// }
+        /// ```
+        ///
+        /// **`Disposing` is raised on the disposing path only.** The finalizer
+        /// path sets the flag and raises nothing, because a finalizer must not
+        /// reach other managed objects. Until Foundation 59 this projection
+        /// raised the event on both paths, so `Dispose(false)` — which Swift's
+        /// lack of `protected` puts within any consumer's reach — announced a
+        /// disposal XNA announces to nobody. Reading the IL is what found it;
+        /// no test failed.
+        ///
+        /// `Object.Finalize()` is empty and `!GraphicsResource()`'s unguarded
+        /// assignment is unobservable once the flag is already set, so the
+        /// early return covers both paths exactly.
+        ///
+        /// The native release lives here rather than in each subclass because
+        /// this projection's storage does: in the CLR the COM pointer belongs
+        /// to `Texture2D` and `SpriteBatch`, whose own overrides release it
+        /// *before* calling this base. The order a handler can observe is the
+        /// same either way — released first, then announced.
         ///
         /// Swift has no `protected`, so this is public — the same single
         /// widening `CNACollection.Items` makes.
@@ -124,6 +152,7 @@ extension Microsoft.Xna.Framework.Graphics {
             } else {
                 managedDisposed = true
             }
+            guard disposing else { return }
             try disposingSource.Raise(self, args: CNAEventArgs.Empty)
         }
 

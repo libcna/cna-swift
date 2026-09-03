@@ -118,6 +118,22 @@
     "System.IntPtr": "Int",
     "System.Type": "Any.Type"
   },
+  "streamDirectionParameters": [
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.Texture2D",
+      "member": "SaveAsPng",
+      "parameter": "stream",
+      "swift": "Foundation.OutputStream",
+      "evidence": "Texture2D::SaveAsImage, which both SaveAsPng and SaveAsJpeg forward to, calls System.IO.Stream::get_CanWrite on this argument and then System.IO.Stream::Write(uint8[],int32,int32). It never reads it. Foundation splits System.IO.Stream into InputStream and OutputStream, so the global mapping cannot serve a written position."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.Texture2D",
+      "member": "SaveAsJpeg",
+      "parameter": "stream",
+      "swift": "Foundation.OutputStream",
+      "evidence": "The same SaveAsImage body; SaveAsJpeg differs from SaveAsPng only in the XnaImageFormat literal it passes (0 against 2)."
+    }
+  ],
   "refOutMapping": "inout",
   "mutatingProtocolRequirements": [
     "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVector.PackFromVector4"

@@ -250,6 +250,15 @@ extension Microsoft.Xna.Framework.Graphics {
             startIndex: Int32,
             elementCount: Int32
         ) throws {
+            // `CopyData`'s first instruction is `Helpers.CheckDisposed(this,
+            // pComPtr)`, ahead of all three validations -- so a disposed
+            // texture reports the disposal even when the arguments are also
+            // wrong, and it reports it as an `ObjectDisposedException` naming
+            // the dynamic type. Until Foundation 59 this read the handle
+            // through the storage instead, which raises the runtime channel's
+            // `CNAError.disposedObject`, and it read it last, so a disposed
+            // texture with a bad element size reported the size.
+            let handle = try validatedHandle("Texture2D.SetData")
             let plan = try transferPlan(
                 T.self, level: level, rect: rect, arrayCount: data.count,
                 startIndex: startIndex, elementCount: elementCount)
@@ -258,8 +267,7 @@ extension Microsoft.Xna.Framework.Graphics {
                 try nativeStorage.runtime.functions.check(
                     withUnsafePointer(to: plan.transfer) { transfer in
                         nativeStorage.runtime.functions.textureSetData(
-                            try nativeStorage.validatedHandle("Texture2D.SetData"),
-                            plan.dataType, transfer,
+                            handle, plan.dataType, transfer,
                             base + plan.byteOffset, plan.nativeElementCount)
                     },
                     operation: "cna_texture2d_set_data")
@@ -294,10 +302,11 @@ extension Microsoft.Xna.Framework.Graphics {
             startIndex: Int32,
             elementCount: Int32
         ) throws {
+            // The same `CopyData` prologue: disposal first, arguments after.
+            let handle = try validatedHandle("Texture2D.GetData")
             let plan = try transferPlan(
                 T.self, level: level, rect: rect, arrayCount: data.count,
                 startIndex: startIndex, elementCount: elementCount)
-            let handle = try nativeStorage.validatedHandle("Texture2D.GetData")
             try data.withUnsafeMutableBytes { bytes in
                 guard let base = bytes.baseAddress else { return }
                 var required: UInt64 = 0
@@ -422,6 +431,54 @@ extension Microsoft.Xna.Framework.Graphics {
             _ graphicsDevice: GraphicsDevice,
             stream: InputStream
         ) throws -> Texture2D {
+            try fromStream(graphicsDevice, stream: stream, decode: nil)
+        }
+
+        /// `FromStream(GraphicsDevice, Stream, Int32 width, Int32 height, Boolean zoom)`.
+        ///
+        /// Twenty-three bytes of IL, and every one of them selects an image
+        /// operation and forwards:
+        ///
+        /// ```text
+        /// XnaImageOperation op = zoom ? (Scale | Crop) : Scale;   // 3 : 1
+        /// return new Texture2D(graphicsDevice, stream, width, height, op);
+        /// ```
+        ///
+        /// `XnaImageOperation` is `Nothing = 0, Scale = 1, Crop = 2` in the
+        /// registered `Microsoft.Xna.Framework.dll`, so `zoom` is exactly the
+        /// difference between *fit inside width×height* and *cover width×height
+        /// and crop the overflow*. The two-argument `FromStream` above passes
+        /// `Nothing` with the profile's `MaxTextureSize` for both dimensions,
+        /// which is why it resizes nothing.
+        ///
+        /// `CNA_Texture2DDecodeInfo` carries `width`, `height` and a `zoom`
+        /// boolean documented as *"true to cover-and-crop; false to fit while
+        /// preserving aspect ratio"* — the same two operations under the same
+        /// two names — so this overload is the same call as the other with a
+        /// decode block supplied instead of null. Neither dimension is silently
+        /// dropped: CNA reports the granted size back and `Width`/`Height` are
+        /// read from that report, exactly as every other creation path here.
+        public static func FromStream(
+            _ graphicsDevice: GraphicsDevice,
+            stream: InputStream,
+            width: Int32,
+            height: Int32,
+            zoom: Bool
+        ) throws -> Texture2D {
+            var decode = CNASwift_Texture2DDecodeInfo()
+            decode.struct_size = UInt32(MemoryLayout<CNASwift_Texture2DDecodeInfo>.size)
+            decode.struct_version = 1
+            decode.width = UInt32(bitPattern: width)
+            decode.height = UInt32(bitPattern: height)
+            decode.zoom = zoom ? 1 : 0
+            return try fromStream(graphicsDevice, stream: stream, decode: decode)
+        }
+
+        private static func fromStream(
+            _ graphicsDevice: GraphicsDevice,
+            stream: InputStream,
+            decode: CNASwift_Texture2DDecodeInfo?
+        ) throws -> Texture2D {
             let deviceHandle = try graphicsDevice.validatedHandle("Texture2D.FromStream")
             var encoded = Data()
             if stream.streamStatus == .notOpen { stream.open() }
@@ -438,14 +495,21 @@ extension Microsoft.Xna.Framework.Graphics {
 
             let runtime = graphicsDevice.runtimeState
             var handle: UInt64 = 0
+            var decodeInfo = decode
             let result = encoded.withUnsafeBytes { rawBuffer -> UInt32 in
-                runtime.functions.textureCreateMemory(
-                    deviceHandle,
-                    rawBuffer.bindMemory(to: UInt8.self).baseAddress,
-                    UInt64(rawBuffer.count),
-                    nil,
-                    &handle
-                )
+                let call = { (block: UnsafePointer<CNASwift_Texture2DDecodeInfo>?) -> UInt32 in
+                    runtime.functions.textureCreateMemory(
+                        deviceHandle,
+                        rawBuffer.bindMemory(to: UInt8.self).baseAddress,
+                        UInt64(rawBuffer.count),
+                        block,
+                        &handle
+                    )
+                }
+                if decodeInfo != nil {
+                    return withUnsafePointer(to: &decodeInfo!) { call($0) }
+                }
+                return call(nil)
             }
             try runtime.functions.check(result, operation: "cna_texture2d_create_from_encoded_memory")
 
@@ -483,6 +547,183 @@ extension Microsoft.Xna.Framework.Graphics {
                 levelCount: common.levelCount,
                 format: common.format
             )
+        }
+
+        // ------------------------------------------------------------------
+        // SaveAsPng and SaveAsJpeg.
+        //
+        // Both are eleven bytes of IL that forward to the private
+        // `SaveAsImage(Stream, XnaImageFormat, Int32, Int32)`, differing only
+        // in the literal they push: `ldc.i4.2` for PNG and `ldc.i4.0` for
+        // JPEG. Everything below is `SaveAsImage`.
+
+        /// `SaveAsPng(Stream stream, Int32 width, Int32 height)`.
+        public func SaveAsPng(
+            _ stream: OutputStream, width: Int32, height: Int32
+        ) throws {
+            try saveAsImage(stream, format: Texture2D.nativeImageFormatPng,
+                            width: width, height: height)
+        }
+
+        /// `SaveAsJpeg(Stream stream, Int32 width, Int32 height)`.
+        public func SaveAsJpeg(
+            _ stream: OutputStream, width: Int32, height: Int32
+        ) throws {
+            try saveAsImage(stream, format: Texture2D.nativeImageFormatJpeg,
+                            width: width, height: height)
+        }
+
+        /// `CNA_TEXTURE_IMAGE_FORMAT_PNG`.
+        private static let nativeImageFormatPng: UInt32 = 0
+        /// `CNA_TEXTURE_IMAGE_FORMAT_JPEG`.
+        private static let nativeImageFormatJpeg: UInt32 = 1
+
+        /// `Texture2D.SaveAsImage(Stream, XnaImageFormat, Int32, Int32)`.
+        ///
+        /// ```text
+        /// if (stream == null) throw ArgumentNullException("stream", NullNotAllowed);
+        /// if (!stream.CanWrite) throw new ArgumentException("stream");
+        /// if (format != Jpeg && format != Png) throw new ArgumentException("format");
+        /// Color[] colors = <read the surface, converted to Color>;
+        /// for (int i = 0; i < colors.Length; i++)
+        ///     if (colors[i].A == 0) colors[i] = Color.Transparent;
+        /// using (ImageStream image = ImageStream.FromColors(
+        ///            colors, _width, _height, format, width, height))
+        ///     stream.Write(new BinaryReader(image).ReadBytes((int)image.Length),
+        ///                  0, ...);
+        /// ```
+        ///
+        /// Four things in that body decide this projection.
+        ///
+        /// **The two `ArgumentException`s carry a parameter name as their
+        /// *message*.** `newobj ArgumentException::.ctor(string)` is the
+        /// one-argument overload, so `Message` is literally `"stream"` and
+        /// `"format"` and `ParamName` is null. That is XNA's own slip and it is
+        /// reproduced, not corrected: this binding projects what the assembly
+        /// does. The `format` check cannot be reached here — the two public
+        /// entry points are the only callers and each passes a constant — so it
+        /// has no counterpart, and the `stream` null check has none either
+        /// because a Swift `OutputStream` parameter cannot be nil. Both are
+        /// recorded in `recorded-message-absences.json`.
+        ///
+        /// **`CanWrite` is a `System.IO.Stream` property Foundation does not
+        /// have.** A `Foundation.OutputStream` is a writing stream by
+        /// construction; what it can still be is *closed* or *failed*, which is
+        /// the state `CanWrite == false` describes, so those two statuses raise
+        /// the `ArgumentException` and nothing else does.
+        ///
+        /// **Every alpha-zero texel becomes `Color.Transparent` before
+        /// encoding.** This is not cosmetic and CNA does not do it:
+        /// `build-probe/f59_encode.c` encodes a texel authored `(200,100,50,0)`
+        /// and an independent decode of the PNG reads `(200,100,50,0)` back,
+        /// where XNA would have written `(0,0,0,0)`. The rewrite is therefore
+        /// performed here, on a copy, and the copy is what is encoded — which
+        /// is also what XNA does, since `ImageStream.FromColors` encodes the
+        /// rewritten array and never the texture.
+        ///
+        /// **The encode target is a CPU-only texture built from that copy.**
+        /// `cna_texture2d_create_cpu_only_rgba8` needs no device and no
+        /// callback scope, which matches a `SaveAsPng` that XNA lets a caller
+        /// make at any time; the intermediate is created, encoded and destroyed
+        /// inside this call and is never reachable. It is the direct
+        /// counterpart of the `ImageStream` XNA disposes in its `finally`.
+        private func saveAsImage(
+            _ stream: OutputStream, format: UInt32, width: Int32, height: Int32
+        ) throws {
+            guard stream.streamStatus != .closed, stream.streamStatus != .error else {
+                throw CNAArgumentException(message: "stream")
+            }
+
+            // XNA's switch has one arm per SurfaceFormat and a `default` that
+            // raises InvalidOperationException. Only `Color` can be created in
+            // this environment -- nineteen of the twenty formats answer
+            // CNA_RESULT_NOT_SUPPORTED, measured in `build-probe/f55_grants.c`
+            // -- so the Color arm is the reachable one and the rest are
+            // recorded rather than written as code that cannot run.
+            guard Format == .Color else {
+                throw CNAError.producerInvariant(
+                    "SaveAsImage reads \(Format) through a converter CNA cannot "
+                    + "supply; only SurfaceFormat.Color is creatable here")
+            }
+
+            var colors = [Microsoft.Xna.Framework.Color](
+                repeating: Microsoft.Xna.Framework.Color.Transparent,
+                count: Int(Width) * Int(Height))
+            try GetData(&colors)
+            for index in colors.indices where colors[index].A == 0 {
+                colors[index] = Microsoft.Xna.Framework.Color.Transparent
+            }
+
+            let runtime = nativeStorage.runtime
+            let pixels = colors.map {
+                CNASwift_Color(r: $0.R, g: $0.G, b: $0.B, a: $0.A)
+            }
+            var source: UInt64 = 0
+            try runtime.functions.check(
+                pixels.withUnsafeBufferPointer { buffer in
+                    runtime.functions.textureCreateCpuOnly(
+                        UInt32(bitPattern: Width), UInt32(bitPattern: Height),
+                        UInt32(bitPattern: SurfaceFormat.Color.rawValue),
+                        buffer.baseAddress, UInt64(buffer.count), &source)
+                },
+                operation: "cna_texture2d_create_cpu_only_rgba8")
+            defer { _ = runtime.functions.textureDestroy(source) }
+
+            var byteCount: UInt64 = 0
+            try runtime.functions.check(
+                runtime.functions.textureGetEncodedByteCount(
+                    source, format, UInt32(bitPattern: width),
+                    UInt32(bitPattern: height), &byteCount),
+                operation: "cna_texture2d_get_encoded_byte_count")
+
+            var encoded = [UInt8](repeating: 0, count: Int(byteCount))
+            var written: UInt64 = 0
+            try runtime.functions.check(
+                encoded.withUnsafeMutableBufferPointer { buffer in
+                    runtime.functions.textureCopyEncoded(
+                        source, format, UInt32(bitPattern: width),
+                        UInt32(bitPattern: height), buffer.baseAddress,
+                        UInt64(buffer.count), &written)
+                },
+                operation: "cna_texture2d_copy_encoded")
+
+            if stream.streamStatus == .notOpen { stream.open() }
+            var offset = 0
+            while offset < Int(written) {
+                let count = encoded[offset...].withUnsafeBufferPointer { buffer in
+                    stream.write(buffer.baseAddress!, maxLength: Int(written) - offset)
+                }
+                if count <= 0 {
+                    throw CNAError.streamFailure(
+                        stream.streamError?.localizedDescription ?? "unknown write error")
+                }
+                offset += count
+            }
+        }
+
+        /// `protected override void Dispose(bool)`.
+        ///
+        /// ```text
+        /// if (disposing) { try { ~Texture2D(); }
+        ///                  finally { base.Dispose(true); } }
+        /// else           { try { !Texture2D(); }
+        ///                  finally { base.Dispose(false); } }
+        /// ```
+        ///
+        /// `~Texture2D()` is a one-line forward to `!Texture2D()`, so both arms
+        /// run the same body and differ only in the flag they hand the base:
+        /// release the native texture if it is not already released, drop the
+        /// device-lost recreation cache, then `GraphicsResource.Dispose(flag)`.
+        ///
+        /// Neither half has a counterpart of its own here. This projection's
+        /// native handle is owned by `GraphicsResource`, which releases it as
+        /// the first thing `Dispose` does — the same order, one level up — and
+        /// `CleanupSavedData` frees `_savedData`, the CPU copy XNA keeps to
+        /// recreate a D3D9 texture after a device loss, which CNA neither
+        /// exposes nor requires. The override exists because XNA declares it
+        /// and a subclass overriding it must reach this link of the chain.
+        open override func Dispose(_ disposing: Bool) throws {
+            try super.Dispose(disposing)
         }
     }
 }

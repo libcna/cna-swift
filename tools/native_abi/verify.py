@@ -156,6 +156,9 @@ def canonical_type(value: str) -> str:
         "CNA_DisplayOrientation": "uint32_t", "CNA_RenderTargetUsage": "uint32_t",
         "CNA_GraphicsProfile": "uint32_t", "CNA_SpriteSortMode": "uint32_t",
         "CNA_TextureDataType": "uint32_t",
+        # `typedef uint32_t CNA_TextureImageFormat;` in texture.h:54,
+        # which names PNG and JPEG.
+        "CNA_TextureImageFormat": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

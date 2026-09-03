@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 58.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 59.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,14 +22,14 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-609 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=169   COMPLETE_TYPES=150   PARTIAL_TYPES=7
-MISSING_TYPE=100  MISSING_MEMBER=63  OVERLOAD_MAPPING_MISMATCH=6
+622 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=165   COMPLETE_TYPES=150   PARTIAL_TYPES=7
+MISSING_TYPE=100  MISSING_MEMBER=58  OVERLOAD_MAPPING_MISMATCH=5
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=87  PROTOTYPE_TYPE_POSITIONS=283  LAYOUTS=28  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=114 CAUGHT=114   NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,258 implemented members
-API_COMPAT_SELF_TESTS=2420  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+BOUND_FUNCTIONS=90  PROTOTYPE_TYPE_POSITIONS=304  LAYOUTS=28  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=123 CAUGHT=123   NATIVE_ABI_MUTATIONS=14 CAUGHT=14
+MESSAGE_COVERAGE_FINDINGS=0 over 1,263 implemented members
+API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=38
 ```
 
@@ -81,14 +81,12 @@ type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `Texture2D.SaveAsPng`/`SaveAsJpeg`, `FromStream(width:height:zoom:)`, `Dispose(Bool)` | 4 members | `cna_texture2d_save_file`, `_copy_encoded`, `_get_encoded_byte_count` exist. Smallest next step. |
 | `VertexBuffer` / `IndexBuffer` (+ `DynamicVertexBuffer`, `DynamicIndexBuffer`, `VertexBufferBinding`) | 5 types, ~8 `GraphicsDevice` members | 26 CNA routes. `VertexDeclaration` and the four vertex types already land (Foundations 43–44). |
 | `GraphicsDevice` drawing (`DrawPrimitives`, `DrawIndexedPrimitives`, `DrawUserPrimitives`, …) | ~8 members | 7 CNA routes. **Verifiable only as "the call was accepted"** — see fact 1. Say so in the evidence rather than implying more. |
 | `Effect` family (`Effect`, `EffectParameter`, `EffectPass`, `EffectTechnique`, the collections, `BasicEffect` and friends) | ~14 types, 2 `SpriteBatch.Begin` overloads, 1 `GraphicsDevice` member | 138 routes. Large but well supported. `cna_sprite_batch_begin_with_effect` is already there, unbound. |
 | `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
 | `TextureCollection` (`GraphicsDevice.Textures`, `VertexTextures`) | 1 type, 2 members | Previously judged blocked: `CNA_TextureSlotInfo` has no kind discriminator and `TextureCube`/`Texture3D` are unprojected. **Re-measure before believing that** — the same assumption was wrong twice. |
-| `SpriteBatch.Dispose(Bool)` | 1 member | Trivial; the pattern is `GraphicsDeviceManager.Dispose(Bool)` from Foundation 52. |
 
 ### BLOCKED — and why
 
@@ -211,7 +209,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 58 have landed since. Nothing here is
+> Foundation Milestones 37 through 59 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->

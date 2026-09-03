@@ -1,7 +1,7 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 58 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 59 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
@@ -149,23 +149,23 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=157               TARGET_MEMBERS=1973
+TARGET_TYPES=157               TARGET_MEMBERS=1978
 COMPLETE_TYPES=150             PARTIAL_TYPES=7      MISSING_TYPE=100
-MISSING_MEMBER=63              TOTAL_DIAGNOSTICS=169
+MISSING_MEMBER=58              TOTAL_DIAGNOSTICS=165
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
-XNA_RESOURCE_STRING_PROJECTIONS=38 API_COMPAT_SELF_TESTS=2420
+XNA_RESOURCE_STRING_PROJECTIONS=38 API_COMPAT_SELF_TESTS=2426
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=100`, `MISSING_MEMBER=63`, and `OVERLOAD_MAPPING_MISMATCH=6`,
+`MISSING_TYPE=100`, `MISSING_MEMBER=58`, and `OVERLOAD_MAPPING_MISMATCH=5`,
 whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
-both taking an `Effect`), and one each on `GraphicsDevice.SetRenderTarget`,
-`Texture2D.FromStream` and the two serialization constructors of
-`ContentLoadException` and `StorageDeviceNotConnectedException`.
-`GraphicsDeviceManager.Dispose` left this list in Foundation 52, all five
-`SpriteBatch.Draw` entries in Foundation 53, and two of the four
-`SpriteBatch.Begin` entries in Foundation 54.
+both taking an `Effect`), and one each on `GraphicsDevice.SetRenderTarget` and
+the two serialization constructors of `ContentLoadException` and
+`StorageDeviceNotConnectedException`. `GraphicsDeviceManager.Dispose` left this
+list in Foundation 52, all five `SpriteBatch.Draw` entries in Foundation 53, two
+of the four `SpriteBatch.Begin` entries in Foundation 54, and
+`Texture2D.FromStream`'s resizing overload in Foundation 59.
 
 Every category that would mean the projection **disagrees** with XNA is 0:
 `TYPE_KIND_MISMATCH`, `BASE_MAPPING_MISMATCH`, `INTERFACE_MAPPING_MISMATCH`,
@@ -182,12 +182,12 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=87  ROUTE_PAIRINGS=87  PROTOTYPE_TYPE_POSITIONS=283
-CANONICAL_DECLARATION_CHECKS=283  C_SWIFT_MEASUREMENTS=283
+BOUND_FUNCTIONS=90  ROUTE_PAIRINGS=90  PROTOTYPE_TYPE_POSITIONS=304
+CANONICAL_DECLARATION_CHECKS=304  C_SWIFT_MEASUREMENTS=304
 LAYOUTS=28  LAYOUT_FIELDS=243  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=114  CAUGHT=114  SURVIVORS=0
+PROJECTION_MUTATIONS=123  CAUGHT=123  SURVIVORS=0
 ```
 
 The projection-mutation harness refuses to run without a selected

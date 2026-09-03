@@ -405,6 +405,23 @@ def expected_member(
         )
         if optional_reference and not mapped_parameter_type.endswith("?"):
             mapped_parameter_type += "?"
+        # `System.IO.Stream` is one CLR type that reads and writes; Foundation
+        # splits the two into `InputStream` and `OutputStream`, so one global
+        # mapping cannot serve both. The direction is READ OUT OF THE IL, one
+        # position at a time, and only a position the CIL proves is written is
+        # overridden -- see `streamDirectionParameters` in `mapping-rules.json`.
+        # An override that does not name a `System.IO.Stream` position is a
+        # defect in the rules, not a licence, and is refused.
+        for item in rules.get("streamDirectionParameters", []):
+            if (item.get("owner") == owner
+                    and item.get("member") == mapped_name
+                    and item.get("parameter") == parameter.get("name")):
+                if parameter.get("type") != "System.IO.Stream":
+                    raise SystemExit(
+                        "streamDirectionParameters names "
+                        f"{owner}.{mapped_name}({parameter.get('name')}), whose "
+                        f"CLR type is {parameter.get('type')} and not System.IO.Stream")
+                mapped_parameter_type = item["swift"]
         types.append(mapped_parameter_type)
 
     mutable: bool | None = None
@@ -1839,6 +1856,77 @@ def self_test() -> None:
     corners_member = expected_member("Microsoft.Xna.Framework.BoundingBox", corners_source, rules, "struct")
     if corners_member.directions != ("inout",):
         failures.append("caller-owned corners array mutation projection")
+
+    # `System.IO.Stream` is direction-mapped per position. The default must stay
+    # `InputStream`, an overridden position must become `OutputStream`, and an
+    # override that names a position which is not a `System.IO.Stream` must be
+    # refused rather than silently applied to whatever type is there.
+    save_source = {
+        "kind": "method", "name": "SaveAsPng", "static": False,
+        "returnType": "System.Void", "parameters": [
+            {"name": "stream", "type": "System.IO.Stream"},
+            {"name": "width", "type": "System.Int32"},
+            {"name": "height", "type": "System.Int32"},
+        ],
+    }
+    stream_direction_self_tests = 0
+    save_member = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D", save_source, rules, "class")
+    stream_direction_self_tests += 1
+    if save_member.parameters != ("Foundation.OutputStream", "Int32", "Int32"):
+        failures.append(
+            "a written System.IO.Stream position is not mapped to OutputStream: "
+            f"{save_member.parameters}")
+    read_source = {
+        "kind": "method", "name": "FromStream", "static": True,
+        "returnType": "Microsoft.Xna.Framework.Graphics.Texture2D", "parameters": [
+            {"name": "graphicsDevice", "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice"},
+            {"name": "stream", "type": "System.IO.Stream"},
+        ],
+    }
+    read_member = expected_member(
+        "Microsoft.Xna.Framework.Graphics.Texture2D", read_source, rules, "class")
+    stream_direction_self_tests += 1
+    if read_member.parameters[1] != "Foundation.InputStream":
+        failures.append(
+            "a read System.IO.Stream position lost the default InputStream mapping: "
+            f"{read_member.parameters}")
+    stream_direction_self_tests += 1
+    if map_clr_type("System.IO.Stream", rules) != "Foundation.InputStream":
+        failures.append("the global System.IO.Stream mapping moved")
+    mistyped_rules = dict(rules)
+    mistyped_rules["streamDirectionParameters"] = [{
+        "owner": "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "member": "SaveAsPng", "parameter": "width",
+        "swift": "Foundation.OutputStream",
+    }]
+    stream_direction_self_tests += 1
+    try:
+        expected_member("Microsoft.Xna.Framework.Graphics.Texture2D",
+                        save_source, mistyped_rules, "class")
+        failures.append(
+            "a stream-direction override on a non-Stream parameter was applied")
+    except SystemExit:
+        pass
+    # Every override must name a position the contract actually declares, so a
+    # rule that has drifted off a renamed parameter is a failure rather than a
+    # silently inert entry.
+    contract_positions = {
+        (item["name"], member["name"], parameter["name"])
+        for item in load_json(REFERENCE)["types"] for member in item["members"]
+        for parameter in member.get("parameters", [])
+    }
+    for item in rules.get("streamDirectionParameters", []):
+        stream_direction_self_tests += 1
+        if (item["owner"], item["member"], item["parameter"]) not in contract_positions:
+            failures.append(
+                f"streamDirectionParameters names {item['owner']}."
+                f"{item['member']}({item['parameter']}), which the contract "
+                "does not declare")
+        if not item.get("evidence"):
+            failures.append(
+                f"streamDirectionParameters entry {item['owner']}."
+                f"{item['member']}({item['parameter']}) carries no IL evidence")
 
     if map_clr_type("System.Nullable`1[System.Single]", rules) != "Float?":
         failures.append("nullable value projection")
@@ -5110,7 +5198,7 @@ def self_test() -> None:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + curve_baseline_self_tests + accessor_writer_self_tests + 2 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + list_self_tests + order_self_tests + nullability_self_tests + field_mutability_self_tests}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + curve_baseline_self_tests + accessor_writer_self_tests + 2 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + list_self_tests + order_self_tests + nullability_self_tests + field_mutability_self_tests + stream_direction_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 

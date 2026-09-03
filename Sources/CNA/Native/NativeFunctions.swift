@@ -77,6 +77,9 @@ internal final class NativeFunctions {
     typealias Texture2dDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias Texture2dSetDataRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_Texture2DTransfer>?, UnsafeRawPointer?, UInt64) -> UInt32
     typealias Texture2dGetDataRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_Texture2DTransfer>?, UnsafeMutableRawPointer?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias Texture2dGetEncodedByteCountRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias Texture2dCopyEncodedRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias Texture2dCreateCpuOnlyRgba8Route = @convention(c) (UInt32, UInt32, UInt32, UnsafePointer<CNASwift_Color>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchBeginWithStatesRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
     typealias SpriteBatchSubmitScaledManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteScaledCommand>?, UInt64) -> UInt32
@@ -172,6 +175,9 @@ internal final class NativeFunctions {
     let textureDestroy: Texture2dDestroyRoute
     let textureSetData: Texture2dSetDataRoute
     let textureGetData: Texture2dGetDataRoute
+    let textureGetEncodedByteCount: Texture2dGetEncodedByteCountRoute
+    let textureCopyEncoded: Texture2dCopyEncodedRoute
+    let textureCreateCpuOnly: Texture2dCreateCpuOnlyRgba8Route
     let spriteBatchCreate: SpriteBatchCreateRoute
     let spriteBatchBeginWithStates: SpriteBatchBeginWithStatesRoute
     let spriteBatchSubmitScaled: SpriteBatchSubmitScaledManyRoute
@@ -287,6 +293,9 @@ internal final class NativeFunctions {
         textureDestroy = try library.resolve("cna_texture2d_destroy", as: Texture2dDestroyRoute.self)
         textureSetData = try library.resolve("cna_texture2d_set_data", as: Texture2dSetDataRoute.self)
         textureGetData = try library.resolve("cna_texture2d_get_data", as: Texture2dGetDataRoute.self)
+        textureGetEncodedByteCount = try library.resolve("cna_texture2d_get_encoded_byte_count", as: Texture2dGetEncodedByteCountRoute.self)
+        textureCopyEncoded = try library.resolve("cna_texture2d_copy_encoded", as: Texture2dCopyEncodedRoute.self)
+        textureCreateCpuOnly = try library.resolve("cna_texture2d_create_cpu_only_rgba8", as: Texture2dCreateCpuOnlyRgba8Route.self)
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
         spriteBatchBeginWithStates = try library.resolve("cna_sprite_batch_begin_with_states", as: SpriteBatchBeginWithStatesRoute.self)
         spriteBatchSubmitScaled = try library.resolve("cna_sprite_batch_submit_scaled_many", as: SpriteBatchSubmitScaledManyRoute.self)

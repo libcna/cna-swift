@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=157
-TARGET_MEMBERS=1973
-TOTAL_DIAGNOSTICS=169
+TARGET_MEMBERS=1978
+TOTAL_DIAGNOSTICS=165
 COMPLETE_TYPES=150
 PARTIAL_TYPES=7
 MISSING_TYPES=100
 MISSING_TYPE=100
-MISSING_MEMBER=63
+MISSING_MEMBER=58
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -24,9 +24,9 @@ INTERFACE_MAPPING_MISMATCH=0
 FIELD_MAPPING_MISMATCH=0
 PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
-PARAMETER_MAPPING_MISMATCH=0
+PARAMETER_MAPPING_MISMATCH=2
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=6
+OVERLOAD_MAPPING_MISMATCH=5
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -88,8 +88,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=109
-PENDING_RETURN_NULLABILITY_PROJECTIONS=260
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=110
+PENDING_RETURN_NULLABILITY_PROJECTIONS=259
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=16
 ```
 
@@ -311,9 +311,8 @@ Expected members: 56; emitted members: 15.
 
 ### `Microsoft.Xna.Framework.Graphics.SpriteBatch`
 
-Expected members: 21; emitted members: 12.
+Expected members: 21; emitted members: 13.
 
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Dispose(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)`: mapped member is absent
@@ -327,13 +326,10 @@ Expected members: 21; emitted members: 12.
 
 ### `Microsoft.Xna.Framework.Graphics.Texture2D`
 
-Expected members: 16; emitted members: 12.
+Expected members: 16; emitted members: 16.
 
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(_:Microsoft.Xna.Framework.Graphics.GraphicsDevice,stream:Foundation.InputStream,width:Int32,height:Int32,zoom:Bool)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(_:Microsoft.Xna.Framework.Graphics.GraphicsDevice,stream:Foundation.InputStream,width:Int32,height:Int32,zoom:Bool)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsJpeg(_:Foundation.InputStream,width:Int32,height:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.InputStream,width:Int32,height:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.Texture2D.Dispose(_:Bool)`: mapped member is absent
+- `PARAMETER_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsJpeg(_:Foundation.OutputStream,width:Int32,height:Int32)`: expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]
+- `PARAMETER_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.Texture2D.SaveAsPng(_:Foundation.OutputStream,width:Int32,height:Int32)`: expected labels/types [('_', 'Foundation.OutputStream'), ('width', 'Int32'), ('height', 'Int32')], found [('_', 'OutputStream'), ('width', 'Int32'), ('height', 'Int32')]
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 

@@ -84,6 +84,88 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 59: the image members and the disposal chain ---------
+    (
+        "disposing-flag-ignored-on-the-finalizer-path",
+        "Disposing raised from Dispose(false), which XNA raises to nobody",
+        RESOURCE,
+        "            guard disposing else { return }\n"
+        "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)",
+        "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)",
+    ),
+    (
+        "alpha-zero-texels-not-rewritten",
+        "SaveAsPng encodes an alpha-0 texel's colour, where XNA writes Transparent",
+        TEXTURE2D,
+        "            for index in colors.indices where colors[index].A == 0 {\n"
+        "                colors[index] = Microsoft.Xna.Framework.Color.Transparent\n"
+        "            }",
+        "            for index in colors.indices where colors[index].A == 255 {\n"
+        "                colors[index] = colors[index]\n"
+        "            }",
+    ),
+    (
+        "encode-dimensions-transposed",
+        "the encoded width and height swapped",
+        TEXTURE2D,
+        "                runtime.functions.textureGetEncodedByteCount(\n"
+        "                    source, format, UInt32(bitPattern: width),\n"
+        "                    UInt32(bitPattern: height), &byteCount),",
+        "                runtime.functions.textureGetEncodedByteCount(\n"
+        "                    source, format, UInt32(bitPattern: height),\n"
+        "                    UInt32(bitPattern: width), &byteCount),",
+    ),
+    (
+        "jpeg-saved-through-the-png-format",
+        "SaveAsJpeg passing the PNG image-format constant",
+        TEXTURE2D,
+        "            try saveAsImage(stream, format: Texture2D.nativeImageFormatJpeg,",
+        "            try saveAsImage(stream, format: Texture2D.nativeImageFormatPng,",
+    ),
+    (
+        "fromstream-zoom-ignored",
+        "the zoom flag dropped, so Scale|Crop decodes as Scale",
+        TEXTURE2D,
+        "            decode.zoom = zoom ? 1 : 0",
+        "            decode.zoom = 0",
+    ),
+    (
+        "fromstream-decode-dimensions-transposed",
+        "the requested width and height swapped on the way to the decoder",
+        TEXTURE2D,
+        "            decode.width = UInt32(bitPattern: width)\n"
+        "            decode.height = UInt32(bitPattern: height)",
+        "            decode.width = UInt32(bitPattern: height)\n"
+        "            decode.height = UInt32(bitPattern: width)",
+    ),
+    (
+        "setdata-disposal-check-on-the-runtime-channel",
+        "a disposed texture reported as CNAError instead of ObjectDisposedException",
+        TEXTURE2D,
+        "            let handle = try validatedHandle(\"Texture2D.SetData\")",
+        "            let handle = try nativeStorage.validatedHandle(\"Texture2D.SetData\")",
+    ),
+    (
+        "getdata-disposal-check-after-the-arguments",
+        "the disposal check moved behind the three validations",
+        TEXTURE2D,
+        "            let handle = try validatedHandle(\"Texture2D.GetData\")\n"
+        "            let plan = try transferPlan(\n"
+        "                T.self, level: level, rect: rect, arrayCount: data.count,\n"
+        "                startIndex: startIndex, elementCount: elementCount)",
+        "            let plan = try transferPlan(\n"
+        "                T.self, level: level, rect: rect, arrayCount: data.count,\n"
+        "                startIndex: startIndex, elementCount: elementCount)\n"
+        "            let handle = try validatedHandle(\"Texture2D.GetData\")",
+    ),
+    (
+        "closed-stream-accepted-by-save",
+        "SaveAsPng writing to a stream XNA refuses for CanWrite",
+        TEXTURE2D,
+        "            guard stream.streamStatus != .closed, stream.streamStatus != .error else {",
+        "            guard stream.streamStatus != .error else {",
+    ),
+
     # ---- Foundation 57: SetData and GetData ------------------------------
     (
         "format-byte-size-wrong-for-color",
@@ -736,8 +818,10 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            } else {\n"
         "                managedDisposed = true\n"
         "            }\n"
+        "            guard disposing else { return }\n"
         "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)",
         "            guard !IsDisposed else { return }\n"
+        "            guard disposing else { return }\n"
         "            try disposingSource.Raise(self, args: CNAEventArgs.Empty)\n"
         "            if let storage {\n"
         "                try storage.dispose(operation: \"\\(storage.typeName).Dispose\")\n"
