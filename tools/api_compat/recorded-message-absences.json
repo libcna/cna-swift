@@ -92,6 +92,12 @@
    "key": "CouldNotReadKeyboard",
    "kind": "deferred",
    "reason": "XNA formats this with the Win32 GetLastError value when GetKeyboardState fails. Same shape and same blocker as GamePad.InvalidController: cna_keyboard_get_state does not fail on the qualified HEADLESS artifact, so the branch has no reachable input, no test and no possible mutation control. The message's own placeholder says 'result code' rather than 'Win32 error', so CNA's result would be an honest substitution the day the branch is reachable."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "NullNotAllowed",
+   "kind": "unreachable",
+   "reason": "SetVertexBuffers tests each binding's _vertexBuffer for null and raises ArgumentException(NullNotAllowed). A Swift VertexBufferBinding stores a non-Optional VertexBuffer and every one of its three constructors requires one, so no binding a caller can build reaches the branch. The array itself being null IS reachable and is the selected unbind-all operation, which is a normal ret and not this throw."
   }
  ]
 }

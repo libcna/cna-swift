@@ -156,6 +156,10 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidDevice"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidEmitterDopplerScale",
       "reason": "AudioEmitter.set_DopplerScale raises ArgumentOutOfRangeException(\"value\", this) for a negative or NaN scale."
     },

@@ -52,7 +52,7 @@ MIRRORED_STRUCTS = [
     "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
     "SpriteCommand",
     "PresentationParameters",
-    "VertexElement", "VertexBufferCreateInfo",
+    "VertexElement", "VertexBufferCreateInfo", "VertexBufferBinding",
     "IndexBufferCreateInfo", "IndexBufferTransfer",
 ]
 

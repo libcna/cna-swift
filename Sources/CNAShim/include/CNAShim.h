@@ -298,6 +298,12 @@ typedef struct CNASwift_VertexBufferCreateInfo {
     uint8_t reserved[7];
 } CNASwift_VertexBufferCreateInfo;
 
+typedef struct CNASwift_VertexBufferBinding {
+    CNASwift_VertexBufferHandle vertex_buffer;
+    int32_t vertex_offset;
+    int32_t instance_frequency;
+} CNASwift_VertexBufferBinding;
+
 typedef struct CNASwift_IndexBufferCreateInfo {
     uint32_t struct_size;
     uint32_t struct_version;

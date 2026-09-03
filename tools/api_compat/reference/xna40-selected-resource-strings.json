@@ -120,6 +120,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidDevice",
+      "value": "Resources can only be used on the GraphicsDevice that they were created on. This resource was not created on this GraphicsDevice."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidEmitterDopplerScale",
       "value": "The doppler scale of an audio emitter must be greater than or equal to zero."
     },

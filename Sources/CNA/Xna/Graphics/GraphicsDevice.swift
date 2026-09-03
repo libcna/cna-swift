@@ -668,6 +668,162 @@ extension Microsoft.Xna.Framework.Graphics {
             return handle
         }
 
+        // ------------------------------------------------------------------
+        // Vertex and index buffer binding.
+        //
+        // XNA keeps the bound objects in fields and hands the same objects
+        // back; CNA can say which native handle is in a slot but deliberately
+        // publishes no route from a native object back to a handle, and its own
+        // header prescribes caching what you bind. Both facts point the same
+        // way, so the managed objects are held on `RuntimeState` and the native
+        // routes carry the binding to the device.
+
+        /// `GraphicsDevice.SetVertexBuffer(VertexBuffer vertexBuffer)`.
+        ///
+        /// Twenty-nine bytes: build a `VertexBufferBinding` and hand it to the
+        /// private `SetVertexBuffers(binding*, 1)`, or — when the buffer is
+        /// null — call `SetVertexBuffers(null, 0)`, which **unbinds every
+        /// stream**. That null branch reaches a normal `ret`, which is why the
+        /// parameter is Optional.
+        public func SetVertexBuffer(
+            _ vertexBuffer: Microsoft.Xna.Framework.Graphics.VertexBuffer?
+        ) throws {
+            guard let vertexBuffer else { return try setVertexBuffers([]) }
+            try setVertexBuffers([
+                Microsoft.Xna.Framework.Graphics.VertexBufferBinding(vertexBuffer)
+            ])
+        }
+
+        /// `GraphicsDevice.SetVertexBuffer(VertexBuffer, Int32 vertexOffset)`.
+        ///
+        /// The same, through the two-argument `VertexBufferBinding`
+        /// constructor — so the offset is validated against the buffer's vertex
+        /// count by the binding, before the device sees it.
+        public func SetVertexBuffer(
+            _ vertexBuffer: Microsoft.Xna.Framework.Graphics.VertexBuffer?,
+            vertexOffset: Int32
+        ) throws {
+            guard let vertexBuffer else { return try setVertexBuffers([]) }
+            try setVertexBuffers([
+                Microsoft.Xna.Framework.Graphics.VertexBufferBinding(
+                    vertexBuffer, vertexOffset)
+            ])
+        }
+
+        /// `GraphicsDevice.SetVertexBuffers(VertexBufferBinding[] vertexBuffers)`.
+        ///
+        /// A null or empty array unbinds every stream, which is the same
+        /// selected operation a null single buffer performs.
+        public func SetVertexBuffers(
+            _ vertexBuffers: [Microsoft.Xna.Framework.Graphics.VertexBufferBinding]?
+        ) throws {
+            try setVertexBuffers(vertexBuffers ?? [])
+        }
+
+        /// The private `SetVertexBuffers(VertexBufferBinding*, Int32)`.
+        ///
+        /// ```text
+        /// if (count > _profileCapabilities.MaxVertexStreams)
+        ///     ThrowNotSupportedException(ProfileMaxVertexStreams, MaxVertexStreams);
+        /// for each binding:
+        ///     if (binding._vertexBuffer == null)
+        ///         throw new ArgumentException(NullNotAllowed);
+        ///     if (binding._vertexBuffer.GraphicsDevice != this)
+        ///         throw new InvalidOperationException(InvalidDevice);
+        /// ```
+        ///
+        /// The null-buffer test cannot be reached through a Swift
+        /// `VertexBufferBinding`, whose stored buffer is non-Optional and whose
+        /// every constructor requires one; it is recorded rather than written.
+        ///
+        /// **The device-identity test is not comparing facades.** A facade is a
+        /// per-callback token (Foundation 42) and two facades of the same device
+        /// are different objects, so comparing them would refuse every binding
+        /// made in a different callback from the one that created the buffer.
+        /// The identity that survives a callback boundary is the `RuntimeState`,
+        /// and that is what is compared — the same runtime is the same device.
+        private func setVertexBuffers(
+            _ bindings: [Microsoft.Xna.Framework.Graphics.VertexBufferBinding]
+        ) throws {
+            let handle = try validatedHandle("GraphicsDevice.SetVertexBuffers")
+            let capabilities = profileCapabilities
+            guard bindings.count <= Int(capabilities.maxVertexStreams) else {
+                try capabilities.throwNotSupported(
+                    Microsoft.Xna.Framework.Graphics.ProfileCapabilities
+                        .profileMaxVertexStreams,
+                    "\(capabilities.maxVertexStreams)")
+            }
+            for binding in bindings {
+                guard binding.VertexBuffer.nativeStorage.runtime === runtime else {
+                    throw CNAInvalidOperationException(
+                        message: GraphicsDevice.invalidDeviceMessage)
+                }
+            }
+
+            var native = try bindings.map { binding in
+                CNASwift_VertexBufferBinding(
+                    vertex_buffer: try binding.VertexBuffer.validatedHandle(
+                        "GraphicsDevice.SetVertexBuffers"),
+                    vertex_offset: binding.VertexOffset,
+                    instance_frequency: binding.InstanceFrequency)
+            }
+            try runtime.functions.check(
+                native.withUnsafeMutableBufferPointer { buffer in
+                    runtime.functions.graphicsDeviceSetVertexBuffers(
+                        handle, buffer.baseAddress, UInt64(buffer.count))
+                },
+                operation: "cna_graphics_device_set_vertex_buffers")
+            runtime.cachedVertexBufferBindings = bindings
+        }
+
+        /// `GraphicsDevice.GetVertexBuffers()`.
+        ///
+        /// `new VertexBufferBinding[currentVertexBufferCount]` filled by
+        /// `Array.Copy` from the device's own array — a **copy** of the managed
+        /// bindings, so a caller mutating the result changes no binding. Swift's
+        /// value-typed `Array` gives that for free.
+        public func GetVertexBuffers()
+            -> [Microsoft.Xna.Framework.Graphics.VertexBufferBinding] {
+            runtime.cachedVertexBufferBindings
+        }
+
+        /// `GraphicsDevice.Indices`.
+        ///
+        /// `ldarg.0; ldfld _currentIB; ret` — a bare field read, so the getter
+        /// neither throws nor is non-Optional.
+        public var Indices: Microsoft.Xna.Framework.Graphics.IndexBuffer? {
+            runtime.cachedIndexBuffer
+        }
+
+        /// `set_Indices`, whose IL has a direct throw and is therefore a
+        /// throwing writer method rather than a Swift setter.
+        ///
+        /// ```text
+        /// Helpers.CheckDisposed(this, pComPtr);
+        /// if (value != null) Helpers.CheckDisposed(value, value.pComPtr);
+        /// if (value == _currentIB) return;
+        /// ...bind...
+        /// ```
+        ///
+        /// The identity short-circuit is reproduced: binding the buffer that is
+        /// already bound reaches no native route at all.
+        public func SetIndices(
+            _ value: Microsoft.Xna.Framework.Graphics.IndexBuffer?
+        ) throws {
+            let handle = try validatedHandle("GraphicsDevice.Indices")
+            let bufferHandle = try value?.validatedHandle("GraphicsDevice.Indices") ?? 0
+            guard value !== runtime.cachedIndexBuffer else { return }
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetIndexBuffer(handle, bufferHandle),
+                operation: "cna_graphics_device_set_index_buffer")
+            runtime.cachedIndexBuffer = value
+        }
+
+        /// `FrameworkResources.InvalidDevice`.
+        internal static let invalidDeviceMessage =
+            "Resources can only be used on the GraphicsDevice that they were "
+            + "created on. This resource was not created on this GraphicsDevice."
+
         internal var runtimeState: RuntimeState { runtime }
     }
 }

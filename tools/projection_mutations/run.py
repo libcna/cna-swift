@@ -91,6 +91,59 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 63: vertex and index buffer binding ------------------
+    (
+        "binding-cache-not-updated",
+        "the bound bindings not recorded, so GetVertexBuffers answers nothing",
+        DEVICE,
+        "            runtime.cachedVertexBufferBindings = bindings",
+        "            runtime.cachedVertexBufferBindings = []",
+    ),
+    (
+        "binding-identity-lost",
+        "GetVertexBuffers rebuilding its answer instead of returning what was bound",
+        DEVICE,
+        "            runtime.cachedVertexBufferBindings\n        }\n\n        /// `GraphicsDevice.Indices`.",
+        "            []\n        }\n\n        /// `GraphicsDevice.Indices`.",
+    ),
+    (
+        "device-identity-compared-by-facade",
+        "the InvalidDevice test comparing facades, which differ between callbacks",
+        DEVICE,
+        "                guard binding.VertexBuffer.nativeStorage.runtime === runtime else {",
+        "                guard binding.VertexBuffer.GraphicsDevice === self else {",
+    ),
+    (
+        "vertex-stream-limit-not-checked",
+        "more simultaneous streams accepted than the profile allows",
+        DEVICE,
+        "            guard bindings.count <= Int(capabilities.maxVertexStreams) else {",
+        "            guard bindings.count <= Int(capabilities.maxVertexStreams) * 4 else {",
+    ),
+    (
+        "indices-cache-not-updated",
+        "the bound index buffer not recorded, so Indices answers nil",
+        DEVICE,
+        "            runtime.cachedIndexBuffer = value",
+        "            runtime.cachedIndexBuffer = nil",
+    ),
+    (
+        "indices-setter-skips-the-disposal-check",
+        "a disposed index buffer reaching the device",
+        DEVICE,
+        '            let bufferHandle = try value?.validatedHandle("GraphicsDevice.Indices") ?? 0',
+        '            let bufferHandle = value?.nativeStorage.handle ?? 0',
+    ),
+    # `vertex-offset-not-carried` -- dropping the binding's vertex offset on the
+    # way to CNA -- was planted here and SURVIVED, and it is withdrawn rather
+    # than kept as a mutation nothing can catch. Nothing in the current public
+    # surface observes the offset the DEVICE received: `GetVertexBuffers()`
+    # reads the managed cache, as XNA's does, and the only thing that would
+    # notice a dropped offset is a draw. `cna_graphics_device_copy_vertex_buffers`
+    # would answer, but binding a route for a test alone is what
+    # docs/native-abi.md forbids. The claim becomes falsifiable when the draw
+    # family lands, and it is recorded as not-yet-evidence until then.
+
     # ---- Foundation 62: the profile and its capability table -------------
     (
         "profile-limit-read-from-the-wrong-profile",

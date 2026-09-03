@@ -1090,6 +1090,18 @@
       "owner": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
       "member": "Begin",
       "parameter": "rasterizerState"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "member": "SetVertexBuffer",
+      "parameter": "vertexBuffer",
+      "reason": "Both overloads null-test vertexBuffer with brfalse.s and the null branch reaches a normal ret after calling SetVertexBuffers(null, 0) -- unbinding every stream, which is how a caller stops drawing from a buffer. Recorded as a gap in docs/foundation-23-parameter-nullability-observations.md when the member was still absent, and selected here under the same rule when it landed."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "member": "SetVertexBuffers",
+      "parameter": "vertexBuffers",
+      "reason": "The array overload null-tests vertexBuffers and the null branch calls SetVertexBuffers(null, 0), unbinding all -- the same selected operation as the single-buffer overload's null."
     }
   ],
   "globalOperatorProjections": [

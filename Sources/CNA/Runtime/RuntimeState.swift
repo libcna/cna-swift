@@ -82,6 +82,21 @@ internal final class RuntimeState {
     // reads the answer.
     var cachedGraphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile?
 
+    // The bound vertex-buffer bindings and index buffer, as MANAGED objects.
+    //
+    // XNA keeps `currentVertexBuffers` and `_currentIB` as fields and both
+    // getters read them, so `GetVertexBuffers()` hands back the very objects
+    // that were bound and `Indices` is a bare field read. CNA can say which
+    // native handle is in a slot -- `cna_graphics_device_copy_vertex_buffers`
+    // and `cna_graphics_device_get_index_buffer` both answer -- but it
+    // deliberately publishes no route from a native object back to a handle,
+    // and its own header prescribes the remedy: "cache what you bind and answer
+    // from the cache". That is what XNA's DeviceResourceManager does, so the
+    // cache is a reproduction rather than an invention.
+    var cachedVertexBufferBindings:
+        [Microsoft.Xna.Framework.Graphics.VertexBufferBinding] = []
+    var cachedIndexBuffer: Microsoft.Xna.Framework.Graphics.IndexBuffer?
+
     var cachedBlendFactor = Microsoft.Xna.Framework.Color.White
     var cachedMultiSampleMask: Int32 = -1
     var cachedReferenceStencil: Int32 = 0

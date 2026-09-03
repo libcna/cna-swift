@@ -188,6 +188,16 @@
       "evidence": "Thirty-two values per profile extracted from the class constructor of the hash-registered Microsoft.Xna.Framework.Graphics.dll by tools/api_compat/profile_capabilities.py, pinned in reference/xna40-profile-capabilities.json, and compared back against the Swift table field for field by Foundation62ProfileCapabilityTests. Nine messages left recorded-message-absences.json: Texture2D's six and the two buffer constructors' three. Reach's IndexElementSize32 is false, so a 32-bit index buffer is refused on this device -- three tests written in Foundations 60 and 61 asserted behaviour XNA does not have and were corrected."
     },
     {
+      "operation": "Vertex and index buffer binding",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "SetVertexBuffer, SetVertexBuffers, GetVertexBuffers and Indices bind through cna_graphics_device_set_vertex_buffers and _set_index_buffer, and the managed objects are held on RuntimeState because CNA publishes no route from a native object back to a handle and its header prescribes caching what you bind -- which is what XNA's DeviceResourceManager does. The tests assert object IDENTITY, including a buffer created in LoadContent and bound in Update, which is why the InvalidDevice test compares runtimes and not per-callback facades."
+    },
+    {
+      "operation": "Drawing",
+      "status": "BLOCKED_UPSTREAM_UNTIL_EFFECT",
+      "evidence": "Every CNA draw route answers CNA_ERROR_CATEGORY_INTERNAL with \"GraphicsDevice::DrawPrimitives: no effect has been applied\" while no effect is applied (build-probe/f63_draw.c), and XNA's VerifyCanDraw raises CannotDrawNoShader for the same reason. Both agree, so the draw members wait for Effect rather than shipping as members that always fail on the runtime channel where XNA raises InvalidOperationException. The binding half does not depend on a shader and landed in Foundation 63."
+    },
+    {
       "operation": "SpriteBatch Begin/Draw/End",
       "status": "VERIFIED_NATIVE",
       "evidence": "begin, both submit shapes -- scaled and destination-rectangle -- and end execute for 60/600 template frames and 20 ownership cycles; all seven XNA Draw overloads execute inside a pair"

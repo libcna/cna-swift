@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 162,
-    "TARGET_MEMBERS": 2024,
-    "TOTAL_DIAGNOSTICS": 157,
+    "TARGET_MEMBERS": 2029,
+    "TOTAL_DIAGNOSTICS": 152,
     "COMPLETE_TYPES": 156,
     "PARTIAL_TYPES": 6,
     "MISSING_TYPES": 95,
     "MISSING_TYPE": 95,
-    "MISSING_MEMBER": 57,
+    "MISSING_MEMBER": 52,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 55,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 56,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 112,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 257,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 17
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 114,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 255,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 18
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -731,26 +731,6 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetVertexBuffers()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer,vertexOffset:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffers(_:[Microsoft.Xna.Framework.Graphics.VertexBufferBinding])",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose(_:Bool)",
       "detail": "mapped member is absent"
     },
@@ -762,11 +742,6 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.IsDisposed()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Indices()",
       "detail": "mapped member is absent"
     },
     {
@@ -1981,14 +1956,14 @@
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "sourceProperty": "Indices",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Indices()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetIndices(_:Microsoft.Xna.Framework.Graphics.IndexBuffer?)",
       "writerName": "SetIndices",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -3929,6 +3904,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "InvalidDataSize",
       "pinnedValue": "The type you are using for T in this method is an invalid size for this resource.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "InvalidDevice",
+      "pinnedValue": "Resources can only be used on the GraphicsDevice that they were created on. This resource was not created on this GraphicsDevice.",
       "reproducedInSwiftSource": true
     },
     {
@@ -6811,8 +6792,8 @@
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "[Microsoft.Xna.Framework.Graphics.VertexBufferBinding]"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -6825,8 +6806,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.IndexBuffer?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -10881,7 +10862,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 16,
+      "targetMembers": 21,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -10995,26 +10976,6 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetVertexBuffers()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer,vertexOffset:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffers(_:[Microsoft.Xna.Framework.Graphics.VertexBufferBinding])",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose(_:Bool)",
           "detail": "mapped member is absent"
         },
@@ -11026,11 +10987,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.IsDisposed()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Indices()",
           "detail": "mapped member is absent"
         },
         {

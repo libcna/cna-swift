@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=162
-TARGET_MEMBERS=2024
-TOTAL_DIAGNOSTICS=157
+TARGET_MEMBERS=2029
+TOTAL_DIAGNOSTICS=152
 COMPLETE_TYPES=156
 PARTIAL_TYPES=6
 MISSING_TYPES=95
 MISSING_TYPE=95
-MISSING_MEMBER=57
+MISSING_MEMBER=52
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -72,7 +72,7 @@ NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=55
+XNA_RESOURCE_STRING_PROJECTIONS=56
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=112
-PENDING_RETURN_NULLABILITY_PROJECTIONS=257
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=17
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=114
+PENDING_RETURN_NULLABILITY_PROJECTIONS=255
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=18
 ```
 
 ## Complete types
@@ -270,7 +270,7 @@ Expected members: 37; emitted members: 35.
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
-Expected members: 56; emitted members: 16.
+Expected members: 56; emitted members: 21.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present(_:Microsoft.Xna.Framework.Rectangle?,destinationRectangle:Microsoft.Xna.Framework.Rectangle?,overrideWindowHandle:Int)`: mapped member is absent
@@ -294,14 +294,9 @@ Expected members: 56; emitted members: 16.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetVertexBuffers()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer,vertexOffset:Int32)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffer(_:Microsoft.Xna.Framework.Graphics.VertexBuffer)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetVertexBuffers(_:[Microsoft.Xna.Framework.Graphics.VertexBufferBinding])`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose(_:Bool)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.IsDisposed()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Indices()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DisplayMode()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Adapter()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.PresentationParameters()`: mapped member is absent

@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 62.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 63.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,16 +22,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-654 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=157   COMPLETE_TYPES=156   PARTIAL_TYPES=6
-MISSING_TYPE=95  MISSING_MEMBER=57  OVERLOAD_MAPPING_MISMATCH=5
+662 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=152   COMPLETE_TYPES=156   PARTIAL_TYPES=6
+MISSING_TYPE=95  MISSING_MEMBER=52  OVERLOAD_MAPPING_MISMATCH=5
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=107  PROTOTYPE_TYPE_POSITIONS=379  LAYOUTS=32  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=149 (last full run 137, CAUGHT=135, 2 no-ops replaced)
+BOUND_FUNCTIONS=109  PROTOTYPE_TYPE_POSITIONS=386  LAYOUTS=33  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=155 (last full run 137, CAUGHT=135, 2 no-ops replaced)
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,292 implemented members
+MESSAGE_COVERAGE_FINDINGS=0 over 1,298 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
-RESOURCE_STRINGS_REPRODUCED=55
+RESOURCE_STRINGS_REPRODUCED=56
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -220,7 +220,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 62 have landed since. Nothing here is
+> Foundation Milestones 37 through 63 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->
