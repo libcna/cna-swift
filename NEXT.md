@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 60.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 61.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,13 +22,14 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-641 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=160   COMPLETE_TYPES=154   PARTIAL_TYPES=6
-MISSING_TYPE=97  MISSING_MEMBER=58  OVERLOAD_MAPPING_MISMATCH=5
+647 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=158   COMPLETE_TYPES=156   PARTIAL_TYPES=6
+MISSING_TYPE=95  MISSING_MEMBER=58  OVERLOAD_MAPPING_MISMATCH=5
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=100  PROTOTYPE_TYPE_POSITIONS=349  LAYOUTS=32  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=137 CAUGHT=137   NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,282 implemented members
+BOUND_FUNCTIONS=106  PROTOTYPE_TYPE_POSITIONS=376  LAYOUTS=32  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=143 (last full run 137, CAUGHT=135, 2 no-ops replaced)
+NATIVE_ABI_MUTATIONS=14 CAUGHT=14
+MESSAGE_COVERAGE_FINDINGS=0 over 1,292 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=46
 ```
@@ -74,7 +75,6 @@ is that the managed type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `DynamicVertexBuffer` / `DynamicIndexBuffer` | 2 types | The static halves landed in Foundation 60. `SetDataOptions` reaches the family only here: the option-taking upload refuses a static buffer for *every* option value, measured in `build-probe/f60_options.c`, and a dynamic index buffer accepts `Discard` through the whole-buffer route but not the windowed one. `IsContentLost` latches from `GraphicsDevice.IsDeviceLost`, which has no counterpart here — the same divergence `RenderTarget2D.ContentLost` already records. |
 | `GraphicsDevice` drawing (`DrawPrimitives`, `DrawIndexedPrimitives`, `DrawUserPrimitives`, …) | ~8 members | 7 CNA routes. **Verifiable only as "the call was accepted"** — see fact 1. Say so in the evidence rather than implying more. |
 | `Effect` family (`Effect`, `EffectParameter`, `EffectPass`, `EffectTechnique`, the collections, `BasicEffect` and friends) | ~14 types, 2 `SpriteBatch.Begin` overloads, 1 `GraphicsDevice` member | 138 routes. Large but well supported. `cna_sprite_batch_begin_with_effect` is already there, unbound. |
 | `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
@@ -218,7 +218,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 60 have landed since. Nothing here is
+> Foundation Milestones 37 through 61 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->

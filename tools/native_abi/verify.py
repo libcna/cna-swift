@@ -60,12 +60,14 @@ MIRRORED_STRUCTS = [
 MIRRORED_CALLBACKS = [
     "GameLifecycleCallback", "GameBeginDrawCallback",
     "RenderTargetContentLostCallback", "GameEventCallback",
+    "VertexBufferContentLostCallback", "IndexBufferContentLostCallback",
 ]
 
 # The scalar typedefs a mirrored declaration may name on either side. The
 # callback wall proves each pair is the same underlying type, which is what
 # makes translating a shim signature into canonical names sound.
-MIRRORED_SCALARS = ["Result", "Bool", "Handle"]
+MIRRORED_SCALARS = ["Result", "Bool", "Handle",
+                    "VertexBufferHandle", "IndexBufferHandle"]
 
 
 # --------------------------------------------------------------------------
@@ -170,6 +172,8 @@ def canonical_type(value: str) -> str:
         "CNA_VertexDeclarationHandle": "uint64_t",
         "CNA_VertexBufferHandle": "uint64_t",
         "CNA_IndexBufferHandle": "uint64_t",
+        "CNA_VertexBufferEventRegistrationHandle": "uint64_t",
+        "CNA_IndexBufferEventRegistrationHandle": "uint64_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

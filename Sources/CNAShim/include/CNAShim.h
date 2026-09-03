@@ -261,6 +261,17 @@ typedef void (*CNASwift_RenderTargetContentLostCallback)(
     CNASwift_Handle render_target,
     void* context);
 
+typedef CNASwift_Handle CNASwift_VertexBufferHandle;
+typedef CNASwift_Handle CNASwift_IndexBufferHandle;
+
+typedef void (*CNASwift_VertexBufferContentLostCallback)(
+    CNASwift_VertexBufferHandle vertex_buffer,
+    void* context);
+
+typedef void (*CNASwift_IndexBufferContentLostCallback)(
+    CNASwift_IndexBufferHandle index_buffer,
+    void* context);
+
 typedef struct CNASwift_Texture2DDecodeInfo {
     uint32_t struct_size;
     uint32_t struct_version;

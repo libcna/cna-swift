@@ -168,6 +168,16 @@
       "evidence": "VertexBuffer(GraphicsDevice, Type, ...) needs Activator.CreateInstance and IndexBuffer(GraphicsDevice, Type, ...) needs Marshal.SizeOf, on a metatype. Swift has neither, and IVertexType.VertexDeclaration is an instance member, so the four vertex structs and the four CLR index widths are recognised by identity -- returning the same static declaration object XNA's FromType cache would hold -- and any other type reaches the VertexDeclaration- and IndexElementSize-taking constructors beside them. A type that IS an IVertexType but is not one of the four gets the limitation on the runtime channel, not XNA's VertexTypeNotIVertexType, because that message would be false."
     },
     {
+      "operation": "Dynamic buffer streaming options",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "DynamicVertexBuffer and DynamicIndexBuffer accept all three SetDataOptions and write what they were given, asserted by reading the contents back. The option's only managed consequence in XNA's CopyData is skipping the bound-buffer test that raises ResourceInUse; the rest is a D3D lock hint. The hint is forwarded where CNA takes it -- always on a dynamic vertex buffer, and on a whole-buffer write for a dynamic index buffer -- and dropped on a windowed index write, which CNA refuses (build-probe/f60_options.c)."
+    },
+    {
+      "operation": "Dynamic buffer ContentLost",
+      "status": "VERIFIED_NATIVE_SUBSCRIPTION",
+      "evidence": "cna_vertex_buffer_subscribe_content_lost and its index counterpart create a real registration that the tests assert non-zero while the buffer lives and zero after disposal, on both the disposing and the finalizer path. The event is never RAISED on this host: CNA's header says it raises ContentLost only on renderer families whose API can lose a device, and documents is_content_lost as currently always false. XNA additionally latches the flag from GraphicsDevice.IsDeviceLost, which has no counterpart here -- the same divergence RenderTarget2D.IsContentLost records."
+    },
+    {
       "operation": "SpriteBatch Begin/Draw/End",
       "status": "VERIFIED_NATIVE",
       "evidence": "begin, both submit shapes -- scaled and destination-rectangle -- and end execute for 60/600 template frames and 20 ownership cycles; all seven XNA Draw overloads execute inside a pair"

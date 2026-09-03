@@ -1,7 +1,7 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 60 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 61 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
@@ -149,16 +149,16 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=160               TARGET_MEMBERS=2009
-COMPLETE_TYPES=154             PARTIAL_TYPES=6      MISSING_TYPE=97
-MISSING_MEMBER=58              TOTAL_DIAGNOSTICS=160
+TARGET_TYPES=162               TARGET_MEMBERS=2023
+COMPLETE_TYPES=156             PARTIAL_TYPES=6      MISSING_TYPE=95
+MISSING_MEMBER=58              TOTAL_DIAGNOSTICS=158
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 XNA_RESOURCE_STRING_PROJECTIONS=46 API_COMPAT_SELF_TESTS=2426
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=97`, `MISSING_MEMBER=58`, and `OVERLOAD_MAPPING_MISMATCH=5`,
+`MISSING_TYPE=95`, `MISSING_MEMBER=58`, and `OVERLOAD_MAPPING_MISMATCH=5`,
 whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
 both taking an `Effect`), and one each on `GraphicsDevice.SetRenderTarget` and
 the two serialization constructors of `ContentLoadException` and
@@ -182,13 +182,22 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=100  ROUTE_PAIRINGS=100  PROTOTYPE_TYPE_POSITIONS=349
-CANONICAL_DECLARATION_CHECKS=349  C_SWIFT_MEASUREMENTS=349
-LAYOUTS=32  LAYOUT_FIELDS=267  CALLBACKS=4  CONSTANTS=215  SCALAR_FACTS=3
+BOUND_FUNCTIONS=106  ROUTE_PAIRINGS=106  PROTOTYPE_TYPE_POSITIONS=376
+CANONICAL_DECLARATION_CHECKS=376  C_SWIFT_MEASUREMENTS=376
+LAYOUTS=32  LAYOUT_FIELDS=267  CALLBACKS=6  CONSTANTS=215  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=137  CAUGHT=137  SURVIVORS=0
+PROJECTION_MUTATIONS=143  LAST_FULL_RUN=137  CAUGHT=135  REPLACED_NO_OPS=2
 ```
+
+The projection-mutation count is what the harness holds; `CAUGHT` is what a
+**full run** last proved. The two differ while a milestone is in flight, and the
+difference is stated rather than rounded up: the last full run covered 137
+mutations and caught 135, the two survivors were no-op mutations that measured
+nothing and were replaced with observable ones, and every mutation added since —
+the two replacements and Foundation 61's six — was planted individually and
+caught. A full run over all 143 is repeated before the final handoff, and only
+then does `CAUGHT` equal the count.
 
 The projection-mutation harness refuses to run without a selected
 `CNA_NATIVE_LIBRARY`: sixteen of its mutations are caught only by suites that

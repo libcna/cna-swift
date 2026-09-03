@@ -211,6 +211,25 @@ extension Microsoft.Xna.Framework.Graphics {
             _ offsetInBytes: Int32, data: [T], startIndex: Int32,
             elementCount: Int32, vertexStride: Int32
         ) throws {
+            try writeData(offsetInBytes, data: data, startIndex: startIndex,
+                          elementCount: elementCount, vertexStride: vertexStride,
+                          options: .None)
+        }
+
+        /// The one upload path, shared with `DynamicVertexBuffer`.
+        ///
+        /// Which route carries it is decided by the option, and that is
+        /// measured rather than chosen: `build-probe/f60_options.c` has the
+        /// option-taking upload answering `CNA_RESULT_NOT_SUPPORTED` on a
+        /// static buffer for **every** option value, `CNA_SET_DATA_NONE`
+        /// included, and succeeding for all three on a dynamic one. So `None`
+        /// goes through the option-free route, which both kinds accept, and a
+        /// real option goes through the one only a dynamic buffer has.
+        internal func writeData<T>(
+            _ offsetInBytes: Int32, data: [T], startIndex: Int32,
+            elementCount: Int32, vertexStride: Int32,
+            options: Microsoft.Xna.Framework.Graphics.SetDataOptions
+        ) throws {
             let plan = try copyPlan(
                 T.self, offsetInBytes: offsetInBytes, arrayCount: data.count,
                 startIndex: startIndex, elementCount: elementCount,
@@ -218,12 +237,23 @@ extension Microsoft.Xna.Framework.Graphics {
             let functions = nativeStorage.runtime.functions
             try data.withUnsafeBytes { bytes in
                 guard let base = bytes.baseAddress else { return }
-                try functions.check(
-                    functions.vertexBufferSetDataRawAt(
-                        plan.handle, UInt64(plan.offsetInBytes),
-                        base + plan.byteOffset, UInt64(plan.byteCount),
-                        UInt64(plan.vertexCount), UInt32(plan.stride)),
-                    operation: "cna_vertex_buffer_set_data_raw_at")
+                let source = base + plan.byteOffset
+                if options == .None {
+                    try functions.check(
+                        functions.vertexBufferSetDataRawAt(
+                            plan.handle, UInt64(plan.offsetInBytes), source,
+                            UInt64(plan.byteCount), UInt64(plan.vertexCount),
+                            UInt32(plan.stride)),
+                        operation: "cna_vertex_buffer_set_data_raw_at")
+                } else {
+                    try functions.check(
+                        functions.vertexBufferSetDataRawAtWithOptions(
+                            plan.handle, UInt64(plan.offsetInBytes), source,
+                            UInt64(plan.byteCount), UInt64(plan.vertexCount),
+                            UInt32(plan.stride),
+                            UInt32(bitPattern: options.rawValue)),
+                        operation: "cna_vertex_buffer_set_data_raw_at_with_options")
+                }
             }
         }
 

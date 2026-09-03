@@ -49,6 +49,8 @@ VERTEXBUFFER = ROOT / "Sources/CNA/Xna/Graphics/VertexBuffer.swift"
 INDEXBUFFER = ROOT / "Sources/CNA/Xna/Graphics/IndexBuffer.swift"
 BUFFERSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/BufferSupport.swift"
 BUFFERBINDING = ROOT / "Sources/CNA/Xna/Graphics/VertexBufferBinding.swift"
+DYNAMICVERTEX = ROOT / "Sources/CNA/Xna/Graphics/DynamicVertexBuffer.swift"
+DYNAMICINDEX = ROOT / "Sources/CNA/Xna/Graphics/DynamicIndexBuffer.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -88,6 +90,72 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 61: the dynamic buffers ------------------------------
+    (
+        "static-upload-takes-the-option-route",
+        "the option-taking upload used for SetDataOptions.None, which a static buffer refuses",
+        VERTEXBUFFER,
+        "                if options == .None {",
+        "                if false {",
+    ),
+    (
+        "index-option-rides-the-windowed-route",
+        "a streaming option forwarded to the windowed index upload, which CNA refuses",
+        INDEXBUFFER,
+        "            let forwarded = (options != .None && wholeBuffer)",
+        "            let forwarded = (options != .None || wholeBuffer)",
+    ),
+    (
+        "dynamic-vertex-buffer-created-static",
+        "DynamicVertexBuffer created with the static flag, so its option overloads are refused",
+        DYNAMICVERTEX,
+        "                vertexCount: vertexCount, usage: usage, dynamic: true,\n"
+        '                typeName: "DynamicVertexBuffer")\n'
+        "            try subscribeToNativeContentLost()\n"
+        "        }\n"
+        "\n"
+        "        /// `DynamicVertexBuffer(GraphicsDevice, Type, Int32, BufferUsage)`.",
+        "                vertexCount: vertexCount, usage: usage, dynamic: false,\n"
+        '                typeName: "DynamicVertexBuffer")\n'
+        "            try subscribeToNativeContentLost()\n"
+        "        }\n"
+        "\n"
+        "        /// `DynamicVertexBuffer(GraphicsDevice, Type, Int32, BufferUsage)`.",
+    ),
+    (
+        "content-lost-subscription-not-released",
+        "disposal leaving the native ContentLost registration alive",
+        DYNAMICVERTEX,
+        "            guard !IsDisposed else { return }\n"
+        "            unsubscribeFromNativeContentLost()\n"
+        "            try super.Dispose(disposing)",
+        "            guard !IsDisposed else { return }\n"
+        "            try super.Dispose(disposing)",
+    ),
+    (
+        "index-content-lost-never-subscribed",
+        "a dynamic index buffer that never registers for ContentLost",
+        DYNAMICINDEX,
+        "                indexCount: indexCount, usage: usage, dynamic: true,\n"
+        '                typeName: "DynamicIndexBuffer")\n'
+        "            try subscribeToNativeContentLost()\n"
+        "        }\n"
+        "\n"
+        "        /// `DynamicIndexBuffer(GraphicsDevice, Type, Int32, BufferUsage)`.",
+        "                indexCount: indexCount, usage: usage, dynamic: true,\n"
+        '                typeName: "DynamicIndexBuffer")\n'
+        "        }\n"
+        "\n"
+        "        /// `DynamicIndexBuffer(GraphicsDevice, Type, Int32, BufferUsage)`.",
+    ),
+    (
+        "content-lost-flag-reports-true",
+        "IsContentLost answering true on a host whose renderer cannot lose a device",
+        DYNAMICVERTEX,
+        "        public var IsContentLost: Bool { contentLost }",
+        "        public var IsContentLost: Bool { true }",
+    ),
+
     # ---- Foundation 60: the vertex and index buffers ---------------------
     (
         "copy-parameters-name-the-callers-parameter",

@@ -203,28 +203,62 @@ extension Microsoft.Xna.Framework.Graphics {
             _ offsetInBytes: Int32, data: [T], startIndex: Int32,
             elementCount: Int32
         ) throws {
-            let options = Microsoft.Xna.Framework.Graphics.SetDataOptions.None
+            try writeData(offsetInBytes, data: data, startIndex: startIndex,
+                          elementCount: elementCount, options: .None)
+        }
+
+        /// The one upload path, shared with `DynamicIndexBuffer`.
+        ///
+        /// `build-probe/f60_options.c`: a dynamic index buffer accepts
+        /// `Discard` and `NoOverwrite` through `cna_index_buffer_set_data`,
+        /// which replaces the whole buffer, and **refuses** them through the
+        /// windowed `cna_index_buffer_set_data_at`. So an option rides the
+        /// whole-buffer route when the write covers the whole buffer, and is
+        /// dropped otherwise — which changes nothing observable, because the
+        /// flag is a D3D lock hint and the one consequence XNA lets a caller
+        /// see is the bound-buffer test, which is managed and reproduced above.
+        internal func writeData<T>(
+            _ offsetInBytes: Int32, data: [T], startIndex: Int32,
+            elementCount: Int32,
+            options: Microsoft.Xna.Framework.Graphics.SetDataOptions
+        ) throws {
             let plan = try copyPlan(
                 T.self, offsetInBytes: offsetInBytes, arrayCount: data.count,
                 startIndex: startIndex, elementCount: elementCount,
                 isSetting: true)
             let functions = nativeStorage.runtime.functions
+            let wholeBuffer = plan.offsetInBytes == 0
+                && plan.nativeElementCount == Int(IndexCount)
+            let forwarded = (options != .None && wholeBuffer)
+                ? options
+                : Microsoft.Xna.Framework.Graphics.SetDataOptions.None
             var transfer = CNASwift_IndexBufferTransfer()
             transfer.struct_size = UInt32(MemoryLayout<CNASwift_IndexBufferTransfer>.size)
             transfer.struct_version = 1
             transfer.index_element_size = UInt32(bitPattern: IndexElementSize.rawValue)
-            transfer.options = UInt32(bitPattern: options.rawValue)
+            transfer.options = UInt32(bitPattern: forwarded.rawValue)
             transfer.start_index = 0
             transfer.element_count = UInt64(plan.nativeElementCount)
             try data.withUnsafeBytes { bytes in
                 guard let base = bytes.baseAddress else { return }
-                try functions.check(
-                    withUnsafePointer(to: transfer) { pointer in
-                        functions.indexBufferSetDataAt(
-                            plan.handle, UInt64(plan.offsetInBytes), pointer,
-                            base + plan.byteOffset, UInt64(plan.nativeElementCount))
-                    },
-                    operation: "cna_index_buffer_set_data_at")
+                let source = base + plan.byteOffset
+                if forwarded == .None {
+                    try functions.check(
+                        withUnsafePointer(to: transfer) { pointer in
+                            functions.indexBufferSetDataAt(
+                                plan.handle, UInt64(plan.offsetInBytes), pointer,
+                                source, UInt64(plan.nativeElementCount))
+                        },
+                        operation: "cna_index_buffer_set_data_at")
+                } else {
+                    try functions.check(
+                        withUnsafePointer(to: transfer) { pointer in
+                            functions.indexBufferSetData(
+                                plan.handle, pointer, source,
+                                UInt64(plan.nativeElementCount))
+                        },
+                        operation: "cna_index_buffer_set_data")
+                }
             }
         }
 

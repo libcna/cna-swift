@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=160
-TARGET_MEMBERS=2009
-TOTAL_DIAGNOSTICS=160
-COMPLETE_TYPES=154
+TARGET_TYPES=162
+TARGET_MEMBERS=2023
+TOTAL_DIAGNOSTICS=158
+COMPLETE_TYPES=156
 PARTIAL_TYPES=6
-MISSING_TYPES=97
-MISSING_TYPE=97
+MISSING_TYPES=95
+MISSING_TYPE=95
 MISSING_MEMBER=58
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -41,11 +41,11 @@ INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=122
+LANGUAGE_PROJECTION_EXCLUSIONS=124
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=11
-INHERITED_MEMBER_PROJECTIONS=1
+INHERITED_MEMBER_PROJECTIONS=3
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=33
 ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
@@ -142,6 +142,8 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=17
 - `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
 - `Microsoft.Xna.Framework.Graphics.DisplayMode`
 - `Microsoft.Xna.Framework.Graphics.DisplayModeCollection`
+- `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`
+- `Microsoft.Xna.Framework.Graphics.DynamicVertexBuffer`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterClass`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterType`
 - `Microsoft.Xna.Framework.Graphics.FillMode`
@@ -383,8 +385,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.BasicEffect`
 - `Microsoft.Xna.Framework.Graphics.DirectionalLight`
 - `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
-- `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`
-- `Microsoft.Xna.Framework.Graphics.DynamicVertexBuffer`
 - `Microsoft.Xna.Framework.Graphics.Effect`
 - `Microsoft.Xna.Framework.Graphics.EffectAnnotation`
 - `Microsoft.Xna.Framework.Graphics.EffectAnnotationCollection`

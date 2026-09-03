@@ -90,6 +90,12 @@ internal final class NativeFunctions {
     typealias IndexBufferDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias IndexBufferSetDataAtRoute = @convention(c) (UInt64, UInt64, UnsafePointer<CNASwift_IndexBufferTransfer>?, UnsafeRawPointer?, UInt64) -> UInt32
     typealias IndexBufferGetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_IndexBufferTransfer>?, UnsafeMutableRawPointer?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias VertexBufferSetDataRawAtWithOptionsRoute = @convention(c) (UInt64, UInt64, UnsafeRawPointer?, UInt64, UInt64, UInt32, UInt32) -> UInt32
+    typealias VertexBufferSubscribeContentLostRoute = @convention(c) (UInt64, CNASwift_VertexBufferContentLostCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias VertexBufferUnsubscribeContentLostRoute = @convention(c) (UInt64) -> UInt32
+    typealias IndexBufferSetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_IndexBufferTransfer>?, UnsafeRawPointer?, UInt64) -> UInt32
+    typealias IndexBufferSubscribeContentLostRoute = @convention(c) (UInt64, CNASwift_IndexBufferContentLostCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias IndexBufferUnsubscribeContentLostRoute = @convention(c) (UInt64) -> UInt32
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchBeginWithStatesRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
     typealias SpriteBatchSubmitScaledManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteScaledCommand>?, UInt64) -> UInt32
@@ -198,6 +204,12 @@ internal final class NativeFunctions {
     let indexBufferDestroy: IndexBufferDestroyRoute
     let indexBufferSetDataAt: IndexBufferSetDataAtRoute
     let indexBufferGetData: IndexBufferGetDataRoute
+    let vertexBufferSetDataRawAtWithOptions: VertexBufferSetDataRawAtWithOptionsRoute
+    let vertexBufferSubscribeContentLost: VertexBufferSubscribeContentLostRoute
+    let vertexBufferUnsubscribeContentLost: VertexBufferUnsubscribeContentLostRoute
+    let indexBufferSetData: IndexBufferSetDataRoute
+    let indexBufferSubscribeContentLost: IndexBufferSubscribeContentLostRoute
+    let indexBufferUnsubscribeContentLost: IndexBufferUnsubscribeContentLostRoute
     let spriteBatchCreate: SpriteBatchCreateRoute
     let spriteBatchBeginWithStates: SpriteBatchBeginWithStatesRoute
     let spriteBatchSubmitScaled: SpriteBatchSubmitScaledManyRoute
@@ -326,6 +338,12 @@ internal final class NativeFunctions {
         indexBufferDestroy = try library.resolve("cna_index_buffer_destroy", as: IndexBufferDestroyRoute.self)
         indexBufferSetDataAt = try library.resolve("cna_index_buffer_set_data_at", as: IndexBufferSetDataAtRoute.self)
         indexBufferGetData = try library.resolve("cna_index_buffer_get_data", as: IndexBufferGetDataRoute.self)
+        vertexBufferSetDataRawAtWithOptions = try library.resolve("cna_vertex_buffer_set_data_raw_at_with_options", as: VertexBufferSetDataRawAtWithOptionsRoute.self)
+        vertexBufferSubscribeContentLost = try library.resolve("cna_vertex_buffer_subscribe_content_lost", as: VertexBufferSubscribeContentLostRoute.self)
+        vertexBufferUnsubscribeContentLost = try library.resolve("cna_vertex_buffer_unsubscribe_content_lost", as: VertexBufferUnsubscribeContentLostRoute.self)
+        indexBufferSetData = try library.resolve("cna_index_buffer_set_data", as: IndexBufferSetDataRoute.self)
+        indexBufferSubscribeContentLost = try library.resolve("cna_index_buffer_subscribe_content_lost", as: IndexBufferSubscribeContentLostRoute.self)
+        indexBufferUnsubscribeContentLost = try library.resolve("cna_index_buffer_unsubscribe_content_lost", as: IndexBufferUnsubscribeContentLostRoute.self)
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
         spriteBatchBeginWithStates = try library.resolve("cna_sprite_batch_begin_with_states", as: SpriteBatchBeginWithStatesRoute.self)
         spriteBatchSubmitScaled = try library.resolve("cna_sprite_batch_submit_scaled_many", as: SpriteBatchSubmitScaledManyRoute.self)
