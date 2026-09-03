@@ -554,6 +554,11 @@ python3 tools/api_compat/bcl_authority_audit.py \
   --negative-control mscorlib.dll=/path/to/another/net4/mscorlib.dll \
   --output docs/generated/bcl-authority-audit.json
 python3 tools/runtime_capabilities/render.py --check
+python3 tools/status_gate/verify.py --self-test
+python3 tools/status_gate/verify.py \
+  --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
+  --cna-include /path/to/cnanext/modules/c-api/include \
+  --library "$CNA_NATIVE_LIBRARY"
 python3 tools/gamepad_native/run.py \
   --library "$CNA_NATIVE_LIBRARY" \
   --output docs/generated/gamepad-native-report.json

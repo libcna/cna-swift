@@ -1,0 +1,491 @@
+#!/usr/bin/env python3
+"""Gate over every *normative* status claim in this repository's prose.
+
+`plan.md` opened with "Foundation Milestones 1 through 47 are complete" while
+the tree was at Foundation 57 and `NEXT.md` said so: a normative statement had
+drifted ten milestones behind the work it describes, and nothing compared them.
+`docs/generated/native-abi-report.json` had drifted further still -- it was last
+written at `BOUND_FUNCTIONS=55` while a live run answers 87 -- so the generated
+report a reader is told to trust over the prose was itself the stale one.
+
+This tool exists so neither can happen again. It has two halves.
+
+**Freshness.** A generated report is only evidence if it is what a live run
+produces now. With `--symbol-graph` the strict verifier, the missing-type
+inventory and the dependency graph are regenerated into a temporary directory
+and required to be byte-identical to the committed copies; with `--cna-include`
+and `--library` the native ABI report is regenerated and compared the same way.
+A stale committed report fails the gate rather than being read as truth.
+
+**Claims.** Every `KEY=VALUE` token in the normative documents whose KEY is one
+this gate derives from a generated report must carry the derived value, and
+every normative Foundation-status claim must name the current Foundation. The
+current Foundation is the highest `docs/foundation-<N>-*-evidence.md` on disk,
+so it moves when a milestone lands its evidence and cannot be edited into
+agreement on its own.
+
+Historical prose is not policed and is not deleted: a region between
+`<!-- status-gate:historical -->` and `<!-- status-gate:/historical -->` (or the
+end of the file) is skipped, which is what lets `NEXT.md` keep the Foundation
+30-36 handoff and its Foundation 36 numbers verbatim.
+
+Run from the repository root:
+
+    python3 tools/status_gate/verify.py --self-test
+    python3 tools/status_gate/verify.py \
+        --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
+        --cna-include /path/to/cnanext/modules/c-api/include \
+        --library "$CNA_NATIVE_LIBRARY"
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[2]
+GENERATED = ROOT / "docs/generated"
+
+# Every normative document. A file listed here is policed outside its historical
+# regions; a file not listed here is not a status authority.
+NORMATIVE_DOCUMENTS = ["plan.md", "README.md", "NEXT.md"]
+
+# Generated reports the derived facts are read out of. Each entry is
+# (path, prefix-free keys to take). A key present in two reports with two
+# different values is refused rather than silently policed against one of them.
+FACT_REPORTS = [
+    "api-compat-report.json",
+    "native-abi-report.json",
+    "bcl-authority-audit.json",
+    "pinned-assembly-audit.json",
+    "gamepad-native-report.json",
+    "native-stress-report.json",
+    "package-qualification-report.json",
+    "message-coverage.json",
+]
+
+HISTORICAL_OPEN = "<!-- status-gate:historical -->"
+HISTORICAL_CLOSE = "<!-- status-gate:/historical -->"
+
+TOKEN = re.compile(r"\b([A-Z][A-Z0-9_]{3,})=(\d+)\b")
+
+# The normative Foundation-status claims. Each must name the current Foundation.
+# A bare "Foundation 48 is the reminder that ..." is prose about a past
+# milestone and is deliberately not in this set; only a statement of *where the
+# work stands* is.
+#
+# Every space here is `\s+` and the patterns are matched against the whole
+# normative text rather than line by line, because the statement that drifted --
+# "Foundation Milestones 1 through 47 are\ncomplete" -- was wrapped across two
+# lines, and a line-by-line gate walks straight past it.
+FOUNDATION_CLAIMS = [
+    r"Foundation\s+Milestones?\s+1\s+through\s+(\d+)\s+(?:are|is)\s+complete",
+    r"Current\s+as\s+of\s+Foundation\s+(\d+)",
+    r"Foundation\s+Milestones?\s+1[-–](\d+)\s+(?:are|is)\s+complete",
+    r"through\s+Foundation\s+(\d+)\s+(?:have|has)\s+landed",
+    r"Milestones?\s+\d+\s+through\s+(\d+)\s+(?:have|has)\s+landed",
+    r"the\s+tree\s+is\s+at\s+Foundation\s+(\d+)",
+    r"Foundations?\s+1\s+through\s+(\d+)\s+(?:are|is)\s+complete",
+]
+FOUNDATION_CLAIM_PATTERNS = [re.compile(pattern) for pattern in FOUNDATION_CLAIMS]
+
+FOUNDATION_EVIDENCE = re.compile(r"^foundation-(\d+)-.*-evidence\.md$")
+
+
+class Failure(Exception):
+    pass
+
+
+def current_foundation(root: Path = ROOT) -> int:
+    """The highest Foundation with an evidence file, which is what "current" means."""
+    numbers = [
+        int(match.group(1))
+        for path in (root / "docs").glob("foundation-*-evidence.md")
+        if (match := FOUNDATION_EVIDENCE.match(path.name))
+    ]
+    if not numbers:
+        raise Failure("no docs/foundation-<N>-*-evidence.md exists")
+    return max(numbers)
+
+
+def mutation_harness_sizes(root: Path = ROOT) -> dict[str, int]:
+    """`len(MUTATIONS)` from each harness, read without running either."""
+    sizes = {}
+    for name, path in [
+        ("PROJECTION_MUTATIONS", root / "tools/projection_mutations/run.py"),
+        ("NATIVE_ABI_MUTATIONS", root / "tools/native_abi/mutations.py"),
+    ]:
+        text = path.read_text(encoding="utf-8")
+        start = text.index("MUTATIONS: list[")
+        start = text.index("[", text.index("=", start))
+        depth, index = 0, start
+        while True:
+            if text[index] == "[":
+                depth += 1
+            elif text[index] == "]":
+                depth -= 1
+                if depth == 0:
+                    break
+            index += 1
+        body = text[start:index + 1]
+        sizes[name] = body.count("\n    (")
+    return sizes
+
+
+def api_compat_self_tests(root: Path = ROOT) -> dict[str, int]:
+    completed = subprocess.run(
+        [sys.executable, str(root / "tools/api_compat/verify.py"), "--self-test"],
+        capture_output=True, text=True, cwd=root, check=False,
+    )
+    if completed.returncode != 0:
+        raise Failure("tools/api_compat/verify.py --self-test does not pass")
+    found = {}
+    for match in TOKEN.finditer(completed.stdout):
+        found[match.group(1)] = int(match.group(2))
+    return {"API_COMPAT_SELF_TESTS": found["API_COMPAT_SELF_TESTS"]}
+
+
+def flatten(document: Any, into: dict[str, int]) -> None:
+    if isinstance(document, dict):
+        for key, value in document.items():
+            if isinstance(value, bool):
+                continue
+            if isinstance(value, int) and key.isupper():
+                into[key] = value
+            elif key == "summary" and isinstance(value, dict):
+                flatten(value, into)
+
+
+def derive_facts(root: Path = ROOT, with_self_tests: bool = True) -> dict[str, int]:
+    facts: dict[str, int] = {}
+    sources: dict[str, str] = {}
+    conflicts: list[str] = []
+
+    def add(key: str, value: int, source: str) -> None:
+        if key in facts and facts[key] != value:
+            conflicts.append(f"{key}: {source} says {value}, {sources[key]} says {facts[key]}")
+            return
+        facts[key] = value
+        sources[key] = source
+
+    for name in FACT_REPORTS:
+        path = root / "docs/generated" / name
+        if not path.exists():
+            raise Failure(f"docs/generated/{name} is absent")
+        found: dict[str, int] = {}
+        flatten(json.loads(path.read_text(encoding="utf-8")), found)
+        for key, value in found.items():
+            add(key, value, name)
+
+    for key, value in mutation_harness_sizes(root).items():
+        add(key, value, "mutation harness")
+    if with_self_tests:
+        for key, value in api_compat_self_tests(root).items():
+            add(key, value, "verify.py --self-test")
+    add("FOUNDATION", current_foundation(root), "docs/foundation-*-evidence.md")
+
+    if conflicts:
+        raise Failure("two reports disagree: " + "; ".join(sorted(conflicts)))
+    return facts
+
+
+def normative_lines(text: str) -> list[tuple[int, str]]:
+    """Every line outside a historical region, with its 1-based number.
+
+    A marker counts only when it is the whole line. `plan.md`'s rule 11 names
+    both markers in its prose, and a substring test let that sentence switch
+    policing off for the rest of the file it appears in -- the gate silently
+    halved its own claim count, which is how this was found.
+    """
+    out, historical = [], False
+    for number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if stripped == HISTORICAL_OPEN:
+            historical = True
+            continue
+        if stripped == HISTORICAL_CLOSE:
+            historical = False
+            continue
+        if not historical:
+            out.append((number, line))
+    return out
+
+
+def check_document(path: Path, facts: dict[str, int], relative: str) -> tuple[list[str], int]:
+    findings: list[str] = []
+    checked = 0
+    foundation = facts["FOUNDATION"]
+    lines = normative_lines(path.read_text(encoding="utf-8"))
+
+    for number, line in lines:
+        for match in TOKEN.finditer(line):
+            key, value = match.group(1), int(match.group(2))
+            if key not in facts or key == "FOUNDATION":
+                continue
+            checked += 1
+            if value != facts[key]:
+                findings.append(
+                    f"{relative}:{number}: {key}={value} but the generated "
+                    f"evidence says {key}={facts[key]}"
+                )
+
+    # The Foundation claims run over the joined normative text so a claim that
+    # wraps across a line break is still one claim.
+    joined = "\n".join(line for _, line in lines)
+    starts, offset = [], 0
+    for _, line in lines:
+        starts.append(offset)
+        offset += len(line) + 1
+
+    def line_of(position: int) -> int:
+        index = 0
+        while index + 1 < len(starts) and starts[index + 1] <= position:
+            index += 1
+        return lines[index][0] if lines else 0
+
+    for pattern in FOUNDATION_CLAIM_PATTERNS:
+        for match in pattern.finditer(joined):
+            checked += 1
+            if int(match.group(1)) != foundation:
+                findings.append(
+                    f"{relative}:{line_of(match.start())}: normative status names "
+                    f"Foundation {match.group(1)} but the current Foundation is "
+                    f"{foundation}"
+                )
+    return findings, checked
+
+
+def regenerate_and_compare(
+    root: Path,
+    symbol_graph: Path | None,
+    cna_include: Path | None,
+    library: Path | None,
+) -> tuple[list[str], int]:
+    """A committed generated report must be what a live run writes now."""
+    findings: list[str] = []
+    compared = 0
+    with tempfile.TemporaryDirectory(prefix="cna-status-gate-") as raw:
+        temporary = Path(raw)
+
+        def compare(committed: Path, fresh: Path, command: str) -> None:
+            nonlocal compared
+            compared += 1
+            if not fresh.exists():
+                findings.append(f"{command} wrote nothing")
+            elif committed.read_bytes() != fresh.read_bytes():
+                findings.append(
+                    f"docs/generated/{committed.name} is stale: {command} "
+                    f"produces different bytes"
+                )
+
+        if symbol_graph is not None:
+            report = temporary / "api-compat-report.json"
+            inventory = temporary / "missing-type-inventory.md"
+            subprocess.run(
+                [sys.executable, "tools/api_compat/verify.py",
+                 "--symbol-graph", str(symbol_graph),
+                 "--output", str(report),
+                 "--inventory-output", str(inventory)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(GENERATED / "api-compat-report.json", report,
+                    "tools/api_compat/verify.py")
+            compare(GENERATED / "missing-type-inventory.md", inventory,
+                    "tools/api_compat/verify.py --inventory-output")
+            graph = temporary / "dependency-graph.json"
+            subprocess.run(
+                [sys.executable, "tools/api_compat/dependency_graph.py",
+                 "--report", str(GENERATED / "api-compat-report.json"),
+                 "--output", str(graph)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(GENERATED / "dependency-graph.json", graph,
+                    "tools/api_compat/dependency_graph.py")
+
+        if cna_include is not None and library is not None:
+            abi = temporary / "native-abi-report.json"
+            subprocess.run(
+                [sys.executable, "tools/native_abi/verify.py",
+                 "--cna-include", str(cna_include),
+                 "--library", str(library),
+                 "--output", str(abi)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(GENERATED / "native-abi-report.json", abi,
+                    "tools/native_abi/verify.py")
+    return findings, compared
+
+
+SELF_TEST_DOCUMENT = """# A document
+
+<!-- status-gate:historical -->
+Foundation Milestones 1 through 3 are complete. COMPLETE_TYPES=1
+<!-- status-gate:/historical -->
+
+Foundation Milestones 1 through 57 are
+complete.
+COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 UNPOLICED_KEY=999
+"""
+
+
+def self_test() -> int:
+    """Every rule here must be shown to fail on a realistic defect."""
+    checks = 0
+    failures: list[str] = []
+
+    def expect(condition: bool, description: str) -> None:
+        nonlocal checks
+        checks += 1
+        if not condition:
+            failures.append(description)
+
+    facts = {"FOUNDATION": 57, "COMPLETE_TYPES": 150, "BOUND_FUNCTIONS": 87}
+    with tempfile.TemporaryDirectory(prefix="cna-status-gate-self-") as raw:
+        temporary = Path(raw)
+        clean = temporary / "clean.md"
+        clean.write_text(SELF_TEST_DOCUMENT, encoding="utf-8")
+        findings, checked = check_document(clean, facts, "clean.md")
+        expect(findings == [], f"the clean document must pass, got {findings}")
+        expect(checked == 3, f"the clean document must check 3 claims, got {checked}")
+
+        # A stale count.
+        stale_count = temporary / "count.md"
+        stale_count.write_text(
+            SELF_TEST_DOCUMENT.replace("COMPLETE_TYPES=150", "COMPLETE_TYPES=135"),
+            encoding="utf-8")
+        findings, _ = check_document(stale_count, facts, "count.md")
+        expect(len(findings) == 1 and "COMPLETE_TYPES=135" in findings[0],
+               f"a stale count must be caught, got {findings}")
+
+        # A stale native-ABI count, which is the second class that drifted.
+        stale_abi = temporary / "abi.md"
+        stale_abi.write_text(
+            SELF_TEST_DOCUMENT.replace("BOUND_FUNCTIONS=87", "BOUND_FUNCTIONS=55"),
+            encoding="utf-8")
+        findings, _ = check_document(stale_abi, facts, "abi.md")
+        expect(len(findings) == 1 and "BOUND_FUNCTIONS=55" in findings[0],
+               f"a stale ABI count must be caught, got {findings}")
+
+        # A stale Foundation number, which is the defect this gate was built
+        # for. It is wrapped across a line break exactly as `plan.md`'s was,
+        # because a line-by-line gate does not see that one at all.
+        stale_foundation = temporary / "foundation.md"
+        stale_foundation.write_text(
+            SELF_TEST_DOCUMENT.replace(
+                "Foundation Milestones 1 through 57 are\ncomplete.",
+                "Foundation Milestones 1 through 47 are\ncomplete."),
+            encoding="utf-8")
+        findings, _ = check_document(stale_foundation, facts, "foundation.md")
+        expect(len(findings) == 1 and "Foundation 47" in findings[0],
+               f"a stale Foundation number must be caught, got {findings}")
+        expect("foundation.md:7:" in (findings[0] if findings else ""),
+               f"the finding must name the line the claim starts on, got {findings}")
+
+        # The historical region must not be policed, and must not be the reason
+        # the clean document passes either.
+        without_markers = temporary / "unmarked.md"
+        without_markers.write_text(
+            SELF_TEST_DOCUMENT.replace(HISTORICAL_OPEN, "").replace(HISTORICAL_CLOSE, ""),
+            encoding="utf-8")
+        findings, _ = check_document(without_markers, facts, "unmarked.md")
+        expect(len(findings) == 2,
+               f"unmarking the historical region must expose its two stale claims, "
+               f"got {findings}")
+
+        # A document that *names* the marker in its prose must stay policed.
+        # A substring test here switched policing off for the rest of `plan.md`
+        # the moment rule 11 described the marker.
+        names_marker = temporary / "names.md"
+        names_marker.write_text(
+            SELF_TEST_DOCUMENT.replace(
+                "COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 UNPOLICED_KEY=999",
+                f"prose that mentions `{HISTORICAL_OPEN}` in passing.\n"
+                f"COMPLETE_TYPES=135 BOUND_FUNCTIONS=87 UNPOLICED_KEY=999"),
+            encoding="utf-8")
+        findings, _ = check_document(names_marker, facts, "names.md")
+        expect(len(findings) == 1 and "COMPLETE_TYPES=135" in findings[0],
+               f"naming the marker in prose must not disable policing, got {findings}")
+
+        # A key no generated report derives is not invented into a claim.
+        unpoliced = temporary / "unpoliced.md"
+        unpoliced.write_text(
+            SELF_TEST_DOCUMENT.replace("UNPOLICED_KEY=999", "UNPOLICED_KEY=1"),
+            encoding="utf-8")
+        findings, _ = check_document(unpoliced, facts, "unpoliced.md")
+        expect(findings == [], "an underived key must not be policed")
+
+        # The current Foundation is read off the evidence files, so a new
+        # milestone's evidence moves it and prose alone cannot.
+        fake = temporary / "repo"
+        (fake / "docs").mkdir(parents=True)
+        for name in ["foundation-3-x-evidence.md", "foundation-57-y-evidence.md"]:
+            (fake / "docs" / name).write_text("", encoding="utf-8")
+        expect(current_foundation(fake) == 57,
+               "the current Foundation is the highest evidence file")
+        (fake / "docs" / "foundation-58-z-evidence.md").write_text("", encoding="utf-8")
+        expect(current_foundation(fake) == 58,
+               "a landed milestone's evidence file moves the current Foundation")
+
+    for failure in failures:
+        print(f"  SELF_TEST_FAILURE {failure}")
+    print(f"STATUS_GATE_SELF_TESTS={checks} "
+          f"STATUS_GATE_SELF_TEST_STATUS={'PASS' if not failures else 'FAIL'}")
+    return 0 if not failures else 1
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--self-test", action="store_true")
+    parser.add_argument("--symbol-graph", type=Path,
+                        help="regenerate the strict report, inventory and dependency "
+                             "graph from this Symbol Graph and require the committed "
+                             "copies to match")
+    parser.add_argument("--cna-include", type=Path,
+                        help="regenerate the native ABI report and require the "
+                             "committed copy to match")
+    parser.add_argument("--library", type=Path)
+    args = parser.parse_args()
+
+    if args.self_test:
+        return self_test()
+
+    try:
+        facts = derive_facts()
+    except Failure as failure:
+        print(f"STATUS_GATE_STATUS=FAIL {failure}")
+        return 1
+
+    findings: list[str] = []
+    checked = 0
+    for relative in NORMATIVE_DOCUMENTS:
+        path = ROOT / relative
+        if not path.exists():
+            findings.append(f"{relative} is absent")
+            continue
+        document_findings, document_checked = check_document(path, facts, relative)
+        findings += document_findings
+        checked += document_checked
+
+    fresh_findings, compared = regenerate_and_compare(
+        ROOT, args.symbol_graph, args.cna_include, args.library)
+    findings += fresh_findings
+
+    for finding in findings:
+        print(f"  {finding}")
+    print(f"STATUS_GATE_FOUNDATION={facts['FOUNDATION']} "
+          f"STATUS_GATE_DERIVED_FACTS={len(facts)} "
+          f"STATUS_GATE_CLAIMS_CHECKED={checked} "
+          f"STATUS_GATE_REPORTS_COMPARED={compared} "
+          f"STATUS_GATE_FINDINGS={len(findings)} "
+          f"STATUS_GATE_STATUS={'PASS' if not findings else 'FAIL'}")
+    return 0 if not findings else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

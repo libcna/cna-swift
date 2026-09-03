@@ -1,19 +1,24 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 57.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 58.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
 
 ## Where the work stands
 
-Twenty-two local commits on `develop`. Reproduce the numbers rather than trust
-them:
+Reproduce the numbers rather than trust them — and note that
+`tools/status_gate/verify.py` now compares every one of them, in this file and
+in `plan.md` and `README.md`, against the generated reports:
 
 ```bash
 git rev-list --count origin/develop..HEAD
 python3 tools/api_compat/verify.py --symbol-graph \
   .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json
+python3 tools/status_gate/verify.py \
+  --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
+  --cna-include /path/to/cnanext/modules/c-api/include \
+  --library "$CNA_NATIVE_LIBRARY"
 ```
 
 ```text
@@ -139,6 +144,13 @@ These are the ones that cost the most to relearn:
    message half of it automatically; nothing yet catches the rest.
 7. **`plan.md` and the diagnostic block in `README.md` must move with the
    numbers.** They are updated in the same commit as the work, never after.
+   Foundation 58 made that a gate rather than a habit, because it had already
+   failed: `plan.md` opened at Foundation 47 while the tree was at 57, and
+   `docs/generated/native-abi-report.json` was itself forty-seven routes stale.
+   `tools/status_gate/verify.py` derives the current Foundation from the highest
+   evidence file, derives every policed count from the generated reports,
+   *and* regenerates four of those reports to prove they are what a live run
+   still produces.
 
 ## The gates, and what each is for
 
@@ -158,6 +170,11 @@ python3 tools/api_compat/message_coverage.py --self-test|--mutations|(report)
 python3 tools/api_compat/pinned_assembly_audit.py …
 python3 tools/api_compat/bcl_authority_audit.py … --cross-check --negative-control …×4
 python3 tools/runtime_capabilities/render.py --check
+python3 tools/status_gate/verify.py --self-test
+python3 tools/status_gate/verify.py \
+  --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
+  --cna-include /path/to/cnanext/modules/c-api/include \
+  --library "$CNA_NATIVE_LIBRARY"
 python3 tools/gamepad_native/run.py --library … --output …
 cd ../cna-swift-template && swift run HelloGame --frames 600
 ```
@@ -194,8 +211,10 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 57 have landed since. Nothing here is
+> Foundation Milestones 37 through 58 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
+
+<!-- status-gate:historical -->
 
 **Foundation Milestones 30 through 36: COMPLETE.** Eleven local commits, none
 pushed.

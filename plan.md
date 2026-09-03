@@ -1,21 +1,30 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 47 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 58 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
 `IGraphicsDeviceService` producer with `DrawableGameComponent`, the four
 graphics state objects, `System.ObjectDisposedException` as the seventh
 admitted BCL exception authority, `VertexDeclaration` with the validator behind
-it, `IVertexType` with the four vertex structs, and the graphics device's
+it, `IVertexType` with the four vertex structs, the graphics device's
 own state members over real CNA routes, its viewport writer, scissor
-rectangle and status.
+rectangle and status, and — since Foundation 48 — the whole of what reading the
+pinned IL member by member has turned up: `Clear`'s depth buffer, the viewport
+and scissor validation, the message-coverage gate itself, the manager's
+preferences and its disposal, `SpriteBatch`'s five `Draw` overloads and its
+state-taking `Begin`s, `Texture2D`'s constructors, the method-generic mapping
+the verifier could not previously express, and `SetData`/`GetData`.
 
-This file states what is true **now**. The milestone-by-milestone progression
-lives in `NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md`
-files, which are not summarised away here; where this document once carried a
-milestone's own prose, that milestone's evidence file carries it still.
+This file states what is true **now**, and a gate keeps that literal:
+`tools/status_gate/verify.py` derives the current Foundation from the highest
+`docs/foundation-<N>-*-evidence.md` on disk and every policed count from the
+generated reports, then refuses any normative sentence here, in `README.md` or
+in `NEXT.md` that disagrees. The milestone-by-milestone progression lives in
+`NEXT.md` and in the per-milestone `docs/foundation-*-evidence.md` files, which
+are not summarised away here; where this document once carried a milestone's own
+prose, that milestone's evidence file carries it still.
 
 ## Normative rules
 
@@ -121,6 +130,17 @@ milestone's own prose, that milestone's evidence file carries it still.
     `tools/native_abi/mutations.py`, `tools/projection_mutations/run.py`, the
     API verifier's self-tests and graph fixtures, the pinned-assembly audit's
     mutations and the BCL authority's negative controls are all of this kind.
+11. **A normative status claim is derived, never remembered.** The current
+    Foundation is the highest `docs/foundation-<N>-*-evidence.md` on disk and
+    every policed count comes out of a generated report;
+    `tools/status_gate/verify.py` refuses any sentence in this file, `README.md`
+    or `NEXT.md` that disagrees, and additionally regenerates the strict report,
+    the missing-type inventory, the dependency graph and the native ABI report
+    to prove each committed copy is still what a live run produces. Historical
+    prose is exempt only inside an explicit `<!-- status-gate:historical -->`
+    region and is never deleted to make a claim true. Both failures this rule
+    exists for had already happened: see
+    `docs/foundation-58-normative-status-gate-evidence.md`.
 
 ## Measurement status
 
