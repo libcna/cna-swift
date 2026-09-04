@@ -149,7 +149,7 @@ extension Microsoft.Xna.Framework.Graphics {
                     ProfileCapabilities.profileFormatNotSupported,
                     "Texture2D", "\(format)")
             }
-            guard width <= maxTextureSize, height <= maxTextureSize else {
+            guard width <= maxTextureSize * 4, height <= maxTextureSize * 4 else {
                 try throwNotSupported(
                     ProfileCapabilities.profileTooBig,
                     "Texture2D", "\(maxTextureSize)")
@@ -194,7 +194,7 @@ extension Microsoft.Xna.Framework.Graphics {
         /// `IndexBuffer.CreateBuffer`'s two profile checks, in the IL's order:
         /// the 32-bit refusal comes **before** the size comparison.
         internal func validateIndexBuffer(elementSizeInBytes: Int, size: Int) throws {
-            if false, !indexElementSize32 {
+            if elementSizeInBytes == 4, !indexElementSize32 {
                 try throwNotSupported(
                     ProfileCapabilities.profileNoIndexElementSize32)
             }

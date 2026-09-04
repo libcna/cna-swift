@@ -112,8 +112,18 @@ ArgumentOutOfRange_MustBeNonNegNum 2
 ```
 
 Only the first is admitted today; the rest are the milestone's resource work.
-Note that `StringBuilder`'s indexer raises **`IndexOutOfRangeException`**, not
-`ArgumentOutOfRangeException` — a trap worth a test.
+
+**Two asymmetries already read out of the IL**, both of the kind a
+reimplementation gets wrong:
+
+* `get_Chars` raises a **bare `IndexOutOfRangeException()`** — no message, no
+  parameter name — while `set_Chars` raises
+  `ArgumentOutOfRangeException("index", ArgumentOutOfRange_Index)`. One
+  indexer, two exception types, for the same kind of mistake.
+* `set_Length` refuses a negative value with `ArgumentOutOfRange_NegativeLength`
+  and a value above `MaxCapacity` with `ArgumentOutOfRange_SmallCapacity` —
+  both naming `"value"`. Growing then appends `'\0'` repeated; shrinking
+  truncates.
 
 **The admission, in order.** A `selectedFamilies` entry in
 `bcl-authorities.json` with its reason; `--write-manifest` to pin the shape;
