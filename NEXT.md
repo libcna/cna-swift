@@ -589,6 +589,58 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
+### The package-qualification gate has been red since commit `805b4cd`
+
+**Found at the Foundation 71 handoff, by running a gate that plan.md names as a
+completion requirement and that nothing had actually run for forty-one
+commits.**
+
+`tools/package_qualification/verify.py` carries its own `ArchiveCanary` source,
+which a fresh consumer compiles against the archived package. That canary
+asserts refusals through `CNAError.argument`, `.argumentOutOfRange`,
+`.collectionModified` and `.notSupported` — **111 compile errors**, because
+commit `805b4cd` *"raise the exact projected CLR and XNA exceptions"* removed
+those cases in favour of the projected CLR exception classes. The canary was
+never updated with them.
+
+The report on disk was **last written by that same commit**, so it has recorded
+`DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS` ever since,
+against an archive whose SHA no longer matches anything. Forty-one commits and
+a great many milestones have claimed this gate green.
+
+**Why nothing caught it.** The status gate's freshness half regenerates and
+byte-compares four reports — api-compat, missing-type-inventory,
+dependency-graph, native-abi. `package-qualification-report.json` is not among
+them, so a stale copy of it is read as truth, which is precisely the failure
+that half of the gate exists to prevent. Adding it costs a consumer build per
+verification, which is why it presumably was not; **the cheap alternative is to
+compare the report's recorded archive SHA against a fresh `git archive` of
+`HEAD` and fail when they differ**, which needs no build at all.
+
+**What is needed.** Rewrite the canary's assertions against the projected
+exception classes (`CNAArgumentException`, `CNAArgumentOutOfRangeException`,
+`CNANotSupportedException`, and whatever now carries the collection-modified
+refusal), re-run the qualification, and wire the SHA check into the status gate
+so it cannot go stale again. Twenty-nine call sites inside the tool; the errors
+cluster into four patterns.
+
+**Not attempted here on purpose.** It was found at the end of a long session
+and a rushed rewrite of a canary — the thing whose whole job is to be exactly
+right about refusals — is worse than an honest red gate written down. The
+qualification is the ONE handoff gate that is not green; everything else in
+this session's sequence passes, including ASan, TSan and the twenty-gate
+sequence.
+
+**One repair was made** while the failure was being diagnosed: the tool built
+its consumer in a `tempfile.TemporaryDirectory` under `/tmp`, which the build
+rules forbid outright — measured at 3.5 TB of SSD writes in five days. It now
+builds in `build-consumer/`, which those same rules name for exactly this
+("standalone consumer fixtures, ALL tickets share this one"). Independence is
+kept by emptying the extraction and consumer directories first; what survives
+is the `.build` scratch, which is the point.
+
+
+
 ### `CNAStringBuilder.Capacity` is a lower bound, and now says so
 
 **Decided in Foundation 71's follow-up.** .NET computes `Capacity` as
@@ -607,6 +659,181 @@ What is now promised and pinned by a test: `Capacity >= Length` always,
 XNA's. What is not promised is the value .NET would have chosen after a growth.
 The property's own documentation carries the same, so the next reader meets it
 where the code is.
+
+### 1. A CLR exception class is a Swift class conforming to `Error`
+
+```text
+System.Exception                                 ->  CNAException : Error
+System.SystemException                           ->  CNASystemException
+System.Runtime.InteropServices.ExternalException ->  CNAExternalException
+```
+
+The chain is **three links, not two**: `ExternalException`'s exact direct base
+is `SystemException`, whose constructors substitute their own message and set
+HResult `0x80131501` before `ExternalException` overwrites it with
+`0x80004005`. `CNAError` stays a separate channel, is not a `CNAException`, and
+a `catch is CNAException` does not swallow it.
+
+Selected surface: `Message`, `InnerException`, `HResult`, `HelpLink`,
+`GetBaseException`, `ExternalException.ErrorCode` — every member reconstructible
+from managed state. `StackTrace`, `Source`, `TargetSite`, `Data`,
+`GetObjectData`, `GetType` and `ToString` each need a CLR runtime service and
+are **forbidden** by the verifier rather than answered with something plausible.
+
+### 2. `Dictionary<K,V>` is a reference class with the CLR's own storage
+
+Buckets, an entry array, a free list and a version counter, so the observable
+behaviour follows from the algorithm: a removed slot is reused by the next
+insertion, the free list is last-freed-first, and clearing an already empty
+dictionary does not invalidate an enumerator.
+
+The fact that settles the hash question: **an entry's index comes from `count++`
+or the free list, never from its hash**, so enumeration order is reproducible
+without reproducing a single CLR hash code. A caller-supplied comparer is exact,
+including that one whose hash disagrees with its equality cannot find its own
+entries.
+
+### 3. `System.Attribute` — the base carries identity, not members
+
+Its public surface is overwhelmingly reflection and is forbidden. The one
+widening is recorded: Swift has neither `abstract` nor `protected`, so
+`CNAAttribute()` compiles where `new Attribute()` does not.
+
+### 4. `System.Type` is the Swift metatype
+
+The contract names it in **twenty-four positions and calls a member on it in
+none**, so the selected surface is identity and assignability — and
+`_openExistential` reproduces `Type.IsAssignableFrom` exactly, including
+protocol conformance and class inheritance. Probed before the decision, not
+after.
+
+### 5. The `Game` base bodies own the managed component semantics
+
+`Initialize`, `Update` and `Draw` are no longer empty. The `LoadContent`
+dispatch question was answered by **measuring the host**:
+
+```text
+RunOneFrame  Initialize, LoadContent, Update, Draw, UnloadContent
+Run          Initialize, LoadContent, BeginRun, Update, EndRun, UnloadContent
+```
+
+which is XNA's `RunGame` sequence exactly, so the native `load_content`
+callback **is** the projection of the `LoadContent()` call inside
+`Game.Initialize()`. One occurrence, one invocation. The measurement is a
+permanent test.
+
+# Historical: the Foundation 30–36 handoff
+
+> **The handoff written at the end of the Foundation 30-36 session, kept as
+> that session's record.** It is not the current state and is not maintained:
+> Foundation Milestones 37 through 71 have landed since. Nothing here is
+> deleted, because the measurements it records were real when it was written.
+
+<!-- status-gate:historical -->
+
+**Foundation Milestones 30 through 36: COMPLETE.** Eleven local commits, none
+pushed.
+
+Resolve HEAD and the unpublished count from live Git rather than from this
+file — any number written here invalidates itself the moment the next
+documentation commit is made:
+
+```text
+git rev-list --count origin/develop..HEAD
+git log --oneline --decorate origin/develop..HEAD
+git status --short --branch
+```
+
+| Commit | What it is |
+|---|---|
+| `56a72e4` | The CLR exception families as real Swift `Error` classes, and eight XNA exception types. |
+| `8171fa7` | `Dictionary<K,V>` as a reference class, and `LaunchParameters`. |
+| `68527e7` | The generated report echoed the caller's absolute symbol-graph path. |
+| `31a787c` | The nullability analyser did not understand `String.IsNullOrEmpty`. |
+| `654ff5c` | `System.Attribute` and the five `ContentSerializer*` types. |
+| `eede22b` | `LaunchParameters` parses the command line; `SetItem` does not throw. |
+| `9e61538` | The managed `Game` component engine. |
+| `d9f2d93` | `GameComponent`. |
+| `1db5e83` | XNA's own resource strings pinned; eight messages corrected. |
+| `eea67d1` | `System.Type` as the Swift metatype, and `GameServiceContainer`. |
+| `8f248aa` | The support-hierarchy checks made runtime tests. |
+
+Everything at and before `7b59ceb` is untouched.
+
+## START — the state this session began from, reproduced exactly
+
+```text
+BRANCH=develop   HEAD == origin/develop == 7b59ceb   WORKTREE_CLEAN=true
+TARGET 126/1706  TOTAL_DIAGNOSTICS 284  COMPLETE 121  MISSING_TYPE 131
+MISSING_MEMBER 130  PARTIAL 5  EXPECTED_SWIFT_MEMBERS 2887
+BCL_INHERITED_MEMBER_PROJECTIONS 16  PROPERTY_MAPPING_MISMATCH 4
+OVERLOAD_MAPPING_MISMATCH 16  NATIVE_ABI 29/91/91/18/2/214
+```
+
+Verified live before any work; every number matched.
+
+## Structural scoreboard
+
+```text
+REFERENCE_TYPES=257                  unchanged
+REFERENCE_MEMBERS=2964               unchanged
+EXPECTED_SWIFT_MEMBERS=2887          unchanged
+TARGET_TYPES=142                     (126 -> 142)
+TARGET_MEMBERS=1767                  (1706 -> 1767)
+TOTAL_DIAGNOSTICS=269                (284 -> 269)
+COMPLETE_TYPES=135                   (121 -> 135)
+PARTIAL_TYPES=6                      (5 -> 7)
+MISSING_TYPE=115                     (131 -> 115)
+MISSING_MEMBER=129                   (130 -> 129)
+BASE_MAPPING_MISMATCH=2              unchanged
+INTERFACE_MAPPING_MISMATCH=1         unchanged
+PROPERTY_MAPPING_MISMATCH=4          unchanged
+OVERLOAD_MAPPING_MISMATCH=18         (16 -> 18, the two deferred serialization ctors)
+INHERITANCE_MAPPING_MISMATCH=0       new rule, green
+LANGUAGE_MAPPING_MISMATCH=0          new check, green
+every other mismatch/leak category=0
+UNMEASURED_STRUCTURAL_CATEGORY=0
+ALLOWLIST_ENTRIES=0
+
+BCL_SUPPORT_TYPE_MEASUREMENTS=10     (3 -> 10)
+BCL_BASE_PROJECTIONS=19              (5 -> 19)
+PROJECTED_BCL_BASE_TYPES=15          (1 -> 15)
+PENDING_BCL_BASE_TYPES=4             unchanged
+BCL_INHERITED_MEMBER_PROJECTIONS=77  (16 -> 77)
+MEASURED_SUPPORT_BASE_PROJECTIONS=23 (9 -> 23)
+NAMESPACE_MARKERS=11                 (10 -> 11, Storage)
+
+BCL_RESOURCE_STRING_PROJECTIONS=8    new
+BCL_STATIC_TABLE_PROJECTIONS=1       new
+XNA_RESOURCE_STRING_PROJECTIONS=4    new
+XNA_SEALED_CLASS_PROJECTIONS=18      new
+BCL_ABSTRACT_BASE_WIDENINGS=1        new, recorded
+NONDERIVABLE_UNSEALED_CLASSES=5      new, RECORDED not diagnosed
+```
+
+**`EXPECTED_SWIFT_MEMBERS` did not move, and should not have.** Every new
+`TARGET_MEMBER` is a declared XNA identity that was already in the pinned
+contract and already counted. The surface those types *inherit* is real and
+usable and is not an XNA identity, so it is counted once on its own axis.
+
+## Sixteen types completed
+
+```text
+Audio.InstancePlayLimitException              Content.ContentSerializerAttribute
+Audio.NoAudioHardwareException                Content.ContentSerializerCollectionItemNameAttribute
+Audio.NoMicrophoneConnectedException          Content.ContentSerializerIgnoreAttribute
+Graphics.DeviceLostException                  Content.ContentSerializerRuntimeTypeAttribute
+Graphics.DeviceNotResetException              Content.ContentSerializerTypeVersionAttribute
+Graphics.NoSuitableGraphicsDeviceException    LaunchParameters
+GameComponent                                 GameServiceContainer
+```
+
+Two more are PARTIAL by exactly one member each —
+`Content.ContentLoadException` and `Storage.StorageDeviceNotConnectedException`
+— see the serialization note below. `Game` gained `Components`,
+`LaunchParameters` and `Services`.
+
+## The decisions this session made
 
 ### 1. A CLR exception class is a Swift class conforming to `Error`
 

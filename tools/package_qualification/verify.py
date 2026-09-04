@@ -10,6 +10,7 @@ import os
 import re
 import stat
 import subprocess
+import shutil
 import tempfile
 import zipfile
 from pathlib import Path
@@ -1210,8 +1211,28 @@ def main() -> int:
                 if any(pattern and pattern in data for pattern in path_patterns):
                     path_leaks.append(name)
 
-        with tempfile.TemporaryDirectory(prefix="cna-swift-archive-consumer-") as temporary:
-            root = Path(temporary)
+        # `build-consumer/`, not a temporary directory under /tmp.
+        #
+        # Two project rules meet here and this is how they reconcile. The
+        # qualification must build a consumer that is INDEPENDENT of this
+        # repository, which a temporary directory gives for free. But the build
+        # rules forbid building anywhere under /tmp, because those builds are
+        # thrown away and rebuilt from scratch every session -- 3.5 TB of SSD
+        # writes in five days, measured -- and they name `build-consumer/` for
+        # exactly this: "standalone consumer fixtures, ALL tickets share this
+        # one".
+        #
+        # Independence is preserved by emptying the directory first: the
+        # consumer is still extracted fresh from the archive and still knows
+        # nothing of the working tree. What is kept across runs is the
+        # `.build` scratch inside it, which is the whole point -- a second
+        # qualification recompiles what changed instead of everything.
+        root = Path(__file__).resolve().parents[2] / "build-consumer"
+        if root.exists():
+            shutil.rmtree(root / "extracted", ignore_errors=True)
+            shutil.rmtree(root / "consumer", ignore_errors=True)
+        root.mkdir(parents=True, exist_ok=True)
+        if True:
             extracted = root / "extracted"
             consumer = root / "consumer"
             archive.extractall(extracted)
