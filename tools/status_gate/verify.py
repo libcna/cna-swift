@@ -175,6 +175,36 @@ def api_compat_self_tests(root: Path = ROOT) -> dict[str, int]:
     return {"API_COMPAT_SELF_TESTS": found["API_COMPAT_SELF_TESTS"]}
 
 
+def planted_mutations(root: Path) -> list[str]:
+    """Any projection mutation left standing in the working tree.
+
+    A mutation is applied to the WORKING TREE while its test runs, so anything
+    that reads the tree during a run sees it — and `git add -A` during a run
+    commits it. That is how `texture-size-limit-not-checked` reached a commit:
+    a profile bound weakened by four, in a tree that was green because the
+    harness had already restored it by the time the tests were re-run.
+
+    The mutation harness knows every replacement string, so asking it is both
+    cheap and exact. This gate runs on every verification, which is the point:
+    "do not commit during a mutation run" is a rule, and this is the part that
+    does not depend on remembering it.
+    """
+    harness = root / "tools/projection_mutations/run.py"
+    if not harness.exists():
+        return ["the projection-mutation harness is absent, so the tree cannot "
+                "be audited for a planted mutation"]
+    result = subprocess.run(
+        [sys.executable, str(harness), "--audit-tree"],
+        capture_output=True, text=True, cwd=root)
+    if result.returncode == 0:
+        return []
+    return [
+        line.strip()
+        for line in result.stdout.splitlines()
+        if line.strip().startswith("PLANTED ")
+    ] or [f"the working-tree mutation audit failed: {result.stdout.strip()}"]
+
+
 def disagreements(summary: dict[str, int]) -> dict[str, int]:
     """Every disagreement category the strict report reports as non-zero.
 
@@ -491,6 +521,19 @@ def self_test() -> int:
         expect(current_foundation(fake) == 58,
                "a landed milestone's evidence file moves the current Foundation")
 
+        # --- the planted-mutation audit ---------------------------------
+        #
+        # A tree with no harness cannot be audited, and saying nothing would
+        # be the wrong answer: the check that cannot run is a finding, not a
+        # pass. The real harness's own two directions are exercised by
+        # `run.py --audit-tree`, which this calls; what is checked here is
+        # that a missing harness is reported rather than skipped.
+        expect(planted_mutations(fake) != [],
+               "a tree with no mutation harness must report that it cannot "
+               "be audited, not pass silently")
+        expect(planted_mutations(ROOT) == [],
+               "the real working tree must hold no planted mutation")
+
     for failure in failures:
         print(f"  SELF_TEST_FAILURE {failure}")
     print(f"STATUS_GATE_SELF_TESTS={checks} "
@@ -534,6 +577,8 @@ def main() -> int:
     fresh_findings, compared = regenerate_and_compare(
         ROOT, args.symbol_graph, args.cna_include, args.library)
     findings += fresh_findings
+
+    findings += planted_mutations(ROOT)
 
     summary = json.loads(
         (GENERATED / "api-compat-report.json").read_text(encoding="utf-8"))["summary"]

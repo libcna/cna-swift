@@ -2616,11 +2616,47 @@ def main() -> int:
     # mutation ends up merged unrun. The filter narrows only which mutations
     # are PLANTED -- every site is still checked for staleness, so a selective
     # run cannot hide a mutation whose site has drifted away.
+    # Auditing the tree for a mutation someone committed.
+    #
+    # A mutation is applied to the WORKING TREE while its test runs, so
+    # anything that reads the tree during a run sees it -- and `git add -A`
+    # during a run commits it. That is not hypothetical: this harness's own
+    # `texture-size-limit-not-checked` reached a commit that way, weakening a
+    # profile bound by four, and it was found by accident when the run was
+    # killed and left the file's *repair* as the visible diff.
+    #
+    # "Do not commit during a run" is a rule, and rules of that shape get
+    # broken. This is the mechanical version, and it is cheap: every
+    # mutation's replacement text is a string this file already holds.
+    parser.add_argument(
+        "--audit-tree", action="store_true",
+        help="report any mutation's replacement text present in the working "
+             "tree, and change nothing")
     parser.add_argument(
         "--only", default=None,
         help="plant only the mutations whose name contains one of these "
              "comma-separated substrings")
     args = parser.parse_args()
+
+    if args.audit_tree:
+        planted = []
+        for name, _description, path, old_text, new_text in MUTATIONS:
+            if not path.exists():
+                continue
+            text = path.read_text(encoding="utf-8")
+            # The replacement present AND the original absent is what
+            # distinguishes a planted mutation from a replacement string that
+            # merely happens to occur -- several are substrings of ordinary
+            # code.
+            if new_text in text and old_text not in text:
+                planted.append((name, path))
+        print(f"PROJECTION_MUTATION_TREE_AUDIT={len(MUTATIONS)} "
+              f"PLANTED={len(planted)}")
+        for name, path in planted:
+            print(f"  PLANTED {name}: {path} holds this mutation's replacement "
+                  "text and not its original")
+        return 1 if planted else 0
+
     tree_lock = acquire_tree_lock("projection_mutations")
     if tree_lock is None:
         print("MUTATION_GATE=BUSY — another mutation harness holds "

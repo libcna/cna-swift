@@ -149,7 +149,7 @@ extension Microsoft.Xna.Framework.Graphics {
                     ProfileCapabilities.profileFormatNotSupported,
                     "Texture2D", "\(format)")
             }
-            guard width <= maxTextureSize * 4, height <= maxTextureSize * 4 else {
+            guard width <= maxTextureSize, height <= maxTextureSize else {
                 try throwNotSupported(
                     ProfileCapabilities.profileTooBig,
                     "Texture2D", "\(maxTextureSize)")
