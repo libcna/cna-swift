@@ -133,6 +133,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CantDisableLighting",
+      "reason": "EnvironmentMapEffect and SkinnedEffect implement IEffectLights.LightingEnabled EXPLICITLY: the getter of each is `ldc.i4.1; ret` and the setter raises NotSupportedException(Format(CantDisableLighting, GetType().Name)) for false. CNA refuses the same call independently with a message of its own, so the managed message is the one a caller must be shown."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "reason": "VertexElementValidator.Validate raises ArgumentException with this when two elements share a VertexElementUsage and UsageIndex, formatted with the later element's own pair."
     },
@@ -262,6 +267,16 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ScissorInvalid",
       "reason": "GraphicsDevice.set_ScissorRectangle raises ArgumentException with this from three branches: a negative field, an edge past the current render target's bounds, and an extent past them that only an int32 overflow can reach."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "SkinnedEffectMaxBones",
+      "reason": "One message serves both bone-transform members and they raise different exceptions with it: SetBoneTransforms raises ArgumentException(Format(SkinnedEffectMaxBones, 72)) with NO paramName for an array longer than MaxBones, and GetBoneTransforms raises ArgumentOutOfRangeException(\"count\", Format(SkinnedEffectMaxBones, 72)) for the same bound. Both 72s are the pinned MaxBones field."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "SkinnedEffectWeightsPerVertex",
+      "reason": "SkinnedEffect.set_WeightsPerVertex accepts 1, 2 or 4 and raises ArgumentOutOfRangeException(\"value\", SkinnedEffectWeightsPerVertex) for anything else -- three beq tests and then the throw, which is why the accessor is pinned IL_DIRECT_THROW rather than reachable through a parameter."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

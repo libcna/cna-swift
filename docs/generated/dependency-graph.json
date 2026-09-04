@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 20,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 18,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
@@ -23,7 +23,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 22,
+      "transitiveMissingReverseReach": 14,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -100,23 +100,6 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.Graphics.DirectionalLight",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.EffectParameter",
-        "Microsoft.Xna.Framework.Vector3"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.BasicEffect",
-        "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect",
-        "Microsoft.Xna.Framework.Graphics.IEffectLights",
-        "Microsoft.Xna.Framework.Graphics.SkinnedEffect"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 4,
-      "transitivePartialReverseReach": []
-    },
-    {
       "type": "Microsoft.Xna.Framework.Audio.AudioCategory",
       "dependencies": [
         "Microsoft.Xna.Framework.Audio.AudioStopOptions"
@@ -166,6 +149,19 @@
       "dependencyComplete": true,
       "directMissingReverseConsumers": [
         "Microsoft.Xna.Framework.Audio.SoundBank"
+      ],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 1,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.MediaSource",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Media.MediaSourceType"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.Media.MediaLibrary"
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 1,

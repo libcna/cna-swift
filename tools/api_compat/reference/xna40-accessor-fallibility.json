@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "referenceSha256": "7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc",
+  "referenceSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d",
   "assemblies": [
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
@@ -39,7 +39,7 @@
     "ACCESSOR_ABSENT": "the CLR property does not declare this accessor",
     "IL_ACCESSOR_NOT_FOUND": "the contract declares an accessor the IL does not; a hard error"
   },
-  "SELF_TESTS": 34,
+  "SELF_TESTS": 41,
   "SELF_TEST_STATUS": "PASS",
   "selfTestFailures": [],
   "PROPERTIES": 840,
@@ -47,7 +47,7 @@
   "SETTERS": 279,
   "INDEXED_PROPERTIES": 24,
   "THROWING_GETTERS": 114,
-  "THROWING_SETTERS": 113,
+  "THROWING_SETTERS": 114,
   "UNRESOLVED_ACCESSORS": [],
   "entries": [
     {
@@ -11979,15 +11979,26 @@
         "fallible": false,
         "evidence": "IL_ABSTRACT_DECLARATION",
         "implementors": [
-          "Microsoft.Xna.Framework.Graphics.BasicEffect::get_LightingEnabled/0"
+          "Microsoft.Xna.Framework.Graphics.BasicEffect::get_LightingEnabled/0",
+          "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect::Microsoft.Xna.Framework.Graphics.IEffectLights.get_LightingEnabled/0",
+          "Microsoft.Xna.Framework.Graphics.SkinnedEffect::Microsoft.Xna.Framework.Graphics.IEffectLights.get_LightingEnabled/0"
         ],
         "method": "get_LightingEnabled"
       },
       "setter": {
-        "fallible": false,
+        "fallible": true,
         "evidence": "IL_ABSTRACT_DECLARATION",
+        "exceptions": [
+          "System.NotSupportedException"
+        ],
+        "chain": [
+          "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect::Microsoft.Xna.Framework.Graphics.IEffectLights.set_LightingEnabled/1",
+          "Microsoft.Xna.Framework.Graphics.SkinnedEffect::Microsoft.Xna.Framework.Graphics.IEffectLights.set_LightingEnabled/1"
+        ],
         "implementors": [
-          "Microsoft.Xna.Framework.Graphics.BasicEffect::set_LightingEnabled/1"
+          "Microsoft.Xna.Framework.Graphics.BasicEffect::set_LightingEnabled/1",
+          "Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect::Microsoft.Xna.Framework.Graphics.IEffectLights.set_LightingEnabled/1",
+          "Microsoft.Xna.Framework.Graphics.SkinnedEffect::Microsoft.Xna.Framework.Graphics.IEffectLights.set_LightingEnabled/1"
         ],
         "method": "set_LightingEnabled"
       }
@@ -12147,6 +12158,12 @@
       "getter": {
         "fallible": false,
         "evidence": "IL_ABSTRACT_DECLARATION",
+        "implementors": [
+          "Microsoft.Xna.Framework.Graphics.VertexPositionColor::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0",
+          "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0",
+          "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0",
+          "Microsoft.Xna.Framework.Graphics.VertexPositionTexture::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0"
+        ],
         "method": "get_VertexDeclaration"
       },
       "setter": {

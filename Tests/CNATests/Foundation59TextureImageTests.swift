@@ -448,14 +448,14 @@ final class Foundation59TextureImageTests: XCTestCase {
         let game = try run { game, device in
             let texture = try G.Texture2D(graphicsDevice: device, width: 2, height: 2)
             var announced = 0
-            _ = try texture.Disposing.Add { _, _ in announced += 1 }
+            _ = texture.Disposing.Add { _, _ in announced += 1 }
             try texture.Dispose(false)
             game.observations["finalizer announced"] = "\(announced)"
             game.observations["finalizer disposed"] = "\(texture.IsDisposed)"
 
             let second = try G.Texture2D(graphicsDevice: device, width: 2, height: 2)
             var announcedSecond = 0
-            _ = try second.Disposing.Add { _, _ in announcedSecond += 1 }
+            _ = second.Disposing.Add { _, _ in announcedSecond += 1 }
             try second.Dispose(true)
             game.observations["disposing announced"] = "\(announcedSecond)"
             game.observations["disposing disposed"] = "\(second.IsDisposed)"
@@ -477,14 +477,14 @@ final class Foundation59TextureImageTests: XCTestCase {
         let game = try run { game, device in
             let batch = try G.SpriteBatch(graphicsDevice: device)
             var announced = 0
-            _ = try batch.Disposing.Add { _, _ in announced += 1 }
+            _ = batch.Disposing.Add { _, _ in announced += 1 }
             try batch.Dispose(false)
             game.observations["finalizer announced"] = "\(announced)"
             game.observations["finalizer disposed"] = "\(batch.IsDisposed)"
 
             let second = try G.SpriteBatch(graphicsDevice: device)
             var announcedSecond = 0
-            _ = try second.Disposing.Add { _, _ in announcedSecond += 1 }
+            _ = second.Disposing.Add { _, _ in announcedSecond += 1 }
             try second.Dispose(true)
             game.observations["disposing announced"] = "\(announcedSecond)"
             game.observations["disposing disposed"] = "\(second.IsDisposed)"
@@ -509,7 +509,7 @@ final class Foundation59TextureImageTests: XCTestCase {
             game.observations["registered"] =
                 "\(target.contentLostRegistration != 0)"
             var announced = 0
-            _ = try target.Disposing.Add { _, _ in announced += 1 }
+            _ = target.Disposing.Add { _, _ in announced += 1 }
             try target.Dispose(true)
             game.observations["announced"] = "\(announced)"
             game.observations["disposed"] = "\(target.IsDisposed)"

@@ -204,6 +204,12 @@ def canonical_type(value: str) -> str:
         # graphics3d.h's primitive topology.
         "CNA_UserVertexSource": "uint32_t",
         "CNA_PrimitiveType": "uint32_t",
+        # effects.h's stable member-view handle for one of an effect's three
+        # directional lights.
+        "CNA_DirectionalLightHandle": "uint64_t",
+        # graphics_state.h's comparison identity, which AlphaTestEffect's
+        # AlphaFunction is spelled with.
+        "CNA_CompareFunction": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

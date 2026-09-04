@@ -138,6 +138,112 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceDrawUserPrimitivesRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_UserPrimitives>?) -> UInt32
     typealias GraphicsDeviceDrawUserIndexedPrimitivesRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_UserPrimitives>?, UnsafePointer<CNASwift_UserIndices>?) -> UInt32
     typealias PrimitiveTypeGetVertexCountRoute = @convention(c) (UInt32, Int32, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias EffectMaterialCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias DirectionalLightDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias DirectionalLightGetDiffuseColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias DirectionalLightSetDiffuseColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias DirectionalLightGetDirectionRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias DirectionalLightSetDirectionRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias DirectionalLightGetSpecularColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias DirectionalLightSetSpecularColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias DirectionalLightGetEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias DirectionalLightSetEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias BasicEffectCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectMatricesGetWorldRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Matrix>?) -> UInt32
+    typealias EffectMatricesSetWorldRoute = @convention(c) (UInt64, CNASwift_Matrix) -> UInt32
+    typealias EffectMatricesGetViewRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Matrix>?) -> UInt32
+    typealias EffectMatricesSetViewRoute = @convention(c) (UInt64, CNASwift_Matrix) -> UInt32
+    typealias EffectMatricesGetProjectionRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Matrix>?) -> UInt32
+    typealias EffectMatricesSetProjectionRoute = @convention(c) (UInt64, CNASwift_Matrix) -> UInt32
+    typealias EffectFogGetColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias EffectFogSetColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias EffectFogGetEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias EffectFogSetEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias EffectFogGetStartRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias EffectFogSetStartRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias EffectFogGetEndRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias EffectFogSetEndRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias EffectLightsGetAmbientColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias EffectLightsSetAmbientColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias EffectLightsGetDirectionalLightRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectLightsGetEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias EffectLightsSetEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias BasicEffectGetVertexColorEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias BasicEffectSetVertexColorEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias BasicEffectGetPreferPerPixelLightingRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias BasicEffectSetPreferPerPixelLightingRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias BasicEffectGetDiffuseColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias BasicEffectSetDiffuseColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias BasicEffectGetEmissiveColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias BasicEffectSetEmissiveColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias BasicEffectGetSpecularColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias BasicEffectSetSpecularColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias BasicEffectGetSpecularPowerRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias BasicEffectSetSpecularPowerRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias BasicEffectGetAlphaRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias BasicEffectSetAlphaRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias BasicEffectGetTextureEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias BasicEffectSetTextureEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias BasicEffectGetTextureRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias BasicEffectSetTextureRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias AlphaTestEffectCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlphaTestEffectGetDiffuseColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias AlphaTestEffectSetDiffuseColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias AlphaTestEffectGetAlphaRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias AlphaTestEffectSetAlphaRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias AlphaTestEffectGetTextureRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlphaTestEffectSetTextureRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias AlphaTestEffectGetVertexColorEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AlphaTestEffectSetVertexColorEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias AlphaTestEffectGetAlphaFunctionRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias AlphaTestEffectSetAlphaFunctionRoute = @convention(c) (UInt64, UInt32) -> UInt32
+    typealias AlphaTestEffectGetReferenceAlphaRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias AlphaTestEffectSetReferenceAlphaRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias DualTextureEffectCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias DualTextureEffectGetDiffuseColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias DualTextureEffectSetDiffuseColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias DualTextureEffectGetAlphaRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias DualTextureEffectSetAlphaRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias DualTextureEffectGetTextureRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias DualTextureEffectSetTextureRoute = @convention(c) (UInt64, UInt32, UInt64) -> UInt32
+    typealias DualTextureEffectGetVertexColorEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias DualTextureEffectSetVertexColorEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias EnvironmentMapEffectCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EnvironmentMapEffectGetDiffuseColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias EnvironmentMapEffectSetDiffuseColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias EnvironmentMapEffectGetEmissiveColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias EnvironmentMapEffectSetEmissiveColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias EnvironmentMapEffectGetAlphaRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias EnvironmentMapEffectSetAlphaRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias EnvironmentMapEffectGetTextureRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EnvironmentMapEffectSetTextureRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias EnvironmentMapEffectGetEnvironmentMapRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EnvironmentMapEffectSetEnvironmentMapRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias EnvironmentMapEffectGetAmountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias EnvironmentMapEffectSetAmountRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias EnvironmentMapEffectGetSpecularRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias EnvironmentMapEffectSetSpecularRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias EnvironmentMapEffectGetFresnelFactorRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias EnvironmentMapEffectSetFresnelFactorRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SkinnedEffectCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SkinnedEffectGetDiffuseColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias SkinnedEffectSetDiffuseColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias SkinnedEffectGetEmissiveColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias SkinnedEffectSetEmissiveColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias SkinnedEffectGetSpecularColorRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias SkinnedEffectSetSpecularColorRoute = @convention(c) (UInt64, CNASwift_Vector3) -> UInt32
+    typealias SkinnedEffectGetSpecularPowerRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias SkinnedEffectSetSpecularPowerRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SkinnedEffectGetAlphaRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias SkinnedEffectSetAlphaRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SkinnedEffectGetPreferPerPixelLightingRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SkinnedEffectSetPreferPerPixelLightingRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias SkinnedEffectGetTextureRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SkinnedEffectSetTextureRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias SkinnedEffectGetWeightsPerVertexRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias SkinnedEffectSetWeightsPerVertexRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias SkinnedEffectSetBoneTransformsRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Matrix>?, UInt64) -> UInt32
+    typealias SkinnedEffectCopyBoneTransformsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<CNASwift_Matrix>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias EffectCreateEmptyRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias EffectCreateCompiledRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias EffectDestroyRoute = @convention(c) (UInt64) -> UInt32
@@ -343,6 +449,112 @@ internal final class NativeFunctions {
     let graphicsDeviceDrawUserPrimitives: GraphicsDeviceDrawUserPrimitivesRoute
     let graphicsDeviceDrawUserIndexedPrimitives: GraphicsDeviceDrawUserIndexedPrimitivesRoute
     let primitiveTypeGetVertexCount: PrimitiveTypeGetVertexCountRoute
+    let effectMaterialCreate: EffectMaterialCreateRoute
+    let directionalLightDestroy: DirectionalLightDestroyRoute
+    let directionalLightGetDiffuseColor: DirectionalLightGetDiffuseColorRoute
+    let directionalLightSetDiffuseColor: DirectionalLightSetDiffuseColorRoute
+    let directionalLightGetDirection: DirectionalLightGetDirectionRoute
+    let directionalLightSetDirection: DirectionalLightSetDirectionRoute
+    let directionalLightGetSpecularColor: DirectionalLightGetSpecularColorRoute
+    let directionalLightSetSpecularColor: DirectionalLightSetSpecularColorRoute
+    let directionalLightGetEnabled: DirectionalLightGetEnabledRoute
+    let directionalLightSetEnabled: DirectionalLightSetEnabledRoute
+    let basicEffectCreate: BasicEffectCreateRoute
+    let effectMatricesGetWorld: EffectMatricesGetWorldRoute
+    let effectMatricesSetWorld: EffectMatricesSetWorldRoute
+    let effectMatricesGetView: EffectMatricesGetViewRoute
+    let effectMatricesSetView: EffectMatricesSetViewRoute
+    let effectMatricesGetProjection: EffectMatricesGetProjectionRoute
+    let effectMatricesSetProjection: EffectMatricesSetProjectionRoute
+    let effectFogGetColor: EffectFogGetColorRoute
+    let effectFogSetColor: EffectFogSetColorRoute
+    let effectFogGetEnabled: EffectFogGetEnabledRoute
+    let effectFogSetEnabled: EffectFogSetEnabledRoute
+    let effectFogGetStart: EffectFogGetStartRoute
+    let effectFogSetStart: EffectFogSetStartRoute
+    let effectFogGetEnd: EffectFogGetEndRoute
+    let effectFogSetEnd: EffectFogSetEndRoute
+    let effectLightsGetAmbientColor: EffectLightsGetAmbientColorRoute
+    let effectLightsSetAmbientColor: EffectLightsSetAmbientColorRoute
+    let effectLightsGetDirectionalLight: EffectLightsGetDirectionalLightRoute
+    let effectLightsGetEnabled: EffectLightsGetEnabledRoute
+    let effectLightsSetEnabled: EffectLightsSetEnabledRoute
+    let basicEffectGetVertexColorEnabled: BasicEffectGetVertexColorEnabledRoute
+    let basicEffectSetVertexColorEnabled: BasicEffectSetVertexColorEnabledRoute
+    let basicEffectGetPreferPerPixelLighting: BasicEffectGetPreferPerPixelLightingRoute
+    let basicEffectSetPreferPerPixelLighting: BasicEffectSetPreferPerPixelLightingRoute
+    let basicEffectGetDiffuseColor: BasicEffectGetDiffuseColorRoute
+    let basicEffectSetDiffuseColor: BasicEffectSetDiffuseColorRoute
+    let basicEffectGetEmissiveColor: BasicEffectGetEmissiveColorRoute
+    let basicEffectSetEmissiveColor: BasicEffectSetEmissiveColorRoute
+    let basicEffectGetSpecularColor: BasicEffectGetSpecularColorRoute
+    let basicEffectSetSpecularColor: BasicEffectSetSpecularColorRoute
+    let basicEffectGetSpecularPower: BasicEffectGetSpecularPowerRoute
+    let basicEffectSetSpecularPower: BasicEffectSetSpecularPowerRoute
+    let basicEffectGetAlpha: BasicEffectGetAlphaRoute
+    let basicEffectSetAlpha: BasicEffectSetAlphaRoute
+    let basicEffectGetTextureEnabled: BasicEffectGetTextureEnabledRoute
+    let basicEffectSetTextureEnabled: BasicEffectSetTextureEnabledRoute
+    let basicEffectGetTexture: BasicEffectGetTextureRoute
+    let basicEffectSetTexture: BasicEffectSetTextureRoute
+    let alphaTestEffectCreate: AlphaTestEffectCreateRoute
+    let alphaTestEffectGetDiffuseColor: AlphaTestEffectGetDiffuseColorRoute
+    let alphaTestEffectSetDiffuseColor: AlphaTestEffectSetDiffuseColorRoute
+    let alphaTestEffectGetAlpha: AlphaTestEffectGetAlphaRoute
+    let alphaTestEffectSetAlpha: AlphaTestEffectSetAlphaRoute
+    let alphaTestEffectGetTexture: AlphaTestEffectGetTextureRoute
+    let alphaTestEffectSetTexture: AlphaTestEffectSetTextureRoute
+    let alphaTestEffectGetVertexColorEnabled: AlphaTestEffectGetVertexColorEnabledRoute
+    let alphaTestEffectSetVertexColorEnabled: AlphaTestEffectSetVertexColorEnabledRoute
+    let alphaTestEffectGetAlphaFunction: AlphaTestEffectGetAlphaFunctionRoute
+    let alphaTestEffectSetAlphaFunction: AlphaTestEffectSetAlphaFunctionRoute
+    let alphaTestEffectGetReferenceAlpha: AlphaTestEffectGetReferenceAlphaRoute
+    let alphaTestEffectSetReferenceAlpha: AlphaTestEffectSetReferenceAlphaRoute
+    let dualTextureEffectCreate: DualTextureEffectCreateRoute
+    let dualTextureEffectGetDiffuseColor: DualTextureEffectGetDiffuseColorRoute
+    let dualTextureEffectSetDiffuseColor: DualTextureEffectSetDiffuseColorRoute
+    let dualTextureEffectGetAlpha: DualTextureEffectGetAlphaRoute
+    let dualTextureEffectSetAlpha: DualTextureEffectSetAlphaRoute
+    let dualTextureEffectGetTexture: DualTextureEffectGetTextureRoute
+    let dualTextureEffectSetTexture: DualTextureEffectSetTextureRoute
+    let dualTextureEffectGetVertexColorEnabled: DualTextureEffectGetVertexColorEnabledRoute
+    let dualTextureEffectSetVertexColorEnabled: DualTextureEffectSetVertexColorEnabledRoute
+    let environmentMapEffectCreate: EnvironmentMapEffectCreateRoute
+    let environmentMapEffectGetDiffuseColor: EnvironmentMapEffectGetDiffuseColorRoute
+    let environmentMapEffectSetDiffuseColor: EnvironmentMapEffectSetDiffuseColorRoute
+    let environmentMapEffectGetEmissiveColor: EnvironmentMapEffectGetEmissiveColorRoute
+    let environmentMapEffectSetEmissiveColor: EnvironmentMapEffectSetEmissiveColorRoute
+    let environmentMapEffectGetAlpha: EnvironmentMapEffectGetAlphaRoute
+    let environmentMapEffectSetAlpha: EnvironmentMapEffectSetAlphaRoute
+    let environmentMapEffectGetTexture: EnvironmentMapEffectGetTextureRoute
+    let environmentMapEffectSetTexture: EnvironmentMapEffectSetTextureRoute
+    let environmentMapEffectGetEnvironmentMap: EnvironmentMapEffectGetEnvironmentMapRoute
+    let environmentMapEffectSetEnvironmentMap: EnvironmentMapEffectSetEnvironmentMapRoute
+    let environmentMapEffectGetAmount: EnvironmentMapEffectGetAmountRoute
+    let environmentMapEffectSetAmount: EnvironmentMapEffectSetAmountRoute
+    let environmentMapEffectGetSpecular: EnvironmentMapEffectGetSpecularRoute
+    let environmentMapEffectSetSpecular: EnvironmentMapEffectSetSpecularRoute
+    let environmentMapEffectGetFresnelFactor: EnvironmentMapEffectGetFresnelFactorRoute
+    let environmentMapEffectSetFresnelFactor: EnvironmentMapEffectSetFresnelFactorRoute
+    let skinnedEffectCreate: SkinnedEffectCreateRoute
+    let skinnedEffectGetDiffuseColor: SkinnedEffectGetDiffuseColorRoute
+    let skinnedEffectSetDiffuseColor: SkinnedEffectSetDiffuseColorRoute
+    let skinnedEffectGetEmissiveColor: SkinnedEffectGetEmissiveColorRoute
+    let skinnedEffectSetEmissiveColor: SkinnedEffectSetEmissiveColorRoute
+    let skinnedEffectGetSpecularColor: SkinnedEffectGetSpecularColorRoute
+    let skinnedEffectSetSpecularColor: SkinnedEffectSetSpecularColorRoute
+    let skinnedEffectGetSpecularPower: SkinnedEffectGetSpecularPowerRoute
+    let skinnedEffectSetSpecularPower: SkinnedEffectSetSpecularPowerRoute
+    let skinnedEffectGetAlpha: SkinnedEffectGetAlphaRoute
+    let skinnedEffectSetAlpha: SkinnedEffectSetAlphaRoute
+    let skinnedEffectGetPreferPerPixelLighting: SkinnedEffectGetPreferPerPixelLightingRoute
+    let skinnedEffectSetPreferPerPixelLighting: SkinnedEffectSetPreferPerPixelLightingRoute
+    let skinnedEffectGetTexture: SkinnedEffectGetTextureRoute
+    let skinnedEffectSetTexture: SkinnedEffectSetTextureRoute
+    let skinnedEffectGetWeightsPerVertex: SkinnedEffectGetWeightsPerVertexRoute
+    let skinnedEffectSetWeightsPerVertex: SkinnedEffectSetWeightsPerVertexRoute
+    let skinnedEffectSetBoneTransforms: SkinnedEffectSetBoneTransformsRoute
+    let skinnedEffectCopyBoneTransforms: SkinnedEffectCopyBoneTransformsRoute
     let effectCreateEmpty: EffectCreateEmptyRoute
     let effectCreateCompiled: EffectCreateCompiledRoute
     let effectDestroy: EffectDestroyRoute
@@ -568,6 +780,112 @@ internal final class NativeFunctions {
         graphicsDeviceDrawUserPrimitives = try library.resolve("cna_graphics_device_draw_user_primitives", as: GraphicsDeviceDrawUserPrimitivesRoute.self)
         graphicsDeviceDrawUserIndexedPrimitives = try library.resolve("cna_graphics_device_draw_user_indexed_primitives", as: GraphicsDeviceDrawUserIndexedPrimitivesRoute.self)
         primitiveTypeGetVertexCount = try library.resolve("cna_primitive_type_get_vertex_count", as: PrimitiveTypeGetVertexCountRoute.self)
+        effectMaterialCreate = try library.resolve("cna_effect_material_create", as: EffectMaterialCreateRoute.self)
+        directionalLightDestroy = try library.resolve("cna_directional_light_destroy", as: DirectionalLightDestroyRoute.self)
+        directionalLightGetDiffuseColor = try library.resolve("cna_directional_light_get_diffuse_color", as: DirectionalLightGetDiffuseColorRoute.self)
+        directionalLightSetDiffuseColor = try library.resolve("cna_directional_light_set_diffuse_color", as: DirectionalLightSetDiffuseColorRoute.self)
+        directionalLightGetDirection = try library.resolve("cna_directional_light_get_direction", as: DirectionalLightGetDirectionRoute.self)
+        directionalLightSetDirection = try library.resolve("cna_directional_light_set_direction", as: DirectionalLightSetDirectionRoute.self)
+        directionalLightGetSpecularColor = try library.resolve("cna_directional_light_get_specular_color", as: DirectionalLightGetSpecularColorRoute.self)
+        directionalLightSetSpecularColor = try library.resolve("cna_directional_light_set_specular_color", as: DirectionalLightSetSpecularColorRoute.self)
+        directionalLightGetEnabled = try library.resolve("cna_directional_light_get_enabled", as: DirectionalLightGetEnabledRoute.self)
+        directionalLightSetEnabled = try library.resolve("cna_directional_light_set_enabled", as: DirectionalLightSetEnabledRoute.self)
+        basicEffectCreate = try library.resolve("cna_basic_effect_create", as: BasicEffectCreateRoute.self)
+        effectMatricesGetWorld = try library.resolve("cna_effect_matrices_get_world", as: EffectMatricesGetWorldRoute.self)
+        effectMatricesSetWorld = try library.resolve("cna_effect_matrices_set_world", as: EffectMatricesSetWorldRoute.self)
+        effectMatricesGetView = try library.resolve("cna_effect_matrices_get_view", as: EffectMatricesGetViewRoute.self)
+        effectMatricesSetView = try library.resolve("cna_effect_matrices_set_view", as: EffectMatricesSetViewRoute.self)
+        effectMatricesGetProjection = try library.resolve("cna_effect_matrices_get_projection", as: EffectMatricesGetProjectionRoute.self)
+        effectMatricesSetProjection = try library.resolve("cna_effect_matrices_set_projection", as: EffectMatricesSetProjectionRoute.self)
+        effectFogGetColor = try library.resolve("cna_effect_fog_get_color", as: EffectFogGetColorRoute.self)
+        effectFogSetColor = try library.resolve("cna_effect_fog_set_color", as: EffectFogSetColorRoute.self)
+        effectFogGetEnabled = try library.resolve("cna_effect_fog_get_enabled", as: EffectFogGetEnabledRoute.self)
+        effectFogSetEnabled = try library.resolve("cna_effect_fog_set_enabled", as: EffectFogSetEnabledRoute.self)
+        effectFogGetStart = try library.resolve("cna_effect_fog_get_start", as: EffectFogGetStartRoute.self)
+        effectFogSetStart = try library.resolve("cna_effect_fog_set_start", as: EffectFogSetStartRoute.self)
+        effectFogGetEnd = try library.resolve("cna_effect_fog_get_end", as: EffectFogGetEndRoute.self)
+        effectFogSetEnd = try library.resolve("cna_effect_fog_set_end", as: EffectFogSetEndRoute.self)
+        effectLightsGetAmbientColor = try library.resolve("cna_effect_lights_get_ambient_color", as: EffectLightsGetAmbientColorRoute.self)
+        effectLightsSetAmbientColor = try library.resolve("cna_effect_lights_set_ambient_color", as: EffectLightsSetAmbientColorRoute.self)
+        effectLightsGetDirectionalLight = try library.resolve("cna_effect_lights_get_directional_light", as: EffectLightsGetDirectionalLightRoute.self)
+        effectLightsGetEnabled = try library.resolve("cna_effect_lights_get_enabled", as: EffectLightsGetEnabledRoute.self)
+        effectLightsSetEnabled = try library.resolve("cna_effect_lights_set_enabled", as: EffectLightsSetEnabledRoute.self)
+        basicEffectGetVertexColorEnabled = try library.resolve("cna_basic_effect_get_vertex_color_enabled", as: BasicEffectGetVertexColorEnabledRoute.self)
+        basicEffectSetVertexColorEnabled = try library.resolve("cna_basic_effect_set_vertex_color_enabled", as: BasicEffectSetVertexColorEnabledRoute.self)
+        basicEffectGetPreferPerPixelLighting = try library.resolve("cna_basic_effect_get_prefer_per_pixel_lighting", as: BasicEffectGetPreferPerPixelLightingRoute.self)
+        basicEffectSetPreferPerPixelLighting = try library.resolve("cna_basic_effect_set_prefer_per_pixel_lighting", as: BasicEffectSetPreferPerPixelLightingRoute.self)
+        basicEffectGetDiffuseColor = try library.resolve("cna_basic_effect_get_diffuse_color", as: BasicEffectGetDiffuseColorRoute.self)
+        basicEffectSetDiffuseColor = try library.resolve("cna_basic_effect_set_diffuse_color", as: BasicEffectSetDiffuseColorRoute.self)
+        basicEffectGetEmissiveColor = try library.resolve("cna_basic_effect_get_emissive_color", as: BasicEffectGetEmissiveColorRoute.self)
+        basicEffectSetEmissiveColor = try library.resolve("cna_basic_effect_set_emissive_color", as: BasicEffectSetEmissiveColorRoute.self)
+        basicEffectGetSpecularColor = try library.resolve("cna_basic_effect_get_specular_color", as: BasicEffectGetSpecularColorRoute.self)
+        basicEffectSetSpecularColor = try library.resolve("cna_basic_effect_set_specular_color", as: BasicEffectSetSpecularColorRoute.self)
+        basicEffectGetSpecularPower = try library.resolve("cna_basic_effect_get_specular_power", as: BasicEffectGetSpecularPowerRoute.self)
+        basicEffectSetSpecularPower = try library.resolve("cna_basic_effect_set_specular_power", as: BasicEffectSetSpecularPowerRoute.self)
+        basicEffectGetAlpha = try library.resolve("cna_basic_effect_get_alpha", as: BasicEffectGetAlphaRoute.self)
+        basicEffectSetAlpha = try library.resolve("cna_basic_effect_set_alpha", as: BasicEffectSetAlphaRoute.self)
+        basicEffectGetTextureEnabled = try library.resolve("cna_basic_effect_get_texture_enabled", as: BasicEffectGetTextureEnabledRoute.self)
+        basicEffectSetTextureEnabled = try library.resolve("cna_basic_effect_set_texture_enabled", as: BasicEffectSetTextureEnabledRoute.self)
+        basicEffectGetTexture = try library.resolve("cna_basic_effect_get_texture", as: BasicEffectGetTextureRoute.self)
+        basicEffectSetTexture = try library.resolve("cna_basic_effect_set_texture", as: BasicEffectSetTextureRoute.self)
+        alphaTestEffectCreate = try library.resolve("cna_alpha_test_effect_create", as: AlphaTestEffectCreateRoute.self)
+        alphaTestEffectGetDiffuseColor = try library.resolve("cna_alpha_test_effect_get_diffuse_color", as: AlphaTestEffectGetDiffuseColorRoute.self)
+        alphaTestEffectSetDiffuseColor = try library.resolve("cna_alpha_test_effect_set_diffuse_color", as: AlphaTestEffectSetDiffuseColorRoute.self)
+        alphaTestEffectGetAlpha = try library.resolve("cna_alpha_test_effect_get_alpha", as: AlphaTestEffectGetAlphaRoute.self)
+        alphaTestEffectSetAlpha = try library.resolve("cna_alpha_test_effect_set_alpha", as: AlphaTestEffectSetAlphaRoute.self)
+        alphaTestEffectGetTexture = try library.resolve("cna_alpha_test_effect_get_texture", as: AlphaTestEffectGetTextureRoute.self)
+        alphaTestEffectSetTexture = try library.resolve("cna_alpha_test_effect_set_texture", as: AlphaTestEffectSetTextureRoute.self)
+        alphaTestEffectGetVertexColorEnabled = try library.resolve("cna_alpha_test_effect_get_vertex_color_enabled", as: AlphaTestEffectGetVertexColorEnabledRoute.self)
+        alphaTestEffectSetVertexColorEnabled = try library.resolve("cna_alpha_test_effect_set_vertex_color_enabled", as: AlphaTestEffectSetVertexColorEnabledRoute.self)
+        alphaTestEffectGetAlphaFunction = try library.resolve("cna_alpha_test_effect_get_alpha_function", as: AlphaTestEffectGetAlphaFunctionRoute.self)
+        alphaTestEffectSetAlphaFunction = try library.resolve("cna_alpha_test_effect_set_alpha_function", as: AlphaTestEffectSetAlphaFunctionRoute.self)
+        alphaTestEffectGetReferenceAlpha = try library.resolve("cna_alpha_test_effect_get_reference_alpha", as: AlphaTestEffectGetReferenceAlphaRoute.self)
+        alphaTestEffectSetReferenceAlpha = try library.resolve("cna_alpha_test_effect_set_reference_alpha", as: AlphaTestEffectSetReferenceAlphaRoute.self)
+        dualTextureEffectCreate = try library.resolve("cna_dual_texture_effect_create", as: DualTextureEffectCreateRoute.self)
+        dualTextureEffectGetDiffuseColor = try library.resolve("cna_dual_texture_effect_get_diffuse_color", as: DualTextureEffectGetDiffuseColorRoute.self)
+        dualTextureEffectSetDiffuseColor = try library.resolve("cna_dual_texture_effect_set_diffuse_color", as: DualTextureEffectSetDiffuseColorRoute.self)
+        dualTextureEffectGetAlpha = try library.resolve("cna_dual_texture_effect_get_alpha", as: DualTextureEffectGetAlphaRoute.self)
+        dualTextureEffectSetAlpha = try library.resolve("cna_dual_texture_effect_set_alpha", as: DualTextureEffectSetAlphaRoute.self)
+        dualTextureEffectGetTexture = try library.resolve("cna_dual_texture_effect_get_texture", as: DualTextureEffectGetTextureRoute.self)
+        dualTextureEffectSetTexture = try library.resolve("cna_dual_texture_effect_set_texture", as: DualTextureEffectSetTextureRoute.self)
+        dualTextureEffectGetVertexColorEnabled = try library.resolve("cna_dual_texture_effect_get_vertex_color_enabled", as: DualTextureEffectGetVertexColorEnabledRoute.self)
+        dualTextureEffectSetVertexColorEnabled = try library.resolve("cna_dual_texture_effect_set_vertex_color_enabled", as: DualTextureEffectSetVertexColorEnabledRoute.self)
+        environmentMapEffectCreate = try library.resolve("cna_environment_map_effect_create", as: EnvironmentMapEffectCreateRoute.self)
+        environmentMapEffectGetDiffuseColor = try library.resolve("cna_environment_map_effect_get_diffuse_color", as: EnvironmentMapEffectGetDiffuseColorRoute.self)
+        environmentMapEffectSetDiffuseColor = try library.resolve("cna_environment_map_effect_set_diffuse_color", as: EnvironmentMapEffectSetDiffuseColorRoute.self)
+        environmentMapEffectGetEmissiveColor = try library.resolve("cna_environment_map_effect_get_emissive_color", as: EnvironmentMapEffectGetEmissiveColorRoute.self)
+        environmentMapEffectSetEmissiveColor = try library.resolve("cna_environment_map_effect_set_emissive_color", as: EnvironmentMapEffectSetEmissiveColorRoute.self)
+        environmentMapEffectGetAlpha = try library.resolve("cna_environment_map_effect_get_alpha", as: EnvironmentMapEffectGetAlphaRoute.self)
+        environmentMapEffectSetAlpha = try library.resolve("cna_environment_map_effect_set_alpha", as: EnvironmentMapEffectSetAlphaRoute.self)
+        environmentMapEffectGetTexture = try library.resolve("cna_environment_map_effect_get_texture", as: EnvironmentMapEffectGetTextureRoute.self)
+        environmentMapEffectSetTexture = try library.resolve("cna_environment_map_effect_set_texture", as: EnvironmentMapEffectSetTextureRoute.self)
+        environmentMapEffectGetEnvironmentMap = try library.resolve("cna_environment_map_effect_get_environment_map", as: EnvironmentMapEffectGetEnvironmentMapRoute.self)
+        environmentMapEffectSetEnvironmentMap = try library.resolve("cna_environment_map_effect_set_environment_map", as: EnvironmentMapEffectSetEnvironmentMapRoute.self)
+        environmentMapEffectGetAmount = try library.resolve("cna_environment_map_effect_get_amount", as: EnvironmentMapEffectGetAmountRoute.self)
+        environmentMapEffectSetAmount = try library.resolve("cna_environment_map_effect_set_amount", as: EnvironmentMapEffectSetAmountRoute.self)
+        environmentMapEffectGetSpecular = try library.resolve("cna_environment_map_effect_get_specular", as: EnvironmentMapEffectGetSpecularRoute.self)
+        environmentMapEffectSetSpecular = try library.resolve("cna_environment_map_effect_set_specular", as: EnvironmentMapEffectSetSpecularRoute.self)
+        environmentMapEffectGetFresnelFactor = try library.resolve("cna_environment_map_effect_get_fresnel_factor", as: EnvironmentMapEffectGetFresnelFactorRoute.self)
+        environmentMapEffectSetFresnelFactor = try library.resolve("cna_environment_map_effect_set_fresnel_factor", as: EnvironmentMapEffectSetFresnelFactorRoute.self)
+        skinnedEffectCreate = try library.resolve("cna_skinned_effect_create", as: SkinnedEffectCreateRoute.self)
+        skinnedEffectGetDiffuseColor = try library.resolve("cna_skinned_effect_get_diffuse_color", as: SkinnedEffectGetDiffuseColorRoute.self)
+        skinnedEffectSetDiffuseColor = try library.resolve("cna_skinned_effect_set_diffuse_color", as: SkinnedEffectSetDiffuseColorRoute.self)
+        skinnedEffectGetEmissiveColor = try library.resolve("cna_skinned_effect_get_emissive_color", as: SkinnedEffectGetEmissiveColorRoute.self)
+        skinnedEffectSetEmissiveColor = try library.resolve("cna_skinned_effect_set_emissive_color", as: SkinnedEffectSetEmissiveColorRoute.self)
+        skinnedEffectGetSpecularColor = try library.resolve("cna_skinned_effect_get_specular_color", as: SkinnedEffectGetSpecularColorRoute.self)
+        skinnedEffectSetSpecularColor = try library.resolve("cna_skinned_effect_set_specular_color", as: SkinnedEffectSetSpecularColorRoute.self)
+        skinnedEffectGetSpecularPower = try library.resolve("cna_skinned_effect_get_specular_power", as: SkinnedEffectGetSpecularPowerRoute.self)
+        skinnedEffectSetSpecularPower = try library.resolve("cna_skinned_effect_set_specular_power", as: SkinnedEffectSetSpecularPowerRoute.self)
+        skinnedEffectGetAlpha = try library.resolve("cna_skinned_effect_get_alpha", as: SkinnedEffectGetAlphaRoute.self)
+        skinnedEffectSetAlpha = try library.resolve("cna_skinned_effect_set_alpha", as: SkinnedEffectSetAlphaRoute.self)
+        skinnedEffectGetPreferPerPixelLighting = try library.resolve("cna_skinned_effect_get_prefer_per_pixel_lighting", as: SkinnedEffectGetPreferPerPixelLightingRoute.self)
+        skinnedEffectSetPreferPerPixelLighting = try library.resolve("cna_skinned_effect_set_prefer_per_pixel_lighting", as: SkinnedEffectSetPreferPerPixelLightingRoute.self)
+        skinnedEffectGetTexture = try library.resolve("cna_skinned_effect_get_texture", as: SkinnedEffectGetTextureRoute.self)
+        skinnedEffectSetTexture = try library.resolve("cna_skinned_effect_set_texture", as: SkinnedEffectSetTextureRoute.self)
+        skinnedEffectGetWeightsPerVertex = try library.resolve("cna_skinned_effect_get_weights_per_vertex", as: SkinnedEffectGetWeightsPerVertexRoute.self)
+        skinnedEffectSetWeightsPerVertex = try library.resolve("cna_skinned_effect_set_weights_per_vertex", as: SkinnedEffectSetWeightsPerVertexRoute.self)
+        skinnedEffectSetBoneTransforms = try library.resolve("cna_skinned_effect_set_bone_transforms", as: SkinnedEffectSetBoneTransformsRoute.self)
+        skinnedEffectCopyBoneTransforms = try library.resolve("cna_skinned_effect_copy_bone_transforms", as: SkinnedEffectCopyBoneTransformsRoute.self)
         effectCreateEmpty = try library.resolve("cna_effect_create_empty", as: EffectCreateEmptyRoute.self)
         effectCreateCompiled = try library.resolve("cna_effect_create_compiled", as: EffectCreateCompiledRoute.self)
         effectDestroy = try library.resolve("cna_effect_destroy", as: EffectDestroyRoute.self)

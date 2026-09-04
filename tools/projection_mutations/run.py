@@ -63,6 +63,13 @@ EFFECT = ROOT / "Sources/CNA/Xna/Graphics/Effect.swift"
 EFFECTCOLLECTIONS = ROOT / "Sources/CNA/Xna/Graphics/EffectCollections.swift"
 EFFECTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/EffectSupport.swift"
 DRAW = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceDraw.swift"
+LIGHT = ROOT / "Sources/CNA/Xna/Graphics/DirectionalLight.swift"
+STOCKSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/StockEffectSupport.swift"
+BASICEFFECT = ROOT / "Sources/CNA/Xna/Graphics/BasicEffect.swift"
+ALPHATEST = ROOT / "Sources/CNA/Xna/Graphics/AlphaTestEffect.swift"
+DUALTEXTURE = ROOT / "Sources/CNA/Xna/Graphics/DualTextureEffect.swift"
+ENVMAP = ROOT / "Sources/CNA/Xna/Graphics/EnvironmentMapEffect.swift"
+SKINNED = ROOT / "Sources/CNA/Xna/Graphics/SkinnedEffect.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -2134,6 +2141,222 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                handle, 0,\n"
         "                startVertex, primitiveCount),",
     ),
+
+    # ---- Foundation 69: the stock effects --------------------------------
+    (
+        "light-getter-reads-the-wrong-cache",
+        "a light's getters answering another field than the one XNA reads",
+        LIGHT,
+        "        public var DiffuseColor: Microsoft.Xna.Framework.Vector3 { cachedDiffuseColor }",
+        "        public var DiffuseColor: Microsoft.Xna.Framework.Vector3 { cachedSpecularColor }",
+    ),
+    (
+        "disabling-a-light-clears-its-cache",
+        "set_Enabled(false) clearing what the light remembers, not just the parameter",
+        LIGHT,
+        "                try diffuseColorParam?.SetValue(\n"
+        "                    Microsoft.Xna.Framework.Vector3.Zero)",
+        "                cachedDiffuseColor = Microsoft.Xna.Framework.Vector3.Zero\n"
+        "                try diffuseColorParam?.SetValue(\n"
+        "                    Microsoft.Xna.Framework.Vector3.Zero)",
+    ),
+    (
+        "enabled-setter-is-not-a-no-op",
+        "set_Enabled re-pushing when the value has not changed",
+        LIGHT,
+        "            guard enabled != value else { return }",
+        "            if enabled == value && false { return }",
+    ),
+    (
+        "diffuse-written-while-disabled",
+        "set_DiffuseColor writing its parameter regardless of Enabled",
+        LIGHT,
+        "            if enabled { try diffuseColorParam?.SetValue(value) }\n"
+        "            cachedDiffuseColor = value",
+        "            try diffuseColorParam?.SetValue(value)\n"
+        "            cachedDiffuseColor = value",
+    ),
+    (
+        "direction-written-only-while-enabled",
+        "set_Direction consulting Enabled, which XNA's does not",
+        LIGHT,
+        "            try directionParam?.SetValue(value)\n"
+        "            cachedDirection = value",
+        "            if enabled { try directionParam?.SetValue(value) }\n"
+        "            cachedDirection = value",
+    ),
+    (
+        "clone-runs-the-setters",
+        "the clone constructor assigning through the setters, so a clone writes parameters",
+        LIGHT,
+        "                enabled = cloneSource.enabled\n"
+        "                cachedDirection = cloneSource.cachedDirection",
+        "                try SetEnabled(cloneSource.enabled)\n"
+        "                cachedDirection = cloneSource.cachedDirection",
+    ),
+    (
+        "default-lighting-table-altered",
+        "one component of EffectHelpers' default lighting table changed",
+        STOCKSUPPORT,
+        "            Microsoft.Xna.Framework.Vector3(-0.5265408, -0.5735765, -0.6275069))",
+        "            Microsoft.Xna.Framework.Vector3(-0.5265408, -0.5735765, -0.6275))",
+    ),
+    (
+        "default-lighting-specular-shared",
+        "light1's specular set from its diffuse instead of Zero",
+        STOCKSUPPORT,
+        "        try light1.SetSpecularColor(Microsoft.Xna.Framework.Vector3.Zero)",
+        "        try light1.SetSpecularColor(\n"
+        "            Microsoft.Xna.Framework.Vector3(0.9647059, 0.7607844, 0.4078432))",
+    ),
+    (
+        "default-lighting-leaves-lights-off",
+        "EnableDefaultLighting setting the three lights' values but not enabling them",
+        STOCKSUPPORT,
+        "        try light0.SetEnabled(true)",
+        "        try light0.SetEnabled(false)",
+    ),
+    (
+        "default-lighting-does-not-enable-lighting",
+        "BasicEffect.EnableDefaultLighting leaving LightingEnabled alone",
+        BASICEFFECT,
+        "            LightingEnabled = true\n"
+        "            AmbientLightColor = try Microsoft.Xna.Framework.Graphics",
+        "            AmbientLightColor = try Microsoft.Xna.Framework.Graphics",
+    ),
+    (
+        "effect-lights-not-cached",
+        "an effect fetching a fresh light view per call, so its lights lose identity",
+        BASICEFFECT,
+        "        public var DirectionalLight0: DirectionalLight? { light0 }",
+        "        public var DirectionalLight0: DirectionalLight? {\n"
+        "            try? Microsoft.Xna.Framework.Graphics.stockEffectLights(\n"
+        "                handle: try validatedHandle(\"BasicEffect.DirectionalLight0\"),\n"
+        "                runtime: nativeStorage.runtime).0\n"
+        "        }",
+    ),
+    (
+        "always-lit-effect-accepts-false",
+        "SkinnedEffect agreeing to disable lighting instead of refusing",
+        SKINNED,
+        "            guard !value else { return }\n"
+        "            throw CNANotSupportedException(",
+        "            guard value else { return }\n"
+        "            throw CNANotSupportedException(",
+    ),
+    (
+        "always-lit-effect-names-the-wrong-type",
+        "CantDisableLighting formatted with the other always-lit effect's name",
+        SKINNED,
+        "                    .replacingOccurrences(of: \"{0}\", with: \"SkinnedEffect\"))",
+        "                    .replacingOccurrences(of: \"{0}\", with: \"EnvironmentMapEffect\"))",
+    ),
+    (
+        "max-bones-off-by-one",
+        "SetBoneTransforms accepting one more bone than MaxBones",
+        SKINNED,
+        "            guard boneTransforms.count <= Int(SkinnedEffect.MaxBones) else {",
+        "            guard boneTransforms.count <= Int(SkinnedEffect.MaxBones) + 1 else {",
+    ),
+    (
+        "empty-bone-array-accepted",
+        "SetBoneTransforms accepting an empty array instead of refusing it as null",
+        SKINNED,
+        "            guard !boneTransforms.isEmpty else {",
+        "            guard boneTransforms.count >= 0 else {",
+    ),
+    # `bone-reader-skips-the-fourth-diagonal` was planted here and WITHDRAWN,
+    # not scored. It deleted `matrix.M44 = 1` from GetBoneTransforms, which
+    # reproduces the loop at IL_0051; `build-probe/f69_bones.c` then measured
+    # that CNA already answers `m44 = 1` for a bone written with `m44 = 0`,
+    # keeping the rest of the fourth column. The managed restoration is
+    # therefore invisible on this artifact and no test can be written that the
+    # mutation would fail. The reason is recorded in SkinnedEffect.swift where
+    # the line stands.
+    (
+        "weights-per-vertex-accepts-three",
+        "WeightsPerVertex admitting a value XNA refuses",
+        SKINNED,
+        "            guard value == 1 || value == 2 || value == 4 else {",
+        "            guard value == 1 || value == 2 || value == 3 || value == 4 else {",
+    ),
+    (
+        "weights-per-vertex-writes-before-testing",
+        "the refused value stored anyway, so the property changes on a throw",
+        SKINNED,
+        "            guard value == 1 || value == 2 || value == 4 else {\n"
+        "                throw CNAArgumentOutOfRangeException(",
+        "            state.weightsPerVertex = value\n"
+        "            guard value == 1 || value == 2 || value == 4 else {\n"
+        "                throw CNAArgumentOutOfRangeException(",
+    ),
+    (
+        "dual-texture-layers-collapse",
+        "Texture2 reading and writing layer zero, so the two properties are one",
+        DUALTEXTURE,
+        "        private static let secondLayer: UInt32 = 1",
+        "        private static let secondLayer: UInt32 = 0",
+    ),
+    (
+        "alpha-default-not-one",
+        "the cached alpha starting at something other than what the constructor sets",
+        STOCKSUPPORT,
+        "        var alpha: Float = 1",
+        "        var alpha: Float = 0",
+    ),
+    (
+        "fog-end-default-not-one",
+        "fogEnd starting at zero, which is not what the constructor's IL sets",
+        STOCKSUPPORT,
+        "        var fogEnd: Float = 1",
+        "        var fogEnd: Float = 0",
+    ),
+    (
+        "weights-per-vertex-default-not-four",
+        "WeightsPerVertex starting at a value XNA's field default is not",
+        STOCKSUPPORT,
+        "        var weightsPerVertex: Int32 = 4",
+        "        var weightsPerVertex: Int32 = 2",
+    ),
+    (
+        "setter-does-not-mark-dirty",
+        "an assignment that never reaches the device because it is not recorded",
+        BASICEFFECT,
+        "            set { state.alpha = newValue; state.mark(.alpha) }",
+        "            set { state.alpha = newValue }",
+    ),
+    (
+        "clone-loses-the-cached-state",
+        "the clone constructor starting from defaults instead of the source's state",
+        BASICEFFECT,
+        "            state = cloneSource.state\n"
+        "            texture = cloneSource.texture",
+        "            texture = cloneSource.texture",
+    ),
+    (
+        "texture-identity-not-tracked",
+        "an assigned texture forgotten, so the getter answers nil for a set texture",
+        BASICEFFECT,
+        "                nativeStorage.runtime.functions.basicEffectSetTexture($0, $1)\n"
+        "            }\n"
+        "            texture = value",
+        "                nativeStorage.runtime.functions.basicEffectSetTexture($0, $1)\n"
+        "            }",
+    ),
+    (
+        "alpha-test-effect-claims-lighting",
+        "an unlit effect conforming to IEffectLights, which XNA's does not",
+        ALPHATEST,
+        "    open class AlphaTestEffect: Effect, IEffectMatrices, IEffectFog {",
+        "    open class AlphaTestEffect: Effect, IEffectMatrices, IEffectFog, IEffectLights {",
+    ),
+    (
+        "environment-map-lighting-reads-a-field",
+        "the always-on getter answering stored state instead of true",
+        ENVMAP,
+        "        public var LightingEnabled: Bool { true }",
+        "        public var LightingEnabled: Bool { state.lightingEnabled }",
+    ),
 ]
 
 
@@ -2184,6 +2407,19 @@ def run_tests(swift_test: str) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--swift-test", default="swift-test")
+    # Running one milestone's own mutations, while the STALENESS check below
+    # still runs over all of them.
+    #
+    # The full run is what the handoff repeats; a milestone that has just
+    # written twenty-seven of them needs to see those twenty-seven fail and
+    # be fixed, and paying eighty minutes per iteration to learn it is how a
+    # mutation ends up merged unrun. The filter narrows only which mutations
+    # are PLANTED -- every site is still checked for staleness, so a selective
+    # run cannot hide a mutation whose site has drifted away.
+    parser.add_argument(
+        "--only", default=None,
+        help="plant only the mutations whose name contains one of these "
+             "comma-separated substrings")
     args = parser.parse_args()
     tree_lock = acquire_tree_lock("projection_mutations")
     if tree_lock is None:
@@ -2228,8 +2464,19 @@ def main() -> int:
         print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")
         return 1
 
+    wanted = None if args.only is None else [
+        part for part in args.only.split(",") if part
+    ]
+    selected = [
+        item for item in MUTATIONS
+        if wanted is None or any(part in item[0] for part in wanted)
+    ]
+    if args.only is not None and not selected:
+        print(f"PROJECTION_MUTATIONS=NONE no mutation name contains {args.only!r}")
+        return 1
+
     survivors: list[str] = []
-    for name, description, path, old, new in MUTATIONS:
+    for name, description, path, old, new in selected:
         text = originals[path]
         if text.count(old) != 1:
             survivors.append(
@@ -2249,8 +2496,10 @@ def main() -> int:
         if path.read_text(encoding="utf-8") != text:
             survivors.append(f"{path} was not restored")
 
-    print(f"PROJECTION_MUTATIONS={len(MUTATIONS)} "
-          f"CAUGHT={len(MUTATIONS) - len(survivors)} SURVIVORS={len(survivors)}")
+    scope = "" if args.only is None else f" SELECTED={args.only!r}"
+    print(f"PROJECTION_MUTATIONS={len(selected)} "
+          f"CAUGHT={len(selected) - len(survivors)} SURVIVORS={len(survivors)}"
+          f"{scope} DECLARED={len(MUTATIONS)}")
     for survivor in survivors:
         print(f"  SURVIVOR {survivor}")
     return 1 if survivors else 0

@@ -629,7 +629,7 @@ final class Foundation60BufferTests: XCTestCase {
                 graphicsDevice: device, vertexType: G.VertexPositionColor.self,
                 vertexCount: 2, usage: .None)
             var quietCount = 0
-            _ = try quiet.Disposing.Add { _, _ in quietCount += 1 }
+            _ = quiet.Disposing.Add { _, _ in quietCount += 1 }
             try quiet.Dispose(false)
             game.observations["finalizer"] = "\(quietCount) \(quiet.IsDisposed)"
 
@@ -637,7 +637,7 @@ final class Foundation60BufferTests: XCTestCase {
                 graphicsDevice: device, indexElementSize: .SixteenBits,
                 indexCount: 2, usage: .None)
             var loudCount = 0
-            _ = try loud.Disposing.Add { _, _ in loudCount += 1 }
+            _ = loud.Disposing.Add { _, _ in loudCount += 1 }
             try loud.Dispose(true)
             game.observations["disposing"] = "\(loudCount) \(loud.IsDisposed)"
         }

@@ -1287,16 +1287,35 @@ def parse_symbol_graph(
             None,
         )
         identity = f"{parent}.{witness.name}"
-        if requirement is None:
+        # A requirement that is itself an accessor projection has already been
+        # recombined into ONE property identity by the block above, so the
+        # protocol's `Set<Name>` requirement is no longer a member to look up
+        # -- `IEffectLights` declares `LightingEnabled { get }` and
+        # `SetLightingEnabled(_:)` and the pair is measured as the single
+        # property `LightingEnabled`. A witness for that writer is matched
+        # against the property, and its shape is not re-compared: the accessor
+        # rule has already decided what shape the writer must have, and
+        # comparing a method against a property would report a mismatch that
+        # is only an artefact of the recombination.
+        recombined_writer = (
+            requirement is None and witness.name.startswith("Set") and
+            any(
+                item.name == witness.name[len("Set"):] and item.kind == "property"
+                for item in types.get(
+                    requirement_owner, TypeModel("", "")).members
+            )
+        )
+        if requirement is None and not recombined_writer:
             diagnostics_context.append(diagnostic(
                 "UNMEASURED_STRUCTURAL_CATEGORY", identity,
                 f"protocol witness sourceOrigin does not resolve to a compiler-emitted requirement: {display_name}",
             ))
             continue
-        mismatch = protocol_witness_shape_diagnostic(witness, requirement)
-        if mismatch:
-            diagnostics_context.append(mismatch)
-            continue
+        if requirement is not None:
+            mismatch = protocol_witness_shape_diagnostic(witness, requirement)
+            if mismatch:
+                diagnostics_context.append(mismatch)
+                continue
         observed_projections.append({
             "ownerType": parent,
             "swiftMember": witness.name,
@@ -2185,25 +2204,74 @@ def self_test() -> None:
         failures.append("nonmutating projected witness not detected")
 
     contract = load_json(REFERENCE)
+    witness_verdicts = load_accessor_fallibility(rules)
+    # The Swift member a witness forces is NOT always the CLR member's name --
+    # a fallibility-forced writer is `Set<Name>` -- so the observations this
+    # self-test feeds back have to come from the rule's own records rather than
+    # from the configured identities.
+    configured_records, _ = protocol_witness_projection_evidence(
+        contract, rules, [], witness_verdicts,
+    )
     configured_witnesses = [
-        {
-            "ownerType": identity.rsplit(".", 1)[0],
-            "swiftMember": identity.rsplit(".", 1)[1],
-        }
-        for identity in rules["protocolWitnessMemberProjections"]
+        {"ownerType": item["ownerType"], "swiftMember": item["swiftMember"]}
+        for item in configured_records
     ]
     _, complete_witness_diagnostics = protocol_witness_projection_evidence(
-        contract, rules, configured_witnesses,
+        contract, rules, configured_witnesses, witness_verdicts,
     )
     if complete_witness_diagnostics:
         failures.append("configured protocol-witness evidence is not contract-complete")
     _, missing_witness_diagnostics = protocol_witness_projection_evidence(
-        contract, rules, configured_witnesses[1:],
+        contract, rules, configured_witnesses[1:], witness_verdicts,
     )
     if "LANGUAGE_MAPPING_MISMATCH" not in {
         item["category"] for item in missing_witness_diagnostics
     }:
         failures.append("removed required witness not detected")
+
+    # --- the two admissible witness shapes, told apart ----------------------
+    #
+    # Shape one is XNA's explicit interface implementation: the member is
+    # absent from the owner's public members. Shape two is an owner whose own
+    # accessor is INFALLIBLE beside an interface accessor that is not, where
+    # Swift's `throws` rules force a second spelling of the same CLR setter.
+    explicit_shapes = [
+        item for item in configured_records
+        if item["absentFromPublicDeclaredClrMembers"]
+    ]
+    forced_shapes = [
+        item for item in configured_records
+        if not item["absentFromPublicDeclaredClrMembers"]
+    ]
+    if not explicit_shapes:
+        failures.append("no explicit-implementation witness remains configured")
+    for item in forced_shapes:
+        if not item["swiftMember"].startswith("Set"):
+            failures.append(
+                f"fallibility-forced witness {item['ownerType']}.{item['swiftMember']} "
+                "must be a writer method")
+        owner_verdict = witness_verdicts.get(
+            (item["ownerType"], item["swiftMember"][len("Set"):]))
+        if owner_verdict is None or owner_verdict["setter"]:
+            failures.append(
+                f"fallibility-forced witness {item['ownerType']}.{item['swiftMember']} "
+                "must have an INFALLIBLE owner setter, or it needs no second writer")
+    # The negative control has to be a real one: a configured witness whose
+    # owner setter is fallible too is not forced by anything and must be
+    # refused rather than recorded.
+    if forced_shapes:
+        sample = forced_shapes[0]
+        property_name = sample["swiftMember"][len("Set"):]
+        relaxed = dict(witness_verdicts)
+        relaxed[(sample["ownerType"], property_name)] = {"getter": False, "setter": True}
+        _, relaxed_diagnostics = protocol_witness_projection_evidence(
+            contract, rules, configured_witnesses, relaxed,
+        )
+        if "UNMEASURED_STRUCTURAL_CATEGORY" not in {
+            item["category"] for item in relaxed_diagnostics
+        }:
+            failures.append(
+                "a witness whose owner setter is fallible too must be refused")
 
     packed_extra_expected = {
         "Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8": TypeModel(
@@ -6070,6 +6138,7 @@ def protocol_witness_projection_evidence(
     contract: dict[str, Any],
     rules: dict[str, Any],
     observed: list[dict[str, str]],
+    verdicts: dict[tuple[str, str], dict[str, bool]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
     source_types = {
         map_type_name(item["name"], rules): item for item in contract["types"]
@@ -6111,8 +6180,24 @@ def protocol_witness_projection_evidence(
     records: list[dict[str, Any]] = []
     failures: list[dict[str, str]] = []
     for identity in rules.get("protocolWitnessMemberProjections", []):
-        owner_name, member_name = identity.rsplit(".", 1)
+        owner_name, swift_member = identity.rsplit(".", 1)
         owner = source_types.get(owner_name)
+        # A configured identity names the SWIFT member, because that is what
+        # the compiler emits and what the strict comparison sees. Most name
+        # their CLR member directly; a writer names `Set<Name>`, which is the
+        # projection of the CLR setter accessor of `<Name>`. Resolve back to
+        # the CLR member before anything else, and only accept the stripped
+        # form when the literal one is not a member of the owner's interfaces.
+        member_name = swift_member
+        if owner is not None and swift_member.startswith("Set"):
+            stripped = swift_member[len("Set"):]
+            direct = owner.get("directInterfaces", [])
+            if not any(
+                declares(open_name(item), swift_member, set()) for item in direct
+            ) and any(
+                declares(open_name(item), stripped, set()) for item in direct
+            ):
+                member_name = stripped
         # The forcing interface is whichever DIRECT CLR interface of the owner
         # declares this member. The rule was written for `IPackedVector<T>` and
         # is general: what makes a Swift witness necessary is that the CLR
@@ -6136,30 +6221,59 @@ def protocol_witness_projection_evidence(
             item for item in owner["members"]
             if item["name"] == member_name and not item.get("static")
         ]
-        if owner is None or len(forcing) != 1 or declared:
+        # SHAPE TWO: the member IS a public property of the owner, but the
+        # interface's accessor is fallible where the owner's is not. Swift
+        # projects the owner's own property as `{ get set }` and the interface
+        # requirement as `{ get }` + a THROWING writer method, and a property
+        # cannot witness a method requirement -- so the owner has to spell the
+        # same CLR setter accessor a second time.
+        #
+        # `IEffectLights.LightingEnabled` is the case: BasicEffect's setter is
+        # a field write, while EnvironmentMapEffect's and SkinnedEffect's are
+        # explicit implementations that raise NotSupportedException. The
+        # interface accessor is fallible because two of its three implementors
+        # are, which is what makes BasicEffect's infallible property
+        # insufficient on its own.
+        interface_name = open_name(forcing[0]) if len(forcing) == 1 else None
+        fallibility_forced = False
+        if owner is not None and len(forcing) == 1 and declared and verdicts:
+            owner_verdict = verdicts.get((owner_name, member_name))
+            interface_verdict = verdicts.get((interface_name, member_name))
+            fallibility_forced = bool(
+                len(declared) == 1 and declared[0]["kind"] == "property" and
+                owner_verdict and interface_verdict and
+                interface_verdict["setter"] and not owner_verdict["setter"]
+            )
+        if owner is None or len(forcing) != 1 or (declared and not fallibility_forced):
             failures.append(diagnostic(
                 "UNMEASURED_STRUCTURAL_CATEGORY", identity,
                 "protocol-witness rule lacks a unique concrete owner, exactly one direct CLR "
                 "interface declaring the member, or absence from the owner's public declared "
-                "CLR instance members",
+                "CLR instance members without a fallibility-forced writer",
             ))
             continue
         forcing_interfaces = forcing
-        interface_name = open_name(forcing[0])
         compiler_observed = identity in observed_identities
         if not compiler_observed:
             failures.append(diagnostic(
                 "LANGUAGE_MAPPING_MISMATCH", identity,
-                "configured protocol-witness projection has no matching compiler sourceOrigin witness",
+                "configured protocol-witness projection has no matching compiler "
+                "sourceOrigin witness",
             ))
         records.append({
             "ownerType": owner_name,
-            "swiftMember": member_name,
+            "swiftMember": swift_member,
             "forcingClrInterface": forcing_interfaces[0],
             "interfaceRequirement": f"{interface_name}.{member_name}",
-            "absentFromPublicDeclaredClrMembers": True,
+            "absentFromPublicDeclaredClrMembers": not fallibility_forced,
             "compilerSourceOriginObserved": compiler_observed,
-            "reason": "Swift requires a public conformance witness for XNA's private explicit-interface implementation",
+            "reason": (
+                "Swift requires a throwing writer to witness an interface accessor "
+                "that is fallible where the owner's own accessor is not"
+                if fallibility_forced else
+                "Swift requires a public conformance witness for XNA's private "
+                "explicit-interface implementation"
+            ),
         })
     return records, failures
 
@@ -6755,7 +6869,7 @@ def main() -> int:
     resource_evidence = resource_evidence + table_evidence
     resource_diagnostics = resource_diagnostics + table_diagnostics
     witness_evidence, witness_diagnostics = protocol_witness_projection_evidence(
-        contract, rules, observed_witnesses,
+        contract, rules, observed_witnesses, accessor_fallibility,
     )
     system_interface_evidence, system_interface_diagnostics = (
         system_interface_projection_evidence(contract, rules)

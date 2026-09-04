@@ -80,7 +80,9 @@ final class Foundation61DynamicBufferTests: XCTestCase {
             let buffer = try G.DynamicVertexBuffer(
                 graphicsDevice: device, vertexType: G.VertexPositionColor.self,
                 vertexCount: 4, usage: .None)
-            game.observations["is a vertex buffer"] = "\(buffer is G.VertexBuffer)"
+            let asVertexBuffer: G.VertexBuffer = buffer
+            game.observations["is a vertex buffer"] =
+            "\(asVertexBuffer === buffer)"
             game.observations["count"] = "\(buffer.VertexCount)"
             game.observations["declaration"] =
                 "\(buffer.VertexDeclaration === G.VertexPositionColor.VertexDeclaration)"
@@ -181,7 +183,11 @@ final class Foundation61DynamicBufferTests: XCTestCase {
             let buffer = try G.DynamicIndexBuffer(
                 graphicsDevice: device, indexElementSize: .SixteenBits,
                 indexCount: 6, usage: .None)
-            game.observations["is an index buffer"] = "\(buffer is G.IndexBuffer)"
+            // Typed as the base, which only compiles because it derives
+            // from it. The recorded fact is the one that can differ.
+            let asIndexBuffer: G.IndexBuffer = buffer
+            game.observations["is an index buffer"] =
+            "\(asIndexBuffer === buffer)"
             try buffer.SetData([Int16(1), 2, 3, 4, 5, 6], startIndex: 0,
                                elementCount: 6, options: .Discard)
             var read = [Int16](repeating: 0, count: 6)
@@ -256,7 +262,7 @@ final class Foundation61DynamicBufferTests: XCTestCase {
                 graphicsDevice: device, vertexType: G.VertexPositionColor.self,
                 vertexCount: 2, usage: .None)
             var quietCount = 0
-            _ = try quiet.Disposing.Add { _, _ in quietCount += 1 }
+            _ = quiet.Disposing.Add { _, _ in quietCount += 1 }
             try quiet.Dispose(false)
             game.observations["finalizer"] =
                 "\(quietCount) \(quiet.IsDisposed) \(quiet.contentLostRegistration == 0)"
@@ -265,7 +271,7 @@ final class Foundation61DynamicBufferTests: XCTestCase {
                 graphicsDevice: device, indexElementSize: .SixteenBits,
                 indexCount: 2, usage: .None)
             var loudCount = 0
-            _ = try loud.Disposing.Add { _, _ in loudCount += 1 }
+            _ = loud.Disposing.Add { _, _ in loudCount += 1 }
             try loud.Dispose(true)
             game.observations["disposing"] =
                 "\(loudCount) \(loud.IsDisposed) \(loud.contentLostRegistration == 0)"

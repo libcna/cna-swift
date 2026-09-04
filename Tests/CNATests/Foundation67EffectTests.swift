@@ -70,7 +70,8 @@ final class Foundation67EffectTests: XCTestCase {
         try requireNative()
         let game = try run { game, device in
             let effect = try G.Effect.empty(graphicsDevice: device)
-            game.observations["is a resource"] = "\(effect is G.GraphicsResource)"
+            let asResource: G.GraphicsResource = effect
+            game.observations["is a resource"] = "\(asResource === effect)"
             game.observations["device"] = "\(effect.GraphicsDevice === device)"
             game.observations["parameters"] = "\(effect.Parameters?.Count ?? -1)"
             game.observations["techniques"] = "\(effect.Techniques?.Count ?? -1)"

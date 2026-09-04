@@ -137,7 +137,7 @@ final class Foundation68DrawTests: XCTestCase {
             } catch let error as CNAError {
                 if case .nativeFailure(let operation, let result, let message) = error {
                     outcome = "\(operation)=\(result)"
-                    game.observations["message"] = message ?? ""
+                    game.observations["message"] = message
                 }
             }
             game.observations["no effect"] = outcome
@@ -182,7 +182,7 @@ final class Foundation68DrawTests: XCTestCase {
             } catch let error as CNAError {
                 if case .nativeFailure(_, let result, let message) = error {
                     outcome = "\(result)"
-                    game.observations["message"] = message ?? ""
+                    game.observations["message"] = message
                 }
             }
             game.observations["unwritten"] = outcome

@@ -54,6 +54,17 @@ EVIDENCE_UNRESOLVED = "IL_ACCESSOR_NOT_FOUND"
 
 INSTRUCTION = re.compile(r"^\s*IL_[0-9a-fA-F]+:\s*(\S+)(.*)$")
 MEMBER_REFERENCE = re.compile(r"([^\s(]+::[^\s(]+)")
+# A CLR explicit interface implementation names its interface method in an
+# `.override` directive, in one of two spellings:
+#
+#     .override Microsoft.Xna.Framework.Graphics.IEffectLights::set_LightingEnabled
+#     .override method instance void [asm]Some.IFoo`1<!0>::Bar(int32)
+#
+# The interface member's arity is the OVERRIDING method's own arity -- an
+# override has the interface method's signature -- so the directive is only
+# read for the pair of names and the signature is never parsed.
+OVERRIDE_DIRECTIVE = re.compile(r"^\s*\.override\s+(.+?)\s*$")
+ASSEMBLY_REFERENCE = re.compile(r"^\[[^\]]*\]")
 
 
 def sha256(path: Path) -> str:
@@ -191,9 +202,42 @@ def balanced_argument_list(text: str, open_index: int) -> str | None:
     return None
 
 
+def override_targets(
+    body: list[str], arity: int,
+) -> tuple[tuple[str, str, int], ...]:
+    """The interface methods a body's `.override` directives name.
+
+    Returned as call-graph keys, so an explicit implementation can be looked up
+    by the interface member it implements rather than by its own IL name -- an
+    explicit implementation is named
+    `Microsoft.Xna.Framework.Graphics.IEffectLights.set_LightingEnabled`, which
+    matches no interface member by name and is why the two effects that refuse
+    to disable lighting were invisible to the implementor search.
+    """
+    targets: list[tuple[str, str, int]] = []
+    for line in body:
+        match = OVERRIDE_DIRECTIVE.match(uncommented(line))
+        if match is None:
+            continue
+        text = match.group(1)
+        head = text.split("(", 1)[0]
+        if "::" not in head:
+            continue
+        owner, name = head.rsplit("::", 1)
+        # The long spelling prefixes the return type and calling convention,
+        # and either spelling may carry an assembly reference or generic
+        # arguments on the owner.
+        owner = owner.split()[-1].split("<", 1)[0]
+        owner = ASSEMBLY_REFERENCE.sub("", owner)
+        name = name.strip()
+        if owner and name:
+            targets.append((owner, name, arity))
+    return tuple(targets)
+
+
 class Method:
     __slots__ = ("owner", "name", "arity", "header", "body", "static",
-                 "virtual", "abstract", "has_body")
+                 "virtual", "abstract", "has_body", "overrides")
 
     def __init__(self, owner: str, name: str, arity: int, header: str,
                  body: list[str]) -> None:
@@ -208,6 +252,7 @@ class Method:
         self.abstract = "abstract" in prefix
         self.has_body = not self.abstract and bool(
             [line for line in body if INSTRUCTION.match(uncommented(line))])
+        self.overrides = override_targets(body, arity)
 
     @property
     def key(self) -> tuple[str, str, int]:
@@ -531,6 +576,15 @@ class CallGraph:
         for name, supers in self.bases.items():
             for parent in supers:
                 self.subtypes[parent].add(name)
+        # Interface member -> the explicit implementations that override it.
+        # Keyed by what the `.override` directive names, which is the only
+        # place an explicit implementation records what it implements.
+        self.explicit: dict[
+            tuple[str, str, int], set[tuple[str, str, int]]] = collections.defaultdict(set)
+        for key, methods in self.methods.items():
+            for method in methods:
+                for target in method.overrides:
+                    self.explicit[target].add(key)
         self.direct: dict[tuple[str, str, int], list[str]] = {}
         self.edges: dict[tuple[str, str, int], set[tuple[str, str, int]]] = {}
         self._build()
@@ -576,7 +630,10 @@ class CallGraph:
             if candidate in self.methods:
                 result.add(candidate)
             pending.extend(self.subtypes.get(subtype, ()))
-        return result
+        # An explicit implementation carries the interface member's name
+        # nowhere in its own IL name, so the walk above cannot see it. A
+        # `callvirt` on the interface member still reaches it.
+        return result | self.explicit.get(reference, set())
 
     def _propagate(self) -> tuple[set[tuple[str, str, int]], dict[Any, Any]]:
         """Reverse breadth-first search keeps the shortest chain to a throw."""
@@ -619,6 +676,12 @@ class CallGraph:
                     result.append(candidate)
                     break
             pending.extend(self.subtypes.get(subtype, ()))
+        # Same blindness as `_overrides`, and the same repair: an implementor
+        # that implements the member EXPLICITLY is named after the interface,
+        # not after the member, so only the `.override` index finds it.
+        for candidate in self.explicit.get((owner, name, arity), ()):
+            if any(method.has_body for method in self.methods.get(candidate, [])):
+                result.append(candidate)
         return sorted(set(result))
 
 
@@ -735,6 +798,23 @@ def exception_types(decoded: list[tuple[str, str]]) -> list[str]:
         if reference and reference[0].endswith("Exception") and reference[0] not in names:
             names.append(reference[0])
     return names
+
+
+def chain_part(part: str) -> str:
+    """One `Owner::member/arity` chain entry, shortened for the table.
+
+    The member alone is enough for an ordinary chain, where every entry is a
+    differently-named method. It is NOT enough for an explicit interface
+    implementation: its IL name is the interface member's fully-qualified name,
+    so `EnvironmentMapEffect` and `SkinnedEffect` refusing to disable lighting
+    render as the same string twice and the evidence reads as a loop. Those
+    entries keep the owning type, which is the only thing that distinguishes
+    them.
+    """
+    owner, _, member = part.rpartition("::")
+    if "." not in member.split("/", 1)[0]:
+        return member
+    return f"{owner.rsplit('.', 1)[-1]}::{member.rsplit('.', 1)[-1]}"
 
 
 def render(key: tuple[str, str, int]) -> str:
@@ -946,6 +1026,45 @@ def self_test(graph: CallGraph, assemblies: list[Assembly]) -> tuple[int, list[s
         graph, "Microsoft.Xna.Framework.Graphics.IEffectMatrices", "set_World", 1)
     expect(not matrices["fallible"], "IEffectMatrices.World setter must be infallible")
 
+    # --- explicit interface implementations are implementors too -------------
+    #
+    # `IEffectLights.LightingEnabled` is implemented three ways: BasicEffect
+    # implements it IMPLICITLY with an infallible field-backed setter, while
+    # EnvironmentMapEffect and SkinnedEffect implement it EXPLICITLY and throw
+    # `NotSupportedException(CantDisableLighting)` when asked to disable it.
+    #
+    # An explicit implementation's IL name is the interface member's
+    # fully-qualified name, so a search by member name finds only BasicEffect
+    # and the interface accessor reads as infallible. That is what these checks
+    # exist to keep from coming back: the projection would then declare
+    # `LightingEnabled { get set }` and neither effect could report the refusal
+    # XNA reports.
+    lights = "Microsoft.Xna.Framework.Graphics.IEffectLights"
+    lighting = classify(graph, lights, "set_LightingEnabled", 1)
+    expect(lighting["fallible"] and lighting["evidence"] == EVIDENCE_ABSTRACT,
+           "IEffectLights.LightingEnabled setter must be fallible through its "
+           "two EXPLICIT implementors")
+    expect(lighting["exceptions"] == ["System.NotSupportedException"],
+           "IEffectLights.LightingEnabled setter must report NotSupportedException")
+    expect(len(graph.implementors(lights, "set_LightingEnabled", 1)) == 3,
+           "all three IEffectLights implementors must be found, explicit or not")
+    for effect in ("EnvironmentMapEffect", "SkinnedEffect"):
+        owner = f"Microsoft.Xna.Framework.Graphics.{effect}"
+        name = f"{lights}.set_LightingEnabled"
+        expect((owner, name, 1) in graph.direct,
+               f"{effect}'s explicit LightingEnabled setter must throw directly")
+    # The getter of the same property is the negative control: both explicit
+    # implementations are `ldc.i4.1; ret`, so widening the implementor search
+    # must not make it fallible.
+    expect(not classify(graph, lights, "get_LightingEnabled", 0)["fallible"],
+           "IEffectLights.LightingEnabled getter must stay infallible")
+    # A second control, on the mechanism rather than the verdict: an explicit
+    # implementation must be reachable from a virtual call on the interface.
+    expect(graph._overrides((lights, "set_LightingEnabled", 1)) >= {
+        ("Microsoft.Xna.Framework.Graphics.SkinnedEffect",
+         f"{lights}.set_LightingEnabled", 1)},
+        "a callvirt on an interface member must reach its explicit implementations")
+
     # --- the graph must distinguish overload arities ------------------------
     expect(any(
         any(other[0] == key[0] and other[1] == key[1] and other[2] != key[2]
@@ -1085,9 +1204,7 @@ def render_markdown(report: dict[str, Any]) -> str:
             if not verdict["fallible"]:
                 continue
             chain = " → ".join(
-                part.rsplit("::", 1)[-1] if index else part.rsplit("::", 1)[-1]
-                for index, part in enumerate(verdict.get("chain", []))
-            )
+                chain_part(part) for part in verdict.get("chain", []))
             lines.append(
                 f"| `{item['type']}` | `{item['property']}` | `{verdict['evidence']}` | "
                 f"{', '.join(verdict.get('exceptions', [])) or '—'} | "

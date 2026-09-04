@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=176
-TARGET_MEMBERS=2174
-TOTAL_DIAGNOSTICS=123
-COMPLETE_TYPES=170
+TARGET_TYPES=184
+TARGET_MEMBERS=2296
+TOTAL_DIAGNOSTICS=115
+COMPLETE_TYPES=178
 PARTIAL_TYPES=6
-MISSING_TYPES=81
-MISSING_TYPE=81
+MISSING_TYPES=73
+MISSING_TYPE=73
 MISSING_MEMBER=38
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -41,12 +41,12 @@ INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=125
+LANGUAGE_PROJECTION_EXCLUSIONS=130
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=11
 INHERITED_MEMBER_PROJECTIONS=4
-PROTOCOL_WITNESS_MEMBER_PROJECTIONS=33
+PROTOCOL_WITNESS_MEMBER_PROJECTIONS=38
 ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
 COLLECTION_INTERFACE_PROJECTIONS=1
@@ -54,25 +54,25 @@ ENUMERATOR_SUPPORT_PROJECTIONS=13
 ACCESSOR_PROJECTIONS=840
 INDEXED_ACCESSOR_PROJECTIONS=24
 THROWING_GETTER_PROJECTIONS=114
-PROPERTY_SETTER_PROJECTIONS=166
-WRITER_METHOD_PROJECTIONS=113
-THROWING_WRITER_METHOD_PROJECTIONS=113
+PROPERTY_SETTER_PROJECTIONS=165
+WRITER_METHOD_PROJECTIONS=114
+THROWING_WRITER_METHOD_PROJECTIONS=114
 INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
 GETTER_ONLY_PROJECTIONS=561
 WRITE_ONLY_PROJECTIONS=0
-MEASURED_ACCESSOR_PROJECTIONS=63
-PENDING_ACCESSOR_PROJECTIONS=50
+MEASURED_ACCESSOR_PROJECTIONS=88
+PENDING_ACCESSOR_PROJECTIONS=26
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 NONPUBLIC_CONSTRUCTION_PROJECTIONS=20
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=18
-XNA_SEALED_CLASS_PROJECTIONS=28
+XNA_SEALED_CLASS_PROJECTIONS=29
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=69
+XNA_RESOURCE_STRING_PROJECTIONS=72
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=158
-PENDING_RETURN_NULLABILITY_PROJECTIONS=211
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=38
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=183
+PENDING_RETURN_NULLABILITY_PROJECTIONS=186
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=57
 ```
 
 ## Complete types
@@ -127,6 +127,8 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=38
 - `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
 - `Microsoft.Xna.Framework.GameServiceContainer`
 - `Microsoft.Xna.Framework.GameTime`
+- `Microsoft.Xna.Framework.Graphics.AlphaTestEffect`
+- `Microsoft.Xna.Framework.Graphics.BasicEffect`
 - `Microsoft.Xna.Framework.Graphics.Blend`
 - `Microsoft.Xna.Framework.Graphics.BlendFunction`
 - `Microsoft.Xna.Framework.Graphics.BlendState`
@@ -140,13 +142,16 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=38
 - `Microsoft.Xna.Framework.Graphics.DepthStencilState`
 - `Microsoft.Xna.Framework.Graphics.DeviceLostException`
 - `Microsoft.Xna.Framework.Graphics.DeviceNotResetException`
+- `Microsoft.Xna.Framework.Graphics.DirectionalLight`
 - `Microsoft.Xna.Framework.Graphics.DisplayMode`
 - `Microsoft.Xna.Framework.Graphics.DisplayModeCollection`
+- `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
 - `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.DynamicVertexBuffer`
 - `Microsoft.Xna.Framework.Graphics.Effect`
 - `Microsoft.Xna.Framework.Graphics.EffectAnnotation`
 - `Microsoft.Xna.Framework.Graphics.EffectAnnotationCollection`
+- `Microsoft.Xna.Framework.Graphics.EffectMaterial`
 - `Microsoft.Xna.Framework.Graphics.EffectParameter`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterClass`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterCollection`
@@ -155,11 +160,13 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=38
 - `Microsoft.Xna.Framework.Graphics.EffectPassCollection`
 - `Microsoft.Xna.Framework.Graphics.EffectTechnique`
 - `Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection`
+- `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
 - `Microsoft.Xna.Framework.Graphics.FillMode`
 - `Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus`
 - `Microsoft.Xna.Framework.Graphics.GraphicsProfile`
 - `Microsoft.Xna.Framework.Graphics.GraphicsResource`
 - `Microsoft.Xna.Framework.Graphics.IEffectFog`
+- `Microsoft.Xna.Framework.Graphics.IEffectLights`
 - `Microsoft.Xna.Framework.Graphics.IEffectMatrices`
 - `Microsoft.Xna.Framework.Graphics.IGraphicsDeviceService`
 - `Microsoft.Xna.Framework.Graphics.IVertexType`
@@ -198,6 +205,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=38
 - `Microsoft.Xna.Framework.Graphics.SamplerState`
 - `Microsoft.Xna.Framework.Graphics.SamplerStateCollection`
 - `Microsoft.Xna.Framework.Graphics.SetDataOptions`
+- `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteEffects`
 - `Microsoft.Xna.Framework.Graphics.SpriteSortMode`
 - `Microsoft.Xna.Framework.Graphics.StencilOperation`
@@ -374,14 +382,7 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.FrameworkDispatcher`
 - `Microsoft.Xna.Framework.GameWindow`
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
-- `Microsoft.Xna.Framework.Graphics.AlphaTestEffect`
-- `Microsoft.Xna.Framework.Graphics.BasicEffect`
-- `Microsoft.Xna.Framework.Graphics.DirectionalLight`
-- `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
-- `Microsoft.Xna.Framework.Graphics.EffectMaterial`
-- `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
-- `Microsoft.Xna.Framework.Graphics.IEffectLights`
 - `Microsoft.Xna.Framework.Graphics.Model`
 - `Microsoft.Xna.Framework.Graphics.ModelBone`
 - `Microsoft.Xna.Framework.Graphics.ModelBoneCollection`
@@ -395,7 +396,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
-- `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.Input.Mouse`

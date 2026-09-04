@@ -105,6 +105,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CantDisableLighting",
+      "value": "{0} does not support setting LightingEnabled to false."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "value": "Invalid VertexDeclaration. Duplicate element {0}{1}."
     },
@@ -302,6 +307,16 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ScissorInvalid",
       "value": "The scissor rectangle is invalid. The scissor rectangle cannot be larger than or outside of the current render target bounds."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "SkinnedEffectMaxBones",
+      "value": "SkinnedEffect supports a maximum of {0} bones."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "SkinnedEffectWeightsPerVertex",
+      "value": "SkinnedEffect.WeightsPerVertex must be 1, 2, or 4."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

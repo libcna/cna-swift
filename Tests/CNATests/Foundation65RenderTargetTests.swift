@@ -95,8 +95,10 @@ final class Foundation65RenderTargetTests: XCTestCase {
             game.observations["usage"] = "\(cube.RenderTargetUsage)"
             game.observations["lost"] = "\(cube.IsContentLost)"
             game.observations["subscribed"] = "\(cube.contentLostRegistration != 0)"
-            game.observations["is a TextureCube"] = "\(cube is G.TextureCube)"
-            game.observations["is a Texture"] = "\(cube is G.Texture)"
+            let asTextureCube: G.TextureCube = cube
+            game.observations["is a TextureCube"] = "\(asTextureCube === cube)"
+            let asTexture: G.Texture = cube
+            game.observations["is a Texture"] = "\(asTexture === cube)"
             try cube.Dispose()
             game.observations["released"] = "\(cube.contentLostRegistration == 0)"
         }
