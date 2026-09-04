@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 64.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 65.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,16 +22,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-678 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=150   COMPLETE_TYPES=158   PARTIAL_TYPES=6
-MISSING_TYPE=93  MISSING_MEMBER=52  OVERLOAD_MAPPING_MISMATCH=5
+693 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=144   COMPLETE_TYPES=160   PARTIAL_TYPES=6
+MISSING_TYPE=91  MISSING_MEMBER=49  OVERLOAD_MAPPING_MISMATCH=4
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=119  PROTOTYPE_TYPE_POSITIONS=426  LAYOUTS=39  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=168 (last full run 137, CAUGHT=135, 2 no-ops replaced)
+BOUND_FUNCTIONS=123  PROTOTYPE_TYPE_POSITIONS=441  LAYOUTS=41  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=177 (last full run 137, CAUGHT=135, 2 no-ops replaced)
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,310 implemented members
+MESSAGE_COVERAGE_FINDINGS=0 over 1,325 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
-RESOURCE_STRINGS_REPRODUCED=56
+RESOURCE_STRINGS_REPRODUCED=59
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -139,7 +139,12 @@ These are the ones that cost the most to relearn:
    and the result was believed for a minute.
 3. **The two mutation harnesses take `.mutation-gate.lock`.** They both edit
    files under `Sources/`; running them together makes one compile the other's
-   defect and report a CAUGHT it did not earn.
+   defect and report a CAUGHT it did not earn. **The lock does not protect an
+   ordinary build**, and nothing else does either: running `swift build -c
+   release` beside `tools/native_abi/mutations.py` in Foundation 65 produced
+   `input file 'NativeFunctions.swift' was modified during the build` and a
+   `signal 6`. Nothing was corrupted, but a whole release-and-sanitizer pass was
+   wasted. Run a mutation harness alone.
 4. **Grep the neighbouring symbols before calling something upstream-blocked.**
    `cna_sprite_batch_begin`'s doc comment describes that route, not the API;
    `begin_with_states` was there all along and Foundation 53 wrote the wrong
@@ -179,7 +184,7 @@ python3 tools/api_compat/verify.py --symbol-graph … --output docs/generated/ap
 python3 tools/api_compat/dependency_graph.py --report … --output …
 python3 tools/native_abi/verify.py     --cna-include … --library "$CNA_NATIVE_LIBRARY"
 python3 tools/native_abi/mutations.py  --cna-include … --library "$CNA_NATIVE_LIBRARY"
-CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~45 min, 168 mutations
+CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~50 min, 177 mutations
 python3 tools/api_compat/message_coverage.py --self-test|--mutations|(report)
 python3 tools/api_compat/pinned_assembly_audit.py …
 python3 tools/api_compat/bcl_authority_audit.py … --cross-check --negative-control …×4
@@ -227,7 +232,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 64 have landed since. Nothing here is
+> Foundation Milestones 37 through 65 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->

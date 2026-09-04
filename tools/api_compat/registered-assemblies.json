@@ -302,6 +302,21 @@
     {
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "WriteOnlyGetNotSupported"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileMaxRenderTargets",
+      "reason": "The private GraphicsDevice.SetRenderTargets raises NotSupportedException through ProfileCapabilities.ThrowNotSupportedException when the binding count exceeds MaxRenderTargets, which is 1 on Reach and 4 on HiDef. The message names the PROFILE and the LIMIT -- the boxed argument is MaxRenderTargets, not the requested count."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CannotSetAlreadyUsedRenderTarget",
+      "reason": "The private GraphicsDevice.SetRenderTargets raises ArgumentException with this when the same target appears twice in one binding array. Reached only for i > 0, so a single-target bind never meets it."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "RenderTargetsMustMatch",
+      "reason": "The private GraphicsDevice.SetRenderTargets raises ArgumentException with this when RenderTargetHelper.IsSameSize refuses a binding against slot zero -- four fields: both extents, the multisample count and the colour format's byte size. Reached only for i > 0."
     }
   ]
 }

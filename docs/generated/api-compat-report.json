@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 164,
-    "TARGET_MEMBERS": 2049,
-    "TOTAL_DIAGNOSTICS": 150,
-    "COMPLETE_TYPES": 158,
+    "TARGET_TYPES": 166,
+    "TARGET_MEMBERS": 2065,
+    "TOTAL_DIAGNOSTICS": 144,
+    "COMPLETE_TYPES": 160,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 93,
-    "MISSING_TYPE": 93,
-    "MISSING_MEMBER": 52,
+    "MISSING_TYPES": 91,
+    "MISSING_TYPE": 91,
+    "MISSING_MEMBER": 49,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -29,7 +29,7 @@
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 5,
+    "OVERLOAD_MAPPING_MISMATCH": 4,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 56,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 59,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,8 +91,8 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 114,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 255,
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 116,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 253,
     "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 18
   },
   "completeTypes": [
@@ -182,6 +182,8 @@
     "Microsoft.Xna.Framework.Graphics.PrimitiveType",
     "Microsoft.Xna.Framework.Graphics.RasterizerState",
     "Microsoft.Xna.Framework.Graphics.RenderTarget2D",
+    "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
+    "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
     "Microsoft.Xna.Framework.Graphics.RenderTargetUsage",
     "Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs",
     "Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs",
@@ -326,8 +328,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection",
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
-    "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
-    "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
     "Microsoft.Xna.Framework.Graphics.SpriteFont",
     "Microsoft.Xna.Framework.Graphics.TextureCollection",
@@ -696,26 +696,6 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTargets(_:[Microsoft.Xna.Framework.Graphics.RenderTargetBinding])",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetRenderTargets()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",
       "detail": "mapped member is absent"
     },
@@ -867,16 +847,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -3868,6 +3838,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "CannotSetAlreadyUsedRenderTarget",
+      "pinnedValue": "The render target has already been set on another index. Each render target may only be set on a single index at a time.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "DuplicateVertexElement",
       "pinnedValue": "Invalid VertexDeclaration. Duplicate element {0}{1}.",
       "reproducedInSwiftSource": true
@@ -3994,6 +3970,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileMaxRenderTargets",
+      "pinnedValue": "XNA Framework {0} profile supports a maximum of {1} simultaneous rendertargets.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "ProfileMaxVertexStreams",
       "pinnedValue": "XNA Framework {0} profile supports a maximum of {1} simultaneous vertex buffers.",
       "reproducedInSwiftSource": true
@@ -4020,6 +4002,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "ProfileTooBig",
       "pinnedValue": "XNA Framework {0} profile supports a maximum {1} size of {2}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "RenderTargetsMustMatch",
+      "pinnedValue": "All active render targets must be the same size with the same multisample type and bit depth.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4390,6 +4378,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 3,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 2,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -6784,8 +6780,8 @@
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "[Microsoft.Xna.Framework.Graphics.RenderTargetBinding]"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -7688,14 +7684,14 @@
       "member": "RenderTarget",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.Texture",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.Texture",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.Texture"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs",
@@ -10868,7 +10864,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 21,
+      "targetMembers": 24,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -10943,26 +10939,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTargets(_:[Microsoft.Xna.Framework.Graphics.RenderTargetBinding])",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.SetRenderTarget(_:Microsoft.Xna.Framework.Graphics.RenderTargetCube?,cubeMapFace:Microsoft.Xna.Framework.Graphics.CubeMapFace)",
-          "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetRenderTargets()",
           "detail": "mapped member is absent"
         },
         {
@@ -11474,29 +11450,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.RenderTargetBinding",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 8,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 8,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.RenderTargetUsage",

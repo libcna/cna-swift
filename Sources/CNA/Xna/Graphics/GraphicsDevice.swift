@@ -389,33 +389,249 @@ extension Microsoft.Xna.Framework.Graphics {
         /// sources, and a single reading is easier to keep honest than three
         /// copies of it.
         internal func currentTargetBounds() throws -> (width: Int32, height: Int32) {
-            if let target = runtime.currentRenderTarget, !target.IsDisposed {
-                return (target.Width, target.Height)
+            if let slotZero = boundRenderTargetSlotZero {
+                return (slotZero.renderTargetWidth, slotZero.renderTargetHeight)
             }
             let native = try nativePresentationParameters()
             return (native.back_buffer_width, native.back_buffer_height)
         }
 
+        /// Slot zero's `DepthStencilFormat`, from either kind of target.
+        private var boundRenderTargetDepthFormat: DepthFormat? {
+            guard let first = runtime.cachedRenderTargetBindings.first,
+                  !first.RenderTarget.IsDisposed else { return nil }
+            if let target = first.RenderTarget as? RenderTarget2D {
+                return target.DepthStencilFormat
+            }
+            if let target = first.RenderTarget as? RenderTargetCube {
+                return target.DepthStencilFormat
+            }
+            return nil
+        }
+
+        /// `currentRenderTargetCount > 0 ? currentRenderTargets[0] : null`,
+        /// which is the branch three XNA members take.
+        ///
+        /// A **disposed** target is treated as no target. XNA cannot reach that
+        /// state — `GraphicsDevice.Dispose` releases its bindings and CNA
+        /// refuses `cna_render_target_destroy` on a bound target with
+        /// `CNA_RESULT_INVALID_STATE` — so this is the honest answer for an
+        /// input XNA does not define rather than a reproduction of one.
+        private var boundRenderTargetSlotZero:
+            (any Microsoft.Xna.Framework.Graphics.RenderTargetDescription)? {
+            guard let first = runtime.cachedRenderTargetBindings.first else { return nil }
+            let target = first.RenderTarget
+            guard !target.IsDisposed else { return nil }
+            return target as? any Microsoft.Xna.Framework.Graphics.RenderTargetDescription
+        }
+
         /// `GraphicsDevice.SetRenderTarget(RenderTarget2D renderTarget)`.
         ///
-        /// A nil target restores the backbuffer, which is what XNA's null
-        /// argument does and what `CNA_INVALID_HANDLE` means to
-        /// `cna_graphics_device_set_render_target2d`.
+        /// Thirty-one bytes of IL, and every one of them is the same decision:
+        ///
+        /// ```text
+        /// if (renderTarget != null) {
+        ///     RenderTargetBinding b = new RenderTargetBinding(renderTarget);
+        ///     SetRenderTargets(&b, 1);
+        /// } else {
+        ///     SetRenderTargets(null, 0);
+        /// }
+        /// ```
+        ///
+        /// So a nil target restores the backbuffer, and every validation the
+        /// array path performs happens here too — in particular the disposal
+        /// check and the device-identity check.
+        ///
+        /// The native call is `cna_graphics_device_set_render_target2d` rather
+        /// than the array route, and that is a measured equivalence rather than
+        /// an assumption: after the dedicated route,
+        /// `cna_graphics_device_get_render_target_count` answers 1 and
+        /// `cna_graphics_device_copy_render_targets` hands back the same handle
+        /// with face `PositiveX` — the identical state the array route leaves
+        /// (`build-probe/f65_rtcube.c`). Binding the array route for a call the
+        /// dedicated one serves would leave the dedicated one with no consuming
+        /// member, which `docs/native-abi.md` forbids.
         public func SetRenderTarget(
             _ renderTarget: RenderTarget2D?
         ) throws {
             let deviceHandle = try validatedHandle("GraphicsDevice.SetRenderTarget")
-            let targetHandle = try renderTarget.map {
-                try $0.validatedHandle("GraphicsDevice.SetRenderTarget")
-            } ?? 0
+            guard let renderTarget else {
+                try unbindRenderTargets(deviceHandle)
+                return
+            }
+            let binding = RenderTargetBinding(renderTarget)
+            try validateRenderTargets([binding])
+            let targetHandle = try renderTarget.validatedHandle(
+                "GraphicsDevice.SetRenderTarget")
             try runtime.functions.check(
                 runtime.functions.graphicsDeviceSetRenderTarget2D(deviceHandle, targetHandle),
                 operation: "cna_graphics_device_set_render_target2d"
             )
-            // `currentRenderTargets[0]` / `currentRenderTargetCount`, which
-            // `get_DefaultClearOptions` reads to decide which buffers a
-            // colour-only `Clear` also clears.
-            runtime.currentRenderTarget = renderTarget
+            runtime.cachedRenderTargetBindings = [binding]
+        }
+
+        /// `GraphicsDevice.SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)`.
+        ///
+        /// The same thirty-two bytes with the face carried into the binding,
+        /// and the same nil-restores-the-backbuffer branch. The face is
+        /// **ignored** when the target is nil, because XNA's null branch calls
+        /// `SetRenderTargets(null, 0)` without ever building a binding.
+        public func SetRenderTarget(
+            _ renderTarget: RenderTargetCube?, cubeMapFace: CubeMapFace
+        ) throws {
+            let deviceHandle = try validatedHandle("GraphicsDevice.SetRenderTarget")
+            guard let renderTarget else {
+                try unbindRenderTargets(deviceHandle)
+                return
+            }
+            let binding = RenderTargetBinding(renderTarget, cubeMapFace)
+            try validateRenderTargets([binding])
+            let targetHandle = try renderTarget.validatedHandle(
+                "GraphicsDevice.SetRenderTarget")
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetRenderTargetCube(
+                    deviceHandle, targetHandle, UInt32(bitPattern: cubeMapFace.rawValue)),
+                operation: "cna_graphics_device_set_render_target_cube"
+            )
+            runtime.cachedRenderTargetBindings = [binding]
+        }
+
+        /// `GraphicsDevice.SetRenderTargets(params RenderTargetBinding[] renderTargets)`.
+        ///
+        /// ```text
+        /// if (renderTargets != null && renderTargets.Length > 0)
+        ///     fixed (RenderTargetBinding* p = &renderTargets[0])
+        ///         SetRenderTargets(p, renderTargets.Length);
+        /// else
+        ///     SetRenderTargets(null, 0);
+        /// ```
+        ///
+        /// A null array and an **empty** array take the same branch, so both
+        /// restore the backbuffer. Optional for the null half, which is XNA's
+        /// own `params` reaching a normal `ret`.
+        public func SetRenderTargets(
+            _ renderTargets: [RenderTargetBinding]?
+        ) throws {
+            let deviceHandle = try validatedHandle("GraphicsDevice.SetRenderTargets")
+            guard let renderTargets, !renderTargets.isEmpty else {
+                try unbindRenderTargets(deviceHandle)
+                return
+            }
+            try validateRenderTargets(renderTargets)
+
+            var native = try renderTargets.map { binding -> CNASwift_RenderTargetBinding in
+                var element = CNASwift_RenderTargetBinding()
+                element.struct_size = UInt32(
+                    MemoryLayout<CNASwift_RenderTargetBinding>.size)
+                element.struct_version = 1
+                element.render_target = try binding.RenderTarget.validatedHandle(
+                    "GraphicsDevice.SetRenderTargets")
+                // `array_slice` is zero for both kinds: CNA refuses a nonzero
+                // slice for a 2D target outright, and a cube's subresource is
+                // the face. XNA has no counterpart field at all.
+                element.array_slice = 0
+                element.cube_map_face = UInt32(bitPattern: binding.CubeMapFace.rawValue)
+                return element
+            }
+            try runtime.functions.check(
+                native.withUnsafeMutableBufferPointer { buffer in
+                    runtime.functions.graphicsDeviceSetRenderTargets(
+                        deviceHandle, buffer.baseAddress, UInt64(buffer.count))
+                },
+                operation: "cna_graphics_device_set_render_targets")
+            runtime.cachedRenderTargetBindings = renderTargets
+        }
+
+        /// `GraphicsDevice.GetRenderTargets()`.
+        ///
+        /// `new RenderTargetBinding[currentRenderTargetCount]` filled by
+        /// `Array.Copy` — a **copy** of the managed bindings, which Swift's
+        /// value-typed `Array` gives for free. The objects are the ones that
+        /// were bound, which is the one thing a handle-keyed lookup through
+        /// `cna_graphics_device_copy_render_targets` could not give: CNA
+        /// answers handles and publishes no route back to an object.
+        public func GetRenderTargets() -> [RenderTargetBinding] {
+            runtime.cachedRenderTargetBindings
+        }
+
+        /// The backbuffer branch both single-target overloads and the array
+        /// overload share: `SetRenderTargets(null, 0)`.
+        private func unbindRenderTargets(_ deviceHandle: UInt64) throws {
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceSetRenderTargets(deviceHandle, nil, 0),
+                operation: "cna_graphics_device_set_render_targets")
+            runtime.cachedRenderTargetBindings = []
+        }
+
+        /// The private `SetRenderTargets(RenderTargetBinding*, Int32)`, up to
+        /// the point where XNA touches the device.
+        ///
+        /// ```text
+        /// if (count == currentRenderTargetCount
+        ///     && every binding's target AND face match the current ones) return;
+        /// if (count > MaxRenderTargets)
+        ///     Throw(ProfileMaxRenderTargets, MaxRenderTargets);
+        /// for (i = 0; i < count; i++) {
+        ///     Texture t = bindings[i]._renderTarget;
+        ///     if (t == null) throw new ArgumentException(NullNotAllowed);
+        ///     Helpers.CheckDisposed(t, t.GetComPtr());
+        ///     if (t.GraphicsDevice != this)
+        ///         throw new InvalidOperationException(InvalidDevice);
+        ///     if (i > 0) {
+        ///         for (j = 0; j < i; j++)
+        ///             if (t == bindings[j]._renderTarget)
+        ///                 throw new ArgumentException(CannotSetAlreadyUsedRenderTarget);
+        ///         if (!RenderTargetHelper.IsSameSize(t, bindings[0]._renderTarget))
+        ///             throw new ArgumentException(RenderTargetsMustMatch);
+        ///     }
+        /// }
+        /// ```
+        ///
+        /// The profile message names the **limit**, not the requested count —
+        /// `V_24` is `MaxRenderTargets` and it is what is boxed — which is the
+        /// same shape `ProfileMaxVertexStreams` has.
+        ///
+        /// The duplicate and same-size tests are `i > 0` only, so a
+        /// single-element array reaches neither; that is why both single-target
+        /// overloads can share this without a special case.
+        ///
+        /// The null-target test cannot be reached through a Swift
+        /// `RenderTargetBinding`, whose stored target is non-Optional and whose
+        /// both constructors require one; it is recorded in
+        /// `recorded-message-absences.json` rather than written as dead code.
+        ///
+        /// The device-identity test compares the **`RuntimeState`**, not the
+        /// facade, for the reason Foundation 63 recorded: a facade is a
+        /// per-callback capability token, so comparing facades would refuse
+        /// every target created in one callback and bound in another.
+        private func validateRenderTargets(
+            _ bindings: [RenderTargetBinding]
+        ) throws {
+            let capabilities = profileCapabilities
+            guard bindings.count <= Int(capabilities.maxRenderTargets) else {
+                try capabilities.throwNotSupported(
+                    Microsoft.Xna.Framework.Graphics.ProfileCapabilities
+                        .profileMaxRenderTargets,
+                    "\(capabilities.maxRenderTargets)")
+            }
+            for (index, binding) in bindings.enumerated() {
+                let target = binding.RenderTarget
+                _ = try target.validatedHandle("GraphicsDevice.SetRenderTargets")
+                guard target.nativeStorage.runtime === runtime else {
+                    throw CNAInvalidOperationException(
+                        message: GraphicsDevice.invalidDeviceMessage)
+                }
+                guard index > 0 else { continue }
+                for earlier in bindings[0..<index] where earlier.RenderTarget === target {
+                    throw CNAArgumentException(
+                        message: GraphicsDevice.cannotSetAlreadyUsedRenderTargetMessage)
+                }
+                guard Microsoft.Xna.Framework.Graphics.renderTargetsAreSameSize(
+                    target, bindings[0].RenderTarget) else {
+                    throw CNAArgumentException(
+                        message: GraphicsDevice.renderTargetsMustMatchMessage)
+                }
+            }
         }
 
         /// The device's applied presentation parameters, as CNA reports them.
@@ -459,8 +675,8 @@ extension Microsoft.Xna.Framework.Graphics {
         internal var defaultClearOptions: ClearOptions {
             get throws {
                 let format: DepthFormat
-                if let target = runtime.currentRenderTarget, !target.IsDisposed {
-                    format = target.DepthStencilFormat
+                if let target = boundRenderTargetDepthFormat {
+                    format = target
                 } else {
                     format = DepthFormat(
                         rawValue: Int32(try nativePresentationParameters().depth_stencil_format))
@@ -820,6 +1036,14 @@ extension Microsoft.Xna.Framework.Graphics {
         }
 
         /// `FrameworkResources.InvalidDevice`.
+        /// `FrameworkResources.CannotSetAlreadyUsedRenderTarget`.
+        internal static let cannotSetAlreadyUsedRenderTargetMessage =
+            "The render target has already been set on another index. Each "
+            + "render target may only be set on a single index at a time."
+        /// `FrameworkResources.RenderTargetsMustMatch`.
+        internal static let renderTargetsMustMatchMessage =
+            "All active render targets must be the same size with the same "
+            + "multisample type and bit depth."
         internal static let invalidDeviceMessage =
             "Resources can only be used on the GraphicsDevice that they were "
             + "created on. This resource was not created on this GraphicsDevice."

@@ -95,6 +95,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CannotSetAlreadyUsedRenderTarget",
+      "value": "The render target has already been set on another index. Each render target may only be set on a single index at a time."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "value": "Invalid VertexDeclaration. Duplicate element {0}{1}."
     },
@@ -200,6 +205,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileMaxRenderTargets",
+      "value": "XNA Framework {0} profile supports a maximum of {1} simultaneous rendertargets."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ProfileMaxVertexStreams",
       "value": "XNA Framework {0} profile supports a maximum of {1} simultaneous vertex buffers."
     },
@@ -222,6 +232,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ProfileTooBig",
       "value": "XNA Framework {0} profile supports a maximum {1} size of {2}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "RenderTargetsMustMatch",
+      "value": "All active render targets must be the same size with the same multisample type and bit depth."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

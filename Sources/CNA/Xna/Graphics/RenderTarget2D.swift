@@ -2,25 +2,6 @@
 
 import CNAShim
 
-/// The rooted context a native ContentLost subscription carries.
-///
-/// The native callback is a plain C function pointer with a `void*`; this box
-/// is what that pointer addresses. It is retained across the subscription and
-/// released when the subscription is removed, so the pointer can never outlive
-/// the Swift state it names — and it holds the target **weakly**, so a
-/// subscription cannot keep a render target alive.
-internal final class RenderTargetContentLostBox {
-    weak var target: Microsoft.Xna.Framework.Graphics.RenderTarget2D?
-    init(_ target: Microsoft.Xna.Framework.Graphics.RenderTarget2D) { self.target = target }
-}
-
-private let renderTargetContentLostCallback: CNASwift_RenderTargetContentLostCallback = {
-    _, context in
-    guard let context else { return }
-    let box = Unmanaged<RenderTargetContentLostBox>.fromOpaque(context).takeUnretainedValue()
-    box.target?.nativeContentWasLost()
-}
-
 extension Microsoft.Xna.Framework.Graphics {
     /// The `Microsoft.Xna.Framework.Graphics.RenderTarget2D` projection.
     ///
@@ -52,13 +33,15 @@ extension Microsoft.Xna.Framework.Graphics {
 
         private let contentLostSource = CNAEventSource<CNAEventArgs>()
         private var contentLost: Bool
+        private var contentLostSubscription: RenderTargetContentLostSubscription?
         /// The native subscription handle, `0` when there is none.
         ///
         /// Internal rather than private so a test can assert that disposal
         /// released it: a subscription that outlived its target would leave a
         /// native callback addressing a released Swift box.
-        internal private(set) var contentLostRegistration: UInt64 = 0
-        private var contentLostBox: Unmanaged<RenderTargetContentLostBox>?
+        internal var contentLostRegistration: UInt64 {
+            contentLostSubscription?.registration ?? 0
+        }
 
         /// `RenderTarget2D..ctor(GraphicsDevice, Int32, Int32)`.
         ///
@@ -203,15 +186,8 @@ extension Microsoft.Xna.Framework.Graphics {
         /// `EventHandler<EventArgs>` raise site uses.
         public var ContentLost: CNAEvent<CNAEventArgs> { contentLostSource.Event }
 
-        /// Releases the native subscription before the base releases the
-        /// handle, so no native callback can address freed Swift state.
-        open override func Dispose(_ disposing: Bool) throws {
-            guard !IsDisposed else { return }
-            unsubscribeFromNativeContentLost()
-            try super.Dispose(disposing)
-        }
-
-        internal func nativeContentWasLost() {
+        /// Latches the flag and raises the event, from CNA's own notification.
+        internal func contentWasLost() {
             contentLost = true
             do {
                 try contentLostSource.Raise(self, args: CNAEventArgs.Empty)
@@ -220,30 +196,27 @@ extension Microsoft.Xna.Framework.Graphics {
             }
         }
 
+        /// Releases the native subscription before the base releases the
+        /// handle, so no native callback can address freed Swift state.
+        open override func Dispose(_ disposing: Bool) throws {
+            guard !IsDisposed else { return }
+            contentLostSubscription?.release()
+            try super.Dispose(disposing)
+        }
+
         private func subscribeToNativeContentLost() throws {
-            let box = Unmanaged.passRetained(RenderTargetContentLostBox(self))
-            var registration: UInt64 = 0
-            let result = nativeStorage.runtime.functions.renderTargetSubscribeContentLost(
-                nativeStorage.handle, renderTargetContentLostCallback, box.toOpaque(), &registration)
-            guard result == 0 else {
-                box.release()
-                try nativeStorage.runtime.functions.check(
-                    result, operation: "cna_render_target_subscribe_content_lost")
-                return
-            }
-            contentLostRegistration = registration
-            contentLostBox = box
+            let subscription = RenderTargetContentLostSubscription(
+                runtime: nativeStorage.runtime)
+            try subscription.subscribe(handle: nativeStorage.handle, receiver: self)
+            contentLostSubscription = subscription
         }
 
-        private func unsubscribeFromNativeContentLost() {
-            guard contentLostRegistration != 0 else { return }
-            _ = nativeStorage.runtime.functions.renderTargetUnsubscribeContentLost(
-                contentLostRegistration)
-            contentLostRegistration = 0
-            contentLostBox?.release()
-            contentLostBox = nil
-        }
+        deinit { contentLostSubscription?.release() }
+    }
+}
 
-        deinit { unsubscribeFromNativeContentLost() }
+extension Microsoft.Xna.Framework.Graphics.RenderTarget2D: NativeContentLostReceiver {
+    internal func nativeContentWasLost() {
+        contentWasLost()
     }
 }

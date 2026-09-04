@@ -126,6 +126,10 @@ internal final class NativeFunctions {
     typealias RenderTargetGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RenderTargetInfo>?) -> UInt32
     typealias RenderTargetDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias RenderTargetCubeCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_RenderTargetCubeCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsDeviceSetRenderTargetCubeRoute = @convention(c) (UInt64, UInt64, UInt32) -> UInt32
+    typealias GraphicsDeviceSetRenderTargetsRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_RenderTargetBinding>?, UInt64) -> UInt32
+    typealias GraphicsDeviceGetRenderTargetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceClearOptionsRoute = @convention(c) (UInt64, UInt32, CNASwift_Color, Float, Int32) -> UInt32
     typealias GraphicsDeviceGetPresentationParametersRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_PresentationParameters>?) -> UInt32
     typealias GraphicsDeviceSetViewportRoute = @convention(c) (UInt64, CNASwift_Viewport) -> UInt32
@@ -253,6 +257,10 @@ internal final class NativeFunctions {
     let renderTargetGetInfo: RenderTargetGetInfoRoute
     let renderTargetDestroy: RenderTargetDestroyRoute
     let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
+    let renderTargetCubeCreate: RenderTargetCubeCreateRoute
+    let graphicsDeviceSetRenderTargetCube: GraphicsDeviceSetRenderTargetCubeRoute
+    let graphicsDeviceSetRenderTargets: GraphicsDeviceSetRenderTargetsRoute
+    let graphicsDeviceGetRenderTargetCount: GraphicsDeviceGetRenderTargetCountRoute
     let graphicsDeviceClearOptions: GraphicsDeviceClearOptionsRoute
     let graphicsDeviceGetPresentationParameters: GraphicsDeviceGetPresentationParametersRoute
     let graphicsDeviceSetViewport: GraphicsDeviceSetViewportRoute
@@ -400,6 +408,10 @@ internal final class NativeFunctions {
         renderTargetGetInfo = try library.resolve("cna_render_target_get_info", as: RenderTargetGetInfoRoute.self)
         renderTargetDestroy = try library.resolve("cna_render_target_destroy", as: RenderTargetDestroyRoute.self)
         graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)
+        renderTargetCubeCreate = try library.resolve("cna_render_target_cube_create", as: RenderTargetCubeCreateRoute.self)
+        graphicsDeviceSetRenderTargetCube = try library.resolve("cna_graphics_device_set_render_target_cube", as: GraphicsDeviceSetRenderTargetCubeRoute.self)
+        graphicsDeviceSetRenderTargets = try library.resolve("cna_graphics_device_set_render_targets", as: GraphicsDeviceSetRenderTargetsRoute.self)
+        graphicsDeviceGetRenderTargetCount = try library.resolve("cna_graphics_device_get_render_target_count", as: GraphicsDeviceGetRenderTargetCountRoute.self)
         graphicsDeviceClearOptions = try library.resolve("cna_graphics_device_clear_options", as: GraphicsDeviceClearOptionsRoute.self)
         graphicsDeviceGetPresentationParameters = try library.resolve("cna_graphics_device_get_presentation_parameters", as: GraphicsDeviceGetPresentationParametersRoute.self)
         graphicsDeviceSetViewport = try library.resolve("cna_graphics_device_set_viewport", as: GraphicsDeviceSetViewportRoute.self)

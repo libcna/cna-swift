@@ -441,6 +441,26 @@
       "operation": "Texture3D on this profile",
       "status": "VERIFIED_MANAGED",
       "evidence": "No Texture3D can be constructed on a Reach device and that is XNA's rule: ValidateCreationParameters raises ProfileFeatureNotSupported when MaxVolumeExtent is zero, and the table extracted from the pinned assembly gives Reach a zero extent and an empty ValidVolumeFormats. The type is complete and implemented, unreachable on this profile rather than absent. CNA agrees independently -- cna_texture3d_create answers NOT_SUPPORTED -- but the refusal raised is the managed one, not the native result code."
+    },
+    {
+      "operation": "RenderTargetCube creation and binding",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "cna_render_target_cube_create answers a game-child handle and cna_graphics_device_set_render_target_cube binds each of the six faces, inside a live LoadContent callback (build-probe/f65_rtcube.c). MEASURED DIVERGENCE: cna_texturecube_get_info accepts a render-target-cube handle and answers CNA_RESULT_SUCCESS with size 0, level count 0 and format 0, so the inherited cube route cannot describe this type; RenderTargetCube reads cna_render_target_get_info, which answers the real extents, level count, format, depth format, sample count and usage. A projection that read the inherited path would report a zero-sized cube with no call having failed."
+    },
+    {
+      "operation": "Multiple render targets",
+      "status": "VERIFIED_NATIVE_WITH_MEASURED_XNA_DIVERGENCE",
+      "evidence": "cna_graphics_device_set_render_targets binds an array, cna_graphics_device_get_render_target_count answers its length and cna_graphics_device_copy_render_targets hands back each binding's handle, array slice and face -- measured for one 2D target, one cube face and TWO DISTINCT 2D targets (build-probe/f65_rtcube.c). The artifact accepts two; XNA does not, because Reach's MaxRenderTargets is 1, so the projection refuses at two with ProfileMaxRenderTargets and the native capability is never reached. CNA's own refusals were measured too and all three are documented: a duplicate target is INTERNAL with 'the same render-target subresource cannot be bound to more than one slot', a nonzero array_slice on a 2D target is NOT_SUPPORTED, and a non-positive-X face on a 2D target is INVALID_ARGUMENT."
+    },
+    {
+      "operation": "Render-target binding readback",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "GetRenderTargets hands back the managed RenderTargetBinding values that were bound, from a cache on RuntimeState. CNA can say which native handle occupies each slot but publishes no route from a native object back to a handle, so object identity -- which XNA's Array.Copy of currentRenderTargetBindings gives -- can only come from a cache. cna_graphics_device_copy_render_targets corroborates the handles and faces and is deliberately not bound: no projected member consumes it."
+    },
+    {
+      "operation": "Runtime lifetime with a bound resource",
+      "status": "MEASURED_NATIVE_DIVERGENCE",
+      "evidence": "A GraphicsResource holds its GraphicsDevice facade strongly and the facade holds the RuntimeState strongly, so any cache on the runtime that holds a resource closes RuntimeState -> resource -> facade -> RuntimeState. Foundation 63 added the first such cache and binding one vertex buffer kept the runtime, every native handle it tracks and every registered child alive past Game.Dispose for the life of the process. RuntimeState.invalidateAfterNativeShutdown now releases every cache that holds a resource, which is also what XNA's GraphicsDevice.Dispose does. A retain cycle is invisible to AddressSanitizer; RuntimeLifetimeTests is what asks, with two controls proving the measurement can observe a released runtime at all."
     }
   ]
 }

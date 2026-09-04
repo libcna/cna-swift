@@ -97,6 +97,18 @@ internal final class RuntimeState {
         [Microsoft.Xna.Framework.Graphics.VertexBufferBinding] = []
     var cachedIndexBuffer: Microsoft.Xna.Framework.Graphics.IndexBuffer?
 
+    /// `currentRenderTargetBindings` and `currentRenderTargetCount`, as one
+    /// array: the count is the array's own.
+    ///
+    /// The same reproduction, for the same reason. CNA answers which native
+    /// handle occupies each slot -- `cna_graphics_device_copy_render_targets`
+    /// hands back the handle, the array slice and the face -- but publishes no
+    /// route from a native object back to a handle, so what was BOUND can only
+    /// come from a cache. `GetRenderTargets()` must hand back the objects, so
+    /// this is where they live.
+    var cachedRenderTargetBindings:
+        [Microsoft.Xna.Framework.Graphics.RenderTargetBinding] = []
+
     var cachedBlendFactor = Microsoft.Xna.Framework.Color.White
     var cachedMultiSampleMask: Int32 = -1
     var cachedReferenceStencil: Int32 = 0
@@ -117,27 +129,6 @@ internal final class RuntimeState {
     var blendStateDirty = false
     var depthStencilStateDirty = false
 
-    /// `currentRenderTargets[0]`, as `get_DefaultClearOptions` reads it.
-    ///
-    /// XNA keeps an array and a count; this binding binds only the single
-    /// `SetRenderTarget(RenderTarget2D)` route, so one slot is the whole of
-    /// what it can honestly track. Nil means the backbuffer, which is XNA's
-    /// `currentRenderTargetCount == 0` branch. It lives here rather than on
-    /// the facade for the same reason the state cache does: the facade is a
-    /// per-callback token, not an identity.
-    ///
-    /// Weak, where XNA's array is a strong reference. A strong one here would
-    /// close a retain cycle -- runtime to target to device facade and back to
-    /// runtime -- that nothing would ever break, and the difference between
-    /// the two is confined to a target whose last reference the caller has
-    /// already dropped while it is still bound. CNA refuses to leave that
-    /// state cleanly: `cna_render_target_destroy` on a bound target answers
-    /// `CNA_RESULT_INVALID_STATE`, measured in `build-probe/f48b_params.c`,
-    /// so a caller who drops a bound target has already stranded the native
-    /// object whatever this reference does. Reporting the backbuffer's depth
-    /// format for a target that is no longer projected is the honest answer
-    /// of the two.
-    weak var currentRenderTarget: Microsoft.Xna.Framework.Graphics.RenderTarget2D?
 
     // XNA builds both collections in the GraphicsDevice constructor, with
     // `ProfileCapabilities.MaxSamplers` (16 in both profiles) and
@@ -264,6 +255,34 @@ internal final class RuntimeState {
         isActive = false
         gameHandle = 0
         isInsideCallback = false
+        releaseBoundResources()
         RuntimeRegistry.leave(self)
+    }
+
+    /// Releases every cache that holds a `GraphicsResource` strongly.
+    ///
+    /// **This closes a retain cycle, and without it the whole runtime leaks.**
+    /// A `GraphicsResource` holds its `GraphicsDevice` facade strongly and the
+    /// facade holds this object strongly, so a cache here that holds a resource
+    /// closes `RuntimeState -> resource -> facade -> RuntimeState`. Foundation
+    /// 63 added the first such cache and nothing caught it: binding one vertex
+    /// buffer kept the runtime, every handle it tracks and every registered
+    /// child alive for the life of the process, past `Game.Dispose`. ASan does
+    /// not report a retain cycle and no test asked.
+    ///
+    /// Doing it here also reproduces XNA rather than merely patching Swift:
+    /// `GraphicsDevice.Dispose` releases `currentVertexBuffers`, `_currentIB`
+    /// and `currentRenderTargetBindings` along with the device, and after this
+    /// point there is no device for anything to be bound to.
+    ///
+    /// `SamplerStateCollection` is not in the list because it already holds its
+    /// device weakly, for this reason, since Foundation 46.
+    private func releaseBoundResources() {
+        cachedVertexBufferBindings = []
+        cachedIndexBuffer = nil
+        cachedRenderTargetBindings = []
+        cachedBlendState = nil
+        cachedDepthStencilState = nil
+        cachedRasterizerState = nil
     }
 }

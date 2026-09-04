@@ -1102,6 +1102,12 @@
       "member": "SetVertexBuffers",
       "parameter": "vertexBuffers",
       "reason": "The array overload null-tests vertexBuffers and the null branch calls SetVertexBuffers(null, 0), unbinding all -- the same selected operation as the single-buffer overload's null."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "member": "SetRenderTargets",
+      "parameter": "renderTargets",
+      "reason": "The params array is null-tested and the null branch calls SetRenderTargets(null, 0), restoring the backbuffer -- the same selected operation as the two single-target overloads' null. An EMPTY array takes the identical branch, so both spellings of 'nothing' mean the backbuffer."
     }
   ],
   "globalOperatorProjections": [

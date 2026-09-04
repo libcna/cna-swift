@@ -81,6 +81,10 @@ extension Microsoft.Xna.Framework.Graphics {
         internal static let profileMaxVertexStreams =
             "XNA Framework {0} profile supports a maximum of {1} simultaneous "
             + "vertex buffers."
+        /// `FrameworkResources.ProfileMaxRenderTargets`.
+        internal static let profileMaxRenderTargets =
+            "XNA Framework {0} profile supports a maximum of {1} simultaneous "
+            + "rendertargets."
         /// `FrameworkResources.ProfileMaxPrimitiveCount`.
         internal static let profileMaxPrimitiveCount =
             "XNA Framework {0} profile supports a maximum of {1} primitives per "

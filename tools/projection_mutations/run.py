@@ -54,6 +54,10 @@ DYNAMICINDEX = ROOT / "Sources/CNA/Xna/Graphics/DynamicIndexBuffer.swift"
 PROFILECAPS = ROOT / "Sources/CNA/Xna/Graphics/ProfileCapabilities.swift"
 TEXTURECUBE = ROOT / "Sources/CNA/Xna/Graphics/TextureCube.swift"
 TEXTURE3D = ROOT / "Sources/CNA/Xna/Graphics/Texture3D.swift"
+RTCUBE = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetCube.swift"
+RTBINDING = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetBinding.swift"
+RTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetSupport.swift"
+RUNTIME = ROOT / "Sources/CNA/Runtime/RuntimeState.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -920,11 +924,11 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "viewport-bounds-always-the-backbuffer",
         "the bounds read from the presentation parameters even with a target bound",
         DEVICE,
-        "            if let target = runtime.currentRenderTarget, !target.IsDisposed {\n"
-        "                return (target.Width, target.Height)\n"
+        "            if let slotZero = boundRenderTargetSlotZero {\n"
+        "                return (slotZero.renderTargetWidth, slotZero.renderTargetHeight)\n"
         "            }",
-        "            if let target = runtime.currentRenderTarget, target.IsDisposed {\n"
-        "                return (target.Width, target.Height)\n"
+        "            if let slotZero = boundRenderTargetSlotZero, false {\n"
+        "                return (slotZero.renderTargetWidth, slotZero.renderTargetHeight)\n"
         "            }",
     ),
     (
@@ -966,8 +970,8 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "default-clear-options-ignores-the-render-target",
         "get_DefaultClearOptions always reading the presentation parameters",
         DEVICE,
-        "                if let target = runtime.currentRenderTarget, !target.IsDisposed {",
-        "                if let target = runtime.currentRenderTarget, target.IsDisposed {",
+        "                if let target = boundRenderTargetDepthFormat {",
+        "                if let target = boundRenderTargetDepthFormat, false {",
     ),
     (
         "default-clear-options-drops-stencil",
@@ -984,8 +988,14 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "set-render-target-forgets-to-record",
         "SetRenderTarget not recording the target DefaultClearOptions reads",
         DEVICE,
-        "            runtime.currentRenderTarget = renderTarget",
-        "            _ = renderTarget",
+        "            runtime.cachedRenderTargetBindings = [binding]\n"
+        "        }\n"
+        "\n"
+        "        /// `GraphicsDevice.SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)`.",
+        "            runtime.cachedRenderTargetBindings = []\n"
+        "        }\n"
+        "\n"
+        "        /// `GraphicsDevice.SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)`.",
     ),
     (
         "null-depth-diagnosis-fires-on-every-failure",
@@ -1151,7 +1161,7 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
     (
         "content-lost-subscription-leaked",
         "disposal leaving the native subscription alive", RENDER_TARGET,
-        "            unsubscribeFromNativeContentLost()\n"
+        "            contentLostSubscription?.release()\n"
         "            try super.Dispose(disposing)",
         "            try super.Dispose(disposing)",
     ),
@@ -1679,6 +1689,120 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                dataLength: arrayCount, dataIndex: startIndex,\n"
         "                elementCount: elementCount)",
         "",
+    ),
+    # ---- Foundation 65: the render-target family --------------------------
+    (
+        "cube-target-reads-the-cube-info-route",
+        "RenderTargetCube's description read where CNA answers zeros",
+        RTCUBE,
+        "                    runtime.functions.renderTargetGetInfo(handle, &info),\n"
+        "                    operation: \"cna_render_target_get_info\")",
+        "                    runtime.functions.renderTargetGetInfo(handle, &info),\n"
+        "                    operation: \"cna_render_target_get_info\")\n"
+        "                info.width = 0; info.height = 0; info.level_count = 0",
+    ),
+    (
+        "cube-target-skips-the-profile-checks",
+        "a 1024 or non-power-of-two cube target accepted where Reach refuses one",
+        RTCUBE,
+        "            try graphicsDevice.profileCapabilities.validateCubeCreation(\n"
+        "                size: size, format: preferredFormat)",
+        "",
+    ),
+    (
+        "cube-target-does-not-release-its-subscription",
+        "a disposed cube target leaving a native callback addressing freed state",
+        RTCUBE,
+        "            contentLostSubscription?.release()\n"
+        "            try super.Dispose(disposing)",
+        "            try super.Dispose(disposing)",
+    ),
+    (
+        "binding-2d-face-is-not-positive-x",
+        "a 2D binding carrying a face where XNA stores ldc.i4.0",
+        RTBINDING,
+        "            storedRenderTarget = renderTarget\n"
+        "            storedCubeMapFace = .PositiveX",
+        "            storedRenderTarget = renderTarget\n"
+        "            storedCubeMapFace = .NegativeZ",
+    ),
+    (
+        "render-target-cache-not-updated",
+        "what was bound not recorded, so GetRenderTargets answers the wrong array",
+        DEVICE,
+        "            runtime.cachedRenderTargetBindings = renderTargets",
+        "            runtime.cachedRenderTargetBindings = []",
+    ),
+    # `render-target-identity-lost` -- rebuilding each binding from the target it
+    # already holds -- was planted here and SURVIVED, because it is a NO-OP: a
+    # RenderTargetBinding is a struct with no identity of its own, so rebuilding
+    # one around the same target is indistinguishable from returning it. It is
+    # replaced rather than scored. What `GetRenderTargets` can actually get
+    # wrong is covered: `render-target-cache-not-updated` catches the wrong
+    # array, and `cube-face-not-carried-to-the-device` covers the face.
+    #
+    # `testTheReturnedArrayIsACopy` asserts a claim no mutation can falsify
+    # either: Swift's Array is a value, so a returned array simply cannot alias
+    # the cache. The test documents the guarantee rather than proving code.
+    (
+        "render-target-limit-unchecked",
+        "two simultaneous targets accepted where Reach's MaxRenderTargets is 1",
+        DEVICE,
+        "            guard bindings.count <= Int(capabilities.maxRenderTargets) else {",
+        "            guard bindings.count <= Int(capabilities.maxVertexStreams) else {",
+    ),
+    (
+        "render-target-device-compared-by-facade",
+        "the device-identity test comparing per-callback tokens",
+        DEVICE,
+        "                guard target.nativeStorage.runtime === runtime else {\n"
+        "                    throw CNAInvalidOperationException(\n"
+        "                        message: GraphicsDevice.invalidDeviceMessage)\n"
+        "                }\n"
+        "                guard index > 0 else { continue }",
+        "                guard target.GraphicsDevice === self else {\n"
+        "                    throw CNAInvalidOperationException(\n"
+        "                        message: GraphicsDevice.invalidDeviceMessage)\n"
+        "                }\n"
+        "                guard index > 0 else { continue }",
+    ),
+    # `render-target-binder-skips-the-disposal-check` was planted here and
+    # SURVIVED, and the reason is that the check is REDUNDANT on every reachable
+    # input: whichever binder runs, the handle is validated again where it is
+    # actually used, and that second validation raises the same
+    # ObjectDisposedException with the same message. The check stays because
+    # XNA's `Helpers.CheckDisposed` is there and because its ORDER matters --
+    # ahead of the device-identity test, so a target that is both disposed and
+    # foreign reports the disposal. That ordering needs two devices to observe
+    # and CNA runs one game at a time, so the claim is recorded as not yet
+    # evidence rather than kept as a mutation nothing can catch.
+    # `cube-face-not-carried-to-the-device` -- binding the positive-X face
+    # whatever was asked -- was planted here and SURVIVED, for exactly the
+    # reason `vertex-offset-not-carried` was withdrawn in Foundation 63:
+    # `GetRenderTargets()` reads the managed cache, as XNA's does, and nothing
+    # in the public surface observes the face the DEVICE received.
+    # `cna_graphics_device_copy_render_targets` does answer it -- the probe
+    # reads face 3 back from a cube binding -- but binding a route for a test
+    # alone is what docs/native-abi.md forbids. Recorded as not yet evidence;
+    # it becomes falsifiable when something renders through a face.
+    (
+        "same-size-test-ignores-the-pixel-size",
+        "IsSameSize comparing extents only, never the format's byte width",
+        RTSUPPORT,
+        "        left.width == right.width\n"
+        "            && left.height == right.height\n"
+        "            && left.samples == right.samples\n"
+        "            && left.pixelSize == right.pixelSize",
+        "        left.width == right.width\n"
+        "            && left.height == right.height",
+    ),
+    (
+        "bound-resources-not-released-at-shutdown",
+        "the retain cycle Foundation 65 closed, reopened",
+        RUNTIME,
+        "        releaseBoundResources()\n"
+        "        RuntimeRegistry.leave(self)",
+        "        RuntimeRegistry.leave(self)",
     ),
 ]
 

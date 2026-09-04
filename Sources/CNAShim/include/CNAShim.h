@@ -175,6 +175,26 @@ typedef struct CNASwift_RenderTargetInfo {
     uint8_t reserved[2];
 } CNASwift_RenderTargetInfo;
 
+typedef struct CNASwift_RenderTargetCubeCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t size;
+    CNASwift_Bool mip_map;
+    uint8_t reserved[3];
+    uint32_t format;
+    uint32_t depth_format;
+    int32_t multi_sample_count;
+    uint32_t usage;
+} CNASwift_RenderTargetCubeCreateInfo;
+
+typedef struct CNASwift_RenderTargetBinding {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint64_t render_target;
+    int32_t array_slice;
+    uint32_t cube_map_face;
+} CNASwift_RenderTargetBinding;
+
 typedef struct CNASwift_BlendState {
     uint32_t struct_size;
     uint32_t struct_version;
