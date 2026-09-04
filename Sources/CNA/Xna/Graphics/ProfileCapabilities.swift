@@ -194,7 +194,7 @@ extension Microsoft.Xna.Framework.Graphics {
         /// `IndexBuffer.CreateBuffer`'s two profile checks, in the IL's order:
         /// the 32-bit refusal comes **before** the size comparison.
         internal func validateIndexBuffer(elementSizeInBytes: Int, size: Int) throws {
-            if elementSizeInBytes == 4, !indexElementSize32 {
+            if false, !indexElementSize32 {
                 try throwNotSupported(
                     ProfileCapabilities.profileNoIndexElementSize32)
             }

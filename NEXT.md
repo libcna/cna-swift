@@ -76,8 +76,52 @@ is that the managed type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `System.Text.StringBuilder` | 1 BCL family, 4 XNA members | **The next milestone.** `SpriteFont.MeasureString(StringBuilder)` and `SpriteBatch.DrawString`'s three `StringBuilder` overloads wait on it, and admitting a BCL family is a measured act: authority, pinned shape, a Swift support class compared against it. Recorded in `bcl-authorities.json` under `availableButNotAdmitted`. |
+| `System.Text.StringBuilder` | 1 BCL family, 4 XNA members | **The next milestone.** `SpriteFont.MeasureString(StringBuilder)` and `SpriteBatch.DrawString`'s three `StringBuilder` overloads wait on it. Admitting a BCL family is a measured act — authority, the full public shape pinned as the authority record, a Swift support class measured against `bclSupportContract` — but it does **not** mean projecting all sixty-five members: `CNAList` projects sixteen of `List<T>`'s pinned fifty-two. Recorded in `bcl-authorities.json` under `availableButNotAdmitted`. |
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
+
+### `System.Text.StringBuilder`, sized
+
+Measured rather than guessed, so the next session starts from facts.
+
+**The family.** `mscorlib` declares it `public sealed`, base `System.Object`,
+**65 visible members**: 6 constructors, 55 methods, 4 properties. `Append` has
+19 overloads and `Insert` 18; `AppendFormat` has 5 and brings .NET composite
+formatting with it. `bcl40-selected-shape.json` pins all 65 as the authority
+record; `bclSupportContract` measures the Swift class structurally, and
+`CNAList` projects sixteen of `List<T>`'s pinned fifty-two, so the Swift class
+is a **measured subset**, not a transcription.
+
+**The backing store must be `[UInt16]`, not `String`.** Every index in the API
+— `Length`, `Item`, `Insert`, `Remove`, `ToString(startIndex:length:)` — is a
+**UTF-16 code-unit** index, which is the same reason Foundation 70 mapped
+`System.Char` to `UInt16`. A Swift `String` would silently change all of them,
+and `SpriteFont.MeasureString` already measures code units.
+
+**The resource keys it raises**, counted from the IL between lines 32751 and
+37827 of the pinned disassembly:
+
+```text
+ArgumentOutOfRange_Index         21   (already pinned)
+ArgumentOutOfRange_StartIndex     4
+ArgumentOutOfRange_SmallCapacity  4
+ArgumentOutOfRange_GenericPositive 4
+ArgumentOutOfRange_NegativeLength  3
+ArgumentOutOfRange_NegativeCapacity 2
+ArgumentOutOfRange_MustBePositive  2
+ArgumentOutOfRange_MustBeNonNegNum 2
+```
+
+Only the first is admitted today; the rest are the milestone's resource work.
+Note that `StringBuilder`'s indexer raises **`IndexOutOfRangeException`**, not
+`ArgumentOutOfRangeException` — a trap worth a test.
+
+**The admission, in order.** A `selectedFamilies` entry in
+`bcl-authorities.json` with its reason; `--write-manifest` to pin the shape;
+`bclSupportTypeProjections` mapping it to `CNAStringBuilder`; a
+`bclSupportContract` entry; the Swift class; then the four XNA members it
+unblocks — `SpriteFont.MeasureString(StringBuilder)` and `SpriteBatch.DrawString`'s
+three `StringBuilder` overloads, which close the last of `SpriteFont`'s and
+`SpriteBatch`'s missing members.
 
 ### The BLOCKED list, re-measured at Foundation 60
 

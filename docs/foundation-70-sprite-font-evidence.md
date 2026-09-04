@@ -21,12 +21,24 @@ pinned in `bcl40-selected-shape.json`, a Swift support class written and
 compared against that shape. `System.Collections.Generic.List<T>`,
 `ReadOnlyCollection<T>`, `Dictionary<K,V>` and fifteen more went through it.
 
-`StringBuilder` declares some sixty public members, most of them `Append`
-overloads. Writing the four an XNA signature happens to need would be
-**admitting a family by fabricating it**, which is the one thing the BCL
-authority rule exists to stop. Projecting the overloads over `String` instead
-would be worse: XNA's take a *mutable buffer*, and a caller holding one is not
-served by a projection that quietly copies it.
+`StringBuilder` declares sixty-five public members, most of them `Append` and
+`Insert` overloads, and it is its own contract with its own semantics.
+Projecting the four overloads over `String` instead is not an option: XNA's
+take a *mutable buffer*, and a caller holding one is not served by a projection
+that quietly copies it.
+
+**A first draft of this section gave the wrong reason**, and it is corrected
+here rather than left standing, because it would have read as a rule. It
+claimed that writing the four members an XNA signature needs would be
+"admitting a family by fabricating it" — that admission requires projecting
+every pinned member. It does not. `CNAList` projects **sixteen** of `List<T>`'s
+pinned fifty-two: the pinned shape is the authority record of what the family
+*is*, and `bclSupportContract` measures the Swift class structurally, not
+member for member. Left uncorrected, that claim would have told a future
+session no family can ever be admitted.
+
+The real reason the four members are absent here is scope: `StringBuilder` is a
+milestone, not a paragraph of one, and it is the next one.
 
 So the four are recorded `MISSING_MEMBER`, the family is recorded in
 `availableButNotAdmitted` with the reason, and admitting `StringBuilder` is
