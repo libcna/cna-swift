@@ -67,16 +67,323 @@ cannot be verified.
 
 ### ACTIONABLE_LOCAL — upstream support exists, the managed side is the work
 
-CNA declares **4,076** distinct `cna_*` symbols. Mapping all 81 still-missing
+CNA declares **4,076** distinct `cna_*` symbols. Mapping all 72 still-missing
 types onto their route families — `docs/generated/cna-route-map.txt`, and the
 reasoning in `docs/frontier-remeasurement-foundation-60.md` — leaves **no family
 without native support** except the ones that need none. Route existence is not
 capability; but nothing below is blocked upstream, and the blocker in every row
 is that the managed type is not projected yet, which is ordinary work:
 
+**The near-term order**, which is finer than the single row below. Grouping the
+seventy-two by what makes one coherent milestone:
+
+| milestone | types | note |
+|---|---:|---|
+| `ContentManager` + `ContentReader` family | 6 | sized below; `.cnj` fixture path known |
+| the `Model` family | 13 | `Model`, `ModelBone`, `ModelMesh`, `ModelMeshPart`, four collections and their four enumerators — one coherent unit, and the four collections already have `CNAReadOnlyCollection` as their base |
+| `GraphicsAdapter` + `GraphicsDeviceInformation` + `PreparingDeviceSettingsEventArgs` | 3 | one cluster: the adapter and the settings event that carries it |
+| `GameWindow`, `TitleContainer`, `FrameworkDispatcher` | 3 | small and standalone; `GameWindow` is under the no-visible-window rule |
+| `OcclusionQuery` | 1 | standalone |
+| `Storage` | 2 | `StorageDevice`, `StorageContainer` — project-controlled temporary roots only, never user documents |
+| `Audio` | 10 | the XACT five, the `SoundEffect` three, `Microphone`, `RendererDetail` — see the microphone rule above |
+| `Design` | 13 | costed below; no CNA route at all |
+| `Media` | 19 | sized below; probe first |
+
+**Where the seventy-two sit**, so the size of what remains is not guessed:
+
+| namespace | types |
+|---|---:|
+| `Media` | 19 |
+| `Design` | 13 |
+| `Audio` | 10 |
+| `Graphics` | 10 |
+| `Content` | 6 |
+| `Microsoft.Xna.Framework` | 5 |
+| `Storage` | 2 |
+| the four `Model*Collection` enumerators | 4 |
+| `GamerServices`, `Input`, `Input.Touch` | 3 |
+
+`Media` and `Design` together are nearly half of it, and neither has been
+started. `Design`'s thirteen converters need no CNA route at all — they need
+the `System.dll` `ComponentModel` closure admitted, which is recorded below as
+its own decision. **`GLOBAL_ACTIONABLE_LOCAL = 0` means all seventy-two**, so
+the road is long: this is a per-namespace campaign, not a handful of milestones.
+
 | Next | Closes | Notes |
 |---|---|---|
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | **The next milestone.** 33 routes. It inherits a specific question from Foundation 70: whether a compiled `.xnb`'s character table arrives sorted, which `SpriteFont`'s binary search requires and which `cna_sprite_font_create` does not guarantee. |
+
+### The mutation harness had no deadline, and one mutation hung a full run
+
+`from-type-size-test-reads-the-wrong-size` inflates a registered vertex type's
+measured size by four. The suite it produces does not fail — it **hangs**, and
+`run_tests` had no timeout, so a 278-mutation run sat on it indefinitely with
+the mutation applied and nothing compiling. That is worse than a survivor: a
+survivor is at least reported.
+
+The harness now has `TEST_TIMEOUT_SECONDS = 600` and a third verdict. A
+timed-out mutation is scored **`HUNG`**, not `CAUGHT`, because the two are
+different facts about the projection — one says a test disagreed, the other
+says the projection stopped answering — and the deadline is deliberately
+generous: it is the line between "slow" and "never", not a performance budget.
+`subprocess.run`'s timeout kills the wrapper but not the test binary it
+spawned, so that is killed explicitly too.
+
+**One entry in the run that produced this note is misleading, and this says
+so.** That run began before the deadline existed; its line for
+`from-type-size-test-reads-the-wrong-size` reads `CAUGHT`, and the reason it
+does is that the hung binary was killed by hand after about seven minutes, not
+that an assertion failed. A run started after this change reports it as `HUNG`.
+
+### The small standalone types, sized
+
+Seven types that no larger family carries, with their member counts and the CNA
+routes behind them:
+
+| type | members | routes | note |
+|---|---:|---:|---|
+| `GameWindow` | 20 | 19 | `abstract`-shaped in XNA, and under the **no-visible-window rule** |
+| `GraphicsAdapter` | 18 | 13 | plus `display_mode` 2; Foundation 60 measured the device answering an adapter index and an 800x480 mode |
+| `GraphicsDeviceInformation` | 7 | — | pure managed: it carries an adapter, a profile and presentation parameters |
+| `OcclusionQuery` | 6 | 8 | standalone |
+| `PreparingDeviceSettingsEventArgs` | 2 | — | pure managed; it is the event payload that carries the one above |
+| `TitleContainer` | 1 | 1 | one static `OpenStream` |
+| `FrameworkDispatcher` | 1 | 1 | one static `Update` |
+
+`TitleContainer` and `FrameworkDispatcher` are **one member each** and one route
+each — the cheapest two types left in the whole surface, and both are
+prerequisites elsewhere (`TitleContainer.OpenStream` is what
+`ContentManager.OpenStream` is measured against; `FrameworkDispatcher.Update` is
+what the audio and media namespaces expect a game to pump).
+
+`GraphicsDeviceInformation` and `PreparingDeviceSettingsEventArgs` need **no CNA
+route at all** — they are managed carriers — but they depend on `GraphicsAdapter`
+existing first, which is why the three go together as one milestone.
+
+### `Storage` — small, but its root is derived, not chosen
+
+Two types, 35 routes: `storage_device` 11, `storage_container` 24.
+
+**The constraint is satisfiable, but not the obvious way.** The rule for this
+work is project-controlled temporary roots only, never user documents — and the
+ABI offers no route that sets a root. It offers
+`cna_storage_set_app_name_ext(app_name)`, "expected once at startup, before any
+storage access", from which the root is **derived**, plus
+`cna_storage_copy_root_ext` to read back what was derived. So the shape a test
+must take is: set a test-only application name, read the root back and **assert
+where it landed before writing anything**, then delete what it created.
+
+That root is a per-application user-data directory, not `/tmp`. It is not user
+documents and the name is ours, which satisfies the rule — but a session that
+assumes it can point storage at a scratch directory will not find a route for
+it, and a session that writes first and looks later has already broken the rule.
+
+**One projection decision is visible up front.** XNA's storage API is the
+fake-async `BeginXxx`/`EndXxx` pair, and CNA "completes synchronously … this
+callback is invoked before it returns so the canonical completion contract is
+preserved". The `IAsyncResult` shape XNA exposes therefore has to be projected
+over a call that has already finished by the time it returns.
+
+### `Audio` splits in two, and only one half is reachable here
+
+Ten types, and the line between them is whether the asset can be
+project-authored.
+
+**Reachable, and testable from bytes this repository can write.**
+`cna_sound_effect_create_pcm16(game, create_info, pcm_bytes, byte_count, out)`
+builds a `SoundEffect` from **raw PCM** — no bank, no proprietary file, nothing
+to download. With it come `SoundEffect` (42 routes), `SoundEffectInstance`
+(16) and `DynamicSoundEffectInstance` (12). There is also
+`create_from_encoded_ext` for a WAV. Three of the ten types, and the natural
+first Audio milestone.
+
+**Blocked on an asset that must not be downloaded.**
+`cna_audio_engine_create(game, settings_file, out_engine)` opens an XACT engine
+**from a path to an `.xgs` settings file**, answering `CNA_RESULT_IO` for a
+missing one. `AudioEngine`, `SoundBank`, `WaveBank`, `Cue` and `AudioCategory`
+— five of the ten — need `.xgs`/`.xsb`/`.xwb` files, and the standing rule is
+that proprietary XACT banks are not to be downloaded. Whether this project can
+*author* a legal `.xgs` triple from scratch is **an open question nobody has
+asked yet**; it is the whole blocker for that half, and it should be asked
+before the half is planned, not during it.
+
+`Microphone` (18 routes) is under the do-not-record rule at the top of this
+section. `RendererDetail` is enumeration and should come free with the engine.
+
+**And the capability question is unasked for all of it.** Whether this HEADLESS
+host has any audio backend at all — whether `create_pcm16` even succeeds — is
+unmeasured, exactly as it is for `Media`. One probe answers both namespaces and
+should precede either.
+
+### The `Model` family, sized — and buildable without content
+
+Thirteen types but only **36 members**: `Model` 8, `ModelMesh` 7, `ModelBone` 5,
+`ModelMeshPart` 8, and the four collections 3+3+1+1 with an enumerator apiece.
+Small for its size on the roadmap, because most of it is properties.
+
+**It can be built in memory.** `cna_model_create(graphics_device, bones,
+bone_count, meshes, mesh_count, out_model)` takes arrays of bone and mesh
+handles, with `cna_model_bone_collection_create` and siblings alongside — so a
+`Model` needs no `.xnb` and no content pipeline, exactly as
+`cna_sprite_font_create` freed `SpriteFont`. There are also
+`cna_model_create_default` and `cna_model_create_with_parents`. That makes the
+whole family testable here, and it is the reason to take it early rather than
+after `ContentManager`.
+
+CNA publishes **231 routes** across the four families — `model` 134,
+`model_mesh` 50, `model_mesh_part` 30, `model_bone` 17 — many of them `_ext`.
+`cna_model_draw` exists; what a returning draw means is Foundation 68's answer
+and no more.
+
+**The BCL work is already done.** All four collections derive from
+`ReadOnlyCollection<T>`, which is admitted and projected as
+`CNAReadOnlyCollection`, and `ModelBoneCollection` and `ModelMeshCollection`
+add a `TryGetValue(name:value:)` each — the `ref`/`out` shape this project
+already maps. `ModelMeshPart.Effect` is the only settable reference among them
+and lands on the `Effect` that Foundation 67 built.
+
+### `Media`, the largest block, sized enough to start
+
+Nineteen types — `MediaPlayer`, `MediaLibrary`, `MediaQueue`, `MediaSource`,
+`Song`, `Video`/`VideoPlayer`, `Picture`, and the `Album`/`Artist`/`Genre`/
+`Playlist` families with a collection apiece. Nearly all of them read.
+
+**Upstream support is not the blocker.** Counted from the pinned 0.21.0
+headers:
+
+```text
+picture 45   song 33   media_player 31   album 25   video_player 23
+media_library 21   artist 18   genre 18   playlist 18   media_queue 10
+song_collection 8   media_source 6
+```
+
+Something over 250 routes, and the documentation reads like an implementation
+rather than a declaration: `cna_media_library_create_from_source` describes
+borrowing a source, copying its kind and name, and refusing a non-local-device
+source with `NOT_SUPPORTED` "exactly as the canonical constructor refuses it".
+No placeholder language anywhere in `media_player.h` — unlike
+`cna_content_manager_create_resource`, which says outright that every load
+through it fails.
+
+**The unknown is capability, not existence, and it is unmeasured.** Route
+existence is not capability — this file's own rule — and nothing has yet asked
+whether a `MediaLibrary` on this HEADLESS host enumerates any source, whether
+it holds any song or picture, or whether `MediaPlayer` can play to a device
+that has no audio output. **A probe answers all three and is the milestone's
+first step**, before a line of Swift. If the library comes back empty, the
+namespace is still projectable but its tests measure refusals rather than
+playback, which is a different milestone from the one the route count suggests.
+
+Do not record `Media` as blocked on the strength of "HEADLESS has no output" —
+that inference was carried into eight entries once before and three of them had
+never been asked. See the BLOCKED list below.
+
+### `ContentManager`, sized
+
+Measured while Foundation 71's mutations ran, so the next session starts from
+facts rather than from the roadmap's one-line guess.
+
+**The type.** Ten members: two constructors, `Dispose()`, `Dispose(Boolean)`,
+`Unload()`, the generic `Load<T>`, the protected `ReadAsset<T>` and
+`OpenStream`, and `ServiceProvider` / `RootDirectory`. CNA publishes **34**
+`cna_content_manager_*` routes, six of them typed loaders — `texture2d`,
+`texture_cube`, `sprite_font`, `effect`, `model`, `sound_effect`. Four of those
+six have their XNA type projected today; `Model` and `SoundEffect` do not.
+
+**The other five `Content` types, sized.** `ContentReader` is 20 members and
+`sealed`, deriving from `System.IO.BinaryReader` — a BCL base that is **not
+admitted** and is the family's largest unknown. `ContentTypeReader` is 6,
+`ContentTypeReader<T>` 3 (a generic class, which the verifier can express since
+Foundation's generic-method repair), `ContentTypeReaderManager` **1**, and
+`ResourceContentManager` 2.
+
+`ResourceContentManager` should be taken **last or not at all for now**: its
+constructor takes a `System.Resources.ResourceManager` (21 members, mscorlib,
+unadmitted), and the route behind it — `cna_content_manager_create_resource` —
+is the declared placeholder whose every load returns `CNA_RESULT_IO`. Projecting
+it would mean admitting a BCL family to reach a type that cannot load anything.
+
+So the first milestone is really **`ContentManager` alone**, with
+`ContentTypeReaderManager` (one member) beside it if convenient; `ContentReader`
+is a second milestone gated on deciding what to do about `BinaryReader`.
+
+**And that gate is measured too.** `System.IO.BinaryReader` is **28 members**,
+a class, unsealed — comparable to `TypeConverter`'s 39 and well under
+`StringBuilder`'s 65. Its own base dependency, `System.IO.Stream`, is 28
+members and **abstract**, and the project already maps `Stream` globally to
+`Foundation.InputStream` for value positions. So the decision is not "is
+`BinaryReader` too big" — it is whether a CLR *base class* that Swift must
+inherit from can sit on a Foundation stream, which is a different question from
+the value mapping that already exists and the one this milestone actually has
+to answer. `measuredSupportBaseProjections` is where a base like that is
+declared, and it currently holds eight entries, none of them a stream.
+
+**Two things must be decided before any code.**
+
+* **`System.IServiceProvider` has no mapping**, and it is needed in three
+  places: both `ContentManager` constructors, its `ServiceProvider` property,
+  and `ResourceContentManager`'s constructor. Measured from mscorlib, it is a
+  **one-member interface** — `GetService(Type) -> Object` — and under this
+  project's existing `System.Type -> Any.Type` and `System.Object -> Any?`
+  mappings that is exactly the signature `GameServiceContainer.GetService`
+  already has:
+
+  ```swift
+  public final func GetService(_ type: Any.Type) -> Any?
+  ```
+
+  So the admission is one protocol with one requirement and a conformance that
+  needs no new code. It still goes through the measured act `StringBuilder`
+  did — authority, pinned shape, `bclSupportContract` — but it is a small one,
+  and `GameServiceContainer` conforming to it is the check that it was
+  projected right.
+* **`System.IO.Stream` needs nothing new.** It maps globally to
+  `Foundation.InputStream`, and the split Foundation imposes is already handled
+  where it bites: `streamDirectionParameters` overrides the global mapping for
+  `Texture2D.SaveAsPng` and `SaveAsJpeg`, whose `stream` is written and so must
+  be an `OutputStream`. `ContentManager.OpenStream` **returns** a stream and
+  opens an asset for reading, so the global mapping serves it unchanged and no
+  override is needed. Worth knowing that the override mechanism is
+  parameter-only — a return position that needed the write direction would have
+  nowhere to say so — but nothing here does.
+
+**Content exists to test against, and it is not `.xnb`.** There is no `.xnb`
+file anywhere on this machine, and `cna_content_manager_create_resource` — the
+`ResourceContentManager` mapping — is a declared placeholder whose every load
+returns `CNA_RESULT_IO`. But `load_sprite_font` "reads both the `.xnb` font
+container and CNA's own `.cnj` font descriptor", and `.cnj` is JSON that
+`cna_content_manager_load_foreign_ext` builds an object from. **A
+project-authored `.cnj` is a legal fixture** and is how this milestone gets
+tested.
+
+**The fixture's shape, and where the shape came from.** A SpriteFont `.cnj` is
+JSON of the form `{"cnjVersion":1,"type":"SpriteFont", …}` — the envelope is
+sampled by `tests/assets/.../curve.cnj` — carrying `textureName` (a sidecar
+image), `lineSpacing`, `spacing`, `defaultCharacter` and a `glyphs` array whose
+entries are `character`, `source`, `crop` and `kerning`. That maps one-for-one
+onto `CNA_SpriteFontGlyph`, so the fixture is a small PNG plus a descriptor.
+
+**That schema is engineering guidance, not authority, and was read from a
+moving tree.** It comes from `CnjContentPipeline.cpp`'s `ImportSpriteFont` in
+`cnanext` — which is the BUILD-TIME pipeline, while the runtime loader is
+whatever `cna_content_manager_load_sprite_font` uses. The pinned header says
+that route reads `.cnj` directly; whether it shares
+`ReadCnjSpriteFontDescription` is likely and **unverified**. Confirm against a
+real load before trusting a field name, and remember `cnanext` moved under this
+session once already.
+
+**It answers Foundation 70's open question.** Whether a loaded font's character
+map arrives sorted — which `SpriteFont`'s binary search requires and
+`cna_sprite_font_create` does not guarantee — becomes answerable the moment a
+`.cnj` font loads. The invariant check added in Foundation 70 will say so
+loudly either way.
+
+**One projection decision is already visible.** `load_sprite_font` hands back
+**two owned handles**, font and atlas, because "handing back only the font
+would leave the atlas alive but unnameable". XNA's `Load<SpriteFont>` returns
+one object, so the atlas attaches to the `SpriteFont` — which is exactly the
+`texture` field it already holds, and the destroy-order rule CNA imposes is the
+one Foundation 70 already reproduces.
 
 ### What `StringBuilder` cost, and what it left behind
 
@@ -132,16 +439,64 @@ Still blocked, and now measured rather than inferred:
   error-channel halves that need a native input failure this environment cannot
   produce. CNA already matches the "not connected" half.
 
-### `Microsoft.Xna.Framework.Design` — no longer out of scope
+### `Microsoft.Xna.Framework.Design` — no longer out of scope, and now costed
 
 The thirteen converters are pure managed and need no CNA route at all. What they
 need is the minimal authentic `System.dll` `ComponentModel` closure, admitted to
 the same non-vacuous standard `mscorlib` was. `System.dll` is on disk and its
 identity is established.
 
+**The closure, measured** — every non-trivial type the thirteen converters
+mention in a signature, with its visible-member count:
+
+| type | assembly | members |
+|---|---|---:|
+| `ComponentModel.TypeConverter` | System.dll | 39 |
+| `ComponentModel.PropertyDescriptor` | System.dll | 30 |
+| `ComponentModel.PropertyDescriptorCollection` | System.dll | 21 |
+| `ComponentModel.ITypeDescriptorContext` | System.dll | 5 |
+| `ComponentModel.ExpandableObjectConverter` | System.dll | 3 |
+| `Globalization.CultureInfo` | mscorlib | 43 |
+| `Collections.IDictionary` | mscorlib | 10 |
+
+About 151 members over seven types in two assemblies — roughly two and a half
+`StringBuilder`s, plus **System.dll's first-time admission**, which `mscorlib`
+already went through and `System.dll` has not.
+
+Two things make it smaller than that sounds. Admission pins the full shape as
+the authority record and projects a **measured subset**, as `CNAList` is sixteen
+of `List<T>`'s fifty-two. And `CultureInfo` — the one type that would drag
+globalization in — is only ever an opaque parameter here: every converter takes
+it as `ConvertFrom(context, culture, value)` and none reads it, so what has to
+be projected is a type, not a culture engine.
+
+`ITypeDescriptorContext` is mentioned 38 times and is a five-member interface;
+`CultureInfo` 21 times; `IDictionary` 12. XNA's own `MathTypeConverter` is the
+shared base of all thirteen and is eight members.
+
 ## Rules a next session must not quietly break
 
-These are the ones that cost the most to relearn:
+**Before the engineering rules, the three standing safety constraints**, which
+are binding regardless of what a milestone would be convenient. They were given
+for this work and are recorded here because a type name in a list does not
+carry them:
+
+* **Do not record a physical microphone.** `Microphone` is among the ten
+  missing `Audio` types, and projecting it must not open the default capture
+  device — not to test it, not to "see what happens". That needs a NEW explicit
+  authorization from the user, per instance. Do not modify PulseAudio or
+  PipeWire host configuration either.
+* **No visible windows on the user's physical desktop.** `GameWindow` is among
+  the five missing root types and is exactly the temptation. Xvfb, a private
+  `DISPLAY`, or the SDL dummy video driver — the environment this session has
+  used throughout.
+* **Do not push.** Commit freely; pushing needs a new explicit instruction.
+
+And one that is not about safety but about authority: **do not download
+proprietary XACT banks** for the `AudioEngine`/`SoundBank`/`WaveBank` work.
+Project-authored legal fixtures only, as Foundation 70's `.cnj` font will be.
+
+These are the engineering ones that cost the most to relearn:
 
 1. **A gate not demonstrated to fail is not evidence.** Every mutation must be
    shown to be caught; one that survives is either a missing test or an
@@ -234,132 +589,24 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
-* One ThreadSanitizer run in Foundation 49 reported a single failure whose
-  identity was not captured. Eleven runs since — three under saturating CPU
-  load — have been clean. Recorded as unreproduced, not as a pass.
-* `GraphicsDevice.PresentationParameters` is deliberately absent: XNA's getter
-  is `IL_NO_FAILURE_PATH` because it reads a field cached at device creation,
-  and this binding has no infallible source. `IGraphicsDeviceManager.CreateDevice`
-  and the native `DeviceCreated`/`DeviceReset` events are the two candidate
-  caching points if it is ever wanted.
-* `useResizedBackBuffer` is stored by the two dimension setters and read by
-  nothing: XNA's readers are inside `ChangeDevice`'s window negotiation, which
-  needs `GameWindow`.
+### `CNAStringBuilder.Capacity` is a lower bound, and now says so
 
----
+**Decided in Foundation 71's follow-up.** .NET computes `Capacity` as
+`m_ChunkOffset + m_ChunkChars.Length` and sizes each new chunk as
+`Max(requiredAdditionalLength, Min(Length, 8000))`; this class holds one flat
+`[UInt16]` and grows to exactly what was asked for, so it reports a smaller
+number after a growth.
 
-# Historical: the Foundation 30–36 handoff
+The difference is **admitted rather than removed**, because reproducing the
+number means reproducing the chunk chain — allocation strategy, not observable
+text — and no XNA member reads `Capacity`. A half-modelled chain would produce a
+plausible wrong number, which is worse than an honest smaller one.
 
-> **The handoff written at the end of the Foundation 30-36 session, kept as
-> that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 71 have landed since. Nothing here is
-> deleted, because the measurements it records were real when it was written.
-
-<!-- status-gate:historical -->
-
-**Foundation Milestones 30 through 36: COMPLETE.** Eleven local commits, none
-pushed.
-
-Resolve HEAD and the unpublished count from live Git rather than from this
-file — any number written here invalidates itself the moment the next
-documentation commit is made:
-
-```text
-git rev-list --count origin/develop..HEAD
-git log --oneline --decorate origin/develop..HEAD
-git status --short --branch
-```
-
-| Commit | What it is |
-|---|---|
-| `56a72e4` | The CLR exception families as real Swift `Error` classes, and eight XNA exception types. |
-| `8171fa7` | `Dictionary<K,V>` as a reference class, and `LaunchParameters`. |
-| `68527e7` | The generated report echoed the caller's absolute symbol-graph path. |
-| `31a787c` | The nullability analyser did not understand `String.IsNullOrEmpty`. |
-| `654ff5c` | `System.Attribute` and the five `ContentSerializer*` types. |
-| `eede22b` | `LaunchParameters` parses the command line; `SetItem` does not throw. |
-| `9e61538` | The managed `Game` component engine. |
-| `d9f2d93` | `GameComponent`. |
-| `1db5e83` | XNA's own resource strings pinned; eight messages corrected. |
-| `eea67d1` | `System.Type` as the Swift metatype, and `GameServiceContainer`. |
-| `8f248aa` | The support-hierarchy checks made runtime tests. |
-
-Everything at and before `7b59ceb` is untouched.
-
-## START — the state this session began from, reproduced exactly
-
-```text
-BRANCH=develop   HEAD == origin/develop == 7b59ceb   WORKTREE_CLEAN=true
-TARGET 126/1706  TOTAL_DIAGNOSTICS 284  COMPLETE 121  MISSING_TYPE 131
-MISSING_MEMBER 130  PARTIAL 5  EXPECTED_SWIFT_MEMBERS 2887
-BCL_INHERITED_MEMBER_PROJECTIONS 16  PROPERTY_MAPPING_MISMATCH 4
-OVERLOAD_MAPPING_MISMATCH 16  NATIVE_ABI 29/91/91/18/2/214
-```
-
-Verified live before any work; every number matched.
-
-## Structural scoreboard
-
-```text
-REFERENCE_TYPES=257                  unchanged
-REFERENCE_MEMBERS=2964               unchanged
-EXPECTED_SWIFT_MEMBERS=2887          unchanged
-TARGET_TYPES=142                     (126 -> 142)
-TARGET_MEMBERS=1767                  (1706 -> 1767)
-TOTAL_DIAGNOSTICS=269                (284 -> 269)
-COMPLETE_TYPES=135                   (121 -> 135)
-PARTIAL_TYPES=6                      (5 -> 7)
-MISSING_TYPE=115                     (131 -> 115)
-MISSING_MEMBER=129                   (130 -> 129)
-BASE_MAPPING_MISMATCH=2              unchanged
-INTERFACE_MAPPING_MISMATCH=1         unchanged
-PROPERTY_MAPPING_MISMATCH=4          unchanged
-OVERLOAD_MAPPING_MISMATCH=18         (16 -> 18, the two deferred serialization ctors)
-INHERITANCE_MAPPING_MISMATCH=0       new rule, green
-LANGUAGE_MAPPING_MISMATCH=0          new check, green
-every other mismatch/leak category=0
-UNMEASURED_STRUCTURAL_CATEGORY=0
-ALLOWLIST_ENTRIES=0
-
-BCL_SUPPORT_TYPE_MEASUREMENTS=10     (3 -> 10)
-BCL_BASE_PROJECTIONS=19              (5 -> 19)
-PROJECTED_BCL_BASE_TYPES=15          (1 -> 15)
-PENDING_BCL_BASE_TYPES=4             unchanged
-BCL_INHERITED_MEMBER_PROJECTIONS=77  (16 -> 77)
-MEASURED_SUPPORT_BASE_PROJECTIONS=23 (9 -> 23)
-NAMESPACE_MARKERS=11                 (10 -> 11, Storage)
-
-BCL_RESOURCE_STRING_PROJECTIONS=8    new
-BCL_STATIC_TABLE_PROJECTIONS=1       new
-XNA_RESOURCE_STRING_PROJECTIONS=4    new
-XNA_SEALED_CLASS_PROJECTIONS=18      new
-BCL_ABSTRACT_BASE_WIDENINGS=1        new, recorded
-NONDERIVABLE_UNSEALED_CLASSES=5      new, RECORDED not diagnosed
-```
-
-**`EXPECTED_SWIFT_MEMBERS` did not move, and should not have.** Every new
-`TARGET_MEMBER` is a declared XNA identity that was already in the pinned
-contract and already counted. The surface those types *inherit* is real and
-usable and is not an XNA identity, so it is counted once on its own axis.
-
-## Sixteen types completed
-
-```text
-Audio.InstancePlayLimitException              Content.ContentSerializerAttribute
-Audio.NoAudioHardwareException                Content.ContentSerializerCollectionItemNameAttribute
-Audio.NoMicrophoneConnectedException          Content.ContentSerializerIgnoreAttribute
-Graphics.DeviceLostException                  Content.ContentSerializerRuntimeTypeAttribute
-Graphics.DeviceNotResetException              Content.ContentSerializerTypeVersionAttribute
-Graphics.NoSuitableGraphicsDeviceException    LaunchParameters
-GameComponent                                 GameServiceContainer
-```
-
-Two more are PARTIAL by exactly one member each —
-`Content.ContentLoadException` and `Storage.StorageDeviceNotConnectedException`
-— see the serialization note below. `Game` gained `Components`,
-`LaunchParameters` and `Services`.
-
-## The decisions this session made
+What is now promised and pinned by a test: `Capacity >= Length` always,
+`Clear()` leaves it alone, and `SetCapacity` is exact because that path is
+XNA's. What is not promised is the value .NET would have chosen after a growth.
+The property's own documentation carries the same, so the next reader meets it
+where the code is.
 
 ### 1. A CLR exception class is a Swift class conforming to `Error`
 

@@ -124,7 +124,35 @@ public final class CNAStringBuilder {
         capacity = max(capacity, value)
     }
 
-    /// `StringBuilder.Capacity`.
+    /// `StringBuilder.Capacity` — **a lower bound here, not .NET's chunk
+    /// arithmetic**, and that is a decision rather than an oversight.
+    ///
+    /// .NET computes it as `m_ChunkOffset + m_ChunkChars.Length` over a chain
+    /// of chunks, and `ExpandByABlock` sizes each new one as
+    ///
+    /// ```text
+    /// newBlockLength = Max(requiredAdditionalLength, Min(Length, 8000))
+    /// ```
+    ///
+    /// so the buffer grows by at least its current length, doubling-ish,
+    /// capped at `MaxChunkSize`. This class holds one flat `[UInt16]` and
+    /// grows `capacity` to exactly what was asked for, so appending twenty
+    /// characters to a fresh builder reports `20` where .NET reports `16 +
+    /// newBlockLength`.
+    ///
+    /// **Why the difference is admitted rather than removed.** Reproducing the
+    /// number means reproducing the chunk chain — `chunkOffset`, per-chunk
+    /// lengths, the `MakeRoom`/`ExpandByABlock` split — which is allocation
+    /// strategy, not observable text. No XNA member reads `Capacity`; the four
+    /// this family was admitted for measure and draw the buffer's contents.
+    /// A half-modelled chunk chain would be a *plausible* wrong number, which
+    /// is worse than an honest smaller one.
+    ///
+    /// What is guaranteed, and what `Foundation71StringBuilderTests` pins:
+    /// `Capacity >= Length` always, `Clear()` leaves it alone, and
+    /// `SetCapacity` behaves exactly as the IL says including all three of its
+    /// refusals. What is **not** guaranteed is the value .NET would have
+    /// chosen after a growth.
     public var Capacity: Int32 { capacity }
 
     /// `set_Capacity`, three refusals, all naming `"value"`.

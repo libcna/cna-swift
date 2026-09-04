@@ -298,6 +298,27 @@ final class Foundation71StringBuilderTests: XCTestCase {
         }
     }
 
+    /// `Capacity` is a **lower bound**, not .NET's chunk arithmetic — the
+    /// difference is recorded on the property, and this pins what is actually
+    /// promised so the promise cannot drift silently.
+    func testCapacityIsAtLeastTheLengthAndSurvivesClear() throws {
+        let builder = CNAStringBuilder()
+        XCTAssertEqual(builder.Capacity, 16)
+        // Growth past the initial capacity keeps the invariant, whatever
+        // number the strategy picks.
+        try builder.Append(String(repeating: "x", count: 20))
+        XCTAssertEqual(builder.Length, 20)
+        XCTAssertGreaterThanOrEqual(builder.Capacity, builder.Length)
+        let grown = builder.Capacity
+        // Clearing empties the text and keeps the room.
+        builder.Clear()
+        XCTAssertEqual(builder.Length, 0)
+        XCTAssertEqual(builder.Capacity, grown)
+        // And an explicit capacity is exact, because that path is XNA's.
+        try builder.SetCapacity(64)
+        XCTAssertEqual(builder.Capacity, 64)
+    }
+
     /// `Clear()` is `this.Length = 0` and nothing else — **the capacity
     /// survives**, which is the whole reason to clear rather than rebuild.
     func testClearKeepsTheCapacity() throws {

@@ -198,11 +198,43 @@ def planted_mutations(root: Path) -> list[str]:
         capture_output=True, text=True, cwd=root)
     if result.returncode == 0:
         return []
-    return [
+    planted = [
         line.strip()
         for line in result.stdout.splitlines()
         if line.strip().startswith("PLANTED ")
     ] or [f"the working-tree mutation audit failed: {result.stdout.strip()}"]
+
+    # A harness that is RUNNING has a mutation applied on purpose, and every
+    # verification during a run would otherwise read as "someone committed
+    # one". Both are findings -- verifying a tree that is being mutated
+    # measures nothing -- but they are different findings, and a gate that
+    # cries the wrong wolf is a gate people learn to ignore.
+    #
+    # The harness holds `.mutation-gate.lock` with flock for the whole run, so
+    # failing to take it is the exact question "is one running right now".
+    if _mutation_harness_running(root):
+        return ["a projection-mutation run is in progress, so the tree holds a "
+                "mutation on purpose and nothing here was measured against a "
+                "clean tree — re-run this gate after it finishes"] + planted
+    return planted
+
+
+def _mutation_harness_running(root: Path) -> bool:
+    """Whether something holds the mutation harness's tree lock."""
+    lock = root / ".mutation-gate.lock"
+    if not lock.exists():
+        return False
+    try:
+        import fcntl
+        with lock.open("a", encoding="utf-8") as handle:
+            try:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                return True
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+    except OSError:
+        return False
+    return False
 
 
 def disagreements(summary: dict[str, int]) -> dict[str, int]:
@@ -531,8 +563,21 @@ def self_test() -> int:
         expect(planted_mutations(fake) != [],
                "a tree with no mutation harness must report that it cannot "
                "be audited, not pass silently")
-        expect(planted_mutations(ROOT) == [],
-               "the real working tree must hold no planted mutation")
+        # The real tree is clean UNLESS a mutation run holds it, in which case
+        # the finding names that instead. Asserting "no findings" outright
+        # would make this self-test fail for a legitimate reason, which is the
+        # same mistake the gate itself was making.
+        real = planted_mutations(ROOT)
+        expect(real == [] or _mutation_harness_running(ROOT),
+               "the real working tree must hold no planted mutation unless a "
+               "run is in progress")
+        if _mutation_harness_running(ROOT):
+            expect(any("run is in progress" in item for item in real),
+                   "a running harness must be named as the cause rather than "
+                   "reported as a committed mutation")
+        # No lock file at all is not a running harness.
+        expect(not _mutation_harness_running(fake),
+               "an empty tree holds no mutation-harness lock")
 
     for failure in failures:
         print(f"  SELF_TEST_FAILURE {failure}")

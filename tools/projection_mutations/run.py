@@ -2752,10 +2752,33 @@ def require_native_library() -> str | None:
     return None
 
 
-def run_tests(swift_test: str) -> int:
-    result = subprocess.run(
-        [swift_test], cwd=ROOT, text=True, capture_output=True)
-    return result.returncode
+# A mutated suite that HANGS is still a suite that does not pass, but without a
+# deadline it stalls the whole run: `from-type-size-test-reads-the-wrong-size`
+# inflates a registered vertex size by four, and the test binary it produces
+# blocks instead of failing. One such mutation held a 278-mutation run
+# indefinitely, which is worse than a survivor -- a survivor is at least
+# reported.
+#
+# The deadline is generous on purpose. It is not a performance budget; it is
+# the line between "slow" and "never", and a mutation that trips it is scored
+# as caught-by-hang rather than silently as caught, because the two are
+# different facts about the projection.
+TEST_TIMEOUT_SECONDS = 600
+
+
+def run_tests(swift_test: str) -> tuple[int, bool]:
+    """(exit status, whether it ran out of time)."""
+    try:
+        result = subprocess.run(
+            [swift_test], cwd=ROOT, text=True, capture_output=True,
+            timeout=TEST_TIMEOUT_SECONDS)
+    except subprocess.TimeoutExpired:
+        # The child is killed by `subprocess.run`, but the test BINARY it
+        # spawned is not its process group's only member and outlives it.
+        subprocess.run(["pkill", "-9", "-f", "CNAPackageTests.xctest"],
+                       capture_output=True)
+        return 1, True
+    return result.returncode, False
 
 
 def main() -> int:
@@ -2850,8 +2873,12 @@ def main() -> int:
             print(f"  STALE {item}")
         return 1
 
-    if run_tests(args.swift_test) != 0:
-        print("PROJECTION_MUTATION_BASELINE=RED — the unmutated tree already fails")
+    baseline, baseline_hung = run_tests(args.swift_test)
+    if baseline != 0:
+        print("PROJECTION_MUTATION_BASELINE="
+              + ("HUNG — the unmutated tree did not finish in "
+                 f"{TEST_TIMEOUT_SECONDS}s" if baseline_hung
+                 else "RED — the unmutated tree already fails"))
         return 1
 
     wanted = None if args.only is None else [
@@ -2875,7 +2902,7 @@ def main() -> int:
         mutated = text.replace(old, new)
         try:
             path.write_text(mutated, encoding="utf-8")
-            code = run_tests(args.swift_test)
+            code, hung = run_tests(args.swift_test)
         finally:
             # Restore ONLY what this harness wrote.
             #
@@ -2902,7 +2929,7 @@ def main() -> int:
                 "  rather than written over the change; recover the file by\n"
                 "  hand and re-run.")
             return 1
-        status = "CAUGHT" if code != 0 else "SURVIVED"
+        status = "HUNG" if hung else ("CAUGHT" if code != 0 else "SURVIVED")
         print(f"{status:9} {name:34} {description}")
         if code == 0:
             survivors.append(f"{name}: {description}")
