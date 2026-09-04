@@ -296,6 +296,11 @@
   ],
   "availableButNotAdmitted": [
     {
+      "assembly": "mscorlib.dll",
+      "family": "System.Text.StringBuilder",
+      "reason": "Required by four XNA members -- SpriteFont.MeasureString(StringBuilder) and SpriteBatch.DrawString's three StringBuilder overloads -- and deliberately not admitted with them. mscorlib's identity is already established here; what is missing is the measured act of admission: the family's full public shape pinned in bcl40-selected-shape.json and a Swift support class measured against it. StringBuilder declares some sixty public members, mostly Append overloads, and writing the four an XNA signature happens to need would be admitting a family by fabricating it. The four XNA members are recorded MISSING rather than projected over String, because XNA's overloads take a mutable buffer and a caller holding one is not served by a projection that copies it."
+    },
+    {
       "assembly": "System.dll",
       "assemblyVersion": "4.0.0.0",
       "publicKeyToken": "b77a5c561934e089",

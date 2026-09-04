@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 184,
-    "TARGET_MEMBERS": 2296,
-    "TOTAL_DIAGNOSTICS": 115,
+    "TARGET_TYPES": 185,
+    "TARGET_MEMBERS": 2304,
+    "TOTAL_DIAGNOSTICS": 116,
     "COMPLETE_TYPES": 178,
-    "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 73,
-    "MISSING_TYPE": 73,
-    "MISSING_MEMBER": 38,
+    "PARTIAL_TYPES": 7,
+    "MISSING_TYPES": 72,
+    "MISSING_TYPE": 72,
+    "MISSING_MEMBER": 36,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -29,7 +29,7 @@
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 4,
+    "OVERLOAD_MAPPING_MISMATCH": 8,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -63,19 +63,19 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 88,
-    "PENDING_ACCESSOR_PROJECTIONS": 26,
+    "MEASURED_ACCESSOR_PROJECTIONS": 89,
+    "PENDING_ACCESSOR_PROJECTIONS": 25,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 20,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 21,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 18,
-    "XNA_SEALED_CLASS_PROJECTIONS": 29,
+    "XNA_SEALED_CLASS_PROJECTIONS": 30,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 72,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 73,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 183,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 186,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 57
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 184,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 185,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 58
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -280,6 +280,7 @@
     "Microsoft.Xna.Framework.Game",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
     "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+    "Microsoft.Xna.Framework.Graphics.SpriteFont",
     "Microsoft.Xna.Framework.GraphicsDeviceManager",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ],
@@ -330,7 +331,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection",
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
-    "Microsoft.Xna.Framework.Graphics.SpriteFont",
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
@@ -736,18 +736,13 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
       "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-      "detail": "mapped member is absent"
+      "category": "OVERLOAD_MAPPING_MISMATCH",
+      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
+      "detail": "required overload is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -755,9 +750,9 @@
       "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-      "detail": "mapped member is absent"
+      "category": "OVERLOAD_MAPPING_MISMATCH",
+      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
+      "detail": "required overload is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -765,9 +760,19 @@
       "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "OVERLOAD_MAPPING_MISMATCH",
+      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
+      "detail": "required overload is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "OVERLOAD_MAPPING_MISMATCH",
+      "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
+      "detail": "required overload is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -2499,6 +2504,20 @@
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.SpriteFont",
+      "sourceProperty": "DefaultCharacter",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.SpriteFont.DefaultCharacter()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.SpriteFont.SetDefaultCharacter(_:UInt16?)",
+      "writerName": "SetDefaultCharacter",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
       "ownerType": "Microsoft.Xna.Framework.Graphics.TextureCollection",
       "sourceProperty": "Item",
       "indexed": true,
@@ -2682,16 +2701,6 @@
       "typeState": "missing",
       "readerThrows": false,
       "writerName": "SetTitle",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Graphics.SpriteFont",
-      "sourceProperty": "DefaultCharacter",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetDefaultCharacter",
       "writerThrows": true,
       "indexed": false,
       "static": false
@@ -2911,6 +2920,13 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.SpriteFont",
       "clrSealed": true,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
@@ -3937,6 +3953,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "CharacterNotInFont",
+      "pinnedValue": "The character '{0}' (0x{1:x4}) is not available in this SpriteFont. If applicable, adjust the font's start and end CharacterRegions to include this character.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "DuplicateVertexElement",
       "pinnedValue": "Invalid VertexDeclaration. Duplicate element {0}{1}.",
       "reproducedInSwiftSource": true
@@ -4713,6 +4735,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.SpriteFont",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -8217,14 +8247,14 @@
       "member": "Characters",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[System.Char]",
-      "swiftReturnType": "CNAReadOnlyCollection<System.Char>?",
+      "swiftReturnType": "CNAReadOnlyCollection<UInt16>?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAReadOnlyCollection<UInt16>?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.Texture2D",
@@ -11659,7 +11689,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
       "status": "PARTIAL",
       "expectedMembers": 21,
-      "targetMembers": 13,
+      "targetMembers": 16,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -11683,18 +11713,13 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
           "detail": "mapped member is absent"
         },
         {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-          "detail": "mapped member is absent"
+          "category": "OVERLOAD_MAPPING_MISMATCH",
+          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
+          "detail": "required overload is absent"
         },
         {
           "category": "MISSING_MEMBER",
@@ -11702,14 +11727,19 @@
           "detail": "mapped member is absent"
         },
         {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:String,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-          "detail": "mapped member is absent"
+          "category": "OVERLOAD_MAPPING_MISMATCH",
+          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
+          "detail": "required overload is absent"
         },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
           "detail": "mapped member is absent"
+        },
+        {
+          "category": "OVERLOAD_MAPPING_MISMATCH",
+          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
+          "detail": "required overload is absent"
         }
       ]
     },
@@ -11722,14 +11752,19 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SpriteFont",
-      "status": "MISSING",
+      "status": "PARTIAL",
       "expectedMembers": 6,
-      "targetMembers": 0,
+      "targetMembers": 5,
       "diagnostics": [
         {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "OVERLOAD_MAPPING_MISMATCH",
+          "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
+          "detail": "required overload is absent"
         }
       ]
     },

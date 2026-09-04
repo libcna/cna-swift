@@ -104,6 +104,7 @@
     "System.SByte": "Int8",
     "System.Int16": "Int16",
     "System.UInt16": "UInt16",
+    "System.Char": "UInt16",
     "System.Int32": "Int32",
     "System.UInt32": "UInt32",
     "System.Int64": "Int64",

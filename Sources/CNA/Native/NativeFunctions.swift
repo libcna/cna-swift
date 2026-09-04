@@ -111,6 +111,15 @@ internal final class NativeFunctions {
     typealias Texture3dGetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Texture3DTransfer>?, UnsafeMutablePointer<CNASwift_Color>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchBeginWithStatesRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
+    typealias SpriteFontCreateRoute = @convention(c) (UnsafePointer<CNASwift_SpriteFontCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SpriteFontDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias SpriteFontGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_SpriteFontInfo>?) -> UInt32
+    typealias SpriteFontCopyCharactersRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt16>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SpriteFontCopyGlyphsRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_SpriteFontGlyph>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SpriteFontSetDefaultCharacterRoute = @convention(c) (UInt64, UInt8, UInt16) -> UInt32
+    typealias SpriteFontSetLineSpacingRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias SpriteFontSetSpacingRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SpriteBatchDrawStringRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteTextCommand>?) -> UInt32
     typealias SpriteBatchSubmitScaledManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteScaledCommand>?, UInt64) -> UInt32
     typealias SpriteBatchSubmitManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteCommand>?, UInt64) -> UInt32
     typealias SpriteBatchEndRoute = @convention(c) (UInt64) -> UInt32
@@ -423,6 +432,15 @@ internal final class NativeFunctions {
     let spriteBatchCreate: SpriteBatchCreateRoute
     let spriteBatchBeginWithStates: SpriteBatchBeginWithStatesRoute
     let spriteBatchSubmitScaled: SpriteBatchSubmitScaledManyRoute
+    let spriteFontCreate: SpriteFontCreateRoute
+    let spriteFontDestroy: SpriteFontDestroyRoute
+    let spriteFontGetInfo: SpriteFontGetInfoRoute
+    let spriteFontCopyCharacters: SpriteFontCopyCharactersRoute
+    let spriteFontCopyGlyphs: SpriteFontCopyGlyphsRoute
+    let spriteFontSetDefaultCharacter: SpriteFontSetDefaultCharacterRoute
+    let spriteFontSetLineSpacing: SpriteFontSetLineSpacingRoute
+    let spriteFontSetSpacing: SpriteFontSetSpacingRoute
+    let spriteBatchDrawString: SpriteBatchDrawStringRoute
     let spriteBatchSubmit: SpriteBatchSubmitManyRoute
     let spriteBatchEnd: SpriteBatchEndRoute
     let spriteBatchDestroy: SpriteBatchDestroyRoute
@@ -754,6 +772,15 @@ internal final class NativeFunctions {
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
         spriteBatchBeginWithStates = try library.resolve("cna_sprite_batch_begin_with_states", as: SpriteBatchBeginWithStatesRoute.self)
         spriteBatchSubmitScaled = try library.resolve("cna_sprite_batch_submit_scaled_many", as: SpriteBatchSubmitScaledManyRoute.self)
+        spriteFontCreate = try library.resolve("cna_sprite_font_create", as: SpriteFontCreateRoute.self)
+        spriteFontDestroy = try library.resolve("cna_sprite_font_destroy", as: SpriteFontDestroyRoute.self)
+        spriteFontGetInfo = try library.resolve("cna_sprite_font_get_info", as: SpriteFontGetInfoRoute.self)
+        spriteFontCopyCharacters = try library.resolve("cna_sprite_font_copy_characters", as: SpriteFontCopyCharactersRoute.self)
+        spriteFontCopyGlyphs = try library.resolve("cna_sprite_font_copy_glyphs", as: SpriteFontCopyGlyphsRoute.self)
+        spriteFontSetDefaultCharacter = try library.resolve("cna_sprite_font_set_default_character", as: SpriteFontSetDefaultCharacterRoute.self)
+        spriteFontSetLineSpacing = try library.resolve("cna_sprite_font_set_line_spacing", as: SpriteFontSetLineSpacingRoute.self)
+        spriteFontSetSpacing = try library.resolve("cna_sprite_font_set_spacing", as: SpriteFontSetSpacingRoute.self)
+        spriteBatchDrawString = try library.resolve("cna_sprite_batch_draw_string", as: SpriteBatchDrawStringRoute.self)
         spriteBatchSubmit = try library.resolve("cna_sprite_batch_submit_many", as: SpriteBatchSubmitManyRoute.self)
         spriteBatchEnd = try library.resolve("cna_sprite_batch_end", as: SpriteBatchEndRoute.self)
         spriteBatchDestroy = try library.resolve("cna_sprite_batch_destroy", as: SpriteBatchDestroyRoute.self)

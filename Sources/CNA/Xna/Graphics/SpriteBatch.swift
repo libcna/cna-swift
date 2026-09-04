@@ -552,6 +552,125 @@ extension Microsoft.Xna.Framework.Graphics {
         /// The override exists because XNA declares it. It is `open` for the
         /// same reason the base is: `protected virtual` maps to `open`, and a
         /// consumer's subclass overriding it must reach this link of the chain.
+        // MARK: - DrawString
+
+        /// `DrawString(SpriteFont, String, Vector2, Color)`.
+        public func DrawString(
+            _ spriteFont: SpriteFont,
+            text: String,
+            position: Microsoft.Xna.Framework.Vector2,
+            color: Microsoft.Xna.Framework.Color
+        ) throws {
+            try DrawString(
+                spriteFont, text: text, position: position, color: color,
+                rotation: 0, origin: .Zero,
+                scale: Microsoft.Xna.Framework.Vector2(1, 1),
+                effects: .None, layerDepth: 0)
+        }
+
+        /// `DrawString(SpriteFont, String, Vector2, Color, Single, Vector2,
+        /// Single, SpriteEffects, Single)` — the uniform-scale overload, whose
+        /// IL widens the single scale into `new Vector2(scale, scale)` before
+        /// calling the same `SpriteFont.InternalDraw`.
+        public func DrawString(
+            _ spriteFont: SpriteFont,
+            text: String,
+            position: Microsoft.Xna.Framework.Vector2,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            scale: Float,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            try DrawString(
+                spriteFont, text: text, position: position, color: color,
+                rotation: rotation, origin: origin,
+                scale: Microsoft.Xna.Framework.Vector2(scale, scale),
+                effects: effects, layerDepth: layerDepth)
+        }
+
+        /// `DrawString(SpriteFont, String, Vector2, Color, Single, Vector2,
+        /// Vector2, SpriteEffects, Single)` — the per-axis scale, and the one
+        /// the other two funnel into.
+        ///
+        /// **The begin/end check is conditional on the text, and that is not a
+        /// simplification.** XNA does not test the pair here at all:
+        /// `DrawString` checks its two arguments for null and calls
+        /// `SpriteFont.InternalDraw`, which loops over the characters and
+        /// calls `SpriteBatch.InternalDraw` once per glyph — and it is
+        /// *there* that `BeginMustBeCalledBeforeDraw` is raised. An empty
+        /// string therefore draws no glyph, raises nothing, and succeeds
+        /// outside a begin/end pair.
+        ///
+        /// CNA's `cna_sprite_batch_draw_string` answers `INVALID_STATE`
+        /// outside an interval whatever the text, so forwarding an empty
+        /// string would refuse a call XNA accepts. The managed test reproduces
+        /// XNA's condition exactly: the pair is required only when the text
+        /// would produce a glyph.
+        ///
+        /// A string of nothing but carriage returns and newlines is the
+        /// interesting case, and it goes the other way: XNA's loop *does*
+        /// iterate, but `'\r'` is skipped and `'\n'` only advances the line,
+        /// so neither reaches `InternalDraw` and neither raises. The
+        /// condition is "produces a glyph", not "is non-empty".
+        public func DrawString(
+            _ spriteFont: SpriteFont,
+            text: String,
+            position: Microsoft.Xna.Framework.Vector2,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            scale: Microsoft.Xna.Framework.Vector2,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            let units = Array(text.utf16)
+            let drawsAGlyph = units.contains { $0 != 13 && $0 != 10 }
+            guard drawsAGlyph else { return }
+            guard inBeginEndPair else {
+                throw CNAInvalidOperationException(
+                    message: beginMustBeCalledBeforeDrawMessage)
+            }
+            // Every character has to be in the font before anything is
+            // submitted, because XNA's loop raises from the glyph it reaches
+            // and CNA's route would refuse the whole string with a message of
+            // its own. Measuring is the cheapest way to ask, and it asks the
+            // same `GetIndexForCharacter` a draw would.
+            _ = try spriteFont.measure(units)
+
+            let batchHandle = try validatedHandle("SpriteBatch.DrawString")
+            let fontHandle = try spriteFont.validatedHandleForDraw()
+            guard spriteFont.box.runtime === nativeStorage.runtime else {
+                throw CNAError.staleRuntimeGeneration(
+                    expected: nativeStorage.generation,
+                    actual: spriteFont.box.runtime.generation)
+            }
+            var utf8 = Array(text.utf8)
+            try utf8.withUnsafeMutableBufferPointer { buffer in
+                var command = CNASwift_SpriteTextCommand()
+                command.struct_size =
+                    UInt32(MemoryLayout<CNASwift_SpriteTextCommand>.size)
+                command.struct_version = 1
+                command.sprite_font = fontHandle
+                command.text = CNASwift_StringView(
+                    data: UnsafeRawPointer(buffer.baseAddress)?
+                        .assumingMemoryBound(to: CChar.self),
+                    byte_length: UInt64(buffer.count))
+                command.position = CNASwift_Vector2(x: position.X, y: position.Y)
+                command.color = color.native
+                command.rotation = rotation
+                command.origin = CNASwift_Vector2(x: origin.X, y: origin.Y)
+                command.scale = CNASwift_Vector2(x: scale.X, y: scale.Y)
+                command.effects = effects.rawValue
+                command.layer_depth = layerDepth
+                try nativeStorage.runtime.functions.check(
+                    nativeStorage.runtime.functions.spriteBatchDrawString(
+                        batchHandle, &command),
+                    operation: "cna_sprite_batch_draw_string")
+            }
+        }
+
         open override func Dispose(_ disposing: Bool) throws {
             try super.Dispose(disposing)
         }

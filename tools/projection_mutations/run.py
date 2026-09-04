@@ -63,6 +63,7 @@ EFFECT = ROOT / "Sources/CNA/Xna/Graphics/Effect.swift"
 EFFECTCOLLECTIONS = ROOT / "Sources/CNA/Xna/Graphics/EffectCollections.swift"
 EFFECTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/EffectSupport.swift"
 DRAW = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceDraw.swift"
+FONT = ROOT / "Sources/CNA/Xna/Graphics/SpriteFont.swift"
 LIGHT = ROOT / "Sources/CNA/Xna/Graphics/DirectionalLight.swift"
 STOCKSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/StockEffectSupport.swift"
 BASICEFFECT = ROOT / "Sources/CNA/Xna/Graphics/BasicEffect.swift"
@@ -2357,6 +2358,205 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "        public var LightingEnabled: Bool { true }",
         "        public var LightingEnabled: Bool { state.lightingEnabled }",
     ),
+
+    # ---- Foundation 70: SpriteFont and DrawString -------------------------
+    (
+        "measure-does-not-clamp-the-first-bearing",
+        "the first glyph of a line adding a negative left bearing instead of clamping it",
+        FONT,
+        "                if firstOfLine {\n"
+        "                    left = max(left, 0)",
+        "                if firstOfLine {\n"
+        "                    left = min(left, 0)",
+    ),
+    (
+        "measure-clamps-every-bearing",
+        "the clamp applied to every glyph, not only the first of a line",
+        FONT,
+        "                var left = glyph.kerning.x\n"
+        "                if firstOfLine {",
+        "                var left = max(glyph.kerning.x, 0)\n"
+        "                if firstOfLine {",
+    ),
+    (
+        "measure-omits-the-inter-glyph-spacing",
+        "Spacing never added, so every string measures as if spacing were zero",
+        FONT,
+        "                    size.X += spacing + rightBearing",
+        "                    size.X += rightBearing",
+    ),
+    (
+        "measure-omits-the-trailing-bearing",
+        "the last glyph's right bearing dropped from the width",
+        FONT,
+        "            size.X += max(rightBearing, 0)\n"
+        "            size.Y += Float(lines * lineSpacing)",
+        "            size.Y += Float(lines * lineSpacing)",
+    ),
+    (
+        "measure-does-not-clamp-the-trailing-bearing",
+        "a negative trailing bearing shrinking the measured width",
+        FONT,
+        "            size.X += max(rightBearing, 0)\n"
+        "            size.Y += Float(lines * lineSpacing)",
+        "            size.X += rightBearing\n"
+        "            size.Y += Float(lines * lineSpacing)",
+    ),
+    (
+        "measure-counts-the-carriage-return",
+        "'\\r' measured as a glyph instead of skipped before every other test",
+        FONT,
+        "                if unit == 13 { continue }          // '\\r'",
+        "                if unit == 13 && false { continue } // '\\r'",
+    ),
+    (
+        "measure-height-uses-the-glyph-bounds",
+        "the height taken from the atlas rectangle rather than the cropping one",
+        FONT,
+        "                size.Y = max(size.Y, Float(glyph.cropping.height))",
+        "                size.Y = max(size.Y, Float(glyph.glyph_bounds.height))",
+    ),
+    (
+        "measure-forgets-the-widest-line",
+        "a multi-line measurement answering only the last line's width",
+        FONT,
+        "            size.X = max(size.X, widest)",
+        "            size.X = size.X",
+    ),
+    (
+        "measure-does-not-add-the-line-heights",
+        "every extra line costing nothing, so one line and five measure the same",
+        FONT,
+        "            size.Y += Float(lines * lineSpacing)",
+        "            size.Y += Float(0 * lineSpacing)",
+    ),
+    (
+        "measure-of-an-empty-string-is-not-zero",
+        "an empty string measured as one empty line instead of Vector2.Zero",
+        FONT,
+        "            guard !units.isEmpty else { return .Zero }",
+        "            guard units.count < 0 else { return .Zero }",
+    ),
+    (
+        "character-search-misses-the-ends",
+        "a binary search that never examines the first or last character",
+        FONT,
+        "            var low = 0\n"
+        "            var high = characterMap.count - 1",
+        "            var low = 1\n"
+        "            var high = characterMap.count - 2",
+    ),
+    # `character-fallback-recurses-without-a-guard` was planted here and
+    # WITHDRAWN. It removed GetIndexForCharacter's `defaultCharacter != unit`
+    # guard, which matters only for a font whose DEFAULT character is itself
+    # absent from the glyph table -- the one state in which the fallback
+    # recurses for ever. `build-probe/f70_default.c` measures that CNA refuses
+    # to build such a font ("defaultCharacter is not present in characters"),
+    # and `cna_sprite_font_set_default_character` refuses the same change
+    # afterwards. No route this projection has can reach the state, so no test
+    # can be written that the mutation would fail. The guard stays: it is
+    # XNA's, and it is the difference between reporting a character and
+    # hanging.
+    (
+        "character-refusal-drops-its-parameter-name",
+        "GetIndexForCharacter's refusal losing the ParamName XNA gives it",
+        FONT,
+        "                message: SpriteFont.characterNotInFontMessage(unit),\n"
+        "                paramName: \"character\")",
+        "                message: SpriteFont.characterNotInFontMessage(unit))",
+    ),
+    (
+        "default-character-refusal-gains-a-parameter-name",
+        "set_DefaultCharacter's refusal naming a parameter, which XNA's does not",
+        FONT,
+        "                    throw CNAArgumentException(\n"
+        "                        message: SpriteFont.characterNotInFontMessage(value))",
+        "                    throw CNAArgumentException(\n"
+        "                        message: SpriteFont.characterNotInFontMessage(value),\n"
+        "                        paramName: \"value\")",
+    ),
+    (
+        "default-character-accepts-anything",
+        "a fallback character the font does not have accepted instead of refused",
+        FONT,
+        "                guard characterMap.contains(value) else {",
+        "                guard characterMap.contains(value) || true else {",
+    ),
+    (
+        "default-character-written-before-the-test",
+        "the refused fallback stored anyway, so the property changes on a throw",
+        FONT,
+        "            if let value {\n"
+        "                guard characterMap.contains(value) else {",
+        "            defaultCharacter = value\n"
+        "            if let value {\n"
+        "                guard characterMap.contains(value) else {",
+    ),
+    (
+        "character-message-hex-not-padded",
+        "the numeric placeholder formatted without XNA's four-digit hex width",
+        FONT,
+        "                    of: \"{1:x4}\", with: String(format: \"%04x\", Int(value)))",
+        "                    of: \"{1:x4}\", with: String(format: \"%x\", Int(value)))",
+    ),
+    (
+        "characters-collection-rebuilt-per-call",
+        "Characters answering a fresh collection each time, so it has no identity",
+        FONT,
+        "            if let charactersView { return charactersView }",
+        "            if let charactersView, false { return charactersView }",
+    ),
+    (
+        "layout-change-never-reaches-the-device",
+        "an assigned LineSpacing that no draw ever pushes",
+        FONT,
+        "            if pendingLineSpacing {",
+        "            if pendingLineSpacing && false {",
+    ),
+    # `layout-flush-does-not-clear-its-flag` was planted here and REPLACED,
+    # not scored: leaving the flag set re-pushes the SAME value on the next
+    # draw, and no answer changes. The replacement crosses the two flags,
+    # which does change one.
+    (
+        "layout-flush-crosses-its-two-flags",
+        "Spacing pushed under LineSpacing's flag, so setting one alone is lost",
+        FONT,
+        "            if pendingSpacing {",
+        "            if pendingLineSpacing {",
+    ),
+    (
+        "draw-string-skips-the-begin-check",
+        "a draw outside a begin/end pair reaching CNA instead of reporting XNA's rule",
+        BATCH,
+        "            guard inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: beginMustBeCalledBeforeDrawMessage)\n"
+        "            }\n"
+        "            // Every character has to be in the font",
+        "            // Every character has to be in the font",
+    ),
+    (
+        "draw-string-refuses-an-empty-string",
+        "an empty string refused outside a pair, which XNA accepts",
+        BATCH,
+        "            let drawsAGlyph = units.contains { $0 != 13 && $0 != 10 }",
+        "            let drawsAGlyph = !units.isEmpty",
+    ),
+    (
+        "draw-string-does-not-validate-its-characters",
+        "an unknown character forwarded to CNA instead of reported the way XNA does",
+        BATCH,
+        "            _ = try spriteFont.measure(units)",
+        "            _ = units",
+    ),
+    # `draw-string-uniform-scale-widened-wrongly` was planted here and
+    # WITHDRAWN, for Foundation 65's reason and Foundation 68's: a submitted
+    # sprite is not readable back. The uniform-scale overload widens one scale
+    # into `Vector2(scale, scale)`, and a mutation to `Vector2(scale, 1)`
+    # produces a command CNA accepts exactly as readily -- there is no query
+    # for what a batch was given, no pixel readback to see the result, and no
+    # scale the route refuses. The widening is asserted by reading, not by
+    # testing, and this records that it is.
 ]
 
 
@@ -2482,11 +2682,36 @@ def main() -> int:
             survivors.append(
                 f"{name}: the mutation site occurs {text.count(old)} times, not once")
             continue
+        mutated = text.replace(old, new)
         try:
-            path.write_text(text.replace(old, new), encoding="utf-8")
+            path.write_text(mutated, encoding="utf-8")
             code = run_tests(args.swift_test)
         finally:
-            path.write_text(text, encoding="utf-8")
+            # Restore ONLY what this harness wrote.
+            #
+            # `originals` is a snapshot taken before the first mutation, and
+            # restoring from it unconditionally overwrites anything that
+            # changed the file meanwhile -- which is not hypothetical: an edit
+            # made to a mutated file during a run was silently reverted, and
+            # the loss was noticed only because the next build failed on a
+            # mutation's own text. The tree lock stops a second HARNESS; it
+            # cannot stop an editor, and this is the part that can.
+            #
+            # A file that no longer holds exactly what was written is left
+            # alone and reported. Losing a mutation's score is recoverable;
+            # losing someone's work is not.
+            collided = path.read_text(encoding="utf-8") != mutated
+            if not collided:
+                path.write_text(text, encoding="utf-8")
+        if collided:
+            print(
+                f"PROJECTION_MUTATION_COLLISION={name}\n"
+                f"  {path} changed underneath the run and was NOT restored.\n"
+                "  It still holds whatever overwrote the mutation, plus the\n"
+                "  mutation itself. This harness's snapshot was discarded\n"
+                "  rather than written over the change; recover the file by\n"
+                "  hand and re-run.")
+            return 1
         status = "CAUGHT" if code != 0 else "SURVIVED"
         print(f"{status:9} {name:34} {description}")
         if code == 0:

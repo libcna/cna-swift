@@ -1,7 +1,7 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 69 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 70 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
@@ -156,16 +156,16 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=184               TARGET_MEMBERS=2296
-COMPLETE_TYPES=178             PARTIAL_TYPES=6      MISSING_TYPE=73
-MISSING_MEMBER=38              TOTAL_DIAGNOSTICS=115
+TARGET_TYPES=185               TARGET_MEMBERS=2304
+COMPLETE_TYPES=178             PARTIAL_TYPES=7      MISSING_TYPE=72
+MISSING_MEMBER=36              TOTAL_DIAGNOSTICS=116
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
-XNA_RESOURCE_STRING_PROJECTIONS=72 API_COMPAT_SELF_TESTS=2426
+XNA_RESOURCE_STRING_PROJECTIONS=73 API_COMPAT_SELF_TESTS=2426
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=73`, `MISSING_MEMBER=38`, and `OVERLOAD_MAPPING_MISMATCH=4`,
+`MISSING_TYPE=72`, `MISSING_MEMBER=36`, and `OVERLOAD_MAPPING_MISMATCH=8`,
 whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
 both taking an `Effect`) and the two serialization constructors of
 `ContentLoadException` and `StorageDeviceNotConnectedException`.
@@ -190,12 +190,13 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=303  ROUTE_PAIRINGS=303  PROTOTYPE_TYPE_POSITIONS=1032
-CANONICAL_DECLARATION_CHECKS=1032  C_SWIFT_MEASUREMENTS=1032
-LAYOUTS=50  LAYOUT_FIELDS=395  CALLBACKS=6  CONSTANTS=225  SCALAR_FACTS=3
+BOUND_FUNCTIONS=312  ROUTE_PAIRINGS=312  PROTOTYPE_TYPE_POSITIONS=1063
+CANONICAL_DECLARATION_CHECKS=1063  C_SWIFT_MEASUREMENTS=1063
+LAYOUTS=54  LAYOUT_FIELDS=431  CALLBACKS=6  CONSTANTS=225  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=241  LAST_FULL_RUN=137  CAUGHT=135  REPLACED_NO_OPS=2
+PROJECTION_MUTATIONS=263  LAST_FULL_RUN=137  CAUGHT=135
+WITHDRAWN_IN_SOURCE=5  REPLACED_NO_OPS_IN_SOURCE=1
 ```
 
 The projection-mutation count is what the harness holds; `CAUGHT` is what a
@@ -214,7 +215,7 @@ is selected, which would report a coverage loss as sixteen projection defects.
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
-(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=72`). The BCL authority
+(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=73`). The BCL authority
 carries `BCL_SENTINEL_CHECKS=433`, `BCL_MUTATION_SELF_TESTS=462`,
 `BCL_CROSS_CHECKS=141` against a second disassembler, and four negative
 controls that are still refused. The four are not the same four binaries as in

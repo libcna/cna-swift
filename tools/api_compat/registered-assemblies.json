@@ -138,6 +138,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CharacterNotInFont",
+      "reason": "One message, two exception shapes, in one type. SpriteFont.GetIndexForCharacter raises ArgumentException(Format(CharacterNotInFont, c, (int)c), \"character\") when a character is neither in the map nor reachable through DefaultCharacter; set_DefaultCharacter raises ArgumentException with the SAME formatted message and NO paramName when the proposed fallback is not in the font. Its second placeholder is `0x{1:x4}`, so the numeric argument is formatted as four lowercase hex digits."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "reason": "VertexElementValidator.Validate raises ArgumentException with this when two elements share a VertexElementUsage and UsageIndex, formatted with the later element's own pair."
     },

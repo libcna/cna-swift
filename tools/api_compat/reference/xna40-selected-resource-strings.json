@@ -110,6 +110,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CharacterNotInFont",
+      "value": "The character '{0}' (0x{1:x4}) is not available in this SpriteFont. If applicable, adjust the font's start and end CharacterRegions to include this character."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "DuplicateVertexElement",
       "value": "Invalid VertexDeclaration. Duplicate element {0}{1}."
     },

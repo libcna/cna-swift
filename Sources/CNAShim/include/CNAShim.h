@@ -592,6 +592,54 @@ typedef struct CNASwift_GamePadCapabilities {
     uint8_t reserved[1];
 } CNASwift_GamePadCapabilities;
 
+typedef struct CNASwift_SpriteFontGlyph {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Rectangle glyph_bounds;
+    CNASwift_Rectangle cropping;
+    uint16_t character;
+    uint16_t reserved;
+    CNASwift_Vector3 kerning;
+} CNASwift_SpriteFontGlyph;
+
+typedef struct CNASwift_SpriteFontCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Handle texture;
+    const CNASwift_SpriteFontGlyph* glyphs;
+    uint64_t glyph_count;
+    int32_t line_spacing;
+    float spacing;
+    uint16_t default_character;
+    CNASwift_Bool has_default_character;
+    uint8_t reserved[5];
+} CNASwift_SpriteFontCreateInfo;
+
+typedef struct CNASwift_SpriteFontInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint64_t character_count;
+    int32_t line_spacing;
+    float spacing;
+    uint16_t default_character;
+    CNASwift_Bool has_default_character;
+    uint8_t reserved[5];
+} CNASwift_SpriteFontInfo;
+
+typedef struct CNASwift_SpriteTextCommand {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Handle sprite_font;
+    CNASwift_StringView text;
+    CNASwift_Vector2 position;
+    CNASwift_Color color;
+    float rotation;
+    CNASwift_Vector2 origin;
+    CNASwift_Vector2 scale;
+    uint32_t effects;
+    float layer_depth;
+} CNASwift_SpriteTextCommand;
+
 #ifdef __cplusplus
 }
 #endif

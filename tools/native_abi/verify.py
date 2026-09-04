@@ -46,7 +46,9 @@ MIRRORED_STRUCTS = [
     "GameCallbacks", "GameFrameHooks", "GameCreateInfo", "Viewport",
     "Texture2DInfo", "Texture2DCreateInfo", "Texture2DTransfer",
     "Texture2DDecodeInfo",
-    "SpriteScaledCommand", "KeyboardState", "GamePadAnalogState",
+    "SpriteScaledCommand", "SpriteTextCommand",
+    "SpriteFontGlyph", "SpriteFontCreateInfo", "SpriteFontInfo",
+    "KeyboardState", "GamePadAnalogState",
     "GamePadState", "GamePadCapabilities", "TextureInfo",
     "RenderTarget2DCreateInfo", "RenderTargetInfo",
     "RenderTargetCubeCreateInfo", "RenderTargetBinding", "TextureSlotInfo",
@@ -210,6 +212,10 @@ def canonical_type(value: str) -> str:
         # graphics_state.h's comparison identity, which AlphaTestEffect's
         # AlphaFunction is spelled with.
         "CNA_CompareFunction": "uint32_t",
+        # sprite_font.h's "one UTF-16 code unit matching the native XNA `char`
+        # representation" -- a CLR `char` is UTF-16, so the projection carries
+        # code units and never a Swift `Character`, which is a grapheme.
+        "CNA_Char16": "uint16_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)
@@ -225,7 +231,8 @@ def swift_type(value: str) -> str:
     if immutable:
         return f"const {swift_type(immutable.group(1))}*"
     mapping = {
-        "UInt8": "uint8_t", "UInt32": "uint32_t", "UInt64": "uint64_t", "Int32": "int32_t",
+        "UInt8": "uint8_t", "UInt16": "uint16_t", "UInt32": "uint32_t",
+        "UInt64": "uint64_t", "Int32": "int32_t",
         "Int64": "int64_t", "Float": "float", "Double": "double", "CChar": "char",
         "UnsafeMutableRawPointer": "void*", "UnsafeRawPointer": "const void*",
     }
