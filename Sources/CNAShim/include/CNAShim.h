@@ -175,6 +175,63 @@ typedef struct CNASwift_RenderTargetInfo {
     uint8_t reserved[2];
 } CNASwift_RenderTargetInfo;
 
+typedef struct CNASwift_Vector3 {
+    float x;
+    float y;
+    float z;
+} CNASwift_Vector3;
+
+typedef struct CNASwift_Vector4 {
+    float x;
+    float y;
+    float z;
+    float w;
+} CNASwift_Vector4;
+
+typedef struct CNASwift_Quaternion {
+    float x;
+    float y;
+    float z;
+    float w;
+} CNASwift_Quaternion;
+
+typedef struct CNASwift_Matrix {
+    float m11;
+    float m12;
+    float m13;
+    float m14;
+    float m21;
+    float m22;
+    float m23;
+    float m24;
+    float m31;
+    float m32;
+    float m33;
+    float m34;
+    float m41;
+    float m42;
+    float m43;
+    float m44;
+} CNASwift_Matrix;
+
+typedef struct CNASwift_EffectParameterInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t row_count;
+    int32_t column_count;
+    uint32_t parameter_class;
+    uint32_t parameter_type;
+} CNASwift_EffectParameterInfo;
+
+typedef struct CNASwift_EffectAnnotationInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t row_count;
+    int32_t column_count;
+    uint32_t parameter_class;
+    uint32_t parameter_type;
+} CNASwift_EffectAnnotationInfo;
+
 typedef struct CNASwift_TextureSlotInfo {
     uint32_t struct_size;
     uint32_t struct_version;

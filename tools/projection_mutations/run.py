@@ -59,6 +59,9 @@ RTBINDING = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetBinding.swift"
 RTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetSupport.swift"
 RUNTIME = ROOT / "Sources/CNA/Runtime/RuntimeState.swift"
 TEXTURECOLLECTION = ROOT / "Sources/CNA/Xna/Graphics/TextureCollection.swift"
+EFFECT = ROOT / "Sources/CNA/Xna/Graphics/Effect.swift"
+EFFECTCOLLECTIONS = ROOT / "Sources/CNA/Xna/Graphics/EffectCollections.swift"
+EFFECTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/EffectSupport.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -1908,6 +1911,121 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         TEXTUREDATA,
         "        if checksRenderTarget, isActiveRenderTarget {",
         "        if checksRenderTarget, false, isActiveRenderTarget {",
+    ),
+    # ---- Foundation 67: the Effect core -----------------------------------
+    (
+        "effect-collection-element-not-cached",
+        "a fresh CNA view per index read, so collection[0] !== collection[0]",
+        EFFECTSUPPORT,
+        "            if let existing = cached[Int(index)] { return existing }",
+        "            _ = cached[Int(index)]",
+    ),
+    # `effect-collection-index-throws-instead-of-nil` -- relaxing the bound from
+    # `<` to `<=` -- was planted here and SURVIVED as a NO-OP: one past the end
+    # gets past the guard and `get_at` then fails, so the answer is still nil.
+    # It is replaced rather than scored, with one that changes the answer.
+    (
+        "effect-collection-index-clamps-instead-of-nil",
+        "an out-of-range index answering element zero rather than null",
+        EFFECTSUPPORT,
+        "            guard index >= 0, index < count else { return nil }",
+        "            guard index >= 0, index < count else {\n"
+        "                return count > 0 ? element(at: 0) : nil\n"
+        "            }",
+    ),
+    (
+        "effect-name-scan-compares-the-wrong-key",
+        "a name lookup that matches nothing, or the wrong element",
+        EFFECTSUPPORT,
+        "                if key(candidate) == name { return candidate }",
+        "                if key(candidate) != name { return candidate }",
+    ),
+    (
+        "effect-string-ignores-the-written-length",
+        "a native string read back with its buffer padding attached",
+        EFFECTSUPPORT,
+        "        let used = buffer.prefix(Int(min(written, bytes))).map { UInt8(bitPattern: $0) }",
+        "        let used = buffer.map { UInt8(bitPattern: $0) } + [UInt8(65)]",
+    ),
+    (
+        "effect-pass-apply-skips-the-disposal-check",
+        "a pass applying through a disposed effect",
+        EFFECTCOLLECTIONS,
+        "            _ = try effect.validatedHandle(\"EffectPass.Apply\")",
+        "            _ = effect.nativeStorage.handle",
+    ),
+    (
+        "effect-pass-apply-skips-the-current-technique-test",
+        "a pass of a non-current technique applying anyway",
+        EFFECTCOLLECTIONS,
+        "            guard effect.CurrentTechnique === technique else {",
+        "            guard effect.CurrentTechnique !== technique else {",
+    ),
+    (
+        "effect-pass-apply-does-not-call-on-apply",
+        "the derived hook never firing",
+        EFFECTCOLLECTIONS,
+        "            try effect.OnApply()\n"
+        "            try box.runtime.functions.check(\n"
+        "                box.runtime.functions.effectPassApply(",
+        "            try box.runtime.functions.check(\n"
+        "                box.runtime.functions.effectPassApply(",
+    ),
+    (
+        "effect-pass-apply-does-not-reach-the-route",
+        "Apply accepted and discarded rather than handed to CNA",
+        EFFECTCOLLECTIONS,
+        "                box.runtime.functions.effectPassApply(\n"
+        "                    try box.validated(\"EffectPass.Apply\")),\n"
+        "                operation: \"cna_effect_pass_apply\")",
+        "                CNA_Result(0)),\n"
+        "                operation: \"cna_effect_pass_apply\")",
+    ),
+    (
+        "effect-technique-passes-not-cached",
+        "a fresh pass collection per read, losing pass identity",
+        EFFECTCOLLECTIONS,
+        "            if let passes { return passes }",
+        "            if let passes, false { return passes }",
+    ),
+    (
+        "effect-current-technique-is-a-third-view",
+        "CurrentTechnique answering an object the collection never handed out",
+        EFFECT,
+        "            let resolved = collection?[name] ?? collection?[Int32(0)]",
+        "            let resolved = EffectTechnique(\n"
+        "                handle: handle, runtime: nativeStorage.runtime, owner: self)",
+    ),
+    (
+        "effect-techniques-not-cached",
+        "a fresh technique collection per read, so Techniques !== Techniques",
+        EFFECT,
+        "            if let techniques { return techniques }",
+        "            if let techniques, false { return techniques }",
+    ),
+    (
+        "effect-code-length-not-a-multiple-of-four",
+        "a badly sized effect array accepted and handed to CNA",
+        EFFECT,
+        "            guard effectCode.count % 4 == 0 else {",
+        "            guard effectCode.count % 1 == 0 else {",
+    ),
+    (
+        "effect-empty-code-not-reported-as-null",
+        "an empty effect array reaching the native compiler",
+        EFFECT,
+        "            guard !effectCode.isEmpty else {",
+        "            guard effectCode.isEmpty || true else {",
+    ),
+    (
+        "effect-apply-also-calls-on-apply",
+        "the derived hook firing twice for one application",
+        EFFECT,
+        "        internal func apply() throws {\n"
+        "            try nativeStorage.runtime.functions.check(",
+        "        internal func apply() throws {\n"
+        "            try OnApply()\n"
+        "            try nativeStorage.runtime.functions.check(",
     ),
 ]
 

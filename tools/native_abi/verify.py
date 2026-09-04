@@ -50,6 +50,8 @@ MIRRORED_STRUCTS = [
     "GamePadState", "GamePadCapabilities", "TextureInfo",
     "RenderTarget2DCreateInfo", "RenderTargetInfo",
     "RenderTargetCubeCreateInfo", "RenderTargetBinding", "TextureSlotInfo",
+    "EffectParameterInfo", "EffectAnnotationInfo",
+    "Vector3", "Vector4", "Quaternion", "Matrix",
     "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
     "SpriteCommand",
     "PresentationParameters",
@@ -180,6 +182,23 @@ def canonical_type(value: str) -> str:
         "CNA_IndexBufferHandle": "uint64_t",
         "CNA_VertexBufferEventRegistrationHandle": "uint64_t",
         "CNA_IndexBufferEventRegistrationHandle": "uint64_t",
+        # effects.h gives every effect object its own handle alias, and two
+        # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,
+        # and it is the header being precise about which handle a route wants
+        # rather than the ABI being wider -- every one of them is `uint64_t`.
+        "CNA_EffectHandle": "uint64_t",
+        "CNA_EffectParameterHandle": "uint64_t",
+        "CNA_EffectParameterCollectionHandle": "uint64_t",
+        "CNA_EffectTechniqueHandle": "uint64_t",
+        "CNA_EffectTechniqueCollectionHandle": "uint64_t",
+        "CNA_EffectPassHandle": "uint64_t",
+        "CNA_EffectPassCollectionHandle": "uint64_t",
+        "CNA_EffectAnnotationHandle": "uint64_t",
+        "CNA_EffectAnnotationCollectionHandle": "uint64_t",
+        "CNA_EffectParameterClass": "uint32_t",
+        "CNA_EffectParameterType": "uint32_t",
+        "CNA_EffectValueType": "uint32_t",
+        "CNA_EffectTextureType": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

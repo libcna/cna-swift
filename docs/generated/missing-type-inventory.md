@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=167
-TARGET_MEMBERS=2069
-TOTAL_DIAGNOSTICS=141
-COMPLETE_TYPES=161
+TARGET_TYPES=176
+TARGET_MEMBERS=2165
+TOTAL_DIAGNOSTICS=132
+COMPLETE_TYPES=170
 PARTIAL_TYPES=6
-MISSING_TYPES=90
-MISSING_TYPE=90
+MISSING_TYPES=81
+MISSING_TYPE=81
 MISSING_MEMBER=47
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -50,7 +50,7 @@ PROTOCOL_WITNESS_MEMBER_PROJECTIONS=33
 ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
 COLLECTION_INTERFACE_PROJECTIONS=1
-ENUMERATOR_SUPPORT_PROJECTIONS=9
+ENUMERATOR_SUPPORT_PROJECTIONS=13
 ACCESSOR_PROJECTIONS=840
 INDEXED_ACCESSOR_PROJECTIONS=24
 THROWING_GETTER_PROJECTIONS=114
@@ -60,19 +60,19 @@ THROWING_WRITER_METHOD_PROJECTIONS=113
 INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
 GETTER_ONLY_PROJECTIONS=561
 WRITE_ONLY_PROJECTIONS=0
-MEASURED_ACCESSOR_PROJECTIONS=62
-PENDING_ACCESSOR_PROJECTIONS=51
+MEASURED_ACCESSOR_PROJECTIONS=63
+PENDING_ACCESSOR_PROJECTIONS=50
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=12
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=20
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=18
-XNA_SEALED_CLASS_PROJECTIONS=20
+XNA_SEALED_CLASS_PROJECTIONS=28
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=62
+XNA_RESOURCE_STRING_PROJECTIONS=64
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=119
-PENDING_RETURN_NULLABILITY_PROJECTIONS=250
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=21
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=158
+PENDING_RETURN_NULLABILITY_PROJECTIONS=211
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=38
 ```
 
 ## Complete types
@@ -144,8 +144,17 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=21
 - `Microsoft.Xna.Framework.Graphics.DisplayModeCollection`
 - `Microsoft.Xna.Framework.Graphics.DynamicIndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.DynamicVertexBuffer`
+- `Microsoft.Xna.Framework.Graphics.Effect`
+- `Microsoft.Xna.Framework.Graphics.EffectAnnotation`
+- `Microsoft.Xna.Framework.Graphics.EffectAnnotationCollection`
+- `Microsoft.Xna.Framework.Graphics.EffectParameter`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterClass`
+- `Microsoft.Xna.Framework.Graphics.EffectParameterCollection`
 - `Microsoft.Xna.Framework.Graphics.EffectParameterType`
+- `Microsoft.Xna.Framework.Graphics.EffectPass`
+- `Microsoft.Xna.Framework.Graphics.EffectPassCollection`
+- `Microsoft.Xna.Framework.Graphics.EffectTechnique`
+- `Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection`
 - `Microsoft.Xna.Framework.Graphics.FillMode`
 - `Microsoft.Xna.Framework.Graphics.GraphicsDeviceStatus`
 - `Microsoft.Xna.Framework.Graphics.GraphicsProfile`
@@ -378,16 +387,7 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.BasicEffect`
 - `Microsoft.Xna.Framework.Graphics.DirectionalLight`
 - `Microsoft.Xna.Framework.Graphics.DualTextureEffect`
-- `Microsoft.Xna.Framework.Graphics.Effect`
-- `Microsoft.Xna.Framework.Graphics.EffectAnnotation`
-- `Microsoft.Xna.Framework.Graphics.EffectAnnotationCollection`
 - `Microsoft.Xna.Framework.Graphics.EffectMaterial`
-- `Microsoft.Xna.Framework.Graphics.EffectParameter`
-- `Microsoft.Xna.Framework.Graphics.EffectParameterCollection`
-- `Microsoft.Xna.Framework.Graphics.EffectPass`
-- `Microsoft.Xna.Framework.Graphics.EffectPassCollection`
-- `Microsoft.Xna.Framework.Graphics.EffectTechnique`
-- `Microsoft.Xna.Framework.Graphics.EffectTechniqueCollection`
 - `Microsoft.Xna.Framework.Graphics.EnvironmentMapEffect`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`
 - `Microsoft.Xna.Framework.Graphics.IEffectLights`

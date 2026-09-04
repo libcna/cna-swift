@@ -65,6 +65,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ArrayMultipleFour",
+      "value": "The array {0} must have a length that is a multiple of four."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "BeginMustBeCalledBeforeDraw",
       "value": "Begin must be called successfully before a Draw can be called."
     },
@@ -162,6 +167,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "NegativeRadius",
       "value": "Radius must be greater than 0."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NotCurrentTechnique",
+      "value": "Cannot Apply an EffectPass that is not from the CurrentTechnique."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

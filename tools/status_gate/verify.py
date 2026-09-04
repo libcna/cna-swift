@@ -41,6 +41,7 @@ Run from the repository root:
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import subprocess
@@ -131,26 +132,33 @@ def current_foundation(root: Path = ROOT) -> int:
 
 
 def mutation_harness_sizes(root: Path = ROOT) -> dict[str, int]:
-    """`len(MUTATIONS)` from each harness, read without running either."""
+    """`len(MUTATIONS)` from each harness, read without running either.
+
+    Parsed rather than scanned. The first version counted brackets from the
+    `MUTATIONS` assignment until the depth returned to zero, which is wrong the
+    moment a mutation's own text contains one: Foundation 67 aimed a native-ABI
+    mutation at `cParameters: ["CNA_Handle texture", ...` -- a legal Python
+    string with an unbalanced `[` -- and the scanner ran off the end of the file
+    and crashed the whole gate. `ast` cannot be fooled by a string's contents.
+    """
     sizes = {}
     for name, path in [
         ("PROJECTION_MUTATIONS", root / "tools/projection_mutations/run.py"),
         ("NATIVE_ABI_MUTATIONS", root / "tools/native_abi/mutations.py"),
     ]:
-        text = path.read_text(encoding="utf-8")
-        start = text.index("MUTATIONS: list[")
-        start = text.index("[", text.index("=", start))
-        depth, index = 0, start
-        while True:
-            if text[index] == "[":
-                depth += 1
-            elif text[index] == "]":
-                depth -= 1
-                if depth == 0:
-                    break
-            index += 1
-        body = text[start:index + 1]
-        sizes[name] = body.count("\n    (")
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        found = None
+        for node in tree.body:
+            targets = (
+                [node.target] if isinstance(node, ast.AnnAssign) else
+                node.targets if isinstance(node, ast.Assign) else []
+            )
+            for target in targets:
+                if isinstance(target, ast.Name) and target.id == "MUTATIONS":
+                    found = node.value
+        if not isinstance(found, (ast.List, ast.Tuple)):
+            raise Failure(f"{path.name} has no MUTATIONS list literal")
+        sizes[name] = len(found.elts)
     return sizes
 
 

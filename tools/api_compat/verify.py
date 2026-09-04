@@ -229,6 +229,18 @@ def map_clr_type(
     enumerator = re.fullmatch(r"System\.Collections\.Generic\.IEnumerator`1\[(.+)]", text)
     if enumerator:
         return f"CNAEnumerator<{map_clr_type(enumerator.group(1), rules, generic_parameters, method_generic_parameters)}>"
+    # `List<T>.Enumerator` is the SAME projection. Four XNA collections --
+    # every one of the effect collections -- declare `GetEnumerator` returning
+    # the concrete BCL struct rather than the interface, which is a CLR
+    # optimisation that avoids boxing and is not part of what they promise:
+    # each also implements `IEnumerable<T>`, whose `GetEnumerator` returns the
+    # interface. Projecting the struct as itself would mean admitting
+    # `List<T>.Enumerator` as a BCL type this binding reproduces, for a type no
+    # consumer can name usefully.
+    list_enumerator = re.fullmatch(
+        r"System\.Collections\.Generic\.List`1\+Enumerator\[(.+)]", text)
+    if list_enumerator:
+        return f"CNAEnumerator<{map_clr_type(list_enumerator.group(1), rules, generic_parameters, method_generic_parameters)}>"
     # Every public event in the pinned contract is System.EventHandler<TArgs>.
     # The delegate is not projected; the event is one get-only property of the
     # consumer view type. See `eventMapping`.
@@ -6303,9 +6315,10 @@ def make_report(
                     named_destination or collection_copy_destination
                 )
     enumerator_support_projections = sum(
-        (member.get("returnType") or "").startswith(
-            "System.Collections.Generic.IEnumerator`1["
-        )
+        (member.get("returnType") or "").startswith((
+            "System.Collections.Generic.IEnumerator`1[",
+            "System.Collections.Generic.List`1+Enumerator[",
+        ))
         for item in contract["types"] for member in item["members"]
     )
     # The general accessor projection, counted over the whole contract rather

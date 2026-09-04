@@ -332,6 +332,16 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ProfileVertexTextureFormatNotSupported",
       "reason": "TextureCollection.set_Item raises NotSupportedException through ProfileCapabilities.ThrowNotSupportedException when the VERTEX collection is given a texture whose format is not in ValidVertexTextureFormats. Reach's list is empty, so every texture fails it -- and because the value is tested before the index, that is what a Reach caller is told rather than the zero-slot bound."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ArrayMultipleFour",
+      "reason": "Effect.CreateEffectFromCode raises ArgumentException with this, formatted with the parameter name, when effectCode's length is not a multiple of four. Pure managed arithmetic on the array, ahead of anything that reads its content."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NotCurrentTechnique",
+      "reason": "EffectPass.Apply raises InvalidOperationException with this when the pass's own technique is not the effect's CurrentTechnique. It sits between the effect's disposal check and the call to Effect.OnApply."
     }
   ]
 }

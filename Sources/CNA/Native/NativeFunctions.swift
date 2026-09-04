@@ -132,6 +132,72 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceGetRenderTargetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceGetTextureRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<CNASwift_TextureSlotInfo>?) -> UInt32
     typealias GraphicsDeviceSetTextureRoute = @convention(c) (UInt64, UInt32, UInt32, UInt64) -> UInt32
+    typealias EffectCreateEmptyRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectCreateCompiledRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectCloneRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectApplyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectGetParametersRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectGetTechniquesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectGetCurrentTechniqueRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectSetCurrentTechniqueRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias EffectGetGraphicsDeviceRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectTechniqueDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectTechniqueGetNameByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectTechniqueCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectTechniqueGetPassesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectTechniqueGetAnnotationsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectTechniqueCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectTechniqueCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectTechniqueCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectPassDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectPassGetNameByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectPassCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectPassGetAnnotationsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectPassApplyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectPassCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectPassCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectPassCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectParameterGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_EffectParameterInfo>?) -> UInt32
+    typealias EffectParameterGetNameByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterGetSemanticByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterCopySemanticRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterGetElementsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterGetStructureMembersRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterGetAnnotationsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterGetValueRoute = @convention(c) (UInt64, UInt32, UnsafeMutableRawPointer?) -> UInt32
+    typealias EffectParameterSetValueRoute = @convention(c) (UInt64, UInt32, UnsafeRawPointer?) -> UInt32
+    typealias EffectParameterGetValuesRoute = @convention(c) (UInt64, UInt32, UInt64, UnsafeMutableRawPointer?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterSetValuesRoute = @convention(c) (UInt64, UInt32, UnsafeRawPointer?, UInt64) -> UInt32
+    typealias EffectParameterGetValueStringByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterCopyValueStringRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterSetValueStringRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias EffectParameterGetValueTextureRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterSetValueTextureRoute = @convention(c) (UInt64, UInt32, UInt64) -> UInt32
+    typealias EffectParameterCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectParameterCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectParameterCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectAnnotationGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_EffectAnnotationInfo>?) -> UInt32
+    typealias EffectAnnotationGetNameByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationGetSemanticByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationCopySemanticRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationGetValueBooleanRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias EffectAnnotationGetValueInt32Route = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias EffectAnnotationGetValueSingleRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias EffectAnnotationGetValueVector2Route = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector2>?) -> UInt32
+    typealias EffectAnnotationGetValueVector3Route = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector3>?) -> UInt32
+    typealias EffectAnnotationGetValueVector4Route = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Vector4>?) -> UInt32
+    typealias EffectAnnotationGetValueMatrixRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Matrix>?) -> UInt32
+    typealias EffectAnnotationGetValueStringByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationCopyValueStringRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias EffectAnnotationCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias EffectAnnotationCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceClearOptionsRoute = @convention(c) (UInt64, UInt32, CNASwift_Color, Float, Int32) -> UInt32
     typealias GraphicsDeviceGetPresentationParametersRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_PresentationParameters>?) -> UInt32
     typealias GraphicsDeviceSetViewportRoute = @convention(c) (UInt64, CNASwift_Viewport) -> UInt32
@@ -265,6 +331,72 @@ internal final class NativeFunctions {
     let graphicsDeviceGetRenderTargetCount: GraphicsDeviceGetRenderTargetCountRoute
     let graphicsDeviceGetTexture: GraphicsDeviceGetTextureRoute
     let graphicsDeviceSetTexture: GraphicsDeviceSetTextureRoute
+    let effectCreateEmpty: EffectCreateEmptyRoute
+    let effectCreateCompiled: EffectCreateCompiledRoute
+    let effectDestroy: EffectDestroyRoute
+    let effectClone: EffectCloneRoute
+    let effectDisposeResources: EffectDisposeRoute
+    let effectApply: EffectApplyRoute
+    let effectGetParameters: EffectGetParametersRoute
+    let effectGetTechniques: EffectGetTechniquesRoute
+    let effectGetCurrentTechnique: EffectGetCurrentTechniqueRoute
+    let effectSetCurrentTechnique: EffectSetCurrentTechniqueRoute
+    let effectGetGraphicsDevice: EffectGetGraphicsDeviceRoute
+    let effectTechniqueDestroy: EffectTechniqueDestroyRoute
+    let effectTechniqueGetNameByteCount: EffectTechniqueGetNameByteCountRoute
+    let effectTechniqueCopyName: EffectTechniqueCopyNameRoute
+    let effectTechniqueGetPasses: EffectTechniqueGetPassesRoute
+    let effectTechniqueGetAnnotations: EffectTechniqueGetAnnotationsRoute
+    let effectTechniqueCollectionDestroy: EffectTechniqueCollectionDestroyRoute
+    let effectTechniqueCollectionGetCount: EffectTechniqueCollectionGetCountRoute
+    let effectTechniqueCollectionGetAt: EffectTechniqueCollectionGetAtRoute
+    let effectPassDestroy: EffectPassDestroyRoute
+    let effectPassGetNameByteCount: EffectPassGetNameByteCountRoute
+    let effectPassCopyName: EffectPassCopyNameRoute
+    let effectPassGetAnnotations: EffectPassGetAnnotationsRoute
+    let effectPassApply: EffectPassApplyRoute
+    let effectPassCollectionDestroy: EffectPassCollectionDestroyRoute
+    let effectPassCollectionGetCount: EffectPassCollectionGetCountRoute
+    let effectPassCollectionGetAt: EffectPassCollectionGetAtRoute
+    let effectParameterDestroy: EffectParameterDestroyRoute
+    let effectParameterGetInfo: EffectParameterGetInfoRoute
+    let effectParameterGetNameByteCount: EffectParameterGetNameByteCountRoute
+    let effectParameterCopyName: EffectParameterCopyNameRoute
+    let effectParameterGetSemanticByteCount: EffectParameterGetSemanticByteCountRoute
+    let effectParameterCopySemantic: EffectParameterCopySemanticRoute
+    let effectParameterGetElements: EffectParameterGetElementsRoute
+    let effectParameterGetStructureMembers: EffectParameterGetStructureMembersRoute
+    let effectParameterGetAnnotations: EffectParameterGetAnnotationsRoute
+    let effectParameterGetValue: EffectParameterGetValueRoute
+    let effectParameterSetValue: EffectParameterSetValueRoute
+    let effectParameterGetValues: EffectParameterGetValuesRoute
+    let effectParameterSetValues: EffectParameterSetValuesRoute
+    let effectParameterGetValueStringByteCount: EffectParameterGetValueStringByteCountRoute
+    let effectParameterCopyValueString: EffectParameterCopyValueStringRoute
+    let effectParameterSetValueString: EffectParameterSetValueStringRoute
+    let effectParameterGetValueTexture: EffectParameterGetValueTextureRoute
+    let effectParameterSetValueTexture: EffectParameterSetValueTextureRoute
+    let effectParameterCollectionDestroy: EffectParameterCollectionDestroyRoute
+    let effectParameterCollectionGetCount: EffectParameterCollectionGetCountRoute
+    let effectParameterCollectionGetAt: EffectParameterCollectionGetAtRoute
+    let effectAnnotationDestroy: EffectAnnotationDestroyRoute
+    let effectAnnotationGetInfo: EffectAnnotationGetInfoRoute
+    let effectAnnotationGetNameByteCount: EffectAnnotationGetNameByteCountRoute
+    let effectAnnotationCopyName: EffectAnnotationCopyNameRoute
+    let effectAnnotationGetSemanticByteCount: EffectAnnotationGetSemanticByteCountRoute
+    let effectAnnotationCopySemantic: EffectAnnotationCopySemanticRoute
+    let effectAnnotationGetValueBoolean: EffectAnnotationGetValueBooleanRoute
+    let effectAnnotationGetValueInt32: EffectAnnotationGetValueInt32Route
+    let effectAnnotationGetValueSingle: EffectAnnotationGetValueSingleRoute
+    let effectAnnotationGetValueVector2: EffectAnnotationGetValueVector2Route
+    let effectAnnotationGetValueVector3: EffectAnnotationGetValueVector3Route
+    let effectAnnotationGetValueVector4: EffectAnnotationGetValueVector4Route
+    let effectAnnotationGetValueMatrix: EffectAnnotationGetValueMatrixRoute
+    let effectAnnotationGetValueStringByteCount: EffectAnnotationGetValueStringByteCountRoute
+    let effectAnnotationCopyValueString: EffectAnnotationCopyValueStringRoute
+    let effectAnnotationCollectionDestroy: EffectAnnotationCollectionDestroyRoute
+    let effectAnnotationCollectionGetCount: EffectAnnotationCollectionGetCountRoute
+    let effectAnnotationCollectionGetAt: EffectAnnotationCollectionGetAtRoute
     let graphicsDeviceClearOptions: GraphicsDeviceClearOptionsRoute
     let graphicsDeviceGetPresentationParameters: GraphicsDeviceGetPresentationParametersRoute
     let graphicsDeviceSetViewport: GraphicsDeviceSetViewportRoute
@@ -418,6 +550,72 @@ internal final class NativeFunctions {
         graphicsDeviceGetRenderTargetCount = try library.resolve("cna_graphics_device_get_render_target_count", as: GraphicsDeviceGetRenderTargetCountRoute.self)
         graphicsDeviceGetTexture = try library.resolve("cna_graphics_device_get_texture", as: GraphicsDeviceGetTextureRoute.self)
         graphicsDeviceSetTexture = try library.resolve("cna_graphics_device_set_texture", as: GraphicsDeviceSetTextureRoute.self)
+        effectCreateEmpty = try library.resolve("cna_effect_create_empty", as: EffectCreateEmptyRoute.self)
+        effectCreateCompiled = try library.resolve("cna_effect_create_compiled", as: EffectCreateCompiledRoute.self)
+        effectDestroy = try library.resolve("cna_effect_destroy", as: EffectDestroyRoute.self)
+        effectClone = try library.resolve("cna_effect_clone", as: EffectCloneRoute.self)
+        effectDisposeResources = try library.resolve("cna_effect_dispose", as: EffectDisposeRoute.self)
+        effectApply = try library.resolve("cna_effect_apply", as: EffectApplyRoute.self)
+        effectGetParameters = try library.resolve("cna_effect_get_parameters", as: EffectGetParametersRoute.self)
+        effectGetTechniques = try library.resolve("cna_effect_get_techniques", as: EffectGetTechniquesRoute.self)
+        effectGetCurrentTechnique = try library.resolve("cna_effect_get_current_technique", as: EffectGetCurrentTechniqueRoute.self)
+        effectSetCurrentTechnique = try library.resolve("cna_effect_set_current_technique", as: EffectSetCurrentTechniqueRoute.self)
+        effectGetGraphicsDevice = try library.resolve("cna_effect_get_graphics_device", as: EffectGetGraphicsDeviceRoute.self)
+        effectTechniqueDestroy = try library.resolve("cna_effect_technique_destroy", as: EffectTechniqueDestroyRoute.self)
+        effectTechniqueGetNameByteCount = try library.resolve("cna_effect_technique_get_name_byte_count", as: EffectTechniqueGetNameByteCountRoute.self)
+        effectTechniqueCopyName = try library.resolve("cna_effect_technique_copy_name", as: EffectTechniqueCopyNameRoute.self)
+        effectTechniqueGetPasses = try library.resolve("cna_effect_technique_get_passes", as: EffectTechniqueGetPassesRoute.self)
+        effectTechniqueGetAnnotations = try library.resolve("cna_effect_technique_get_annotations", as: EffectTechniqueGetAnnotationsRoute.self)
+        effectTechniqueCollectionDestroy = try library.resolve("cna_effect_technique_collection_destroy", as: EffectTechniqueCollectionDestroyRoute.self)
+        effectTechniqueCollectionGetCount = try library.resolve("cna_effect_technique_collection_get_count", as: EffectTechniqueCollectionGetCountRoute.self)
+        effectTechniqueCollectionGetAt = try library.resolve("cna_effect_technique_collection_get_at", as: EffectTechniqueCollectionGetAtRoute.self)
+        effectPassDestroy = try library.resolve("cna_effect_pass_destroy", as: EffectPassDestroyRoute.self)
+        effectPassGetNameByteCount = try library.resolve("cna_effect_pass_get_name_byte_count", as: EffectPassGetNameByteCountRoute.self)
+        effectPassCopyName = try library.resolve("cna_effect_pass_copy_name", as: EffectPassCopyNameRoute.self)
+        effectPassGetAnnotations = try library.resolve("cna_effect_pass_get_annotations", as: EffectPassGetAnnotationsRoute.self)
+        effectPassApply = try library.resolve("cna_effect_pass_apply", as: EffectPassApplyRoute.self)
+        effectPassCollectionDestroy = try library.resolve("cna_effect_pass_collection_destroy", as: EffectPassCollectionDestroyRoute.self)
+        effectPassCollectionGetCount = try library.resolve("cna_effect_pass_collection_get_count", as: EffectPassCollectionGetCountRoute.self)
+        effectPassCollectionGetAt = try library.resolve("cna_effect_pass_collection_get_at", as: EffectPassCollectionGetAtRoute.self)
+        effectParameterDestroy = try library.resolve("cna_effect_parameter_destroy", as: EffectParameterDestroyRoute.self)
+        effectParameterGetInfo = try library.resolve("cna_effect_parameter_get_info", as: EffectParameterGetInfoRoute.self)
+        effectParameterGetNameByteCount = try library.resolve("cna_effect_parameter_get_name_byte_count", as: EffectParameterGetNameByteCountRoute.self)
+        effectParameterCopyName = try library.resolve("cna_effect_parameter_copy_name", as: EffectParameterCopyNameRoute.self)
+        effectParameterGetSemanticByteCount = try library.resolve("cna_effect_parameter_get_semantic_byte_count", as: EffectParameterGetSemanticByteCountRoute.self)
+        effectParameterCopySemantic = try library.resolve("cna_effect_parameter_copy_semantic", as: EffectParameterCopySemanticRoute.self)
+        effectParameterGetElements = try library.resolve("cna_effect_parameter_get_elements", as: EffectParameterGetElementsRoute.self)
+        effectParameterGetStructureMembers = try library.resolve("cna_effect_parameter_get_structure_members", as: EffectParameterGetStructureMembersRoute.self)
+        effectParameterGetAnnotations = try library.resolve("cna_effect_parameter_get_annotations", as: EffectParameterGetAnnotationsRoute.self)
+        effectParameterGetValue = try library.resolve("cna_effect_parameter_get_value", as: EffectParameterGetValueRoute.self)
+        effectParameterSetValue = try library.resolve("cna_effect_parameter_set_value", as: EffectParameterSetValueRoute.self)
+        effectParameterGetValues = try library.resolve("cna_effect_parameter_get_values", as: EffectParameterGetValuesRoute.self)
+        effectParameterSetValues = try library.resolve("cna_effect_parameter_set_values", as: EffectParameterSetValuesRoute.self)
+        effectParameterGetValueStringByteCount = try library.resolve("cna_effect_parameter_get_value_string_byte_count", as: EffectParameterGetValueStringByteCountRoute.self)
+        effectParameterCopyValueString = try library.resolve("cna_effect_parameter_copy_value_string", as: EffectParameterCopyValueStringRoute.self)
+        effectParameterSetValueString = try library.resolve("cna_effect_parameter_set_value_string", as: EffectParameterSetValueStringRoute.self)
+        effectParameterGetValueTexture = try library.resolve("cna_effect_parameter_get_value_texture", as: EffectParameterGetValueTextureRoute.self)
+        effectParameterSetValueTexture = try library.resolve("cna_effect_parameter_set_value_texture", as: EffectParameterSetValueTextureRoute.self)
+        effectParameterCollectionDestroy = try library.resolve("cna_effect_parameter_collection_destroy", as: EffectParameterCollectionDestroyRoute.self)
+        effectParameterCollectionGetCount = try library.resolve("cna_effect_parameter_collection_get_count", as: EffectParameterCollectionGetCountRoute.self)
+        effectParameterCollectionGetAt = try library.resolve("cna_effect_parameter_collection_get_at", as: EffectParameterCollectionGetAtRoute.self)
+        effectAnnotationDestroy = try library.resolve("cna_effect_annotation_destroy", as: EffectAnnotationDestroyRoute.self)
+        effectAnnotationGetInfo = try library.resolve("cna_effect_annotation_get_info", as: EffectAnnotationGetInfoRoute.self)
+        effectAnnotationGetNameByteCount = try library.resolve("cna_effect_annotation_get_name_byte_count", as: EffectAnnotationGetNameByteCountRoute.self)
+        effectAnnotationCopyName = try library.resolve("cna_effect_annotation_copy_name", as: EffectAnnotationCopyNameRoute.self)
+        effectAnnotationGetSemanticByteCount = try library.resolve("cna_effect_annotation_get_semantic_byte_count", as: EffectAnnotationGetSemanticByteCountRoute.self)
+        effectAnnotationCopySemantic = try library.resolve("cna_effect_annotation_copy_semantic", as: EffectAnnotationCopySemanticRoute.self)
+        effectAnnotationGetValueBoolean = try library.resolve("cna_effect_annotation_get_value_boolean", as: EffectAnnotationGetValueBooleanRoute.self)
+        effectAnnotationGetValueInt32 = try library.resolve("cna_effect_annotation_get_value_int32", as: EffectAnnotationGetValueInt32Route.self)
+        effectAnnotationGetValueSingle = try library.resolve("cna_effect_annotation_get_value_single", as: EffectAnnotationGetValueSingleRoute.self)
+        effectAnnotationGetValueVector2 = try library.resolve("cna_effect_annotation_get_value_vector2", as: EffectAnnotationGetValueVector2Route.self)
+        effectAnnotationGetValueVector3 = try library.resolve("cna_effect_annotation_get_value_vector3", as: EffectAnnotationGetValueVector3Route.self)
+        effectAnnotationGetValueVector4 = try library.resolve("cna_effect_annotation_get_value_vector4", as: EffectAnnotationGetValueVector4Route.self)
+        effectAnnotationGetValueMatrix = try library.resolve("cna_effect_annotation_get_value_matrix", as: EffectAnnotationGetValueMatrixRoute.self)
+        effectAnnotationGetValueStringByteCount = try library.resolve("cna_effect_annotation_get_value_string_byte_count", as: EffectAnnotationGetValueStringByteCountRoute.self)
+        effectAnnotationCopyValueString = try library.resolve("cna_effect_annotation_copy_value_string", as: EffectAnnotationCopyValueStringRoute.self)
+        effectAnnotationCollectionDestroy = try library.resolve("cna_effect_annotation_collection_destroy", as: EffectAnnotationCollectionDestroyRoute.self)
+        effectAnnotationCollectionGetCount = try library.resolve("cna_effect_annotation_collection_get_count", as: EffectAnnotationCollectionGetCountRoute.self)
+        effectAnnotationCollectionGetAt = try library.resolve("cna_effect_annotation_collection_get_at", as: EffectAnnotationCollectionGetAtRoute.self)
         graphicsDeviceClearOptions = try library.resolve("cna_graphics_device_clear_options", as: GraphicsDeviceClearOptionsRoute.self)
         graphicsDeviceGetPresentationParameters = try library.resolve("cna_graphics_device_get_presentation_parameters", as: GraphicsDeviceGetPresentationParametersRoute.self)
         graphicsDeviceSetViewport = try library.resolve("cna_graphics_device_set_viewport", as: GraphicsDeviceSetViewportRoute.self)

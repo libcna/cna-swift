@@ -471,6 +471,21 @@
       "operation": "Texture collection slot counts",
       "status": "VERIFIED_MANAGED",
       "evidence": "RESOLVES the divergence recorded for the sampler collections. All four collections -- Textures, VertexTextures, SamplerStates and VertexSamplerStates -- are sized from the device's own profile: MaxSamplers 16 and MaxVertexSamplers 0 under Reach, 16 and 4 under HiDef, from the table extracted in Foundation 62. Until then all four were 16 long because the binding had no profile to ask, and a 16-slot vertex collection accepted fifteen indices XNA raises ArgumentOutOfRangeException for. CNA's own limit is the wider of the two -- CNA_TEXTURE_COLLECTION_MAX_TEXTURES is 16 on both stages -- and XNA's profile is the narrower rule that decides."
+    },
+    {
+      "operation": "Effect creation and application",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "cna_effect_create_empty builds what CNA's header calls 'the minimal concrete adapter for the native abstract Effect base class' -- no parameters, one technique, one pass, and a native type name that is literally Microsoft.Xna.Framework.Graphics.Effect. cna_effect_apply and cna_effect_pass_apply both succeed, and after either the same cna_graphics_device_draw_primitives that answered CNA_RESULT_INTERNAL with 'no effect has been applied' returns 0 (build-probe/f67_effect.c). That is the claim Foundation 63 withheld the whole draw family on, now tested in both directions. effect_has_renderer and effect_get_is_compiled_ext are both false on HEADLESS and neither prevents apply."
+    },
+    {
+      "operation": "Effect object-graph identity",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "cna_effect_get_techniques hands back a fresh OWNED collection view on every call and get_at a fresh element view, so without a cache effect.Techniques !== effect.Techniques and technique.Passes[0] !== technique.Passes[0]. XNA holds a List<T> built once and indexes into it, so identity holds there; EffectElementCache reproduces that by caching per index. The five ..._collection_find routes are deliberately NOT bound for the same reason: find answers a second owned view of the element rather than the one get_at gave, so a name lookup would break the identity the index path establishes. XNA's own Item[String] is a managed scan over its List<T>, which is what this does."
+    },
+    {
+      "operation": "Vertex buffer draw range",
+      "status": "MEASURED_NATIVE_DIVERGENCE",
+      "evidence": "CNA counts vertices WRITTEN, not capacity allocated: a 64-vertex buffer with a renderer, bound, with an effect applied, refuses every draw with CNA_RESULT_INVALID_ARGUMENT and 'The requested primitive range exceeds the bound vertex buffer'; uploading data makes the identical call succeed (build-probe/f67_effect.c). XNA has no such rule -- an un-SetData'd VertexBuffer draws undefined contents rather than raising. The draw members must decide explicitly what to do about it; a test that happened to upload data first would never have seen it, and the probe found it only because its first draft misread the refusal as a capacity problem."
     }
   ]
 }

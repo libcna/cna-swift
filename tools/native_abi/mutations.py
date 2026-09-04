@@ -55,9 +55,18 @@ def acquire_tree_lock(name: str):
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
     (
+        # Aimed through the SYMBOL as well as the parameter pair. Foundation 67
+        # bound seventy effect routes, nine of which copy a name into a caller
+        # buffer with exactly this parameter pair, and the site stopped being
+        # unique -- the harness reported it as a survivor rather than a stale
+        # site, which is the failure the pre-check exists to make loud.
         "wrong-parameter-width", "a bound route's parameter width", MANIFEST,
-        '"char* destination", "uint64_t capacity"',
-        '"char* destination", "uint32_t capacity"',
+        '"cna_error_copy_last_message", swiftField: "errorMessageCopy", '
+        'routeType: "ErrorCopyLastMessageRoute", cReturn: "CNA_Result", '
+        'cParameters: ["char* destination", "uint64_t capacity"',
+        '"cna_error_copy_last_message", swiftField: "errorMessageCopy", '
+        'routeType: "ErrorCopyLastMessageRoute", cReturn: "CNA_Result", '
+        'cParameters: ["char* destination", "uint32_t capacity"',
     ),
     (
         "wrong-parameter-spelling", "a canonical parameter type recorded as a compatible alias",

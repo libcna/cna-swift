@@ -134,6 +134,36 @@
    "key": "NullNotAllowed",
    "kind": "unreachable",
    "reason": "Both constructors null-test renderTarget and raise ArgumentNullException(\"renderTarget\", NullNotAllowed). Both Swift parameters are non-Optional class parameters, so neither branch has an input that reaches it. Same rule as GameServiceContainer.GetService's null Type: an unreachable branch is recorded, not written as code that cannot run."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Effect",
+   "key": "DeviceCannotBeNullOnResourceCreate",
+   "kind": "unreachable",
+   "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.EffectPass",
+   "key": "DeviceCannotBeNullOnResourceCreate",
+   "kind": "unreachable",
+   "reason": "Reached from EffectPass.Apply only through the Effect constructor it shares a call graph with; the constructor's own null-device branch is unreachable for the same reason, and a pass cannot exist without an effect that was already constructed."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Effect",
+   "key": "MustUserShaderCode",
+   "kind": "native-owned",
+   "reason": "Raised when the bytes handed to the Effect constructor are not a compiled effect, which XNA decides by parsing the effect header itself. This binding does not parse compiled shader bytecode and has no business inventing a verdict about it; cna_effect_create_compiled reaches its own conclusion about the same bytes and reports it on the runtime channel."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Effect",
+   "key": "ProfileVertexShaderModel",
+   "kind": "native-owned",
+   "reason": "Raised when the vertex shader model inside the compiled effect exceeds the profile's VertexShaderVersion. The shader model is a field of the compiled bytecode, which this binding does not read -- the profile limit is pinned and available, but the value to compare it against is not."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Effect",
+   "key": "ProfilePixelShaderModel",
+   "kind": "native-owned",
+   "reason": "The pixel-shader half of the same test, unreachable for the same reason."
   }
  ]
 }
