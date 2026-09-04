@@ -461,6 +461,16 @@
       "operation": "Runtime lifetime with a bound resource",
       "status": "MEASURED_NATIVE_DIVERGENCE",
       "evidence": "A GraphicsResource holds its GraphicsDevice facade strongly and the facade holds the RuntimeState strongly, so any cache on the runtime that holds a resource closes RuntimeState -> resource -> facade -> RuntimeState. Foundation 63 added the first such cache and binding one vertex buffer kept the runtime, every native handle it tracks and every registered child alive past Game.Dispose for the life of the process. RuntimeState.invalidateAfterNativeShutdown now releases every cache that holds a resource, which is also what XNA's GraphicsDevice.Dispose does. A retain cycle is invisible to AddressSanitizer; RuntimeLifetimeTests is what asks, with two controls proving the measurement can observe a released runtime at all."
+    },
+    {
+      "operation": "Texture sampler slots",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "cna_graphics_device_set_texture and _get_texture bind and read all 16 slots of both shader stages inside a live callback, and CNA_TextureSlotInfo::bound distinguishes 'occupied by something no handle names' from 'empty' (build-probe/f66_slots.c). The refusals were measured too: slot 16 is INVALID_ARGUMENT 'The texture sampler slot is out of range', an unknown stage is INVALID_ARGUMENT 'The shader stage is not recognized', and a texture that is the active render target is INVALID_STATE 'A texture that is currently bound as a render target cannot be bound for sampling' -- which is CNA's own version of XNA's MustResolveRenderTarget, reached only if the managed check were removed. Destroying a bound texture succeeds and empties every slot it held."
+    },
+    {
+      "operation": "Texture collection slot counts",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "RESOLVES the divergence recorded for the sampler collections. All four collections -- Textures, VertexTextures, SamplerStates and VertexSamplerStates -- are sized from the device's own profile: MaxSamplers 16 and MaxVertexSamplers 0 under Reach, 16 and 4 under HiDef, from the table extracted in Foundation 62. Until then all four were 16 long because the binding had no profile to ask, and a 16-slot vertex collection accepted fifteen indices XNA raises ArgumentOutOfRangeException for. CNA's own limit is the wider of the two -- CNA_TEXTURE_COLLECTION_MAX_TEXTURES is 16 on both stages -- and XNA's profile is the narrower rule that decides."
     }
   ]
 }

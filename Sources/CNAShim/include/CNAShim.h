@@ -175,6 +175,14 @@ typedef struct CNASwift_RenderTargetInfo {
     uint8_t reserved[2];
 } CNASwift_RenderTargetInfo;
 
+typedef struct CNASwift_TextureSlotInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Bool bound;
+    uint8_t reserved[7];
+    uint64_t texture;
+} CNASwift_TextureSlotInfo;
+
 typedef struct CNASwift_RenderTargetCubeCreateInfo {
     uint32_t struct_size;
     uint32_t struct_version;

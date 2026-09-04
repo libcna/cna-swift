@@ -138,17 +138,30 @@ internal final class RuntimeState {
     // this binding cannot justify.
     private var pixelSamplerStates: Microsoft.Xna.Framework.Graphics.SamplerStateCollection?
     private var vertexSamplerStates: Microsoft.Xna.Framework.Graphics.SamplerStateCollection?
+    private var pixelTextures: Microsoft.Xna.Framework.Graphics.TextureCollection?
+    private var vertexTextures: Microsoft.Xna.Framework.Graphics.TextureCollection?
 
-    /// `CNA_MAX_SAMPLERS`, measured with `build-probe/f42_states.c`: CNA
-    /// accepts slots 0 through 15 on **both** stages and answers
-    /// `CNA_RESULT_INVALID_ARGUMENT` for 16 and above.
+    /// How many slots each of the four collections has, **from the device's own
+    /// profile**: `MaxSamplers` and `MaxVertexSamplers`, which are 16 and 0
+    /// under Reach and 16 and 4 under HiDef.
     ///
-    /// A recorded divergence. XNA's vertex collection is 0 long under Reach
-    /// and 4 under HiDef, and this binding has no profile selection, so both
-    /// collections are the length CNA actually accepts. The bounds check is
-    /// observable, so this is a behaviour decision and is recorded in
-    /// `docs/runtime-capabilities.json` rather than left implicit.
-    static let maxSamplers = 16
+    /// **A recorded divergence that Foundation 66 resolved.** Until then all
+    /// four were 16 long, because the vertex collections were built before this
+    /// binding could ask what profile the device was — the note here said "this
+    /// binding has no profile selection", and Foundation 62 made that untrue.
+    /// A 16-slot vertex collection accepted fifteen indices XNA raises
+    /// `ArgumentOutOfRangeException` for, on a profile that has no vertex
+    /// samplers at all, and the bounds check is observable.
+    ///
+    /// CNA's own limit is unchanged and is the wider of the two: 16 slots on
+    /// **both** stages, `CNA_TEXTURE_COLLECTION_MAX_TEXTURES`, with 16 and
+    /// above refused (`build-probe/f42_states.c`, `build-probe/f66_slots.c`).
+    /// XNA's profile is the narrower rule and is the one that decides.
+    func samplerSlotCount(vertex: Bool) -> Int {
+        let capabilities = Microsoft.Xna.Framework.Graphics.ProfileCapabilities
+            .table(for: cachedGraphicsProfile ?? .Reach)
+        return Int(vertex ? capabilities.maxVertexSamplers : capabilities.maxSamplers)
+    }
 
     func samplerStates(
         for device: Microsoft.Xna.Framework.Graphics.GraphicsDevice, vertex: Bool
@@ -160,7 +173,7 @@ internal final class RuntimeState {
             }
             let created = Microsoft.Xna.Framework.Graphics.SamplerStateCollection(
                 device: device, samplerOffset: 0x101, stage: 1,
-                count: RuntimeState.maxSamplers)
+                count: samplerSlotCount(vertex: true))
             vertexSamplerStates = created
             return created
         }
@@ -170,9 +183,42 @@ internal final class RuntimeState {
         }
         let created = Microsoft.Xna.Framework.Graphics.SamplerStateCollection(
             device: device, samplerOffset: 0, stage: 0,
-            count: RuntimeState.maxSamplers)
+            count: samplerSlotCount(vertex: false))
         pixelSamplerStates = created
         return created
+    }
+
+    /// `pTextureCollection` / `pVertexTextureCollection`, built the same way
+    /// and for the same reasons.
+    func textures(
+        for device: Microsoft.Xna.Framework.Graphics.GraphicsDevice, vertex: Bool
+    ) -> Microsoft.Xna.Framework.Graphics.TextureCollection {
+        if vertex {
+            if let existing = vertexTextures {
+                existing.rebind(to: device)
+                return existing
+            }
+            let created = Microsoft.Xna.Framework.Graphics.TextureCollection(
+                device: device, textureOffset: 0x101, stage: 1,
+                count: samplerSlotCount(vertex: true))
+            vertexTextures = created
+            return created
+        }
+        if let existing = pixelTextures {
+            existing.rebind(to: device)
+            return existing
+        }
+        let created = Microsoft.Xna.Framework.Graphics.TextureCollection(
+            device: device, textureOffset: 0, stage: 0,
+            count: samplerSlotCount(vertex: false))
+        pixelTextures = created
+        return created
+    }
+
+    /// Every texture collection that exists, for the `ResourceInUse` scan and
+    /// for dropping a disposed texture out of the managed cache.
+    var liveTextureCollections: [Microsoft.Xna.Framework.Graphics.TextureCollection] {
+        [pixelTextures, vertexTextures].compactMap { $0 }
     }
 
     init(functions: NativeFunctions) {
@@ -281,6 +327,8 @@ internal final class RuntimeState {
         cachedVertexBufferBindings = []
         cachedIndexBuffer = nil
         cachedRenderTargetBindings = []
+        pixelTextures = nil
+        vertexTextures = nil
         cachedBlendState = nil
         cachedDepthStencilState = nil
         cachedRasterizerState = nil

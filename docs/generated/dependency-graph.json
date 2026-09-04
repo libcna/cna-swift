@@ -5,32 +5,8 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 18,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 17,
   "ranked": [
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.DepthFormat",
-        "Microsoft.Xna.Framework.Graphics.DisplayMode",
-        "Microsoft.Xna.Framework.Graphics.DisplayModeCollection",
-        "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
-        "Microsoft.Xna.Framework.Graphics.SurfaceFormat"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.GraphicsDeviceInformation"
-      ],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
-      ],
-      "transitiveMissingReverseReach": 26,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
-    },
     {
       "type": "Microsoft.Xna.Framework.Graphics.EffectAnnotation",
       "dependencies": [
@@ -52,16 +28,22 @@
       ]
     },
     {
-      "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
+      "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
       "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.Texture"
+        "Microsoft.Xna.Framework.Graphics.DepthFormat",
+        "Microsoft.Xna.Framework.Graphics.DisplayMode",
+        "Microsoft.Xna.Framework.Graphics.DisplayModeCollection",
+        "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
+        "Microsoft.Xna.Framework.Graphics.SurfaceFormat"
       ],
       "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
+      "directMissingReverseConsumers": [
+        "Microsoft.Xna.Framework.GraphicsDeviceInformation"
+      ],
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 23,
+      "transitiveMissingReverseReach": 25,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -175,6 +157,23 @@
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 1,
       "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GameWindow",
+      "dependencies": [
+        "Microsoft.Xna.Framework.DisplayOrientation",
+        "Microsoft.Xna.Framework.Rectangle"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Game"
+      ],
+      "transitiveMissingReverseReach": 1,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
     }
   ]
 }

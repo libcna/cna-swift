@@ -260,6 +260,25 @@ extension Microsoft.Xna.Framework.Graphics {
         /// `Texture.Format`.
         public let Format: SurfaceFormat
 
+        /// `Texture.isActiveRenderTarget` — an assembly-visible field, not a
+        /// public member, so `internal`.
+        ///
+        /// XNA's private `SetRenderTargets` clears it on every target it
+        /// unbinds and sets it on every target it binds, and **three** places
+        /// read it: `TextureCollection.set_Item` and the `CopyData` of both
+        /// `Texture2D` and `TextureCube`, each raising
+        /// `InvalidOperationException(MustResolveRenderTarget)`. A render
+        /// target cannot be sampled from, or written to, while it is the
+        /// device's own target.
+        ///
+        /// CNA enforces the sampling half itself and says so:
+        /// `cna_graphics_device_set_texture` on an active target answers
+        /// `CNA_RESULT_INVALID_STATE` with *"A texture that is currently bound
+        /// as a render target cannot be bound for sampling"*
+        /// (`build-probe/f66_slots.c`). The two agree; the managed check runs
+        /// first so the message is XNA's.
+        internal var isActiveRenderTarget = false
+
         internal init(
             storage: NativeHandleStorage,
             device: GraphicsDevice?,
@@ -273,6 +292,24 @@ extension Microsoft.Xna.Framework.Graphics {
 
         /// Reads the common texture facts a `Texture` carries, for a handle
         /// that is already owned by its caller.
+        /// Drops this texture from every sampler slot the managed collections
+        /// think it occupies, before the handle is released.
+        ///
+        /// CNA does the native half itself: `cna_texture2d_destroy` on a bound
+        /// texture succeeds and the slot reads back empty afterwards
+        /// (`build-probe/f66_slots.c`). Without this the managed cache would go
+        /// on naming a disposed object the device no longer holds, and
+        /// `Textures[i]` would answer it.
+        open override func Dispose(_ disposing: Bool) throws {
+            guard !IsDisposed else { return }
+            if let storage {
+                for collection in storage.runtime.liveTextureCollections {
+                    collection.forget(self)
+                }
+            }
+            try super.Dispose(disposing)
+        }
+
         internal static func readCommonInfo(
             handle: UInt64, runtime: RuntimeState
         ) throws -> (levelCount: Int32, format: SurfaceFormat) {

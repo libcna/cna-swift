@@ -58,6 +58,7 @@ RTCUBE = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetCube.swift"
 RTBINDING = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetBinding.swift"
 RTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/RenderTargetSupport.swift"
 RUNTIME = ROOT / "Sources/CNA/Runtime/RuntimeState.swift"
+TEXTURECOLLECTION = ROOT / "Sources/CNA/Xna/Graphics/TextureCollection.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -461,10 +462,12 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            let handle = try validatedHandle(\"Texture2D.GetData\")\n"
         "            let plan = try transferPlan(\n"
         "                T.self, level: level, rect: rect, arrayCount: data.count,\n"
-        "                startIndex: startIndex, elementCount: elementCount)",
+        "                startIndex: startIndex, elementCount: elementCount,\n"
+        "                isSetting: false)",
         "            let plan = try transferPlan(\n"
         "                T.self, level: level, rect: rect, arrayCount: data.count,\n"
-        "                startIndex: startIndex, elementCount: elementCount)\n"
+        "                startIndex: startIndex, elementCount: elementCount,\n"
+        "                isSetting: false)\n"
         "            let handle = try validatedHandle(\"Texture2D.GetData\")",
     ),
     (
@@ -988,11 +991,11 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "set-render-target-forgets-to-record",
         "SetRenderTarget not recording the target DefaultClearOptions reads",
         DEVICE,
-        "            runtime.cachedRenderTargetBindings = [binding]\n"
+        "            recordActiveRenderTargets([binding])\n"
         "        }\n"
         "\n"
         "        /// `GraphicsDevice.SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)`.",
-        "            runtime.cachedRenderTargetBindings = []\n"
+        "            recordActiveRenderTargets([])\n"
         "        }\n"
         "\n"
         "        /// `GraphicsDevice.SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)`.",
@@ -1148,8 +1151,10 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "dispose-not-idempotent", "a second Dispose reaching the dead handle",
         RESOURCE,
         "            guard !IsDisposed else { return }\n"
-        "            if let storage {",
-        "            if let storage {",
+        "            if let storage {\n"
+        "                try storage.dispose(operation: \"\\(storage.typeName).Dispose\")",
+        "            if let storage {\n"
+        "                try storage.dispose(operation: \"\\(storage.typeName).Dispose\")",
     ),
     (
         "derived-type-name-lost",
@@ -1730,8 +1735,8 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "render-target-cache-not-updated",
         "what was bound not recorded, so GetRenderTargets answers the wrong array",
         DEVICE,
-        "            runtime.cachedRenderTargetBindings = renderTargets",
-        "            runtime.cachedRenderTargetBindings = []",
+        "            recordActiveRenderTargets(renderTargets)",
+        "            recordActiveRenderTargets([])",
     ),
     # `render-target-identity-lost` -- rebuilding each binding from the target it
     # already holds -- was planted here and SURVIVED, because it is a NO-OP: a
@@ -1803,6 +1808,106 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "        releaseBoundResources()\n"
         "        RuntimeRegistry.leave(self)",
         "        RuntimeRegistry.leave(self)",
+    ),
+    # ---- Foundation 66: TextureCollection and the three bound-state checks ---
+    (
+        "texture-collections-not-profile-sized",
+        "the vertex collections 16 slots long on a profile that has none",
+        RUNTIME,
+        "        return Int(vertex ? capabilities.maxVertexSamplers : capabilities.maxSamplers)",
+        "        return Int(capabilities.maxSamplers)",
+    ),
+    (
+        "texture-slot-cache-not-updated",
+        "what was bound not recorded, so Textures[i] answers nil",
+        TEXTURECOLLECTION,
+        "            slots[resolved] = value\n"
+        "        }",
+        "        }",
+    ),
+    (
+        "texture-slot-value-checked-after-the-index",
+        "an active render target reported as a bad index",
+        TEXTURECOLLECTION,
+        "        public func SetItem(_ index: Int32, _ value: Texture?) throws {\n"
+        "            if let value {",
+        "        public func SetItem(_ index: Int32, _ value: Texture?) throws {\n"
+        "            _ = try checkedIndex(index)\n"
+        "            if let value {",
+    ),
+    (
+        "texture-slot-render-target-test-dropped",
+        "the device's own render target accepted as a sampler source",
+        TEXTURECOLLECTION,
+        "                guard !value.isActiveRenderTarget else {",
+        "                guard value.isActiveRenderTarget else {",
+    ),
+    (
+        "vertex-texture-format-rule-applied-to-both-stages",
+        "the pixel collection refusing every format the vertex rule refuses",
+        TEXTURECOLLECTION,
+        "                if textureOffset > 0 {",
+        "                if textureOffset >= 0 {",
+    ),
+    (
+        "texture-slot-binder-does-not-reach-the-device",
+        "a slot recorded managed-side and never bound natively",
+        TEXTURECOLLECTION,
+        "            try device.runtimeState.functions.check(\n"
+        "                device.runtimeState.functions.graphicsDeviceSetTexture(\n"
+        "                    deviceHandle, stage, UInt32(resolved), textureHandle),\n"
+        "                operation: \"cna_graphics_device_set_texture\")",
+        "            _ = (deviceHandle, textureHandle)",
+    ),
+    (
+        "disposed-texture-stays-in-the-collection",
+        "a disposed texture still answered by Textures[i]",
+        RESOURCE,
+        "                for collection in storage.runtime.liveTextureCollections {\n"
+        "                    collection.forget(self)\n"
+        "                }",
+        "",
+    ),
+    (
+        "active-render-target-flag-never-set",
+        "nothing ever marked as the device's target, so three checks never fire",
+        DEVICE,
+        "            for binding in bindings {\n"
+        "                binding.RenderTarget.isActiveRenderTarget = true\n"
+        "            }",
+        "",
+    ),
+    (
+        "active-render-target-flag-never-cleared",
+        "a target that was unbound still refusing to be sampled or written",
+        DEVICE,
+        "            for previous in runtime.cachedRenderTargetBindings {\n"
+        "                previous.RenderTarget.isActiveRenderTarget = false\n"
+        "            }",
+        "",
+    ),
+    (
+        "resource-in-use-scan-dropped",
+        "SetData accepted on a texture bound to a sampler",
+        TEXTUREDATA,
+        "        for collection in nativeStorage.runtime.liveTextureCollections\n"
+        "        where collection.holds(self) {",
+        "        for collection in nativeStorage.runtime.liveTextureCollections\n"
+        "        where false && collection.holds(self) {",
+    ),
+    (
+        "resource-in-use-scan-ignores-is-setting",
+        "GetData refused on a bound texture, which XNA allows",
+        TEXTUREDATA,
+        "        guard isSetting else { return }",
+        "        guard isSetting || true else { return }",
+    ),
+    (
+        "must-resolve-render-target-not-checked-in-transfers",
+        "SetData accepted on the device's own render target",
+        TEXTUREDATA,
+        "        if checksRenderTarget, isActiveRenderTarget {",
+        "        if checksRenderTarget, false, isActiveRenderTarget {",
     ),
 ]
 

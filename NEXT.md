@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 65.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 66.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,16 +22,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-693 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=144   COMPLETE_TYPES=160   PARTIAL_TYPES=6
-MISSING_TYPE=91  MISSING_MEMBER=49  OVERLOAD_MAPPING_MISMATCH=4
+704 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=141   COMPLETE_TYPES=161   PARTIAL_TYPES=6
+MISSING_TYPE=90  MISSING_MEMBER=47  OVERLOAD_MAPPING_MISMATCH=4
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=123  PROTOTYPE_TYPE_POSITIONS=441  LAYOUTS=41  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=177 (last full run 137, CAUGHT=135, 2 no-ops replaced)
+BOUND_FUNCTIONS=125  PROTOTYPE_TYPE_POSITIONS=451  LAYOUTS=42  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=189 (last full run 137, CAUGHT=135, 2 no-ops replaced)
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,325 implemented members
+MESSAGE_COVERAGE_FINDINGS=0 over 1,329 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
-RESOURCE_STRINGS_REPRODUCED=59
+RESOURCE_STRINGS_REPRODUCED=62
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -66,7 +66,7 @@ cannot be verified.
 
 ### ACTIONABLE_LOCAL — upstream support exists, the managed side is the work
 
-CNA declares **4,076** distinct `cna_*` symbols. Mapping all 93 still-missing
+CNA declares **4,076** distinct `cna_*` symbols. Mapping all 90 still-missing
 types onto their route families — `docs/generated/cna-route-map.txt`, and the
 reasoning in `docs/frontier-remeasurement-foundation-60.md` — leaves **no family
 without native support** except the ones that need none. Route existence is not
@@ -75,12 +75,9 @@ is that the managed type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `GraphicsDevice` drawing (`DrawPrimitives`, `DrawIndexedPrimitives`, `DrawUserPrimitives`, …) | ~8 members | 7 CNA routes. **Verifiable only as "the call was accepted"** — see fact 1. Say so in the evidence rather than implying more. |
-| `Effect` family (`Effect`, `EffectParameter`, `EffectPass`, `EffectTechnique`, the collections, `BasicEffect` and friends) | ~14 types, 2 `SpriteBatch.Begin` overloads, 1 `GraphicsDevice` member | 138 routes. Large but well supported. `cna_sprite_batch_begin_with_effect` is already there, unbound. |
+| `GraphicsDevice` drawing + the `Effect` family together | ~14 types, ~8 device members, 2 `SpriteBatch.Begin` overloads | 138 + 7 routes. **The next milestone, and the largest.** Nothing is blocked in front of it any more: Foundation 63 landed the vertex/index binders, 64 the last two texture types, 65 the render targets and 66 `TextureCollection`. The draws were deliberately withheld in Foundation 63 because CNA refuses every one of them without an applied effect, which is also XNA's `CannotDrawNoShader`; `Effect` is what makes them reachable, so the two land together or not at all. |
 | `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
-| `TextureCollection` (`GraphicsDevice.Textures`, `VertexTextures`) | 1 type, 2 members | Not blocked. The two reasons it was once judged so are both gone: `TextureCube` and `Texture3D` landed in Foundation 64, and CNA's header prescribes the remedy for the missing kind discriminator — cache what you bind and answer from the cache, which is what XNA's `DeviceResourceManager` does. It also makes two recorded absences reachable: the `ResourceInUse` scan in every texture's `CopyData`. |
-| `RenderTargetCube` + `RenderTargetBinding` + the device's render-target members | ~2 types, ~4 members | `cna_render_target_cube_create` answers 0 on this artifact (`build-probe/f64_cube.c`) and is deliberately unbound until the member needs it. It makes `MustResolveRenderTarget` reachable on `Texture2D` and `TextureCube` — both recorded absences today. |
 
 ### The BLOCKED list, re-measured at Foundation 60
 
@@ -103,10 +100,9 @@ Not blocked, and now ordinary work:
   handle. Title and `AllowUserResizing` round-trip; the client rectangle is the
   empty one a headless session has, which is what HEADLESS means.
 * **`GraphicsDevice.Present`, `Reset`** — both accepted.
-* **`TextureCollection`** — CNA's own header prescribes the fix: cache what you
-  bind and answer from the cache, using `bound` to tell "something else owns
-  this slot" from "the slot is empty". That is what XNA's `DeviceResourceManager`
-  cache does.
+* **`TextureCollection`** — landed in Foundation 66, exactly as CNA's header
+  prescribed: cache what you bind and answer from the cache, using `bound` to
+  tell "something else owns this slot" from "the slot is empty".
 * **Audio, Media, Touch, Storage, GamerServices** — no longer unmeasured: 20-45
   routes per family, listed in `docs/generated/cna-route-map.txt`.
 
@@ -145,6 +141,13 @@ These are the ones that cost the most to relearn:
    `input file 'NativeFunctions.swift' was modified during the build` and a
    `signal 6`. Nothing was corrupted, but a whole release-and-sanitizer pass was
    wasted. Run a mutation harness alone.
+
+   The same contention shows up a second way, and it looks worse than it is:
+   `NativeLifecycleTests`' two frame-count assertions are **wall-clock**, and a
+   loaded machine drops frames. Running the suite beside a mutation harness in
+   Foundation 66 produced 597 frames where 599 are required, and 58 where 59
+   are. Both passed immediately on an idle machine. A red frame count is the
+   first thing to re-run before believing it.
 4. **Grep the neighbouring symbols before calling something upstream-blocked.**
    `cna_sprite_batch_begin`'s doc comment describes that route, not the API;
    `begin_with_states` was there all along and Foundation 53 wrote the wrong
@@ -184,7 +187,7 @@ python3 tools/api_compat/verify.py --symbol-graph … --output docs/generated/ap
 python3 tools/api_compat/dependency_graph.py --report … --output …
 python3 tools/native_abi/verify.py     --cna-include … --library "$CNA_NATIVE_LIBRARY"
 python3 tools/native_abi/mutations.py  --cna-include … --library "$CNA_NATIVE_LIBRARY"
-CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~50 min, 177 mutations
+CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~55 min, 189 mutations
 python3 tools/api_compat/message_coverage.py --self-test|--mutations|(report)
 python3 tools/api_compat/pinned_assembly_audit.py …
 python3 tools/api_compat/bcl_authority_audit.py … --cross-check --negative-control …×4
@@ -232,7 +235,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 65 have landed since. Nothing here is
+> Foundation Milestones 37 through 66 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->

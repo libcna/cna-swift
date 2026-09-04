@@ -49,7 +49,7 @@ MIRRORED_STRUCTS = [
     "SpriteScaledCommand", "KeyboardState", "GamePadAnalogState",
     "GamePadState", "GamePadCapabilities", "TextureInfo",
     "RenderTarget2DCreateInfo", "RenderTargetInfo",
-    "RenderTargetCubeCreateInfo", "RenderTargetBinding",
+    "RenderTargetCubeCreateInfo", "RenderTargetBinding", "TextureSlotInfo",
     "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
     "SpriteCommand",
     "PresentationParameters",

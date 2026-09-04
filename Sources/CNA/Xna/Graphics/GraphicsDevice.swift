@@ -467,7 +467,7 @@ extension Microsoft.Xna.Framework.Graphics {
                 runtime.functions.graphicsDeviceSetRenderTarget2D(deviceHandle, targetHandle),
                 operation: "cna_graphics_device_set_render_target2d"
             )
-            runtime.cachedRenderTargetBindings = [binding]
+            recordActiveRenderTargets([binding])
         }
 
         /// `GraphicsDevice.SetRenderTarget(RenderTargetCube renderTarget, CubeMapFace cubeMapFace)`.
@@ -493,7 +493,7 @@ extension Microsoft.Xna.Framework.Graphics {
                     deviceHandle, targetHandle, UInt32(bitPattern: cubeMapFace.rawValue)),
                 operation: "cna_graphics_device_set_render_target_cube"
             )
-            runtime.cachedRenderTargetBindings = [binding]
+            recordActiveRenderTargets([binding])
         }
 
         /// `GraphicsDevice.SetRenderTargets(params RenderTargetBinding[] renderTargets)`.
@@ -539,7 +539,7 @@ extension Microsoft.Xna.Framework.Graphics {
                         deviceHandle, buffer.baseAddress, UInt64(buffer.count))
                 },
                 operation: "cna_graphics_device_set_render_targets")
-            runtime.cachedRenderTargetBindings = renderTargets
+            recordActiveRenderTargets(renderTargets)
         }
 
         /// `GraphicsDevice.GetRenderTargets()`.
@@ -560,7 +560,25 @@ extension Microsoft.Xna.Framework.Graphics {
             try runtime.functions.check(
                 runtime.functions.graphicsDeviceSetRenderTargets(deviceHandle, nil, 0),
                 operation: "cna_graphics_device_set_render_targets")
-            runtime.cachedRenderTargetBindings = []
+            recordActiveRenderTargets([])
+        }
+
+        /// `Texture.isActiveRenderTarget`, cleared on what leaves the device
+        /// and set on what arrives, which is what XNA's private
+        /// `SetRenderTargets` does around its own binding loop.
+        ///
+        /// Three members read the flag — `TextureCollection.SetItem` and the
+        /// `CopyData` of `Texture2D` and `TextureCube` — so it is the single
+        /// place all three get their answer from, and the cache and the flag
+        /// are written together so neither can be updated without the other.
+        private func recordActiveRenderTargets(_ bindings: [RenderTargetBinding]) {
+            for previous in runtime.cachedRenderTargetBindings {
+                previous.RenderTarget.isActiveRenderTarget = false
+            }
+            for binding in bindings {
+                binding.RenderTarget.isActiveRenderTarget = true
+            }
+            runtime.cachedRenderTargetBindings = bindings
         }
 
         /// The private `SetRenderTargets(RenderTargetBinding*, Int32)`, up to
@@ -815,6 +833,34 @@ extension Microsoft.Xna.Framework.Graphics {
                 return nil
             }
             return runtime.samplerStates(for: self, vertex: true)
+        }
+
+        /// `GraphicsDevice.Textures`.
+        ///
+        /// `ldfld pTextureCollection; ret` — a bare field read with no failure
+        /// path and no setter, so a plain non-throwing reader, and **Optional**
+        /// on the same proof `SamplerStates` carries: the pinned verdict is
+        /// `PROVEN_NULLABLE_SUCCESS` on the evidence that *no constructor of
+        /// `GraphicsDevice` assigns `pTextureCollection`*.
+        public var Textures: TextureCollection? {
+            guard (try? validatedHandle("GraphicsDevice.Textures")) != nil else {
+                return nil
+            }
+            return runtime.textures(for: self, vertex: false)
+        }
+
+        /// `GraphicsDevice.VertexTextures`, built with offset `0x101` —
+        /// `D3DVERTEXTEXTURESAMPLER0`. Optional on the same proof.
+        ///
+        /// **Zero slots on Reach**, whose `MaxVertexSamplers` is 0 in the
+        /// extracted table. The collection exists and every index is out of
+        /// range, which is exactly what XNA does: `new TextureCollection(this,
+        /// 0x101, _profileCapabilities.MaxVertexSamplers)`.
+        public var VertexTextures: TextureCollection? {
+            guard (try? validatedHandle("GraphicsDevice.VertexTextures")) != nil else {
+                return nil
+            }
+            return runtime.textures(for: self, vertex: true)
         }
 
         /// `GraphicsDevice.BlendFactor`.

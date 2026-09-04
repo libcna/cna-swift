@@ -317,6 +317,21 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "RenderTargetsMustMatch",
       "reason": "The private GraphicsDevice.SetRenderTargets raises ArgumentException with this when RenderTargetHelper.IsSameSize refuses a binding against slot zero -- four fields: both extents, the multisample count and the colour format's byte size. Reached only for i > 0."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "MustResolveRenderTarget",
+      "reason": "TextureCollection.set_Item and the CopyData of Texture2D and TextureCube each raise InvalidOperationException with this when a texture is the device's own active render target. Texture.isActiveRenderTarget is set and cleared by the private GraphicsDevice.SetRenderTargets."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ResourceInUse",
+      "reason": "Helpers.GetExceptionFromResult maps E_ABORT (0x80004004) to InvalidOperationException with this, and the CopyData of all three texture types raises it through that mapping when the texture is bound to a sampler slot. The message names SetData, and the scan is guarded by isSetting, so GetData is allowed."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileVertexTextureFormatNotSupported",
+      "reason": "TextureCollection.set_Item raises NotSupportedException through ProfileCapabilities.ThrowNotSupportedException when the VERTEX collection is given a texture whose format is not in ValidVertexTextureFormats. Reach's list is empty, so every texture fails it -- and because the value is tested before the index, that is what a Reach caller is told rather than the zero-slot bound."
     }
   ]
 }

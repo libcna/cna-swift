@@ -258,6 +258,8 @@ extension Microsoft.Xna.Framework.Graphics {
                     message: Microsoft.Xna.Framework.Graphics.GraphicsDevice
                         .nullNotAllowedMessage)
             }
+            try checkNotBoundToTheDevice(
+                isSetting: isSetting, checksRenderTarget: true)
             try Microsoft.Xna.Framework.Graphics.validateCopyParameters(
                 dataLength: arrayCount, dataIndex: startIndex,
                 elementCount: elementCount)

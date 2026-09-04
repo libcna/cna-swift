@@ -150,6 +150,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "MustResolveRenderTarget",
+      "value": "The render target must not be set on the device when it is used as a texture."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "NegativePlaneDistance",
       "value": "You should specify positive value for {0}."
     },
@@ -235,6 +240,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileVertexTextureFormatNotSupported",
+      "value": "XNA Framework {0} profile does not support vertex texture format {1}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "RenderTargetsMustMatch",
       "value": "All active render targets must be the same size with the same multisample type and bit depth."
     },
@@ -242,6 +252,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ResourceDataMustBeCorrectSize",
       "value": "The array is not the correct size for the amount of data requested."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ResourceInUse",
+      "value": "You may not call SetData on a resource while it is actively set on the GraphicsDevice. Unset it from the device before calling SetData."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

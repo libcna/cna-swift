@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=166
-TARGET_MEMBERS=2065
-TOTAL_DIAGNOSTICS=144
-COMPLETE_TYPES=160
+TARGET_TYPES=167
+TARGET_MEMBERS=2069
+TOTAL_DIAGNOSTICS=141
+COMPLETE_TYPES=161
 PARTIAL_TYPES=6
-MISSING_TYPES=91
-MISSING_TYPE=91
-MISSING_MEMBER=49
+MISSING_TYPES=90
+MISSING_TYPE=90
+MISSING_MEMBER=47
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -41,11 +41,11 @@ INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=124
+LANGUAGE_PROJECTION_EXCLUSIONS=125
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
 NAMESPACE_MARKERS=11
-INHERITED_MEMBER_PROJECTIONS=3
+INHERITED_MEMBER_PROJECTIONS=4
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=33
 ARRAY_MUTATION_MAPPINGS=20
 COMPARABLE_INTERFACE_PROJECTIONS=1
@@ -60,19 +60,19 @@ THROWING_WRITER_METHOD_PROJECTIONS=113
 INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
 GETTER_ONLY_PROJECTIONS=561
 WRITE_ONLY_PROJECTIONS=0
-MEASURED_ACCESSOR_PROJECTIONS=61
-PENDING_ACCESSOR_PROJECTIONS=52
+MEASURED_ACCESSOR_PROJECTIONS=62
+PENDING_ACCESSOR_PROJECTIONS=51
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=11
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=12
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=18
-XNA_SEALED_CLASS_PROJECTIONS=19
+XNA_SEALED_CLASS_PROJECTIONS=20
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=19
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=59
+XNA_RESOURCE_STRING_PROJECTIONS=62
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=116
-PENDING_RETURN_NULLABILITY_PROJECTIONS=253
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=18
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=119
+PENDING_RETURN_NULLABILITY_PROJECTIONS=250
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=21
 ```
 
 ## Complete types
@@ -197,6 +197,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=18
 - `Microsoft.Xna.Framework.Graphics.Texture2D`
 - `Microsoft.Xna.Framework.Graphics.Texture3D`
 - `Microsoft.Xna.Framework.Graphics.TextureAddressMode`
+- `Microsoft.Xna.Framework.Graphics.TextureCollection`
 - `Microsoft.Xna.Framework.Graphics.TextureCube`
 - `Microsoft.Xna.Framework.Graphics.TextureFilter`
 - `Microsoft.Xna.Framework.Graphics.VertexBuffer`
@@ -274,7 +275,7 @@ Expected members: 37; emitted members: 35.
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
-Expected members: 56; emitted members: 24.
+Expected members: 56; emitted members: 26.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present(_:Microsoft.Xna.Framework.Rectangle?,destinationRectangle:Microsoft.Xna.Framework.Rectangle?,overrideWindowHandle:Int)`: mapped member is absent
@@ -300,8 +301,6 @@ Expected members: 56; emitted members: 24.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DisplayMode()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Adapter()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.PresentationParameters()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexTextures()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Textures()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Disposing()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceDestroyed()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceCreated()`: mapped member is absent
@@ -407,7 +406,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`
-- `Microsoft.Xna.Framework.Graphics.TextureCollection`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.Input.Mouse`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`

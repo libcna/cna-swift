@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 166,
-    "TARGET_MEMBERS": 2065,
-    "TOTAL_DIAGNOSTICS": 144,
-    "COMPLETE_TYPES": 160,
+    "TARGET_TYPES": 167,
+    "TARGET_MEMBERS": 2069,
+    "TOTAL_DIAGNOSTICS": 141,
+    "COMPLETE_TYPES": 161,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 91,
-    "MISSING_TYPE": 91,
-    "MISSING_MEMBER": 49,
+    "MISSING_TYPES": 90,
+    "MISSING_TYPE": 90,
+    "MISSING_MEMBER": 47,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -44,11 +44,11 @@
     "UNMEASURED_STRUCTURAL_CATEGORY": 0,
     "ALLOWLIST_ENTRIES": 0,
     "APPLIED_ALLOWLIST_ENTRIES": 0,
-    "LANGUAGE_PROJECTION_EXCLUSIONS": 124,
+    "LANGUAGE_PROJECTION_EXCLUSIONS": 125,
     "ENUM_STORAGE_FIELD_EXCLUSIONS": 49,
     "FINALIZER_LANGUAGE_MAPPINGS": 28,
     "NAMESPACE_MARKERS": 11,
-    "INHERITED_MEMBER_PROJECTIONS": 3,
+    "INHERITED_MEMBER_PROJECTIONS": 4,
     "PROTOCOL_WITNESS_MEMBER_PROJECTIONS": 33,
     "ARRAY_MUTATION_MAPPINGS": 20,
     "COMPARABLE_INTERFACE_PROJECTIONS": 1,
@@ -63,19 +63,19 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 61,
-    "PENDING_ACCESSOR_PROJECTIONS": 52,
+    "MEASURED_ACCESSOR_PROJECTIONS": 62,
+    "PENDING_ACCESSOR_PROJECTIONS": 51,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 11,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 12,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 18,
-    "XNA_SEALED_CLASS_PROJECTIONS": 19,
+    "XNA_SEALED_CLASS_PROJECTIONS": 20,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 59,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 62,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 116,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 253,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 18
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 119,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 250,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 21
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -198,6 +198,7 @@
     "Microsoft.Xna.Framework.Graphics.Texture2D",
     "Microsoft.Xna.Framework.Graphics.Texture3D",
     "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
+    "Microsoft.Xna.Framework.Graphics.TextureCollection",
     "Microsoft.Xna.Framework.Graphics.TextureCube",
     "Microsoft.Xna.Framework.Graphics.TextureFilter",
     "Microsoft.Xna.Framework.Graphics.VertexBuffer",
@@ -330,7 +331,6 @@
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
     "Microsoft.Xna.Framework.Graphics.SpriteFont",
-    "Microsoft.Xna.Framework.Graphics.TextureCollection",
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
@@ -741,16 +741,6 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexTextures()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Textures()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Disposing()",
       "detail": "mapped member is absent"
     },
@@ -907,11 +897,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.TextureCollection",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2235,6 +2220,20 @@
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
+      "ownerType": "Microsoft.Xna.Framework.Graphics.TextureCollection",
+      "sourceProperty": "Item",
+      "indexed": true,
+      "readerSymbol": "Microsoft.Xna.Framework.Graphics.TextureCollection.Item(_:Int32)",
+      "readerForm": "method",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Graphics.TextureCollection.SetItem(_:Int32,_:Microsoft.Xna.Framework.Graphics.Texture?)",
+      "writerName": "SetItem",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "sourceProperty": "PreferredBackBufferWidth",
       "indexed": false,
@@ -2669,16 +2668,6 @@
       "static": false
     },
     {
-      "ownerType": "Microsoft.Xna.Framework.Graphics.TextureCollection",
-      "sourceProperty": "Item",
-      "typeState": "missing",
-      "readerThrows": true,
-      "writerName": "SetItem",
-      "writerThrows": true,
-      "indexed": true,
-      "static": false
-    },
-    {
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
       "sourceProperty": "Adapter",
       "typeState": "missing",
@@ -2845,6 +2834,13 @@
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture",
       "clrSealed": false,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
+      "clrSealed": true,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
@@ -3904,6 +3900,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "MustResolveRenderTarget",
+      "pinnedValue": "The render target must not be set on the device when it is used as a texture.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "NegativePlaneDistance",
       "pinnedValue": "You should specify positive value for {0}.",
       "reproducedInSwiftSource": true
@@ -4006,6 +4008,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ProfileVertexTextureFormatNotSupported",
+      "pinnedValue": "XNA Framework {0} profile does not support vertex texture format {1}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "RenderTargetsMustMatch",
       "pinnedValue": "All active render targets must be the same size with the same multisample type and bit depth.",
       "reproducedInSwiftSource": true
@@ -4014,6 +4022,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "ResourceDataMustBeCorrectSize",
       "pinnedValue": "The array is not the correct size for the amount of data requested.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ResourceInUse",
+      "pinnedValue": "You may not call SetData on a resource while it is actively set on the GraphicsDevice. Unset it from the device before calling SetData.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4450,6 +4464,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -6906,8 +6928,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.TextureCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -6920,8 +6942,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.TextureCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -7964,14 +7986,14 @@
       "member": "Item",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.Texture",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.Texture?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.Texture?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.VertexBuffer",
@@ -10864,7 +10886,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 24,
+      "targetMembers": 26,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -10984,16 +11006,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.PresentationParameters()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.VertexTextures()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Textures()",
           "detail": "mapped member is absent"
         },
         {
@@ -11620,7 +11632,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.Texture",
       "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 2,
+      "targetMembers": 3,
       "diagnostics": []
     },
     {
@@ -11646,16 +11658,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.TextureCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureCube",

@@ -153,3 +153,57 @@ extension Microsoft.Xna.Framework.Graphics {
             && uBack <= UInt32(bitPattern: depth) && uFront < uBack
     }
 }
+
+extension Microsoft.Xna.Framework.Graphics.Texture {
+    /// `CopyData`'s two device-state tests, shared by all three texture types.
+    ///
+    /// ```text
+    /// if (isActiveRenderTarget)                       // Texture2D and TextureCube only
+    ///     throw new InvalidOperationException(MustResolveRenderTarget);
+    /// if (isSetting) {
+    ///     for (i = 0; i < device.Textures._maxTextures; i++)
+    ///         if (device.Textures[i] == this)
+    ///             throw GetExceptionFromResult(E_ABORT);       // ResourceInUse
+    ///     for (i = 0; i < device.VertexTextures._maxTextures; i++)
+    ///         if (device.VertexTextures[i] == this)
+    ///             throw GetExceptionFromResult(E_ABORT);
+    /// }
+    /// ```
+    ///
+    /// Both were recorded as absences until Foundation 66 — the first needed
+    /// `GraphicsDevice.SetRenderTarget` to set the flag, the second needed
+    /// `TextureCollection` to exist for anything to be bound to.
+    ///
+    /// `E_ABORT` is `0x80004004`, and `Helpers.GetExceptionFromResult` maps it
+    /// to `new InvalidOperationException(ResourceInUse)` — so the exception is
+    /// an ordinary `InvalidOperationException` with a message about `SetData`,
+    /// not a COM code reaching the caller.
+    ///
+    /// The scan compares by **reference**, over the collections' own slots, so
+    /// the managed cache is the right place to answer it: a slot filled by
+    /// canonical CNA code holds no object this binding ever had, and cannot be
+    /// `this`.
+    ///
+    /// `Texture3D` has no `isActiveRenderTarget` test at all, because no volume
+    /// render target exists; it has both scans.
+    internal func checkNotBoundToTheDevice(
+        isSetting: Bool, checksRenderTarget: Bool
+    ) throws {
+        if checksRenderTarget, isActiveRenderTarget {
+            throw CNAInvalidOperationException(
+                message: Microsoft.Xna.Framework.Graphics.TextureCollection
+                    .mustResolveRenderTargetMessage)
+        }
+        guard isSetting else { return }
+        for collection in nativeStorage.runtime.liveTextureCollections
+        where collection.holds(self) {
+            throw CNAInvalidOperationException(
+                message: Microsoft.Xna.Framework.Graphics.Texture.resourceInUseMessage)
+        }
+    }
+
+    /// `FrameworkResources.ResourceInUse`, which `E_ABORT` maps to.
+    internal static let resourceInUseMessage =
+        "You may not call SetData on a resource while it is actively set on "
+        + "the GraphicsDevice. Unset it from the device before calling SetData."
+}

@@ -270,7 +270,8 @@ extension Microsoft.Xna.Framework.Graphics {
             let handle = try validatedHandle("Texture2D.SetData")
             let plan = try transferPlan(
                 T.self, level: level, rect: rect, arrayCount: data.count,
-                startIndex: startIndex, elementCount: elementCount)
+                startIndex: startIndex, elementCount: elementCount,
+                isSetting: true)
             try data.withUnsafeBytes { bytes in
                 guard let base = bytes.baseAddress else { return }
                 try nativeStorage.runtime.functions.check(
@@ -315,7 +316,8 @@ extension Microsoft.Xna.Framework.Graphics {
             let handle = try validatedHandle("Texture2D.GetData")
             let plan = try transferPlan(
                 T.self, level: level, rect: rect, arrayCount: data.count,
-                startIndex: startIndex, elementCount: elementCount)
+                startIndex: startIndex, elementCount: elementCount,
+                isSetting: false)
             try data.withUnsafeMutableBytes { bytes in
                 guard let base = bytes.baseAddress else { return }
                 var required: UInt64 = 0
@@ -387,7 +389,8 @@ extension Microsoft.Xna.Framework.Graphics {
             rect: Microsoft.Xna.Framework.Rectangle?,
             arrayCount: Int,
             startIndex: Int32,
-            elementCount: Int32
+            elementCount: Int32,
+            isSetting: Bool
         ) throws -> TransferPlan {
             guard arrayCount > 0 else {
                 throw CNAArgumentNullException(
@@ -395,6 +398,8 @@ extension Microsoft.Xna.Framework.Graphics {
                     message: Microsoft.Xna.Framework.Graphics.GraphicsDevice
                         .nullNotAllowedMessage)
             }
+            try checkNotBoundToTheDevice(
+                isSetting: isSetting, checksRenderTarget: true)
             try Microsoft.Xna.Framework.Graphics.validateCopyParameters(
                 dataLength: arrayCount, dataIndex: startIndex,
                 elementCount: elementCount)

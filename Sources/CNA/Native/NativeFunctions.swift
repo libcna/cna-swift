@@ -130,6 +130,8 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceSetRenderTargetCubeRoute = @convention(c) (UInt64, UInt64, UInt32) -> UInt32
     typealias GraphicsDeviceSetRenderTargetsRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_RenderTargetBinding>?, UInt64) -> UInt32
     typealias GraphicsDeviceGetRenderTargetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsDeviceGetTextureRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<CNASwift_TextureSlotInfo>?) -> UInt32
+    typealias GraphicsDeviceSetTextureRoute = @convention(c) (UInt64, UInt32, UInt32, UInt64) -> UInt32
     typealias GraphicsDeviceClearOptionsRoute = @convention(c) (UInt64, UInt32, CNASwift_Color, Float, Int32) -> UInt32
     typealias GraphicsDeviceGetPresentationParametersRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_PresentationParameters>?) -> UInt32
     typealias GraphicsDeviceSetViewportRoute = @convention(c) (UInt64, CNASwift_Viewport) -> UInt32
@@ -261,6 +263,8 @@ internal final class NativeFunctions {
     let graphicsDeviceSetRenderTargetCube: GraphicsDeviceSetRenderTargetCubeRoute
     let graphicsDeviceSetRenderTargets: GraphicsDeviceSetRenderTargetsRoute
     let graphicsDeviceGetRenderTargetCount: GraphicsDeviceGetRenderTargetCountRoute
+    let graphicsDeviceGetTexture: GraphicsDeviceGetTextureRoute
+    let graphicsDeviceSetTexture: GraphicsDeviceSetTextureRoute
     let graphicsDeviceClearOptions: GraphicsDeviceClearOptionsRoute
     let graphicsDeviceGetPresentationParameters: GraphicsDeviceGetPresentationParametersRoute
     let graphicsDeviceSetViewport: GraphicsDeviceSetViewportRoute
@@ -412,6 +416,8 @@ internal final class NativeFunctions {
         graphicsDeviceSetRenderTargetCube = try library.resolve("cna_graphics_device_set_render_target_cube", as: GraphicsDeviceSetRenderTargetCubeRoute.self)
         graphicsDeviceSetRenderTargets = try library.resolve("cna_graphics_device_set_render_targets", as: GraphicsDeviceSetRenderTargetsRoute.self)
         graphicsDeviceGetRenderTargetCount = try library.resolve("cna_graphics_device_get_render_target_count", as: GraphicsDeviceGetRenderTargetCountRoute.self)
+        graphicsDeviceGetTexture = try library.resolve("cna_graphics_device_get_texture", as: GraphicsDeviceGetTextureRoute.self)
+        graphicsDeviceSetTexture = try library.resolve("cna_graphics_device_set_texture", as: GraphicsDeviceSetTextureRoute.self)
         graphicsDeviceClearOptions = try library.resolve("cna_graphics_device_clear_options", as: GraphicsDeviceClearOptionsRoute.self)
         graphicsDeviceGetPresentationParameters = try library.resolve("cna_graphics_device_get_presentation_parameters", as: GraphicsDeviceGetPresentationParametersRoute.self)
         graphicsDeviceSetViewport = try library.resolve("cna_graphics_device_set_viewport", as: GraphicsDeviceSetViewportRoute.self)
