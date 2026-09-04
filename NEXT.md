@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 70.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 71.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,16 +22,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-773 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=116   COMPLETE_TYPES=178   PARTIAL_TYPES=7
-MISSING_TYPE=72  MISSING_MEMBER=36  OVERLOAD_MAPPING_MISMATCH=8
+791 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=108   COMPLETE_TYPES=179   PARTIAL_TYPES=6
+MISSING_TYPE=72  MISSING_MEMBER=32  OVERLOAD_MAPPING_MISMATCH=4
 every category that would mean DISAGREEMENT with XNA: 0
 BOUND_FUNCTIONS=312  PROTOTYPE_TYPE_POSITIONS=1063  LAYOUTS=54  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=263 (last full run 137, CAUGHT=135)
+PROJECTION_MUTATIONS=278 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,612 implemented members
-API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
+API_COMPAT_SELF_TESTS=2443  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
 ```
 
@@ -76,62 +76,23 @@ is that the managed type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `System.Text.StringBuilder` | 1 BCL family, 4 XNA members | **The next milestone.** `SpriteFont.MeasureString(StringBuilder)` and `SpriteBatch.DrawString`'s three `StringBuilder` overloads wait on it. Admitting a BCL family is a measured act — authority, the full public shape pinned as the authority record, a Swift support class measured against `bclSupportContract` — but it does **not** mean projecting all sixty-five members: `CNAList` projects sixteen of `List<T>`'s pinned fifty-two. Recorded in `bcl-authorities.json` under `availableButNotAdmitted`. |
-| `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
+| `ContentManager` (+ `Game.Content`) | 2 types, 1 member | **The next milestone.** 33 routes. It inherits a specific question from Foundation 70: whether a compiled `.xnb`'s character table arrives sorted, which `SpriteFont`'s binary search requires and which `cna_sprite_font_create` does not guarantee. |
 
-### `System.Text.StringBuilder`, sized
+### What `StringBuilder` cost, and what it left behind
 
-Measured rather than guessed, so the next session starts from facts.
+Admitted in Foundation 71. The sizing recorded here beforehand held up: 65
+visible members pinned as the authority record, 14 projected, the `[UInt16]`
+store, and the two IL asymmetries — the indexer's two accessors raising
+different exception types, and `set_Length` naming `"value"` for both refusals
+with two different keys.
 
-**The family.** `mscorlib` declares it `public sealed`, base `System.Object`,
-**65 visible members**: 6 constructors, 55 methods, 4 properties. `Append` has
-19 overloads and `Insert` 18; `AppendFormat` has 5 and brings .NET composite
-formatting with it. `bcl40-selected-shape.json` pins all 65 as the authority
-record; `bclSupportContract` measures the Swift class structurally, and
-`CNAList` projects sixteen of `List<T>`'s pinned fifty-two, so the Swift class
-is a **measured subset**, not a transcription.
-
-**The backing store must be `[UInt16]`, not `String`.** Every index in the API
-— `Length`, `Item`, `Insert`, `Remove`, `ToString(startIndex:length:)` — is a
-**UTF-16 code-unit** index, which is the same reason Foundation 70 mapped
-`System.Char` to `UInt16`. A Swift `String` would silently change all of them,
-and `SpriteFont.MeasureString` already measures code units.
-
-**The resource keys it raises**, counted from the IL between lines 32751 and
-37827 of the pinned disassembly:
-
-```text
-ArgumentOutOfRange_Index         21   (already pinned)
-ArgumentOutOfRange_StartIndex     4
-ArgumentOutOfRange_SmallCapacity  4
-ArgumentOutOfRange_GenericPositive 4
-ArgumentOutOfRange_NegativeLength  3
-ArgumentOutOfRange_NegativeCapacity 2
-ArgumentOutOfRange_MustBePositive  2
-ArgumentOutOfRange_MustBeNonNegNum 2
-```
-
-Only the first is admitted today; the rest are the milestone's resource work.
-
-**Two asymmetries already read out of the IL**, both of the kind a
-reimplementation gets wrong:
-
-* `get_Chars` raises a **bare `IndexOutOfRangeException()`** — no message, no
-  parameter name — while `set_Chars` raises
-  `ArgumentOutOfRangeException("index", ArgumentOutOfRange_Index)`. One
-  indexer, two exception types, for the same kind of mistake.
-* `set_Length` refuses a negative value with `ArgumentOutOfRange_NegativeLength`
-  and a value above `MaxCapacity` with `ArgumentOutOfRange_SmallCapacity` —
-  both naming `"value"`. Growing then appends `'\0'` repeated; shrinking
-  truncates.
-
-**The admission, in order.** A `selectedFamilies` entry in
-`bcl-authorities.json` with its reason; `--write-manifest` to pin the shape;
-`bclSupportTypeProjections` mapping it to `CNAStringBuilder`; a
-`bclSupportContract` entry; the Swift class; then the four XNA members it
-unblocks — `SpriteFont.MeasureString(StringBuilder)` and `SpriteBatch.DrawString`'s
-three `StringBuilder` overloads, which close the last of `SpriteFont`'s and
-`SpriteBatch`'s missing members.
+**Two things it taught that the sizing did not predict.** Every growing member
+is fallible for a reason its own body does not show: `ExpandByABlock` raises
+`ArgumentOutOfRangeException("requiredLength", …)` past `MaxCapacity`, so a
+plain `Append` throws and the parameter name is one no caller ever passes. And
+two of the messages were transcribed wrong in the first draft — mscorlib says
+"MaxCapacity must be one or greater.", not "…greater than zero." Extract every
+message; never write the plausible one.
 
 ### The BLOCKED list, re-measured at Foundation 60
 
@@ -291,7 +252,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 70 have landed since. Nothing here is
+> Foundation Milestones 37 through 71 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->
@@ -347,7 +308,7 @@ TARGET_TYPES=142                     (126 -> 142)
 TARGET_MEMBERS=1767                  (1706 -> 1767)
 TOTAL_DIAGNOSTICS=269                (284 -> 269)
 COMPLETE_TYPES=135                   (121 -> 135)
-PARTIAL_TYPES=7                      (5 -> 7)
+PARTIAL_TYPES=6                      (5 -> 7)
 MISSING_TYPE=115                     (131 -> 115)
 MISSING_MEMBER=129                   (130 -> 129)
 BASE_MAPPING_MISMATCH=2              unchanged

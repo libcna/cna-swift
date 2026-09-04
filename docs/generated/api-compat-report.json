@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 185,
-    "TARGET_MEMBERS": 2304,
-    "TOTAL_DIAGNOSTICS": 116,
-    "COMPLETE_TYPES": 178,
-    "PARTIAL_TYPES": 7,
+    "TARGET_MEMBERS": 2308,
+    "TOTAL_DIAGNOSTICS": 108,
+    "COMPLETE_TYPES": 179,
+    "PARTIAL_TYPES": 6,
     "MISSING_TYPES": 72,
     "MISSING_TYPE": 72,
-    "MISSING_MEMBER": 36,
+    "MISSING_MEMBER": 32,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -29,7 +29,7 @@
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 8,
+    "OVERLOAD_MAPPING_MISMATCH": 4,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -69,10 +69,10 @@
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 21,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
-    "BCL_SUPPORT_TYPE_MEASUREMENTS": 18,
+    "BCL_SUPPORT_TYPE_MEASUREMENTS": 19,
     "XNA_SEALED_CLASS_PROJECTIONS": 30,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
-    "BCL_RESOURCE_STRING_PROJECTIONS": 19,
+    "BCL_RESOURCE_STRING_PROJECTIONS": 29,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
     "XNA_RESOURCE_STRING_PROJECTIONS": 73,
@@ -208,6 +208,7 @@
     "Microsoft.Xna.Framework.Graphics.SetDataOptions",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
     "Microsoft.Xna.Framework.Graphics.SpriteEffects",
+    "Microsoft.Xna.Framework.Graphics.SpriteFont",
     "Microsoft.Xna.Framework.Graphics.SpriteSortMode",
     "Microsoft.Xna.Framework.Graphics.StencilOperation",
     "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
@@ -280,7 +281,6 @@
     "Microsoft.Xna.Framework.Game",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
     "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-    "Microsoft.Xna.Framework.Graphics.SpriteFont",
     "Microsoft.Xna.Framework.GraphicsDeviceManager",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ],
@@ -732,46 +732,6 @@
     {
       "category": "OVERLOAD_MAPPING_MISMATCH",
       "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
       "detail": "required overload is absent"
     },
     {
@@ -3665,6 +3625,41 @@
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
     {
+      "supportType": "CNAStringBuilder",
+      "clrFamily": "System.Text.StringBuilder",
+      "kind": "class",
+      "inheritance": "final",
+      "genericParameters": [],
+      "base": null,
+      "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor",
+        "Append",
+        "AppendLine",
+        "Capacity",
+        "Clear",
+        "EnsureCapacity",
+        "Insert",
+        "Item",
+        "Length",
+        "MaxCapacity",
+        "Remove",
+        "SetCapacity",
+        "SetItem",
+        "SetLength",
+        "ToString"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "AppendFormat"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNASystemException",
       "clrFamily": "System.SystemException",
       "kind": "class",
@@ -3699,6 +3694,66 @@
     }
   ],
   "bclResourceStringProjections": [
+    {
+      "resourceKey": "ArgumentOutOfRange_NegativeLength",
+      "pinnedValue": "Length cannot be less than zero.",
+      "reproducedInSwiftSource": true,
+      "reason": "StringBuilder.set_Length refuses a negative value with it, naming \"value\"."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_SmallCapacity",
+      "pinnedValue": "capacity was less than the current size.",
+      "reproducedInSwiftSource": true,
+      "reason": "Three StringBuilder members share it: set_Length past MaxCapacity, set_Capacity below the current Length, and -- reached from every growing member -- ExpandByABlock, whose ParamName is the internal \"requiredLength\" no caller passes."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_NegativeCapacity",
+      "pinnedValue": "Capacity must be positive.",
+      "reproducedInSwiftSource": true,
+      "reason": "StringBuilder.set_Capacity and EnsureCapacity refuse a negative capacity with it."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_Capacity",
+      "pinnedValue": "Capacity exceeds maximum capacity.",
+      "reproducedInSwiftSource": true,
+      "reason": "StringBuilder.set_Capacity refuses a value above MaxCapacity with it, and the two-argument constructor refuses a capacity above its own ceiling."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_NegativeCount",
+      "pinnedValue": "Count cannot be less than zero.",
+      "reproducedInSwiftSource": true,
+      "reason": "StringBuilder.Append(Char, Int32) refuses a negative repeatCount with it, before writing anything."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_StartIndex",
+      "pinnedValue": "StartIndex cannot be less than zero.",
+      "reproducedInSwiftSource": true,
+      "reason": "StringBuilder.Remove and ToString(Int32, Int32) refuse a negative start with it."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_StartIndexLargerThanLength",
+      "pinnedValue": "startIndex cannot be larger than length of string.",
+      "reproducedInSwiftSource": true,
+      "reason": "StringBuilder.ToString(Int32, Int32) refuses a start past Length with it."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_IndexLength",
+      "pinnedValue": "Index and length must refer to a location within the string.",
+      "reproducedInSwiftSource": true,
+      "reason": "StringBuilder.ToString(Int32, Int32) refuses a range past the end with it, naming \"length\"."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_MustBePositive",
+      "pinnedValue": "'{0}' must be greater than zero.",
+      "reproducedInSwiftSource": true,
+      "reason": "The two-argument StringBuilder constructor refuses a negative capacity with it -- the ONLY formatted message in the family, whose {0} is the parameter name, so the argument is named twice."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_SmallMaxCapacity",
+      "pinnedValue": "MaxCapacity must be one or greater.",
+      "reproducedInSwiftSource": true,
+      "reason": "The two-argument StringBuilder constructor refuses a maxCapacity below one with it."
+    },
     {
       "resourceKey": "Exception_WasThrown",
       "pinnedValue": "Exception of type '{0}' was thrown.",
@@ -8247,7 +8302,7 @@
       "member": "Characters",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "System.Collections.ObjectModel.ReadOnlyCollection`1[System.Char]",
       "swiftReturnType": "CNAReadOnlyCollection<UInt16>?",
       "optional": true,
@@ -11689,7 +11744,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
       "status": "PARTIAL",
       "expectedMembers": 21,
-      "targetMembers": 16,
+      "targetMembers": 19,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -11709,36 +11764,6 @@
         {
           "category": "OVERLOAD_MAPPING_MISMATCH",
           "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)",
-          "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color)",
-          "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Float,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-          "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.DrawString(_:Microsoft.Xna.Framework.Graphics.SpriteFont,text:System.Text.StringBuilder,position:Microsoft.Xna.Framework.Vector2,color:Microsoft.Xna.Framework.Color,rotation:Float,origin:Microsoft.Xna.Framework.Vector2,scale:Microsoft.Xna.Framework.Vector2,effects:Microsoft.Xna.Framework.Graphics.SpriteEffects,layerDepth:Float)",
           "detail": "required overload is absent"
         }
       ]
@@ -11752,21 +11777,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SpriteFont",
-      "status": "PARTIAL",
+      "status": "COMPLETE",
       "expectedMembers": 6,
-      "targetMembers": 5,
-      "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteFont.MeasureString(_:System.Text.StringBuilder)",
-          "detail": "required overload is absent"
-        }
-      ]
+      "targetMembers": 6,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SpriteSortMode",

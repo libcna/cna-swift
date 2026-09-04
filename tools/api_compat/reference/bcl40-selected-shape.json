@@ -5619,6 +5619,1580 @@
           ]
         }
       ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Text.StringBuilder",
+      "kind": "class",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [
+        "System.Runtime.Serialization.ISerializable"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "maxCapacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "length",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Byte",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Char",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "repeatCount",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Char",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Char[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "charCount",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Char[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Decimal",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Double",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Int16",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Int64",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.SByte",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Single",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.UInt16",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.UInt32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Append",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.UInt64",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AppendFormat",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "format",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arg0",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arg1",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arg2",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AppendFormat",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "format",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arg0",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arg1",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AppendFormat",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "format",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "arg0",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AppendFormat",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "format",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "args",
+              "type": "System.Object[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AppendFormat",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "provider",
+              "type": "System.IFormatProvider",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "format",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "args",
+              "type": "System.Object[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AppendLine",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "AppendLine",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Clear",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "sourceIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "destination",
+              "type": "System.Char[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "destinationIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "EnsureCapacity",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "capacity",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Equals",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "sb",
+              "type": "System.Text.StringBuilder",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Byte",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Char",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Char[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "charCount",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Char[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Decimal",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Double",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Int16",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Int64",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.SByte",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Single",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.UInt16",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.UInt32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.UInt64",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "length",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Replace",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "oldChar",
+              "type": "System.Char",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "newChar",
+              "type": "System.Char",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Replace",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "oldChar",
+              "type": "System.Char",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "newChar",
+              "type": "System.Char",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Replace",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "oldValue",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "newValue",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Replace",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Text.StringBuilder",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "oldValue",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "newValue",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ToString",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ToString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "startIndex",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "length",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Capacity",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Chars",
+          "type": "System.Char",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Length",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "MaxCapacity",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
     }
   ],
   "resourceStrings": [
@@ -5684,8 +7258,18 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_Capacity",
+      "value": "Capacity exceeds maximum capacity."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "ArgumentOutOfRange_Index",
       "value": "Index was out of range. Must be non-negative and less than the size of the collection."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_IndexLength",
+      "value": "Index and length must refer to a location within the string."
     },
     {
       "assembly": "mscorlib.dll",
@@ -5694,8 +7278,48 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_MustBePositive",
+      "value": "'{0}' must be greater than zero."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "ArgumentOutOfRange_NeedNonNegNum",
       "value": "Non-negative number required."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_NegativeCapacity",
+      "value": "Capacity must be positive."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_NegativeCount",
+      "value": "Count cannot be less than zero."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_NegativeLength",
+      "value": "Length cannot be less than zero."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_SmallCapacity",
+      "value": "capacity was less than the current size."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_SmallMaxCapacity",
+      "value": "MaxCapacity must be one or greater."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_StartIndex",
+      "value": "StartIndex cannot be less than zero."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_StartIndexLargerThanLength",
+      "value": "startIndex cannot be larger than length of string."
     },
     {
       "assembly": "mscorlib.dll",

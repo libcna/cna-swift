@@ -625,7 +625,80 @@ extension Microsoft.Xna.Framework.Graphics {
             effects: SpriteEffects,
             layerDepth: Float
         ) throws {
-            let units = Array(text.utf16)
+            try drawText(spriteFont, units: Array(text.utf16),
+                         position: position, color: color,
+                         rotation: rotation, origin: origin, scale: scale,
+                         effects: effects, layerDepth: layerDepth)
+        }
+
+        /// `DrawString(SpriteFont, StringBuilder, …)`, all three overloads.
+        ///
+        /// XNA declares three, each one line over a `StringProxy`; they are
+        /// three here for the same reason and share the same body. The
+        /// buffer's code units are read where the `String` overloads read
+        /// theirs, so a caller holding a builder is not made to materialise
+        /// a string first.
+        public func DrawString(
+            _ spriteFont: SpriteFont,
+            text: CNAStringBuilder,
+            position: Microsoft.Xna.Framework.Vector2,
+            color: Microsoft.Xna.Framework.Color
+        ) throws {
+            try DrawString(
+                spriteFont, text: text, position: position, color: color,
+                rotation: 0, origin: .Zero,
+                scale: Microsoft.Xna.Framework.Vector2(1, 1),
+                effects: .None, layerDepth: 0)
+        }
+
+        public func DrawString(
+            _ spriteFont: SpriteFont,
+            text: CNAStringBuilder,
+            position: Microsoft.Xna.Framework.Vector2,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            scale: Float,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            try DrawString(
+                spriteFont, text: text, position: position, color: color,
+                rotation: rotation, origin: origin,
+                scale: Microsoft.Xna.Framework.Vector2(scale, scale),
+                effects: effects, layerDepth: layerDepth)
+        }
+
+        public func DrawString(
+            _ spriteFont: SpriteFont,
+            text: CNAStringBuilder,
+            position: Microsoft.Xna.Framework.Vector2,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            scale: Microsoft.Xna.Framework.Vector2,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
+            try drawText(spriteFont, units: text.codeUnits,
+                         position: position, color: color,
+                         rotation: rotation, origin: origin, scale: scale,
+                         effects: effects, layerDepth: layerDepth)
+        }
+
+        /// What both families funnel into, over the code units each one
+        /// already holds.
+        private func drawText(
+            _ spriteFont: SpriteFont,
+            units: [UInt16],
+            position: Microsoft.Xna.Framework.Vector2,
+            color: Microsoft.Xna.Framework.Color,
+            rotation: Float,
+            origin: Microsoft.Xna.Framework.Vector2,
+            scale: Microsoft.Xna.Framework.Vector2,
+            effects: SpriteEffects,
+            layerDepth: Float
+        ) throws {
             let drawsAGlyph = units.contains { $0 != 13 && $0 != 10 }
             guard drawsAGlyph else { return }
             guard inBeginEndPair else {
@@ -646,7 +719,7 @@ extension Microsoft.Xna.Framework.Graphics {
                     expected: nativeStorage.generation,
                     actual: spriteFont.box.runtime.generation)
             }
-            var utf8 = Array(text.utf8)
+            var utf8 = Array(String(decoding: units, as: UTF16.self).utf8)
             try utf8.withUnsafeMutableBufferPointer { buffer in
                 var command = CNASwift_SpriteTextCommand()
                 command.struct_size =

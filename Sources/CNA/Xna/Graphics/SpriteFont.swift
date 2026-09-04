@@ -233,21 +233,19 @@ extension Microsoft.Xna.Framework.Graphics {
             try measure(Array(text.utf16))
         }
 
-        // `MeasureString(StringBuilder)` is NOT projected, and neither are
-        // `SpriteBatch.DrawString`'s three `StringBuilder` overloads.
-        //
-        // `System.Text.StringBuilder` is a BCL support family this project has
-        // not admitted. Admitting one is a measured act -- authority
-        // established in `bcl-authorities.json`, the full public shape pinned
-        // in `bcl40-selected-shape.json`, a Swift support class written and
-        // measured against it -- and StringBuilder's surface is some sixty
-        // members of `Append` overloads. Writing four of them to satisfy four
-        // XNA members would be admitting a family by fabricating it, which is
-        // the one thing the BCL authority rule exists to stop.
-        //
-        // The four members are recorded absent rather than approximated with
-        // `String`: XNA's overloads take a *mutable buffer* and a caller who
-        // has one is not served by a projection that quietly copies it.
+        /// `SpriteFont.MeasureString(StringBuilder)`.
+        ///
+        /// One line, exactly as the `String` overload is one line. XNA needs a
+        /// `StringProxy` to let a single measurement body serve both; the
+        /// proxy has nothing to abstract over here, because both overloads
+        /// hand `measure` the same UTF-16 code units.
+        ///
+        /// This reads the buffer's contents rather than copying it into a
+        /// `String` first — which is the whole reason the overload exists.
+        public func MeasureString(_ text: CNAStringBuilder) throws
+            -> Microsoft.Xna.Framework.Vector2 {
+            try measure(text.codeUnits)
+        }
 
         internal func measure(
             _ units: [UInt16]

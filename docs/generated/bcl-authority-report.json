@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "registrySha256": "deb47ac952ce017207b20ad057f458a9c326c2141d0fe0571ebd3650b99017d9",
+  "manifestSha256": "7235e93878b4d36d145f734ca7b89ec26436393472fe70a89d8981647a75ed62",
+  "BCL_AUTHORITY_STATUS": "PASS",
+  "BCL_AUTHORITY_ASSEMBLIES": 1,
+  "BCL_AUTHORITY_TYPES": 29,
+  "BCL_AUTHORITY_MEMBERS": 319,
+  "BCL_IDENTITY_CHECKS": 21,
+  "BCL_SENTINEL_CHECKS": 433,
+  "BCL_MANIFEST_CHECKS": 62,
+  "BCL_MUTATION_SELF_TESTS": 462,
+  "BCL_CROSS_CHECKS": 0,
+  "BCL_RESOURCE_CHECKS": 31,
+  "BCL_IL_LITERAL_CHECKS": 1,
+  "BCL_STATIC_TABLE_CHECKS": 1,
+  "BCL_NEGATIVE_CONTROLS": 0,
+  "BCL_CROSS_CHECK_TOOL": "not run",
+  "identityFailures": [],
+  "manifestFailures": [],
+  "sentinelFailures": [],
+  "mutationFailures": [],
+  "crossCheckFailures": [],
+  "resourceFailures": [],
+  "controlFailures": [],
+  "negativeControls": [],
+  "assemblies": [
+    {
+      "assembly": "mscorlib.dll",
+      "assemblyName": "mscorlib",
+      "assemblyVersion": "4.0.0.0",
+      "publicKeyToken": "b77a5c561934e089",
+      "publicKeyTokenRecomputed": "b77a5c561934e089",
+      "sha256": "5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
+      "fileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
+      "selectedTypes": 29,
+      "selectedMembers": 319
+    }
+  ]
+}

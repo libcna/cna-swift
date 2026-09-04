@@ -64,6 +64,7 @@ EFFECTCOLLECTIONS = ROOT / "Sources/CNA/Xna/Graphics/EffectCollections.swift"
 EFFECTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/EffectSupport.swift"
 DRAW = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceDraw.swift"
 FONT = ROOT / "Sources/CNA/Xna/Graphics/SpriteFont.swift"
+BUILDER = ROOT / "Sources/CNA/CNAStringBuilder.swift"
 LIGHT = ROOT / "Sources/CNA/Xna/Graphics/DirectionalLight.swift"
 STOCKSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/StockEffectSupport.swift"
 BASICEFFECT = ROOT / "Sources/CNA/Xna/Graphics/BasicEffect.swift"
@@ -2557,6 +2558,159 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
     # for what a batch was given, no pixel readback to see the result, and no
     # scale the route refuses. The widening is asserted by reading, not by
     # testing, and this records that it is.
+
+    # ---- Foundation 71: System.Text.StringBuilder -------------------------
+    (
+        "builder-length-counts-characters",
+        "Length counting Swift Characters instead of UTF-16 code units",
+        BUILDER,
+        "    public var Length: Int32 { Int32(units.count) }",
+        "    public var Length: Int32 { Int32(String(decoding: units, as: UTF16.self).count) }",
+    ),
+    (
+        "builder-indexer-getter-throws-the-setter-s-exception",
+        "get_Chars raising ArgumentOutOfRangeException where XNA raises a bare IndexOutOfRangeException",
+        BUILDER,
+        "            throw CNAIndexOutOfRangeException()",
+        "            throw CNAArgumentOutOfRangeException(paramName: \"index\")",
+    ),
+    (
+        "builder-indexer-setter-throws-the-getter-s-exception",
+        "set_Chars raising IndexOutOfRangeException where XNA raises ArgumentOutOfRangeException",
+        BUILDER,
+        "    public func SetItem(_ index: Int32, _ value: UInt16) throws {\n"
+        "        guard index >= 0, index < Length else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"index\", message: CNAStringBuilder.indexOutOfRange)",
+        "    public func SetItem(_ index: Int32, _ value: UInt16) throws {\n"
+        "        guard index >= 0, index < Length else {\n"
+        "            throw CNAIndexOutOfRangeException()",
+    ),
+    (
+        "builder-set-length-does-not-pad",
+        "growing the length leaving the new units unwritten instead of NUL",
+        BUILDER,
+        "            units.append(contentsOf: repeatElement(0, count: wanted - units.count))",
+        "            units.append(contentsOf: repeatElement(32, count: wanted - units.count))",
+    ),
+    (
+        "builder-set-length-refusals-transposed",
+        "set_Length reporting the ceiling message for a negative value and vice versa",
+        BUILDER,
+        "                paramName: \"value\", message: CNAStringBuilder.negativeLength)\n"
+        "        }\n"
+        "        guard value <= maxCapacity else {",
+        "                paramName: \"value\", message: CNAStringBuilder.smallCapacity)\n"
+        "        }\n"
+        "        guard value <= maxCapacity else {",
+    ),
+    (
+        "builder-append-ignores-max-capacity",
+        "the shared growth guard removed, so a builder grows past MaxCapacity",
+        BUILDER,
+        "        guard required <= Int(maxCapacity) else {",
+        "        guard required <= Int(maxCapacity) || true else {",
+    ),
+    # `builder-repeat-count-written-before-testing` was planted here and
+    # REPLACED, not scored: it moved the append before the guard, and with a
+    # NEGATIVE count there is nothing to append -- `max(0, -1)` writes zero
+    # elements and the guard still throws, so no answer changes. The
+    # replacement refuses a count XNA accepts, which does.
+    (
+        "builder-repeat-count-refuses-zero",
+        "Append(char, 0) refused, though XNA's `>= 0` accepts it and writes nothing",
+        BUILDER,
+        "        guard repeatCount >= 0 else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"repeatCount\", message: CNAStringBuilder.negativeCount)",
+        "        guard repeatCount > 0 else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"repeatCount\", message: CNAStringBuilder.negativeCount)",
+    ),
+    (
+        "builder-append-line-uses-the-host-separator",
+        "AppendLine emitting the host's newline instead of the Windows CLR's",
+        BUILDER,
+        "    internal static let newLine = \"\\r\\n\"",
+        "    internal static let newLine = \"\\n\"",
+    ),
+    (
+        "builder-insert-refuses-the-end",
+        "Insert at Length refused, though XNA's unsigned bound accepts it",
+        BUILDER,
+        "        guard index >= 0, index <= Length else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"index\", message: CNAStringBuilder.indexOutOfRange)\n"
+        "        }\n"
+        "        let inserted = Array(value.utf16)",
+        "        guard index >= 0, index < Length else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"index\", message: CNAStringBuilder.indexOutOfRange)\n"
+        "        }\n"
+        "        let inserted = Array(value.utf16)",
+    ),
+    (
+        "builder-remove-names-start-index-for-its-range",
+        "Remove's range refusal naming startIndex, where XNA's names index",
+        BUILDER,
+        "        guard length <= Length - startIndex else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"index\", message: CNAStringBuilder.indexOutOfRange)",
+        "        guard length <= Length - startIndex else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"startIndex\", message: CNAStringBuilder.indexOutOfRange)",
+    ),
+    (
+        "builder-clear-drops-the-capacity",
+        "Clear rebuilding the store, so the capacity it exists to keep is lost",
+        BUILDER,
+        "        units.removeAll(keepingCapacity: true)\n"
+        "        return self",
+        "        units.removeAll(keepingCapacity: true)\n"
+        "        capacity = CNAStringBuilder.defaultCapacity\n"
+        "        return self",
+    ),
+    (
+        "builder-to-string-range-refusals-reordered",
+        "ToString testing its length before its start index, so a doubly wrong call misreports",
+        BUILDER,
+        "        guard startIndex >= 0 else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"startIndex\", message: CNAStringBuilder.startIndex)\n"
+        "        }\n"
+        "        guard startIndex <= Length else {",
+        "        guard length >= 0 else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"length\", message: CNAStringBuilder.negativeLength)\n"
+        "        }\n"
+        "        guard startIndex >= 0 else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"startIndex\", message: CNAStringBuilder.startIndex)\n"
+        "        }\n"
+        "        guard startIndex <= Length else {",
+    ),
+    (
+        "builder-zero-capacity-ignores-the-ceiling",
+        "a zero capacity taking sixteen even when MaxCapacity is smaller",
+        BUILDER,
+        "            ? min(CNAStringBuilder.defaultCapacity, maxCapacity)",
+        "            ? CNAStringBuilder.defaultCapacity",
+    ),
+    (
+        "builder-must-be-positive-not-formatted",
+        "the one formatted mscorlib message left with its placeholder unfilled",
+        BUILDER,
+        "                message: CNAStringBuilder.mustBePositive\n"
+        "                    .replacingOccurrences(of: \"{0}\", with: \"capacity\"))",
+        "                message: CNAStringBuilder.mustBePositive)",
+    ),
+    (
+        "measure-string-builder-reads-a-copy",
+        "MeasureString(StringBuilder) measuring a rendered String, so code units are lost",
+        FONT,
+        "            try measure(text.codeUnits)",
+        "            try measure(Array(text.ToString().utf16).filter { $0 < 0xD800 })",
+    ),
 ]
 
 

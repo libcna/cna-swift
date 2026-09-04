@@ -208,6 +208,7 @@
   },
   "measuredSupportBaseMapping": "A non-XNA CLR base listed in measuredSupportBaseProjections is a MEASURED base, exactly as an XNA base is: the Swift type must be a class whose compiler-emitted superclass is the mapped support type. A missing base, AnyObject or Object in its place, a struct where the CLR declares a class, a different support base, composition in place of inheritance, or any other base projection is a BASE_MAPPING_MISMATCH. It is never silently dropped and never allowlisted. A GENERIC support base additionally requires its CLR generic argument to be preserved in the Swift specialization -- Collection<IGameComponent> projects to CNACollection<any IGameComponent>, never to CNACollection<Any> -- and that argument is measured by bclSupportBaseSpecializationMapping.",
   "bclSupportTypeProjections": {
+    "System.Text.StringBuilder": "CNAStringBuilder",
     "System.Collections.ObjectModel.Collection`1": "CNACollection",
     "System.Collections.ObjectModel.ReadOnlyCollection`1": "CNAReadOnlyCollection",
     "System.Collections.Generic.List`1": "CNAList",
@@ -230,6 +231,20 @@
   "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
   "bclSupportContract": {
+    "CNAStringBuilder": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "clrFamily": "System.Text.StringBuilder",
+      "requiredMembers": [
+        "Length", "SetLength", "Capacity", "SetCapacity", "MaxCapacity",
+        "Item", "SetItem", "Append", "AppendLine", "Insert", "Remove",
+        "Clear", "ToString", "EnsureCapacity"
+      ],
+      "openMembers": [],
+      "forbiddenMembers": ["AppendFormat"]
+    },
     "CNACollection": {
       "kind": "class",
       "inheritance": "open",
@@ -739,6 +754,46 @@
   "bclStaticTableMapping": "A static data table this binding reproduces is read out of the admitted assembly's own static-array initializer by tools/api_compat/bcl_authority_audit.py and pinned in reference/bcl40-selected-shape.json under staticTables. The verifier reads the Swift literal back out of the compiled source and compares it element for element; a table transcribed by hand is a BASE_MAPPING_MISMATCH even when nothing observable depends on its values, because a sizing decision of this projection's own is exactly what the pinning exists to exclude.",
   "bclResourceStringProjections": [
     {
+      "key": "ArgumentOutOfRange_NegativeLength",
+      "reason": "StringBuilder.set_Length refuses a negative value with it, naming \"value\"."
+    },
+    {
+      "key": "ArgumentOutOfRange_SmallCapacity",
+      "reason": "Three StringBuilder members share it: set_Length past MaxCapacity, set_Capacity below the current Length, and -- reached from every growing member -- ExpandByABlock, whose ParamName is the internal \"requiredLength\" no caller passes."
+    },
+    {
+      "key": "ArgumentOutOfRange_NegativeCapacity",
+      "reason": "StringBuilder.set_Capacity and EnsureCapacity refuse a negative capacity with it."
+    },
+    {
+      "key": "ArgumentOutOfRange_Capacity",
+      "reason": "StringBuilder.set_Capacity refuses a value above MaxCapacity with it, and the two-argument constructor refuses a capacity above its own ceiling."
+    },
+    {
+      "key": "ArgumentOutOfRange_NegativeCount",
+      "reason": "StringBuilder.Append(Char, Int32) refuses a negative repeatCount with it, before writing anything."
+    },
+    {
+      "key": "ArgumentOutOfRange_StartIndex",
+      "reason": "StringBuilder.Remove and ToString(Int32, Int32) refuse a negative start with it."
+    },
+    {
+      "key": "ArgumentOutOfRange_StartIndexLargerThanLength",
+      "reason": "StringBuilder.ToString(Int32, Int32) refuses a start past Length with it."
+    },
+    {
+      "key": "ArgumentOutOfRange_IndexLength",
+      "reason": "StringBuilder.ToString(Int32, Int32) refuses a range past the end with it, naming \"length\"."
+    },
+    {
+      "key": "ArgumentOutOfRange_MustBePositive",
+      "reason": "The two-argument StringBuilder constructor refuses a negative capacity with it -- the ONLY formatted message in the family, whose {0} is the parameter name, so the argument is named twice."
+    },
+    {
+      "key": "ArgumentOutOfRange_SmallMaxCapacity",
+      "reason": "The two-argument StringBuilder constructor refuses a maxCapacity below one with it."
+    },
+    {
       "key": "Exception_WasThrown",
       "reason": "System.Exception.get_Message returns this formatted with the CLR class name whenever the stored message is null."
     },
@@ -818,7 +873,7 @@
   "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "9464163d37292ae9a950f07153104e58d2e606d9aa6de1d48b43a1ef1f5816be",
+  "bclSelectedShapeSha256": "7235e93878b4d36d145f734ca7b89ec26436393472fe70a89d8981647a75ed62",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class",

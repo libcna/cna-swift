@@ -36,6 +36,10 @@
       "registered": "Foundation 26",
       "selectedFamilies": [
         {
+          "type": "System.Text.StringBuilder",
+          "reason": "The declared parameter type of four XNA members -- SpriteFont.MeasureString(StringBuilder) and SpriteBatch.DrawString's three StringBuilder overloads -- which cannot be projected over String, because XNA's overloads take a MUTABLE BUFFER and a caller holding one is not served by a projection that copies it. Projected as CNAStringBuilder over a [UInt16] store: every index in this family's API is a UTF-16 code-unit index, which is the same reason System.Char maps to UInt16."
+        },
+        {
           "type": "System.Collections.ObjectModel.Collection`1",
           "reason": "The direct CLR base of Microsoft.Xna.Framework.GameComponentCollection. Its public surface, its protected Items view and its four protected virtual hooks are the behaviour CNACollection<Element> projects."
         },
@@ -170,6 +174,56 @@
       ],
       "selectedResourceStrings": [
         {
+          "key": "ArgumentOutOfRange_NegativeLength",
+          "value": "Length cannot be less than zero.",
+          "reason": "StringBuilder.set_Length refuses a negative value with it, naming \"value\"."
+        },
+        {
+          "key": "ArgumentOutOfRange_SmallCapacity",
+          "value": "capacity was less than the current size.",
+          "reason": "Three StringBuilder members share it: set_Length past MaxCapacity, set_Capacity below the current Length, and -- reached from every growing member -- ExpandByABlock, whose ParamName is the internal \"requiredLength\" no caller passes."
+        },
+        {
+          "key": "ArgumentOutOfRange_NegativeCapacity",
+          "value": "Capacity must be positive.",
+          "reason": "StringBuilder.set_Capacity and EnsureCapacity refuse a negative capacity with it."
+        },
+        {
+          "key": "ArgumentOutOfRange_Capacity",
+          "value": "Capacity exceeds maximum capacity.",
+          "reason": "StringBuilder.set_Capacity refuses a value above MaxCapacity with it, and the two-argument constructor refuses a capacity above its own ceiling."
+        },
+        {
+          "key": "ArgumentOutOfRange_NegativeCount",
+          "value": "Count cannot be less than zero.",
+          "reason": "StringBuilder.Append(Char, Int32) refuses a negative repeatCount with it, before writing anything."
+        },
+        {
+          "key": "ArgumentOutOfRange_StartIndex",
+          "value": "StartIndex cannot be less than zero.",
+          "reason": "StringBuilder.Remove and ToString(Int32, Int32) refuse a negative start with it."
+        },
+        {
+          "key": "ArgumentOutOfRange_StartIndexLargerThanLength",
+          "value": "startIndex cannot be larger than length of string.",
+          "reason": "StringBuilder.ToString(Int32, Int32) refuses a start past Length with it."
+        },
+        {
+          "key": "ArgumentOutOfRange_IndexLength",
+          "value": "Index and length must refer to a location within the string.",
+          "reason": "StringBuilder.ToString(Int32, Int32) refuses a range past the end with it, naming \"length\"."
+        },
+        {
+          "key": "ArgumentOutOfRange_MustBePositive",
+          "value": "'{0}' must be greater than zero.",
+          "reason": "The two-argument StringBuilder constructor refuses a negative capacity with it -- the ONLY formatted message in the family, whose {0} is the parameter name, so the argument is named twice."
+        },
+        {
+          "key": "ArgumentOutOfRange_SmallMaxCapacity",
+          "value": "MaxCapacity must be one or greater.",
+          "reason": "The two-argument StringBuilder constructor refuses a maxCapacity below one with it."
+        },
+        {
           "key": "Arg_ArgumentException",
           "value": "Value does not fall within the expected range.",
           "reason": "The message a parameterless ArgumentException carries, and therefore the base message of every ArgumentException whose caller supplied none."
@@ -295,11 +349,6 @@
     }
   ],
   "availableButNotAdmitted": [
-    {
-      "assembly": "mscorlib.dll",
-      "family": "System.Text.StringBuilder",
-      "reason": "Required by four XNA members -- SpriteFont.MeasureString(StringBuilder) and SpriteBatch.DrawString's three StringBuilder overloads -- and not admitted with them, for SCOPE and not for principle. mscorlib's identity is already established here; what is missing is the measured act of admission: the family's full public shape pinned in bcl40-selected-shape.json as the authority record, and a Swift support class measured against bclSupportContract. That does NOT mean projecting all sixty-five members -- CNAList projects sixteen of List<T>'s pinned fifty-two, and the pinned shape is what the family IS, not what the Swift class must spell. An earlier draft of this entry claimed otherwise and would have read as a rule that no family can ever be admitted; it is corrected here. The four XNA members are recorded MISSING rather than projected over String, because XNA's overloads take a mutable buffer and a caller holding one is not served by a projection that copies it."
-    },
     {
       "assembly": "System.dll",
       "assemblyVersion": "4.0.0.0",
