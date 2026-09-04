@@ -75,7 +75,7 @@ is that the managed type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `GraphicsDevice` drawing + the `Effect` family together | ~14 types, ~8 device members, 2 `SpriteBatch.Begin` overloads | 138 + 7 routes. **The next milestone, and the largest.** Nothing is blocked in front of it any more: Foundation 63 landed the vertex/index binders, 64 the last two texture types, 65 the render targets and 66 `TextureCollection`. The draws were deliberately withheld in Foundation 63 because CNA refuses every one of them without an applied effect, which is also XNA's `CannotDrawNoShader`; `Effect` is what makes them reachable, so the two land together or not at all. |
+| `Effect` core (9 types) + the draws | 96 members, ~8 device members | 138 + 7 routes. **The next milestone, and the largest.** Nothing blocks it: Foundation 63 landed the vertex/index binders, 64 the last two texture types, 65 the render targets, 66 `TextureCollection`. **Measured, not assumed** — `docs/frontier-effect-measurement-foundation-67.md` has the probe: `cna_effect_create_empty` succeeds, `cna_effect_apply` removes the *"no effect has been applied"* refusal, and a real `draw_primitives` then returns 0. It also found a native rule XNA does not have — CNA counts vertices **written**, not capacity, so a buffer with no `SetData` refuses every draw — which must be decided explicitly rather than discovered. That file has the type table, the tagged-value model and the build order. |
 | `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
 
