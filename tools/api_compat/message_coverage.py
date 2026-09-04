@@ -127,7 +127,16 @@ def methods_of(body: str) -> dict[str, list[str]]:
 
 
 def reachable_keys(methods: dict[str, list[str]], start: str) -> set[str]:
-    """Resource keys raised by `start` or by what it calls within its class."""
+    """Resource keys raised by `start` or by what it calls within its class.
+
+    A call site spells a GENERIC method as `Type::CopyData<!!0>(`, with the
+    instantiation between the name and the parenthesis. A pattern that required
+    the parenthesis to follow the name immediately therefore saw no call at all,
+    and every message reachable only through a generic helper went unread: the
+    whole `CopyData<T>` family of `Texture2D`, `TextureCube`, `Texture3D`,
+    `VertexBuffer` and `IndexBuffer` -- which is where texture and buffer
+    transfer validation lives. The instantiation is now skipped over.
+    """
     seen: set[str] = set()
     keys: set[str] = set()
     frontier = [(start, 0)]
@@ -139,7 +148,7 @@ def reachable_keys(methods: dict[str, list[str]], start: str) -> set[str]:
         for segment in methods.get(name, []):
             keys.update(re.findall(r"Resources::get_(\w+)", segment))
             if depth < MAX_CALL_DEPTH:
-                for callee in re.findall(r"::(\w+)\(", segment):
+                for callee in re.findall(r"::(\w+)(?:<[^<>(]*>)?\(", segment):
                     if callee in methods and callee not in seen:
                         frontier.append((callee, depth + 1))
     return keys
@@ -423,6 +432,19 @@ def mutations(report, contract, absences, table, texts, literals,
                     "keys reachable only through a private callee",
                     detected))
 
+    # The call walk blind to a GENERIC callee -- the shape the walk had until
+    # Foundation 64, which silently dropped every `CopyData<T>` family and with
+    # them all texture and buffer transfer validation.
+    renamed = {stem: re.sub(r"::(\w+)<[^<>(]*>\(", r"::\1_stripped(", text)
+               for stem, text in texts.items()}
+    summary, findings, _u, error = analyse(
+        report, contract, absences, table, renamed, literals, tables_read)
+    detected = bool(error) or (
+        summary and summary["MESSAGES_REPRODUCED"] < base_summary["MESSAGES_REPRODUCED"])
+    results.append(("generic-call-sites-unreadable",
+                    "keys reachable only through a generic callee",
+                    detected))
+
     after_summary, after_findings, _u, after_error = clean()
     if after_error or after_findings or after_summary != base_summary:
         results.append(("harness-restores-its-inputs",
@@ -496,7 +518,29 @@ def self_test() -> int:
     if reachable_keys(cyclic, "A") != {"Key"}:
         failures.append("a call cycle is not walked correctly")
 
-    print(f"MESSAGE_COVERAGE_SELF_TESTS={len(cases) + 4} "
+    # A GENERIC callee, spelled the way a call site spells one. This is the
+    # shape the walk could not see until Foundation 64: `CopyData<!!0>(` put an
+    # instantiation between the name and the parenthesis, so no call was found
+    # and every `CopyData<T>` message went unread.
+    generic = methods_of("""
+  .method public hidebysig instance void SetData<valuetype .ctor T>(!!T[] data) cil managed
+  {
+    IL_0000:  call instance void T::CopyData<!!0>(!!0[], int32, bool)
+  } // end of method T::SetData
+  .method private hidebysig instance void CopyData<valuetype .ctor T>(!!T[] data,
+                                                                      int32 startIndex,
+                                                                      bool isSetting) cil managed
+  {
+    IL_0000:  call string Resources::get_NullNotAllowed()
+  } // end of method T::CopyData
+""")
+    if set(generic) != {"SetData", "CopyData"}:
+        failures.append(f"methods_of found {sorted(generic)} for generic methods")
+    if reachable_keys(generic, "SetData") != {"NullNotAllowed"}:
+        failures.append("a key raised by a GENERIC callee is not reachable from "
+                        "the public member that calls it")
+
+    print(f"MESSAGE_COVERAGE_SELF_TESTS={len(cases) + 6} "
           f"MESSAGE_COVERAGE_SELF_TEST_STATUS={'PASS' if not failures else 'FAIL'}")
     for failure in failures:
         print(f"  {failure}")

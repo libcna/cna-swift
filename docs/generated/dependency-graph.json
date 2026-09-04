@@ -23,25 +23,7 @@
       "directPartialReverseConsumers": [
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
       ],
-      "transitiveMissingReverseReach": 30,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.Texture"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
-      ],
-      "transitiveMissingReverseReach": 27,
+      "transitiveMissingReverseReach": 28,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -67,6 +49,24 @@
       "transitiveMissingReverseReach": 25,
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Graphics.SpriteBatch"
+      ]
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.TextureCollection",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.Texture"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice"
+      ],
+      "transitiveMissingReverseReach": 25,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
       ]
     },
     {

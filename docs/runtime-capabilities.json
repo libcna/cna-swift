@@ -426,6 +426,21 @@
       "operation": "Viewport, scissor rectangle and device status",
       "status": "VERIFIED_NATIVE",
       "evidence": "A viewport written through SetViewport reaches CNA and reads back through the reader that already existed (8,16 320x240 0.25..0.75 from an 800x480 default); a scissor rectangle round trips; the device reports Normal. GraphicsDeviceStatus is mapped explicitly even though CNA and XNA agree on all three values, because Foundation 45 found eight of nine state enums agreeing and the ninth swapped. On the qualified HEADLESS renderer the device is never lost, so Normal is the only value this environment can produce and no claim is made about Lost or NotReset."
+    },
+    {
+      "operation": "TextureCube creation and description",
+      "status": "VERIFIED_NATIVE",
+      "evidence": "cna_texturecube_create answers a game-child handle and cna_texturecube_get_info reports the granted size, level count and format, inside a live LoadContent callback. Size, LevelCount and Format are what CNA granted, not what was asked for. The five profile refusals in front of it -- non-positive size, the ValidCubeFormats list, MaxCubeSize 512, the unconditional NonPow2Cube rule and the DXT alignment -- are managed and never reach a route."
+    },
+    {
+      "operation": "TextureCube face data transfer",
+      "status": "UNSUPPORTED_BY_RENDERER",
+      "evidence": "cna_texturecube_set_data and cna_texturecube_get_data answer CNA_RESULT_NOT_SUPPORTED for all six faces on the qualified HEADLESS artifact (build-probe/f64_cube.c), which CNA's own header names a legitimate outcome: 'unsupported storage returns NOT_SUPPORTED atomically'. The six transfer members are implemented and every XNA validation in front of them is asserted; the transfer itself is asserted to be exactly that refusal on the runtime channel. NATIVE EVIDENCE, asserted nowhere: the same code round-trips all six faces on CNA's SOFTWARE artifact, which is not the qualified renderer."
+    },
+    {
+      "operation": "Texture3D on this profile",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "No Texture3D can be constructed on a Reach device and that is XNA's rule: ValidateCreationParameters raises ProfileFeatureNotSupported when MaxVolumeExtent is zero, and the table extracted from the pinned assembly gives Reach a zero extent and an empty ValidVolumeFormats. The type is complete and implemented, unreachable on this profile rather than absent. CNA agrees independently -- cna_texture3d_create answers NOT_SUPPORTED -- but the refusal raised is the managed one, not the native result code."
     }
   ]
 }

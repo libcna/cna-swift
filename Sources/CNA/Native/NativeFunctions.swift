@@ -99,6 +99,16 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceGetGraphicsProfileRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
     typealias GraphicsDeviceSetVertexBuffersRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_VertexBufferBinding>?, UInt64) -> UInt32
     typealias GraphicsDeviceSetIndexBufferRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias TexturecubeCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_TextureCubeCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias TexturecubeDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias TexturecubeGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_TextureCubeInfo>?) -> UInt32
+    typealias TexturecubeSetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_TextureCubeTransfer>?, UnsafePointer<CNASwift_Color>?, UInt64) -> UInt32
+    typealias TexturecubeGetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_TextureCubeTransfer>?, UnsafeMutablePointer<CNASwift_Color>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias Texture3dCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Texture3DCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias Texture3dDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias Texture3dGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Texture3DInfo>?) -> UInt32
+    typealias Texture3dSetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Texture3DTransfer>?, UnsafePointer<CNASwift_Color>?, UInt64) -> UInt32
+    typealias Texture3dGetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Texture3DTransfer>?, UnsafeMutablePointer<CNASwift_Color>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchBeginWithStatesRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
     typealias SpriteBatchSubmitScaledManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteScaledCommand>?, UInt64) -> UInt32
@@ -216,6 +226,16 @@ internal final class NativeFunctions {
     let graphicsDeviceGetGraphicsProfile: GraphicsDeviceGetGraphicsProfileRoute
     let graphicsDeviceSetVertexBuffers: GraphicsDeviceSetVertexBuffersRoute
     let graphicsDeviceSetIndexBuffer: GraphicsDeviceSetIndexBufferRoute
+    let textureCubeCreate: TexturecubeCreateRoute
+    let textureCubeDestroy: TexturecubeDestroyRoute
+    let textureCubeGetInfo: TexturecubeGetInfoRoute
+    let textureCubeSetData: TexturecubeSetDataRoute
+    let textureCubeGetData: TexturecubeGetDataRoute
+    let texture3DCreate: Texture3dCreateRoute
+    let texture3DDestroy: Texture3dDestroyRoute
+    let texture3DGetInfo: Texture3dGetInfoRoute
+    let texture3DSetData: Texture3dSetDataRoute
+    let texture3DGetData: Texture3dGetDataRoute
     let spriteBatchCreate: SpriteBatchCreateRoute
     let spriteBatchBeginWithStates: SpriteBatchBeginWithStatesRoute
     let spriteBatchSubmitScaled: SpriteBatchSubmitScaledManyRoute
@@ -353,6 +373,16 @@ internal final class NativeFunctions {
         graphicsDeviceGetGraphicsProfile = try library.resolve("cna_graphics_device_get_graphics_profile", as: GraphicsDeviceGetGraphicsProfileRoute.self)
         graphicsDeviceSetVertexBuffers = try library.resolve("cna_graphics_device_set_vertex_buffers", as: GraphicsDeviceSetVertexBuffersRoute.self)
         graphicsDeviceSetIndexBuffer = try library.resolve("cna_graphics_device_set_index_buffer", as: GraphicsDeviceSetIndexBufferRoute.self)
+        textureCubeCreate = try library.resolve("cna_texturecube_create", as: TexturecubeCreateRoute.self)
+        textureCubeDestroy = try library.resolve("cna_texturecube_destroy", as: TexturecubeDestroyRoute.self)
+        textureCubeGetInfo = try library.resolve("cna_texturecube_get_info", as: TexturecubeGetInfoRoute.self)
+        textureCubeSetData = try library.resolve("cna_texturecube_set_data", as: TexturecubeSetDataRoute.self)
+        textureCubeGetData = try library.resolve("cna_texturecube_get_data", as: TexturecubeGetDataRoute.self)
+        texture3DCreate = try library.resolve("cna_texture3d_create", as: Texture3dCreateRoute.self)
+        texture3DDestroy = try library.resolve("cna_texture3d_destroy", as: Texture3dDestroyRoute.self)
+        texture3DGetInfo = try library.resolve("cna_texture3d_get_info", as: Texture3dGetInfoRoute.self)
+        texture3DSetData = try library.resolve("cna_texture3d_set_data", as: Texture3dSetDataRoute.self)
+        texture3DGetData = try library.resolve("cna_texture3d_get_data", as: Texture3dGetDataRoute.self)
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
         spriteBatchBeginWithStates = try library.resolve("cna_sprite_batch_begin_with_states", as: SpriteBatchBeginWithStatesRoute.self)
         spriteBatchSubmitScaled = try library.resolve("cna_sprite_batch_submit_scaled_many", as: SpriteBatchSubmitScaledManyRoute.self)

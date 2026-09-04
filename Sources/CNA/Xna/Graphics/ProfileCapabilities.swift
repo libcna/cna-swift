@@ -199,6 +199,129 @@ extension Microsoft.Xna.Framework.Graphics {
             }
         }
 
+        /// `FrameworkResources.ProfileNotPowerOfTwo`.
+        internal static let profileNotPowerOfTwo =
+            "XNA Framework {0} profile requires {1} sizes to be powers of two."
+        /// `FrameworkResources.ProfileFeatureNotSupported`.
+        internal static let profileFeatureNotSupported =
+            "XNA Framework {0} profile does not support {1}."
+
+        /// `TextureCube.ValidateCreationParameters`.
+        ///
+        /// ```text
+        /// if (size <= 0) throw new ArgumentOutOfRangeException(
+        ///     "size", ResourcesMustBeGreaterThanZeroSize);
+        /// bool compressed = CheckCompressedTexture(format);
+        /// if (!ValidCubeFormats.Contains(format))
+        ///     Throw(ProfileFormatNotSupported, "TextureCube", format);
+        /// if (size > MaxCubeSize)  Throw(ProfileTooBig, "TextureCube", MaxCubeSize);
+        /// if (!NonPow2Cube && !IsPowerOfTwo(size))
+        ///     Throw(ProfileNotPowerOfTwo, "TextureCube");
+        /// if (compressed && (size & 3) != 0)
+        ///     throw new ArgumentException(DxtNotMultipleOfFour);
+        /// ```
+        ///
+        /// The cube has **no aspect-ratio check** — a cube face is square by
+        /// construction — and its power-of-two message is
+        /// `ProfileNotPowerOfTwo`, not `Texture2D`'s mipmap-specific one.
+        internal func validateCubeCreation(
+            size: Int32, format: SurfaceFormat
+        ) throws {
+            guard size > 0 else {
+                throw CNAArgumentOutOfRangeException(
+                    paramName: "size",
+                    message: Microsoft.Xna.Framework.Graphics.Texture2D
+                        .resourcesMustBeGreaterThanZeroSizeMessage)
+            }
+            let compressed = ProfileCapabilities.isCompressed(format)
+            guard validCubeFormats.contains(format) else {
+                try throwNotSupported(
+                    ProfileCapabilities.profileFormatNotSupported,
+                    "TextureCube", "\(format)")
+            }
+            guard size <= maxCubeSize else {
+                try throwNotSupported(
+                    ProfileCapabilities.profileTooBig, "TextureCube", "\(maxCubeSize)")
+            }
+            if !nonPow2Cube, !ProfileCapabilities.isPowerOfTwo(size) {
+                try throwNotSupported(
+                    ProfileCapabilities.profileNotPowerOfTwo, "TextureCube")
+            }
+            if compressed, size & 3 != 0 {
+                throw CNAArgumentException(
+                    message: ProfileCapabilities.dxtNotMultipleOfFour)
+            }
+        }
+
+        /// `Texture3D.ValidateCreationParameters`.
+        ///
+        /// ```text
+        /// if (width  <= 0) throw ArgumentOutOfRangeException("width",  ...);
+        /// if (height <= 0) throw ArgumentOutOfRangeException("height", ...);
+        /// if (depth  <= 0) throw ArgumentOutOfRangeException("depth",  ...);
+        /// if (MaxVolumeExtent == 0)
+        ///     Throw(ProfileFeatureNotSupported, "Texture3D");
+        /// if (!ValidVolumeFormats.Contains(format))
+        ///     Throw(ProfileFormatNotSupported, "Texture3D", format);
+        /// if (width > MaxVolumeExtent || height > ... || depth > ...)
+        ///     Throw(ProfileTooBig, "Texture3D", MaxVolumeExtent);
+        /// if (aspect ratio > MaxTextureAspectRatio)
+        ///     Throw(ProfileAspectRatio, "Texture3D", MaxTextureAspectRatio);
+        /// if (!NonPow2Volume && !(all three are powers of two))
+        ///     Throw(ProfileNotPowerOfTwo, "Texture3D");
+        /// ```
+        ///
+        /// **`MaxVolumeExtent == 0` is the whole story on Reach.** The extracted
+        /// table gives Reach a zero extent and an empty `ValidVolumeFormats`, so
+        /// the second check fires for every volume texture and no `Texture3D`
+        /// can be constructed on this profile at all — which is XNA's rule, not
+        /// a limit of this binding, and is why the type is complete and its
+        /// constructor always refuses here. CNA agrees independently:
+        /// `cna_texture3d_create` answers `CNA_RESULT_NOT_SUPPORTED`
+        /// (`build-probe/f64_cube.c`).
+        internal func validateVolumeCreation(
+            width: Int32, height: Int32, depth: Int32, format: SurfaceFormat
+        ) throws {
+            for (value, name) in [(width, "width"), (height, "height"), (depth, "depth")] {
+                guard value > 0 else {
+                    throw CNAArgumentOutOfRangeException(
+                        paramName: name,
+                        message: Microsoft.Xna.Framework.Graphics.Texture2D
+                            .resourcesMustBeGreaterThanZeroSizeMessage)
+                }
+            }
+            guard maxVolumeExtent != 0 else {
+                try throwNotSupported(
+                    ProfileCapabilities.profileFeatureNotSupported, "Texture3D")
+            }
+            guard validVolumeFormats.contains(format) else {
+                try throwNotSupported(
+                    ProfileCapabilities.profileFormatNotSupported,
+                    "Texture3D", "\(format)")
+            }
+            guard width <= maxVolumeExtent, height <= maxVolumeExtent,
+                  depth <= maxVolumeExtent else {
+                try throwNotSupported(
+                    ProfileCapabilities.profileTooBig, "Texture3D", "\(maxVolumeExtent)")
+            }
+            // `Max(Max(width, height), depth)` over `Min(Min(width, height),
+            // depth)` -- all THREE extents, not the two `Texture2D` compares.
+            let longer = max(max(width, height), depth)
+            let shorter = min(min(width, height), depth)
+            guard (longer + shorter - 1) / shorter <= maxTextureAspectRatio else {
+                try throwNotSupported(
+                    ProfileCapabilities.profileAspectRatio,
+                    "Texture3D", "\(maxTextureAspectRatio)")
+            }
+            if !nonPow2Volume,
+               !(ProfileCapabilities.isPowerOfTwo(width)
+                 && ProfileCapabilities.isPowerOfTwo(height)
+                 && ProfileCapabilities.isPowerOfTwo(depth)) {
+                try throwNotSupported(
+                    ProfileCapabilities.profileNotPowerOfTwo, "Texture3D")
+            }
+        }
+
         /// `Texture.CheckCompressedTexture`, which answers true for the three
         /// DXT formats and nothing else.
         internal static func isCompressed(_ format: SurfaceFormat) -> Bool {

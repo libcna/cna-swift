@@ -2053,8 +2053,13 @@ def self_test() -> None:
         rules, "class")
     if set_data_member.directions != ("",):
         failures.append("a source array of the same name was made inout")
+    # The negative control's owner must be one the rules can NEVER name. It
+    # used to be Texture3D, which was chosen because it was unprojected -- and
+    # this self-test failed the moment Foundation 64 projected it and registered
+    # its GetData. A control that a later milestone can legitimately turn into a
+    # positive is not a control.
     other_owner = expected_member(
-        "Microsoft.Xna.Framework.Graphics.Texture3D",
+        "Microsoft.Xna.Framework.Graphics.NoSuchTextureType",
         {"kind": "method", "name": "GetData", "static": False,
          "returnType": "System.Void",
          "genericParameters": [{"name": "T", "position": 0}],

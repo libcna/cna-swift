@@ -337,7 +337,50 @@ extension Microsoft.Xna.Framework.Graphics {
             var nativeElementCount: UInt64
         }
 
-        /// The three XNA validations, then the conversion into CNA's units.
+        /// `CopyData`'s validations in `CopyData`'s order, then the conversion
+        /// into CNA's units.
+        ///
+        /// ```text
+        /// Helpers.CheckDisposed(this, pComPtr);              // in the caller
+        /// if (data == null || data.Length == 0)
+        ///     throw new ArgumentNullException("data", NullNotAllowed);
+        /// if (isActiveRenderTarget)
+        ///     throw new InvalidOperationException(MustResolveRenderTarget);
+        /// if (isSetting) {
+        ///     for (i = 0; i < device.Textures._maxTextures; i++)
+        ///         if (device.Textures[i] == this)
+        ///             throw GetExceptionFromResult(E_ABORT);   // ResourceInUse
+        ///     for (i = 0; i < device.VertexTextures._maxTextures; i++)
+        ///         if (device.VertexTextures[i] == this)
+        ///             throw GetExceptionFromResult(E_ABORT);
+        /// }
+        /// GetLevelDesc(level, &desc);
+        /// Helpers.ValidateCopyParameters(data.Length, startIndex, elementCount);
+        /// GetAndValidateSizes<T>(&desc, ...);   // InvalidDataSize
+        /// GetAndValidateRect(&desc, ..., ref rect);        // InvalidRect
+        /// ValidateTotalSize(&desc, ...);                   // InvalidTotalSize
+        /// ```
+        ///
+        /// **An empty array is an `ArgumentNullException`.** `IL_001b: ldlen;
+        /// IL_001d: brfalse IL_0444` branches to the same throw the null test
+        /// uses, so a zero-length array reports `"data"` as null — the same
+        /// shape `VertexBuffer.CopyData` has, and XNA's own behaviour rather
+        /// than a tidied one.
+        ///
+        /// **The array window is `ValidateCopyParameters`, not the total-size
+        /// test.** Until Foundation 64 this checked `startIndex` and
+        /// `elementCount` against the array inline and raised
+        /// `ArgumentException(InvalidTotalSize)` for both, *after* the element
+        /// size and the rectangle. XNA raises
+        /// `ArgumentOutOfRangeException(MustBeValidIndex)` naming `dataIndex`
+        /// or `elementCount`, and raises it **before** either — so a bad window
+        /// and a bad element size together reported the wrong one.
+        ///
+        /// Two of `CopyData`'s tests have no reachable input yet and are
+        /// recorded in `recorded-message-absences.json` rather than written as
+        /// code that cannot run: `isActiveRenderTarget` is set by
+        /// `SetRenderTarget`, and the bound-texture scan reads
+        /// `GraphicsDevice.Textures`. Neither is projected.
         private func transferPlan<T>(
             _ element: T.Type,
             level: Int32,
@@ -346,6 +389,16 @@ extension Microsoft.Xna.Framework.Graphics {
             startIndex: Int32,
             elementCount: Int32
         ) throws -> TransferPlan {
+            guard arrayCount > 0 else {
+                throw CNAArgumentNullException(
+                    paramName: "data",
+                    message: Microsoft.Xna.Framework.Graphics.GraphicsDevice
+                        .nullNotAllowedMessage)
+            }
+            try Microsoft.Xna.Framework.Graphics.validateCopyParameters(
+                dataLength: arrayCount, dataIndex: startIndex,
+                elementCount: elementCount)
+
             // `GetAndValidateSizes<T>`:
             //     if (elementSize == formatSize) ok
             //     else if (formatSize <= elementSize) throw InvalidDataSize
@@ -394,10 +447,6 @@ extension Microsoft.Xna.Framework.Graphics {
             let regionBytes = Int64(regionWidth) * Int64(regionHeight) * Int64(formatSize)
             let windowBytes = Int64(elementSize) * Int64(elementCount)
             guard regionBytes == windowBytes else {
-                throw CNAArgumentException(message: invalidTotalSizeMessage)
-            }
-            guard startIndex >= 0, elementCount >= 0,
-                  Int(startIndex) + Int(elementCount) <= arrayCount else {
                 throw CNAArgumentException(message: invalidTotalSizeMessage)
             }
 

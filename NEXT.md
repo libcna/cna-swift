@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 63.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 64.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,14 +22,14 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-662 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=152   COMPLETE_TYPES=156   PARTIAL_TYPES=6
-MISSING_TYPE=95  MISSING_MEMBER=52  OVERLOAD_MAPPING_MISMATCH=5
+678 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=150   COMPLETE_TYPES=158   PARTIAL_TYPES=6
+MISSING_TYPE=93  MISSING_MEMBER=52  OVERLOAD_MAPPING_MISMATCH=5
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=109  PROTOTYPE_TYPE_POSITIONS=386  LAYOUTS=33  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=155 (last full run 137, CAUGHT=135, 2 no-ops replaced)
+BOUND_FUNCTIONS=119  PROTOTYPE_TYPE_POSITIONS=426  LAYOUTS=39  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=168 (last full run 137, CAUGHT=135, 2 no-ops replaced)
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,298 implemented members
+MESSAGE_COVERAGE_FINDINGS=0 over 1,310 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=56
 ```
@@ -66,7 +66,7 @@ cannot be verified.
 
 ### ACTIONABLE_LOCAL — upstream support exists, the managed side is the work
 
-CNA declares **4,076** distinct `cna_*` symbols. Mapping all 97 still-missing
+CNA declares **4,076** distinct `cna_*` symbols. Mapping all 93 still-missing
 types onto their route families — `docs/generated/cna-route-map.txt`, and the
 reasoning in `docs/frontier-remeasurement-foundation-60.md` — leaves **no family
 without native support** except the ones that need none. Route existence is not
@@ -79,7 +79,8 @@ is that the managed type is not projected yet, which is ordinary work:
 | `Effect` family (`Effect`, `EffectParameter`, `EffectPass`, `EffectTechnique`, the collections, `BasicEffect` and friends) | ~14 types, 2 `SpriteBatch.Begin` overloads, 1 `GraphicsDevice` member | 138 routes. Large but well supported. `cna_sprite_batch_begin_with_effect` is already there, unbound. |
 | `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
-| `TextureCollection` (`GraphicsDevice.Textures`, `VertexTextures`) | 1 type, 2 members | Previously judged blocked: `CNA_TextureSlotInfo` has no kind discriminator and `TextureCube`/`Texture3D` are unprojected. **Re-measure before believing that** — the same assumption was wrong twice. |
+| `TextureCollection` (`GraphicsDevice.Textures`, `VertexTextures`) | 1 type, 2 members | Not blocked. The two reasons it was once judged so are both gone: `TextureCube` and `Texture3D` landed in Foundation 64, and CNA's header prescribes the remedy for the missing kind discriminator — cache what you bind and answer from the cache, which is what XNA's `DeviceResourceManager` does. It also makes two recorded absences reachable: the `ResourceInUse` scan in every texture's `CopyData`. |
+| `RenderTargetCube` + `RenderTargetBinding` + the device's render-target members | ~2 types, ~4 members | `cna_render_target_cube_create` answers 0 on this artifact (`build-probe/f64_cube.c`) and is deliberately unbound until the member needs it. It makes `MustResolveRenderTarget` reachable on `Texture2D` and `TextureCube` — both recorded absences today. |
 
 ### The BLOCKED list, re-measured at Foundation 60
 
@@ -146,9 +147,15 @@ These are the ones that cost the most to relearn:
 5. **A route with no consuming member is not bound**, and a mirrored structure
    with no route is the same unearned count. Three have been *un*bound so far.
 6. **Read the IL of every member you implement, including the ones already
-   implemented.** Four defects in three milestones were found that way and none
-   by a failing test. `tools/api_compat/message_coverage.py` now catches the
-   message half of it automatically; nothing yet catches the rest.
+   implemented.** Eight defects in four milestones were found that way and none
+   by a failing test — the four newest are Foundation 64's, all in a `Texture2D`
+   that had been green since Foundation 59. `tools/api_compat/message_coverage.py`
+   catches the message half of it automatically; nothing yet catches the rest.
+   And note what Foundation 64 also found: that gate's call walk could not see a
+   call to a **generic** method, so the whole `CopyData<T>` family was invisible
+   to it while it reported `PASS`. A gate that reads less than it claims is the
+   same failure one level up, and the same remedy applies — a mutation that
+   makes the reading fail.
 7. **`plan.md` and the diagnostic block in `README.md` must move with the
    numbers.** They are updated in the same commit as the work, never after.
    Foundation 58 made that a gate rather than a habit, because it had already
@@ -172,7 +179,7 @@ python3 tools/api_compat/verify.py --symbol-graph … --output docs/generated/ap
 python3 tools/api_compat/dependency_graph.py --report … --output …
 python3 tools/native_abi/verify.py     --cna-include … --library "$CNA_NATIVE_LIBRARY"
 python3 tools/native_abi/mutations.py  --cna-include … --library "$CNA_NATIVE_LIBRARY"
-CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~40 min, 114 mutations
+CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~45 min, 168 mutations
 python3 tools/api_compat/message_coverage.py --self-test|--mutations|(report)
 python3 tools/api_compat/pinned_assembly_audit.py …
 python3 tools/api_compat/bcl_authority_audit.py … --cross-check --negative-control …×4
@@ -220,7 +227,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 63 have landed since. Nothing here is
+> Foundation Milestones 37 through 64 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->

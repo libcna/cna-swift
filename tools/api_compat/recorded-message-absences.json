@@ -98,6 +98,48 @@
    "key": "NullNotAllowed",
    "kind": "unreachable",
    "reason": "SetVertexBuffers tests each binding's _vertexBuffer for null and raises ArgumentException(NullNotAllowed). A Swift VertexBufferBinding stores a non-Optional VertexBuffer and every one of its three constructors requires one, so no binding a caller can build reaches the branch. The array itself being null IS reachable and is the selected unbind-all operation, which is a normal ret and not this throw."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "MustResolveRenderTarget",
+   "kind": "deferred",
+   "reason": "Texture2D.CopyData refuses a transfer on a texture that is the ACTIVE render target: `if (isActiveRenderTarget) throw new InvalidOperationException(MustResolveRenderTarget)`, third in the method after the disposal and null-array tests. `Texture.isActiveRenderTarget` is set by GraphicsDevice.SetRenderTarget, which is not projected, so nothing a caller can do sets the flag and the branch has no reachable input. It becomes reachable in the render-target milestone and is implemented there."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "ResourceInUse",
+   "kind": "deferred",
+   "reason": "Texture2D, TextureCube and Texture3D each scan GraphicsDevice.Textures and GraphicsDevice.VertexTextures for themselves before a SetData and raise GetExceptionFromResult(E_ABORT) -- ResourceInUse -- when the texture is bound to a sampler. TextureCollection is not projected, so no caller can bind a texture and the scan has no reachable input. Same shape and same remedy as VertexBuffer's bound-buffer test, which SetVertexBuffer made reachable in Foundation 63; this one becomes reachable with TextureCollection."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture2D",
+   "key": "CannotUseFormatTypeAsManualWhenLocking",
+   "kind": "native-owned",
+   "reason": "Raised when IDirect3D9::CheckDeviceFormat(adapter, deviceType, adapterFormat, D3DUSAGE_DYNAMIC, D3DRTYPE_TEXTURE, format) answers a failing HRESULT -- XNA asking the installed DRIVER whether this texture's format can be locked, and reporting the driver's refusal. CNA publishes no route that asks that question and is not Direct3D; its own transfer routes answer NOT_SUPPORTED for storage they cannot move, which is reported on the runtime channel. Deciding for a driver that a format is unlockable would be an invented diagnosis."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.TextureCube",
+   "key": "DeviceCannotBeNullOnResourceCreate",
+   "kind": "unreachable",
+   "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.Texture3D",
+   "key": "DeviceCannotBeNullOnResourceCreate",
+   "kind": "unreachable",
+   "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.TextureCube",
+   "key": "MustResolveRenderTarget",
+   "kind": "deferred",
+   "reason": "TextureCube.CopyData refuses a transfer on a cube that is the ACTIVE render target: `if (isActiveRenderTarget) throw new InvalidOperationException(MustResolveRenderTarget)`, third in the method after the disposal and null-array tests, exactly as Texture2D.CopyData has it. `Texture.isActiveRenderTarget` is set by GraphicsDevice.SetRenderTarget, which is not projected, so nothing a caller can do sets the flag. It becomes reachable in the render-target milestone, alongside RenderTargetCube."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.TextureCube",
+   "key": "CannotUseFormatTypeAsManualWhenLocking",
+   "kind": "native-owned",
+   "reason": "Raised when IDirect3D9::CheckDeviceFormat(adapter, deviceType, adapterFormat, D3DUSAGE_DYNAMIC, D3DRTYPE_CUBETEXTURE, format) answers a failing HRESULT -- XNA asking the installed DRIVER whether this cube's format can be locked, and reporting the driver's refusal. Same shape and same reason as Texture2D's: CNA publishes no route that asks that question and is not Direct3D. On the qualified artifact CNA refuses the cube transfer itself with NOT_SUPPORTED, which is reported on the runtime channel."
   }
  ]
 }

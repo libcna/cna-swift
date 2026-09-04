@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=162
-TARGET_MEMBERS=2029
-TOTAL_DIAGNOSTICS=152
-COMPLETE_TYPES=156
+TARGET_TYPES=164
+TARGET_MEMBERS=2049
+TOTAL_DIAGNOSTICS=150
+COMPLETE_TYPES=158
 PARTIAL_TYPES=6
-MISSING_TYPES=95
-MISSING_TYPE=95
+MISSING_TYPES=93
+MISSING_TYPE=93
 MISSING_MEMBER=52
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -193,7 +193,9 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=18
 - `Microsoft.Xna.Framework.Graphics.SurfaceFormat`
 - `Microsoft.Xna.Framework.Graphics.Texture`
 - `Microsoft.Xna.Framework.Graphics.Texture2D`
+- `Microsoft.Xna.Framework.Graphics.Texture3D`
 - `Microsoft.Xna.Framework.Graphics.TextureAddressMode`
+- `Microsoft.Xna.Framework.Graphics.TextureCube`
 - `Microsoft.Xna.Framework.Graphics.TextureFilter`
 - `Microsoft.Xna.Framework.Graphics.VertexBuffer`
 - `Microsoft.Xna.Framework.Graphics.VertexBufferBinding`
@@ -409,9 +411,7 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.RenderTargetCube`
 - `Microsoft.Xna.Framework.Graphics.SkinnedEffect`
 - `Microsoft.Xna.Framework.Graphics.SpriteFont`
-- `Microsoft.Xna.Framework.Graphics.Texture3D`
 - `Microsoft.Xna.Framework.Graphics.TextureCollection`
-- `Microsoft.Xna.Framework.Graphics.TextureCube`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.Input.Mouse`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`

@@ -298,6 +298,76 @@ typedef struct CNASwift_VertexBufferCreateInfo {
     uint8_t reserved[7];
 } CNASwift_VertexBufferCreateInfo;
 
+typedef struct CNASwift_TextureCubeCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t size;
+    CNASwift_Bool mip_map;
+    uint8_t reserved0[3];
+    uint32_t format;
+    uint32_t reserved1;
+} CNASwift_TextureCubeCreateInfo;
+
+typedef struct CNASwift_TextureCubeInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t size;
+    uint32_t level_count;
+    uint32_t format;
+    uint32_t reserved;
+} CNASwift_TextureCubeInfo;
+
+typedef struct CNASwift_TextureCubeTransfer {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t face;
+    int32_t level;
+    CNASwift_Bool has_rectangle;
+    uint8_t reserved0[3];
+    CNASwift_Rectangle rectangle;
+    uint32_t reserved1;
+    uint64_t start_index;
+    uint64_t element_count;
+} CNASwift_TextureCubeTransfer;
+
+typedef struct CNASwift_Texture3DCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t width;
+    uint32_t height;
+    uint32_t depth;
+    CNASwift_Bool mip_map;
+    uint8_t reserved0[3];
+    uint32_t format;
+    uint32_t reserved1;
+} CNASwift_Texture3DCreateInfo;
+
+typedef struct CNASwift_Texture3DInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t width;
+    uint32_t height;
+    uint32_t depth;
+    uint32_t level_count;
+    uint32_t format;
+    uint32_t reserved;
+} CNASwift_Texture3DInfo;
+
+typedef struct CNASwift_Texture3DTransfer {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t level;
+    int32_t left;
+    int32_t top;
+    int32_t right;
+    int32_t bottom;
+    int32_t front;
+    int32_t back;
+    uint32_t reserved;
+    uint64_t start_index;
+    uint64_t element_count;
+} CNASwift_Texture3DTransfer;
+
 typedef struct CNASwift_VertexBufferBinding {
     CNASwift_VertexBufferHandle vertex_buffer;
     int32_t vertex_offset;

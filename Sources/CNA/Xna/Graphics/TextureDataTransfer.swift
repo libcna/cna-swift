@@ -119,3 +119,37 @@ internal let invalidTotalSizeMessage =
 
 internal let invalidRectangleMessage =
     "The rectangle is too large or too small for this resource."
+
+extension Microsoft.Xna.Framework.Graphics {
+    /// `Texture3D.GetAndValidateBox`, as a predicate.
+    ///
+    /// ```text
+    /// if (box.Right  > desc.Width)  fail;   // bgt.un
+    /// if (box.Left  >= box.Right)   fail;   // bge.un
+    /// if (box.Bottom > desc.Height) fail;
+    /// if (box.Top   >= box.Bottom)  fail;
+    /// if (box.Back   > desc.Depth)  fail;
+    /// if (box.Front >= box.Back)    fail;
+    /// ```
+    ///
+    /// All six comparisons are **unsigned**, so a negative coordinate becomes a
+    /// value near `UInt32.max` and is caught by the first test it meets rather
+    /// than passing a signed `>= 0` guard that XNA does not have. The failure
+    /// is `ArgumentException(InvalidRectangle, "box")`.
+    ///
+    /// It lives here, apart from `Texture3D`, because no `Texture3D` can be
+    /// constructed on a Reach device: the arithmetic would otherwise be
+    /// unreachable and untestable on the qualified profile.
+    internal static func volumeBoxIsValid(
+        width: Int32, height: Int32, depth: Int32,
+        left: Int32, top: Int32, right: Int32,
+        bottom: Int32, front: Int32, back: Int32
+    ) -> Bool {
+        let uRight = UInt32(bitPattern: right), uLeft = UInt32(bitPattern: left)
+        let uBottom = UInt32(bitPattern: bottom), uTop = UInt32(bitPattern: top)
+        let uBack = UInt32(bitPattern: back), uFront = UInt32(bitPattern: front)
+        return uRight <= UInt32(bitPattern: width) && uLeft < uRight
+            && uBottom <= UInt32(bitPattern: height) && uTop < uBottom
+            && uBack <= UInt32(bitPattern: depth) && uFront < uBack
+    }
+}

@@ -242,6 +242,89 @@ final class Foundation57TextureDataTests: XCTestCase {
         XCTAssertEqual(game.observations["read"], "7,7,7,7 8,8,8,8")
     }
 
+    /// An **empty** array is an `ArgumentNullException` naming `"data"`.
+    ///
+    /// Added in Foundation 64, with the check it asserts: `CopyData`'s second
+    /// test is `if (data == null || data.Length == 0)` and both arms reach the
+    /// same `throw`, so a zero-length array reports the parameter as null. A
+    /// Swift array cannot be null; it can be empty, and that is the reachable
+    /// half of XNA's own test. `VertexBuffer.CopyData` had this from Foundation
+    /// 60 and `Texture2D` did not — the mutation
+    /// `texture2d-empty-array-not-reported-as-null` survived until this test
+    /// existed.
+    func testAnEmptyArrayIsReportedAsNull() throws {
+        try requireNative()
+        _ = try run { game, device in
+            let texture = try G.Texture2D(graphicsDevice: device, width: 2, height: 2)
+            let empty: [F.Color] = []
+            assertProjected(
+                CNAArgumentNullException.self,
+                message: composedArgumentMessage(
+                    "This method does not accept null for this parameter.",
+                    paramName: "data"),
+                paramName: "data",
+                hResult: CNAArgumentNullException.argumentNullHResult
+            ) { try texture.SetData(empty) }
+
+            var readInto: [F.Color] = []
+            assertProjected(
+                CNAArgumentNullException.self,
+                message: composedArgumentMessage(
+                    "This method does not accept null for this parameter.",
+                    paramName: "data"),
+                paramName: "data",
+                hResult: CNAArgumentNullException.argumentNullHResult
+            ) { try texture.GetData(&readInto) }
+            try texture.Dispose()
+            game.observations["checked"] = "yes"
+        }
+    }
+
+    /// The array window is `Helpers.ValidateCopyParameters`, which raises
+    /// `ArgumentOutOfRangeException(MustBeValidIndex)` naming `dataIndex` or
+    /// `elementCount` — **not** `ArgumentException(InvalidTotalSize)` — and
+    /// raises it before the element size and the rectangle are looked at.
+    ///
+    /// Also Foundation 64. Until then this projection checked the window inline,
+    /// with the wrong exception class, the wrong message, the wrong parameter
+    /// name, the wrong `HResult` and in the wrong order.
+    func testTheArrayWindowIsValidateCopyParameters() throws {
+        try requireNative()
+        _ = try run { game, device in
+            let texture = try G.Texture2D(graphicsDevice: device, width: 2, height: 2)
+            let four = self.colors([(1, 1, 1, 1), (2, 2, 2, 2),
+                                    (3, 3, 3, 3), (4, 4, 4, 4)])
+            assertProjected(
+                CNAArgumentOutOfRangeException.self,
+                message: composedArgumentMessage(
+                    "This parameter must be a valid index within the array.",
+                    paramName: "dataIndex"),
+                paramName: "dataIndex",
+                hResult: CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+            ) { try texture.SetData(four, startIndex: -1, elementCount: 4) }
+
+            let countMessage = composedArgumentMessage(
+                "This parameter must be a valid index within the array.",
+                paramName: "elementCount")
+            assertProjected(
+                CNAArgumentOutOfRangeException.self,
+                message: countMessage, paramName: "elementCount",
+                hResult: CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+            ) { try texture.SetData(four, startIndex: 2, elementCount: 4) }
+
+            // The window is checked BEFORE the element size, so a call that is
+            // wrong in both ways reports the window.
+            let bytes = [UInt8](repeating: 0, count: 4)
+            assertProjected(
+                CNAArgumentOutOfRangeException.self,
+                message: countMessage, paramName: "elementCount",
+                hResult: CNAArgumentOutOfRangeException.corArgumentOutOfRangeHResult
+            ) { try texture.SetData(bytes, startIndex: 0, elementCount: 99) }
+            try texture.Dispose()
+            game.observations["checked"] = "yes"
+        }
+    }
+
     /// The format's byte size is XNA's own table, decoded from the pinned IL.
     /// `HalfVector4` and `HdrBlendable` really do share a D3D format and a
     /// size; the DXT formats have none, because they are block-compressed.

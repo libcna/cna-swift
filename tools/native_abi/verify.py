@@ -54,6 +54,8 @@ MIRRORED_STRUCTS = [
     "PresentationParameters",
     "VertexElement", "VertexBufferCreateInfo", "VertexBufferBinding",
     "IndexBufferCreateInfo", "IndexBufferTransfer",
+    "TextureCubeCreateInfo", "TextureCubeInfo", "TextureCubeTransfer",
+    "Texture3DCreateInfo", "Texture3DInfo", "Texture3DTransfer",
 ]
 
 # The shim mirrors exactly these canonical callback types.
@@ -163,6 +165,9 @@ def canonical_type(value: str) -> str:
         # `typedef uint32_t CNA_TextureImageFormat;` in texture.h:54,
         # which names PNG and JPEG.
         "CNA_TextureImageFormat": "uint32_t",
+        # `typedef uint32_t CNA_CubeMapFace;` in render_target.h:38,
+        # which names the six faces.
+        "CNA_CubeMapFace": "uint32_t",
         # graphics3d.h's buffer and vertex-element typedefs, and the two
         # buffer-handle aliases in vertex_resources.h and index_resources.h.
         "CNA_BufferUsage": "uint32_t", "CNA_IndexElementSize": "uint32_t",

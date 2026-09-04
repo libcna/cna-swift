@@ -71,6 +71,20 @@ _Static_assert(CNA_CLEAR_OPTION_TARGET == 1, "ClearOptions.Target");
 _Static_assert(CNA_CLEAR_OPTION_DEPTH_BUFFER == 2, "ClearOptions.DepthBuffer");
 _Static_assert(CNA_CLEAR_OPTION_STENCIL == 4, "ClearOptions.Stencil");
 
+/* TextureCube.SetData/GetData pass CubeMapFace.rawValue straight into
+ * CNA_TextureCubeTransfer::face, so the six values are a boundary dependency,
+ * and no observation on the qualified artifact can catch a mismatch: the
+ * transfer answers NOT_SUPPORTED whichever face it is given. These six
+ * assertions are the only evidence that the pass-through is safe. Foundation
+ * 45 found BlendFunction's Min and Max swapped between the two headers, so
+ * agreement is checked and never assumed. */
+_Static_assert(CNA_CUBE_MAP_FACE_POSITIVE_X == 0, "CubeMapFace.PositiveX");
+_Static_assert(CNA_CUBE_MAP_FACE_NEGATIVE_X == 1, "CubeMapFace.NegativeX");
+_Static_assert(CNA_CUBE_MAP_FACE_POSITIVE_Y == 2, "CubeMapFace.PositiveY");
+_Static_assert(CNA_CUBE_MAP_FACE_NEGATIVE_Y == 3, "CubeMapFace.NegativeY");
+_Static_assert(CNA_CUBE_MAP_FACE_POSITIVE_Z == 4, "CubeMapFace.PositiveZ");
+_Static_assert(CNA_CUBE_MAP_FACE_NEGATIVE_Z == 5, "CubeMapFace.NegativeZ");
+
 _Static_assert(CNA_GAMEPAD_TYPE_UNKNOWN == 0, "GamePadType.Unknown");
 _Static_assert(CNA_GAMEPAD_TYPE_GAMEPAD == 1, "GamePadType.GamePad");
 _Static_assert(CNA_GAMEPAD_TYPE_WHEEL == 2, "GamePadType.Wheel");

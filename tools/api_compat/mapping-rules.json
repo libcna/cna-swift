@@ -1154,6 +1154,16 @@
       "owner": "Microsoft.Xna.Framework.Graphics.IndexBuffer",
       "member": "GetData",
       "parameter": "data"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.TextureCube",
+      "member": "GetData",
+      "parameter": "data"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.Texture3D",
+      "member": "GetData",
+      "parameter": "data"
     }
   ]
 }

@@ -1,7 +1,7 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 63 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 64 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
@@ -15,7 +15,10 @@ pinned IL member by member has turned up: `Clear`'s depth buffer, the viewport
 and scissor validation, the message-coverage gate itself, the manager's
 preferences and its disposal, `SpriteBatch`'s five `Draw` overloads and its
 state-taking `Begin`s, `Texture2D`'s constructors, the method-generic mapping
-the verifier could not previously express, and `SetData`/`GetData`.
+the verifier could not previously express, `SetData`/`GetData`, the vertex and
+index buffer family with its dynamic pair, the extracted `ProfileCapabilities`
+table and the nine messages that were waiting on it, the vertex- and
+index-buffer binders, and `TextureCube` with `Texture3D`.
 
 This file states what is true **now**, and a gate keeps that literal:
 `tools/status_gate/verify.py` derives the current Foundation from the highest
@@ -149,16 +152,16 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=162               TARGET_MEMBERS=2029
-COMPLETE_TYPES=156             PARTIAL_TYPES=6      MISSING_TYPE=95
-MISSING_MEMBER=52              TOTAL_DIAGNOSTICS=152
+TARGET_TYPES=164               TARGET_MEMBERS=2049
+COMPLETE_TYPES=158             PARTIAL_TYPES=6      MISSING_TYPE=93
+MISSING_MEMBER=52              TOTAL_DIAGNOSTICS=150
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
 XNA_RESOURCE_STRING_PROJECTIONS=56 API_COMPAT_SELF_TESTS=2426
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=95`, `MISSING_MEMBER=52`, and `OVERLOAD_MAPPING_MISMATCH=5`,
+`MISSING_TYPE=93`, `MISSING_MEMBER=52`, and `OVERLOAD_MAPPING_MISMATCH=5`,
 whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
 both taking an `Effect`), and one each on `GraphicsDevice.SetRenderTarget` and
 the two serialization constructors of `ContentLoadException` and
@@ -182,12 +185,12 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=109  ROUTE_PAIRINGS=109  PROTOTYPE_TYPE_POSITIONS=386
-CANONICAL_DECLARATION_CHECKS=386  C_SWIFT_MEASUREMENTS=386
-LAYOUTS=33  LAYOUT_FIELDS=270  CALLBACKS=6  CONSTANTS=215  SCALAR_FACTS=3
+BOUND_FUNCTIONS=119  ROUTE_PAIRINGS=119  PROTOTYPE_TYPE_POSITIONS=426
+CANONICAL_DECLARATION_CHECKS=426  C_SWIFT_MEASUREMENTS=426
+LAYOUTS=39  LAYOUT_FIELDS=322  CALLBACKS=6  CONSTANTS=221  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=155  LAST_FULL_RUN=137  CAUGHT=135  REPLACED_NO_OPS=2
+PROJECTION_MUTATIONS=168  LAST_FULL_RUN=137  CAUGHT=135  REPLACED_NO_OPS=2
 ```
 
 The projection-mutation count is what the harness holds; `CAUGHT` is what a

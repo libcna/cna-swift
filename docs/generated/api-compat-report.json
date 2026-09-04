@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 162,
-    "TARGET_MEMBERS": 2029,
-    "TOTAL_DIAGNOSTICS": 152,
-    "COMPLETE_TYPES": 156,
+    "TARGET_TYPES": 164,
+    "TARGET_MEMBERS": 2049,
+    "TOTAL_DIAGNOSTICS": 150,
+    "COMPLETE_TYPES": 158,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 95,
-    "MISSING_TYPE": 95,
+    "MISSING_TYPES": 93,
+    "MISSING_TYPE": 93,
     "MISSING_MEMBER": 52,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -194,7 +194,9 @@
     "Microsoft.Xna.Framework.Graphics.SurfaceFormat",
     "Microsoft.Xna.Framework.Graphics.Texture",
     "Microsoft.Xna.Framework.Graphics.Texture2D",
+    "Microsoft.Xna.Framework.Graphics.Texture3D",
     "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
+    "Microsoft.Xna.Framework.Graphics.TextureCube",
     "Microsoft.Xna.Framework.Graphics.TextureFilter",
     "Microsoft.Xna.Framework.Graphics.VertexBuffer",
     "Microsoft.Xna.Framework.Graphics.VertexBufferBinding",
@@ -328,9 +330,7 @@
     "Microsoft.Xna.Framework.Graphics.RenderTargetCube",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
     "Microsoft.Xna.Framework.Graphics.SpriteFont",
-    "Microsoft.Xna.Framework.Graphics.Texture3D",
     "Microsoft.Xna.Framework.Graphics.TextureCollection",
-    "Microsoft.Xna.Framework.Graphics.TextureCube",
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
@@ -941,17 +941,7 @@
     },
     {
       "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.Texture3D",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.TextureCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Graphics.TextureCube",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -4456,6 +4446,22 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.Texture3D",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Graphics.TextureCube",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 1,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -11662,16 +11668,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.Texture3D",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 11,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.Texture3D",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 11,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureAddressMode",
@@ -11695,16 +11695,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureCube",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Graphics.TextureCube",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.TextureFilter",

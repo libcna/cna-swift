@@ -52,6 +52,8 @@ BUFFERBINDING = ROOT / "Sources/CNA/Xna/Graphics/VertexBufferBinding.swift"
 DYNAMICVERTEX = ROOT / "Sources/CNA/Xna/Graphics/DynamicVertexBuffer.swift"
 DYNAMICINDEX = ROOT / "Sources/CNA/Xna/Graphics/DynamicIndexBuffer.swift"
 PROFILECAPS = ROOT / "Sources/CNA/Xna/Graphics/ProfileCapabilities.swift"
+TEXTURECUBE = ROOT / "Sources/CNA/Xna/Graphics/TextureCube.swift"
+TEXTURE3D = ROOT / "Sources/CNA/Xna/Graphics/Texture3D.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -170,8 +172,14 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "aspect-ratio-divides-the-wrong-way",
         "the ceiling division written as a floor, so a texture at the limit is refused",
         PROFILECAPS,
-        "            guard (longer + shorter - 1) / shorter <= maxTextureAspectRatio else {",
-        "            guard (longer + shorter) / shorter <= maxTextureAspectRatio else {",
+        "            guard (longer + shorter - 1) / shorter <= maxTextureAspectRatio else {\n"
+        "                try throwNotSupported(\n"
+        "                    ProfileCapabilities.profileAspectRatio,\n"
+        "                    \"Texture2D\", \"\\(maxTextureAspectRatio)\")",
+        "            guard (longer + shorter) / shorter <= maxTextureAspectRatio else {\n"
+        "                try throwNotSupported(\n"
+        "                    ProfileCapabilities.profileAspectRatio,\n"
+        "                    \"Texture2D\", \"\\(maxTextureAspectRatio)\")",
     ),
     (
         "profile-message-omits-the-profile",
@@ -1559,6 +1567,118 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         MANAGER,
         "        public static let DefaultBackBufferWidth: Int32 = 800",
         "        public static let DefaultBackBufferWidth: Int32 = 640",
+    ),
+    # ---- Foundation 64: TextureCube and Texture3D ------------------------
+    (
+        "cube-size-limit-is-the-texture-limit",
+        "MaxCubeSize read as MaxTextureSize, so a 1024 cube is accepted",
+        PROFILECAPS,
+        "            guard size <= maxCubeSize else {",
+        "            guard size <= maxTextureSize else {",
+    ),
+    (
+        "cube-power-of-two-test-dropped",
+        "a non-power-of-two cube accepted where Reach refuses one",
+        PROFILECAPS,
+        "            if !nonPow2Cube, !ProfileCapabilities.isPowerOfTwo(size) {",
+        "            if false, !ProfileCapabilities.isPowerOfTwo(size) {",
+    ),
+    (
+        "cube-format-list-is-the-texture-list",
+        "ValidCubeFormats read as ValidTextureFormats, a different list",
+        PROFILECAPS,
+        "            guard validCubeFormats.contains(format) else {",
+        "            guard validTextureFormats.contains(format) else {",
+    ),
+    (
+        "volume-zero-extent-test-dropped",
+        "a Texture3D allowed past the check that makes Reach refuse every one",
+        PROFILECAPS,
+        "            guard maxVolumeExtent != 0 else {",
+        "            guard true else {",
+    ),
+    (
+        "volume-extent-guards-run-after-the-profile-test",
+        "a non-positive extent reported as a profile refusal, not its own name",
+        PROFILECAPS,
+        "            for (value, name) in [(width, \"width\"), (height, \"height\"), (depth, \"depth\")] {\n"
+        "                guard value > 0 else {\n"
+        "                    throw CNAArgumentOutOfRangeException(\n"
+        "                        paramName: name,\n"
+        "                        message: Microsoft.Xna.Framework.Graphics.Texture2D\n"
+        "                            .resourcesMustBeGreaterThanZeroSizeMessage)\n"
+        "                }\n"
+        "            }",
+        "",
+    ),
+    (
+        "volume-aspect-ratio-ignores-the-depth",
+        "Max/Min taken over width and height only, never over all three extents",
+        PROFILECAPS,
+        "            let longer = max(max(width, height), depth)\n"
+        "            let shorter = min(min(width, height), depth)",
+        "            let longer = max(width, height)\n"
+        "            let shorter = min(width, height)",
+    ),
+    (
+        "cube-empty-array-not-reported-as-null",
+        "a zero-length array falling through to the size tests",
+        TEXTURECUBE,
+        "            guard arrayCount > 0 else {",
+        "            guard arrayCount >= 0 else {",
+    ),
+    (
+        "cube-window-not-validate-copy-parameters",
+        "the array window silently accepted instead of raising MustBeValidIndex",
+        TEXTURECUBE,
+        "            try Microsoft.Xna.Framework.Graphics.validateCopyParameters(\n"
+        "                dataLength: arrayCount, dataIndex: startIndex,\n"
+        "                elementCount: elementCount)",
+        "",
+    ),
+    (
+        "cube-disposal-checked-after-the-arguments",
+        "a disposed cube reporting a bad argument instead of the disposal",
+        TEXTURECUBE,
+        "            let handle = try validatedHandle(\n"
+        "                isSetting ? \"TextureCube.SetData\" : \"TextureCube.GetData\")\n"
+        "            guard arrayCount > 0 else {",
+        "            guard arrayCount > 0 else {",
+    ),
+    (
+        "cube-transfer-does-not-reach-the-route",
+        "SetData accepted and discarded rather than handed to CNA",
+        TEXTURECUBE,
+        "                            functions.textureCubeSetData(\n"
+        "                                plan.handle, transfer, $0, plan.elementCount)",
+        "                            CNA_Result(0)",
+    ),
+    (
+        "volume-box-test-signed-not-unsigned",
+        "a negative box coordinate slipping past a comparison XNA makes unsigned",
+        TEXTUREDATA,
+        "        return uRight <= UInt32(bitPattern: width) && uLeft < uRight\n"
+        "            && uBottom <= UInt32(bitPattern: height) && uTop < uBottom\n"
+        "            && uBack <= UInt32(bitPattern: depth) && uFront < uBack",
+        "        return right <= width && left < right\n"
+        "            && bottom <= height && top < bottom\n"
+        "            && back <= depth && front < back",
+    ),
+    (
+        "texture2d-empty-array-not-reported-as-null",
+        "Texture2D's zero-length array falling through to the size tests",
+        TEXTURE2D,
+        "            guard arrayCount > 0 else {",
+        "            guard arrayCount >= 0 else {",
+    ),
+    (
+        "texture2d-window-not-validate-copy-parameters",
+        "Texture2D's array window silently accepted instead of MustBeValidIndex",
+        TEXTURE2D,
+        "            try Microsoft.Xna.Framework.Graphics.validateCopyParameters(\n"
+        "                dataLength: arrayCount, dataIndex: startIndex,\n"
+        "                elementCount: elementCount)",
+        "",
     ),
 ]
 
