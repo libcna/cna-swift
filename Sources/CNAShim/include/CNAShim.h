@@ -214,6 +214,27 @@ typedef struct CNASwift_Matrix {
     float m44;
 } CNASwift_Matrix;
 
+typedef struct CNASwift_UserPrimitives {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t primitive_type;
+    uint32_t vertex_source;
+    const void* vertex_data;
+    uint64_t vertex_declaration;
+    int32_t vertex_offset;
+    int32_t num_vertices;
+    int32_t primitive_count;
+    uint32_t reserved;
+} CNASwift_UserPrimitives;
+
+typedef struct CNASwift_UserIndices {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t index_element_size;
+    int32_t index_offset;
+    const void* index_data;
+} CNASwift_UserIndices;
+
 typedef struct CNASwift_EffectParameterInfo {
     uint32_t struct_size;
     uint32_t struct_version;

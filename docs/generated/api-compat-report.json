@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 176,
-    "TARGET_MEMBERS": 2165,
-    "TOTAL_DIAGNOSTICS": 132,
+    "TARGET_MEMBERS": 2174,
+    "TOTAL_DIAGNOSTICS": 123,
     "COMPLETE_TYPES": 170,
     "PARTIAL_TYPES": 6,
     "MISSING_TYPES": 81,
     "MISSING_TYPE": 81,
-    "MISSING_MEMBER": 47,
+    "MISSING_MEMBER": 38,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -75,7 +75,7 @@
     "BCL_RESOURCE_STRING_PROJECTIONS": 19,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 64,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 69,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -602,51 +602,6 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Reset(_:Microsoft.Xna.Framework.Graphics.PresentationParameters,graphicsAdapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,startVertex:Int32,primitiveCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,baseVertex:Int32,minVertexIndex:Int32,numVertices:Int32,startIndex:Int32,primitiveCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawInstancedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,baseVertex:Int32,minVertexIndex:Int32,numVertices:Int32,startIndex:Int32,primitiveCount:Int32,instanceCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
       "detail": "mapped member is absent"
     },
     {
@@ -3903,6 +3858,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "InvalidInstanceStreams",
+      "pinnedValue": "DrawInstancedPrimitives requires at least one vertex buffer to be bound with a non-zero instance frequency, and also at least one with a zero instance frequency.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "InvalidRectangle",
       "pinnedValue": "The rectangle is too large or too small for this resource.",
       "reproducedInSwiftSource": true
@@ -3921,6 +3882,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "MustDrawSomething",
+      "pinnedValue": "When drawing, at least one primitive must be drawn.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "MustResolveRenderTarget",
       "pinnedValue": "The render target must not be set on the device when it is used as a texture.",
       "reproducedInSwiftSource": true
@@ -3935,6 +3902,12 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "NegativeRadius",
       "pinnedValue": "Radius must be greater than 0.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NonZeroInstanceFrequency",
+      "pinnedValue": "Non-instanced draw calls are not valid when a vertex buffer is bound with a non-zero instance frequency.",
       "reproducedInSwiftSource": true
     },
     {
@@ -3965,6 +3938,18 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "NullNotAllowed",
       "pinnedValue": "This method does not accept null for this parameter.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "NumberVerticesMustBeGreaterZero",
+      "pinnedValue": "When drawing indexed primitives, the number of vertices passed in must be greater than zero.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "OffsetNotValid",
+      "pinnedValue": "The offset must be within the valid range for this resource.",
       "reproducedInSwiftSource": true
     },
     {
@@ -10931,7 +10916,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 26,
+      "targetMembers": 35,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -10961,51 +10946,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Reset(_:Microsoft.Xna.Framework.Graphics.PresentationParameters,graphicsAdapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,startVertex:Int32,primitiveCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,baseVertex:Int32,minVertexIndex:Int32,numVertices:Int32,startIndex:Int32,primitiveCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawInstancedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,baseVertex:Int32,minVertexIndex:Int32,numVertices:Int32,startIndex:Int32,primitiveCount:Int32,instanceCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int32],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserIndexedPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,numVertices:Int32,indexData:[Int16],indexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DrawUserPrimitives(_:Microsoft.Xna.Framework.Graphics.PrimitiveType,vertexData:[T],vertexOffset:Int32,primitiveCount:Int32,vertexDeclaration:Microsoft.Xna.Framework.Graphics.VertexDeclaration)",
           "detail": "mapped member is absent"
         },
         {

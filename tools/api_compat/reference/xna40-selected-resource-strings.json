@@ -140,6 +140,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidInstanceStreams",
+      "value": "DrawInstancedPrimitives requires at least one vertex buffer to be bound with a non-zero instance frequency, and also at least one with a zero instance frequency."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidRectangle",
       "value": "The rectangle is too large or too small for this resource."
     },
@@ -155,6 +160,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "MustDrawSomething",
+      "value": "When drawing, at least one primitive must be drawn."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "MustResolveRenderTarget",
       "value": "The render target must not be set on the device when it is used as a texture."
     },
@@ -167,6 +177,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "NegativeRadius",
       "value": "Radius must be greater than 0."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NonZeroInstanceFrequency",
+      "value": "Non-instanced draw calls are not valid when a vertex buffer is bound with a non-zero instance frequency."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -192,6 +207,16 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "NullNotAllowed",
       "value": "This method does not accept null for this parameter."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NumberVerticesMustBeGreaterZero",
+      "value": "When drawing indexed primitives, the number of vertices passed in must be greater than zero."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OffsetNotValid",
+      "value": "The offset must be within the valid range for this resource."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

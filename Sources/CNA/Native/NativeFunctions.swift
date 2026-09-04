@@ -132,6 +132,12 @@ internal final class NativeFunctions {
     typealias GraphicsDeviceGetRenderTargetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceGetTextureRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<CNASwift_TextureSlotInfo>?) -> UInt32
     typealias GraphicsDeviceSetTextureRoute = @convention(c) (UInt64, UInt32, UInt32, UInt64) -> UInt32
+    typealias GraphicsDeviceDrawPrimitivesRoute = @convention(c) (UInt64, UInt32, Int32, Int32) -> UInt32
+    typealias GraphicsDeviceDrawIndexedPrimitivesRoute = @convention(c) (UInt64, UInt32, Int32, Int32, Int32, Int32, Int32) -> UInt32
+    typealias GraphicsDeviceDrawInstancedPrimitivesRoute = @convention(c) (UInt64, UInt32, Int32, Int32, Int32, Int32, Int32, Int32) -> UInt32
+    typealias GraphicsDeviceDrawUserPrimitivesRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_UserPrimitives>?) -> UInt32
+    typealias GraphicsDeviceDrawUserIndexedPrimitivesRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_UserPrimitives>?, UnsafePointer<CNASwift_UserIndices>?) -> UInt32
+    typealias PrimitiveTypeGetVertexCountRoute = @convention(c) (UInt32, Int32, UnsafeMutablePointer<Int32>?) -> UInt32
     typealias EffectCreateEmptyRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias EffectCreateCompiledRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias EffectDestroyRoute = @convention(c) (UInt64) -> UInt32
@@ -331,6 +337,12 @@ internal final class NativeFunctions {
     let graphicsDeviceGetRenderTargetCount: GraphicsDeviceGetRenderTargetCountRoute
     let graphicsDeviceGetTexture: GraphicsDeviceGetTextureRoute
     let graphicsDeviceSetTexture: GraphicsDeviceSetTextureRoute
+    let graphicsDeviceDrawPrimitives: GraphicsDeviceDrawPrimitivesRoute
+    let graphicsDeviceDrawIndexedPrimitives: GraphicsDeviceDrawIndexedPrimitivesRoute
+    let graphicsDeviceDrawInstancedPrimitives: GraphicsDeviceDrawInstancedPrimitivesRoute
+    let graphicsDeviceDrawUserPrimitives: GraphicsDeviceDrawUserPrimitivesRoute
+    let graphicsDeviceDrawUserIndexedPrimitives: GraphicsDeviceDrawUserIndexedPrimitivesRoute
+    let primitiveTypeGetVertexCount: PrimitiveTypeGetVertexCountRoute
     let effectCreateEmpty: EffectCreateEmptyRoute
     let effectCreateCompiled: EffectCreateCompiledRoute
     let effectDestroy: EffectDestroyRoute
@@ -550,6 +562,12 @@ internal final class NativeFunctions {
         graphicsDeviceGetRenderTargetCount = try library.resolve("cna_graphics_device_get_render_target_count", as: GraphicsDeviceGetRenderTargetCountRoute.self)
         graphicsDeviceGetTexture = try library.resolve("cna_graphics_device_get_texture", as: GraphicsDeviceGetTextureRoute.self)
         graphicsDeviceSetTexture = try library.resolve("cna_graphics_device_set_texture", as: GraphicsDeviceSetTextureRoute.self)
+        graphicsDeviceDrawPrimitives = try library.resolve("cna_graphics_device_draw_primitives", as: GraphicsDeviceDrawPrimitivesRoute.self)
+        graphicsDeviceDrawIndexedPrimitives = try library.resolve("cna_graphics_device_draw_indexed_primitives", as: GraphicsDeviceDrawIndexedPrimitivesRoute.self)
+        graphicsDeviceDrawInstancedPrimitives = try library.resolve("cna_graphics_device_draw_instanced_primitives", as: GraphicsDeviceDrawInstancedPrimitivesRoute.self)
+        graphicsDeviceDrawUserPrimitives = try library.resolve("cna_graphics_device_draw_user_primitives", as: GraphicsDeviceDrawUserPrimitivesRoute.self)
+        graphicsDeviceDrawUserIndexedPrimitives = try library.resolve("cna_graphics_device_draw_user_indexed_primitives", as: GraphicsDeviceDrawUserIndexedPrimitivesRoute.self)
+        primitiveTypeGetVertexCount = try library.resolve("cna_primitive_type_get_vertex_count", as: PrimitiveTypeGetVertexCountRoute.self)
         effectCreateEmpty = try library.resolve("cna_effect_create_empty", as: EffectCreateEmptyRoute.self)
         effectCreateCompiled = try library.resolve("cna_effect_create_compiled", as: EffectCreateCompiledRoute.self)
         effectDestroy = try library.resolve("cna_effect_destroy", as: EffectDestroyRoute.self)

@@ -342,6 +342,31 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "NotCurrentTechnique",
       "reason": "EffectPass.Apply raises InvalidOperationException with this when the pass's own technique is not the effect's CurrentTechnique. It sits between the effect's disposal check and the call to Effect.OnApply."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "MustDrawSomething",
+      "reason": "Every draw raises ArgumentOutOfRangeException with this for a non-positive primitiveCount, and DrawInstancedPrimitives reuses it for instanceCount rather than declaring an instance-specific message."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NumberVerticesMustBeGreaterZero",
+      "reason": "DrawIndexedPrimitives and DrawInstancedPrimitives raise ArgumentOutOfRangeException('numVertices') with this, and the test comes BEFORE the primitive count's."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "NonZeroInstanceFrequency",
+      "reason": "The three non-instanced draws raise InvalidOperationException with this when instanceStreamMask is non-zero -- that is, when a bound VertexBufferBinding carries an instance frequency. DrawInstancedPrimitives does not, because it is the draw that needs one."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OffsetNotValid",
+      "reason": "The user-primitive draws raise ArgumentOutOfRangeException with this for a vertexOffset or indexOffset outside its array."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidInstanceStreams",
+      "reason": "DrawInstancedPrimitives raises InvalidOperationException with this when the bound bindings are ALL instanced or ALL non-instanced -- it needs per-instance data and per-vertex data, and either extreme supplies only half. Derived from the same cached bindings GetVertexBuffers reads."
     }
   ]
 }

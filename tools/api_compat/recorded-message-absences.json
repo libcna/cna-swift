@@ -164,6 +164,54 @@
    "key": "ProfilePixelShaderModel",
    "kind": "native-owned",
    "reason": "The pixel-shader half of the same test, unreachable for the same reason."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "CannotDrawNoShader",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). Inventing a managed exception here would mean asserting a conclusion about a shader pipeline this binding cannot inspect."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "CannotDrawNoData",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). The bound-buffer half is CNA's own refusal, 'The requested primitive range exceeds the bound vertex buffer', which is a different and narrower claim than XNA's."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "CannotMixShader2and3",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). It compares the vertex and pixel shader models the tracker holds; neither is readable here."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "MissingVertexShaderInput",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). It asks whether the bound vertex declaration satisfies the compiled vertex shader's input semantics, which requires reading the shader's signature."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "MissingVertexShaderInputDetails",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). The detail half of MissingVertexShaderInput, formatted with the missing semantic's usage and index -- both read from the shader signature."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "ProfileInvalidBlendFormat",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). It LOOKS derivable -- InvalidBlendFormats is in the extracted profile table and the render-target bindings are cached here -- but it is the tracker's blend state and the tracker's render target that decide, and a SpriteBatch flush changes both without this binding seeing it. A check that reads a partial view would silently not fire, which is worse than an honest absence."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "ProfileInvalidFilterFormat",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). Same shape as ProfileInvalidBlendFormat: InvalidFilterFormats is pinned, but the TextureFilter that decides is the tracker's applied sampler state rather than the managed SamplerStateCollection, and canonical CNA code fills sampler slots this binding never wrote."
+  },
+  {
+   "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+   "key": "ProfileNoWrapNonPow2",
+   "kind": "native-owned",
+   "reason": "Raised from GraphicsDevice.VerifyCanDraw, which every draw calls and which reads `pStateTracker` -- the Direct3D state tracker holding the shaders, vertex declaration, sampler modes and bound textures the DEVICE currently has. CNA publishes no equivalent and reaches its own verdict about the same states, which the draw members forward on the runtime channel: `cna_graphics_device_draw_primitives` answers CNA_RESULT_INTERNAL with 'no effect has been applied' for the state XNA calls CannotDrawNoShader (build-probe/f67_effect.c). Same again: it pairs the tracker's TextureAddressMode with the bound texture's dimensions, and CNA_TextureSlotInfo reports that a slot is occupied without naming the object when something else owns it."
   }
  ]
 }

@@ -51,6 +51,7 @@ MIRRORED_STRUCTS = [
     "RenderTarget2DCreateInfo", "RenderTargetInfo",
     "RenderTargetCubeCreateInfo", "RenderTargetBinding", "TextureSlotInfo",
     "EffectParameterInfo", "EffectAnnotationInfo",
+    "UserPrimitives", "UserIndices",
     "Vector3", "Vector4", "Quaternion", "Matrix",
     "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
     "SpriteCommand",
@@ -199,6 +200,10 @@ def canonical_type(value: str) -> str:
         "CNA_EffectParameterType": "uint32_t",
         "CNA_EffectValueType": "uint32_t",
         "CNA_EffectTextureType": "uint32_t",
+        # graphics_device.h's user-primitive vertex-source identity, and
+        # graphics3d.h's primitive topology.
+        "CNA_UserVertexSource": "uint32_t",
+        "CNA_PrimitiveType": "uint32_t",
     }
     for old, new in aliases.items():
         text = re.sub(rf"\b{old}\b", new, text)

@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 67.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 68.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -22,16 +22,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-716 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
-TOTAL_DIAGNOSTICS=132   COMPLETE_TYPES=170   PARTIAL_TYPES=6
-MISSING_TYPE=81  MISSING_MEMBER=47  OVERLOAD_MAPPING_MISMATCH=4
+730 tests, 0 failures (debug, release, ASan with detect_leaks=0, TSan)
+TOTAL_DIAGNOSTICS=123   COMPLETE_TYPES=170   PARTIAL_TYPES=6
+MISSING_TYPE=81  MISSING_MEMBER=38  OVERLOAD_MAPPING_MISMATCH=4
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=191  PROTOTYPE_TYPE_POSITIONS=669  LAYOUTS=48  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=203 (last full run 137, CAUGHT=135, 2 no-ops replaced)
+BOUND_FUNCTIONS=197  PROTOTYPE_TYPE_POSITIONS=702  LAYOUTS=50  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=215 (last full run 137, CAUGHT=135, 2 no-ops replaced)
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,403 implemented members
+MESSAGE_COVERAGE_FINDINGS=0 over 1,408 implemented members
 API_COMPAT_SELF_TESTS=2426  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
-RESOURCE_STRINGS_REPRODUCED=64
+RESOURCE_STRINGS_REPRODUCED=69
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -75,8 +75,7 @@ is that the managed type is not projected yet, which is ordinary work:
 
 | Next | Closes | Notes |
 |---|---|---|
-| `GraphicsDevice` drawing | ~8 members | 7 routes. **The next milestone.** The Effect core landed in Foundation 67, and `docs/foundation-67-effect-evidence.md` has the measurement it needs: with an effect applied and a vertex buffer written, `cna_graphics_device_draw_primitives` returns 0 where the same call without an apply answers `CNA_RESULT_INTERNAL`. Two things to decide explicitly rather than discover: CNA counts vertices **written** rather than capacity, which XNA does not, and no draw's *result* is observable here — fact 1 stands, so the evidence must say "the call was accepted" and no more. |
-| Stock effects (`BasicEffect`, `AlphaTestEffect`, `DualTextureEffect`, `EnvironmentMapEffect`, `SkinnedEffect`, `EffectMaterial`, `IEffectLights`) | 7 types | ~150 routes, all present. They derive from `Effect`, which now exists. |
+| Stock effects (`BasicEffect`, `AlphaTestEffect`, `DualTextureEffect`, `EnvironmentMapEffect`, `SkinnedEffect`, `EffectMaterial`, `IEffectLights`) | 7 types | **The next milestone.** ~150 routes, all present, and `Effect` now exists for them to derive from. `cna_effect_matrices_*`, `cna_effect_fog_*` and `cna_effect_lights_*` are the three interface families they share. |
 | `SpriteFont` + `SpriteBatch.DrawString` | 1 type, 6 members | 9 routes, including `cna_sprite_batch_draw_string`. |
 | `ContentManager` (+ `Game.Content`) | 2 types, 1 member | 33 routes. Phase 8. |
 
@@ -111,7 +110,9 @@ Still blocked, and now measured rather than inferred:
 
 * **`GraphicsDevice.GetBackBufferData`** — the size query answers 384,000 with
   `CNA_RESULT_CAPACITY` and the read answers `NOT_SUPPORTED`, before and after a
-  clear that succeeds. Foundation 53's first bounding fact stands.
+  clear that succeeds. Foundation 53's first bounding fact stands, and
+  Foundation 68 landed the draws **without** weakening it: a draw that returns
+  is a draw the device accepted, and no test claims a pixel arrived anywhere.
 * **`GamePad.InvalidController`, `Keyboard.CouldNotReadKeyboard`** — the
   error-channel halves that need a native input failure this environment cannot
   produce. CNA already matches the "not connected" half.
@@ -188,7 +189,7 @@ python3 tools/api_compat/verify.py --symbol-graph … --output docs/generated/ap
 python3 tools/api_compat/dependency_graph.py --report … --output …
 python3 tools/native_abi/verify.py     --cna-include … --library "$CNA_NATIVE_LIBRARY"
 python3 tools/native_abi/mutations.py  --cna-include … --library "$CNA_NATIVE_LIBRARY"
-CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~60 min, 203 mutations
+CNA_NATIVE_LIBRARY=… python3 tools/projection_mutations/run.py     # ~65 min, 215 mutations
 python3 tools/api_compat/message_coverage.py --self-test|--mutations|(report)
 python3 tools/api_compat/pinned_assembly_audit.py …
 python3 tools/api_compat/bcl_authority_audit.py … --cross-check --negative-control …×4
@@ -236,7 +237,7 @@ Two operational notes worth the seconds they save:
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 67 have landed since. Nothing here is
+> Foundation Milestones 37 through 68 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->

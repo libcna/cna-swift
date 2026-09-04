@@ -62,6 +62,7 @@ TEXTURECOLLECTION = ROOT / "Sources/CNA/Xna/Graphics/TextureCollection.swift"
 EFFECT = ROOT / "Sources/CNA/Xna/Graphics/Effect.swift"
 EFFECTCOLLECTIONS = ROOT / "Sources/CNA/Xna/Graphics/EffectCollections.swift"
 EFFECTSUPPORT = ROOT / "Sources/CNA/Xna/Graphics/EffectSupport.swift"
+DRAW = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceDraw.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -2026,6 +2027,112 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "        internal func apply() throws {\n"
         "            try OnApply()\n"
         "            try nativeStorage.runtime.functions.check(",
+    ),
+    # ---- Foundation 68: the draw family -----------------------------------
+    (
+        "draw-accepts-zero-primitives",
+        "a draw of nothing accepted where XNA raises MustDrawSomething",
+        DRAW,
+        "        guard primitiveCount > 0 else {",
+        "        guard primitiveCount >= 0 else {",
+    ),
+    (
+        "draw-primitive-limit-unchecked",
+        "more primitives than the profile allows reaching the device",
+        DRAW,
+        "        guard primitiveCount <= capabilities.maxPrimitiveCount else {",
+        "        guard primitiveCount <= capabilities.maxVertexBufferSize else {",
+    ),
+    (
+        "draw-vertex-count-checked-after-the-primitive-count",
+        "a bad numVertices reported as a bad primitiveCount",
+        DRAW,
+        "        let handle = try validatedHandle(\"GraphicsDevice.DrawIndexedPrimitives\")\n"
+        "        guard numVertices > 0 else {",
+        "        let handle = try validatedHandle(\"GraphicsDevice.DrawIndexedPrimitives\")\n"
+        "        try validatePrimitiveCount(primitiveCount)\n"
+        "        guard numVertices > 0 else {",
+    ),
+    (
+        "draw-instance-stream-mask-always-zero",
+        "a non-instanced draw accepted with an instanced stream bound",
+        DRAW,
+        "        for (index, binding) in runtimeState.cachedVertexBufferBindings.enumerated()\n"
+        "        where binding.InstanceFrequency != 0 {",
+        "        for (index, binding) in runtimeState.cachedVertexBufferBindings.enumerated()\n"
+        "        where binding.InstanceFrequency == 0 {",
+    ),
+    (
+        "instanced-draw-accepts-a-uniform-stream-set",
+        "an instanced draw accepted with every stream instanced, or none",
+        DRAW,
+        "        guard mask != 0, !allOne else {",
+        "        guard mask == 0 || allOne || true else {",
+    ),
+    (
+        "user-draw-empty-array-not-reported-as-null",
+        "an empty user vertex array falling through to the offset test",
+        DRAW,
+        "        guard count > 0 else {\n"
+        "            throw CNAArgumentNullException(\n"
+        "                paramName: \"vertexData\",",
+        "        guard count >= 0 else {\n"
+        "            throw CNAArgumentNullException(\n"
+        "                paramName: \"vertexData\",",
+    ),
+    (
+        "user-draw-offset-not-bounded-by-the-array",
+        "a vertex offset past the end of the caller's array accepted",
+        DRAW,
+        "        guard vertexOffset >= 0, Int(vertexOffset) < count else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"vertexOffset\",",
+        "        guard vertexOffset >= 0, Int(vertexOffset) <= count else {\n"
+        "            throw CNAArgumentOutOfRangeException(\n"
+        "                paramName: \"vertexOffset\",",
+    ),
+    (
+        "user-draw-element-count-test-is-signed",
+        "an overflowing offset plus element count slipping past an unsigned test",
+        DRAW,
+        "        let end = UInt32(bitPattern: elements) &+ UInt32(bitPattern: offset)\n"
+        "        return end <= UInt32(clamping: count)",
+        "        let end = elements &+ offset\n"
+        "        return end <= Int32(clamping: count)",
+    ),
+    (
+        "user-draw-element-count-not-consulted",
+        "a primitive count the array cannot supply accepted",
+        DRAW,
+        "        guard Microsoft.Xna.Framework.Graphics.GraphicsDevice.arrayHolds(\n"
+        "            offset: vertexOffset, elements: needed, count: count) else {",
+        "        guard Microsoft.Xna.Framework.Graphics.GraphicsDevice.arrayHolds(\n"
+        "            offset: vertexOffset, elements: 0, count: count) else {",
+    ),
+    (
+        "user-indexed-draw-allows-32-bit-indices-on-reach",
+        "32-bit user indices accepted where Reach refuses them",
+        DRAW,
+        "            guard capabilities.indexElementSize32 else {",
+        "            guard !capabilities.indexElementSize32 else {",
+    ),
+    (
+        "draw-does-not-reach-the-route",
+        "DrawPrimitives accepted and discarded rather than handed to CNA",
+        DRAW,
+        "            runtimeState.functions.graphicsDeviceDrawPrimitives(\n"
+        "                handle, UInt32(bitPattern: primitiveType.rawValue),\n"
+        "                startVertex, primitiveCount),",
+        "            CNA_Result(0),",
+    ),
+    (
+        "primitive-type-not-carried-to-the-route",
+        "every draw submitted as a triangle list whatever was asked",
+        DRAW,
+        "                handle, UInt32(bitPattern: primitiveType.rawValue),\n"
+        "                startVertex, primitiveCount),",
+        "                handle, 0,\n"
+        "                startVertex, primitiveCount),",
     ),
 ]
 

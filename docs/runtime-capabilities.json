@@ -193,9 +193,9 @@
       "evidence": "SetVertexBuffer, SetVertexBuffers, GetVertexBuffers and Indices bind through cna_graphics_device_set_vertex_buffers and _set_index_buffer, and the managed objects are held on RuntimeState because CNA publishes no route from a native object back to a handle and its header prescribes caching what you bind -- which is what XNA's DeviceResourceManager does. The tests assert object IDENTITY, including a buffer created in LoadContent and bound in Update, which is why the InvalidDevice test compares runtimes and not per-callback facades."
     },
     {
-      "operation": "Drawing",
+      "operation": "Drawing (superseded, Foundation 63 state)",
       "status": "BLOCKED_UPSTREAM_UNTIL_EFFECT",
-      "evidence": "Every CNA draw route answers CNA_ERROR_CATEGORY_INTERNAL with \"GraphicsDevice::DrawPrimitives: no effect has been applied\" while no effect is applied (build-probe/f63_draw.c), and XNA's VerifyCanDraw raises CannotDrawNoShader for the same reason. Both agree, so the draw members wait for Effect rather than shipping as members that always fail on the runtime channel where XNA raises InvalidOperationException. The binding half does not depend on a shader and landed in Foundation 63."
+      "evidence": "SUPERSEDED by the \"Drawing\" row above at Foundation 68. Kept because the measurement was real when it was written: every CNA draw route answered CNA_ERROR_CATEGORY_INTERNAL with \"no effect has been applied\" while no effect was applied, and Effect was not projected. Foundation 67 tested the other half and Foundation 68 landed the members."
     },
     {
       "operation": "SpriteBatch Begin/Draw/End",
@@ -486,6 +486,11 @@
       "operation": "Vertex buffer draw range",
       "status": "MEASURED_NATIVE_DIVERGENCE",
       "evidence": "CNA counts vertices WRITTEN, not capacity allocated: a 64-vertex buffer with a renderer, bound, with an effect applied, refuses every draw with CNA_RESULT_INVALID_ARGUMENT and 'The requested primitive range exceeds the bound vertex buffer'; uploading data makes the identical call succeed (build-probe/f67_effect.c). XNA has no such rule -- an un-SetData'd VertexBuffer draws undefined contents rather than raising. The draw members must decide explicitly what to do about it; a test that happened to upload data first would never have seen it, and the probe found it only because its first draft misread the refusal as a capacity problem."
+    },
+    {
+      "operation": "Draw validation ownership",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "The managed half of every draw is reproduced and is what the tests assert: the disposal check, MustDrawSomething for a non-positive primitiveCount, ProfileMaxPrimitiveCount against the extracted limit (65,535 on Reach), NumberVerticesMustBeGreaterZero BEFORE the primitive count on the indexed draws, NonZeroInstanceFrequency on the three non-instanced ones, InvalidInstanceStreams on the instanced one when the bound streams are all instanced or all not, and the user-primitive draws' seven tests including the unsigned offset-plus-element-count bound. VerifyCanDraw's eight messages are recorded native-owned: five read shader state outright, and three -- ProfileInvalidBlendFormat, ProfileInvalidFilterFormat, ProfileNoWrapNonPow2 -- LOOK derivable from the pinned profile table but decide on the D3D tracker's applied sampler state and bound textures, which canonical CNA code changes without this binding seeing it. A check reading a partial view would silently not fire."
     }
   ]
 }

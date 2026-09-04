@@ -71,6 +71,18 @@ _Static_assert(CNA_CLEAR_OPTION_TARGET == 1, "ClearOptions.Target");
 _Static_assert(CNA_CLEAR_OPTION_DEPTH_BUFFER == 2, "ClearOptions.DepthBuffer");
 _Static_assert(CNA_CLEAR_OPTION_STENCIL == 4, "ClearOptions.Stencil");
 
+/* Every draw passes PrimitiveType.rawValue straight into the route's
+ * CNA_PrimitiveType, and no observation on this host can catch a swap: a
+ * TriangleList drawn as a TriangleStrip is accepted and renders nothing anyone
+ * can read back. These four are the whole of the evidence that the
+ * pass-through is safe. CNA additionally declares a POINT_LIST extension at 4
+ * which XNA has no member for, so the enum is narrower than the ABI and the
+ * projection can only ever send 0 through 3. */
+_Static_assert(CNA_PRIMITIVE_TRIANGLE_LIST == 0, "PrimitiveType.TriangleList");
+_Static_assert(CNA_PRIMITIVE_TRIANGLE_STRIP == 1, "PrimitiveType.TriangleStrip");
+_Static_assert(CNA_PRIMITIVE_LINE_LIST == 2, "PrimitiveType.LineList");
+_Static_assert(CNA_PRIMITIVE_LINE_STRIP == 3, "PrimitiveType.LineStrip");
+
 /* TextureCube.SetData/GetData pass CubeMapFace.rawValue straight into
  * CNA_TextureCubeTransfer::face, so the six values are a boundary dependency,
  * and no observation on the qualified artifact can catch a mismatch: the
