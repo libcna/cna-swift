@@ -31,6 +31,7 @@ RESOURCE = ROOT / "Sources/CNA/Xna/Graphics/GraphicsResource.swift"
 TEXTURE2D = ROOT / "Sources/CNA/Xna/Graphics/Texture2D.swift"
 RENDER_TARGET = ROOT / "Sources/CNA/Xna/Graphics/RenderTarget2D.swift"
 GAME = ROOT / "Sources/CNA/Xna/Framework/Game.swift"
+DISPATCHER = ROOT / "Sources/CNA/Xna/Framework/FrameworkDispatcher.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
@@ -111,6 +112,22 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 72: FrameworkDispatcher ------------------------------
+    #
+    # Aimed at the handle, not at the pump. Whether the pump did any WORK is
+    # not observable from here -- no song plays, no microphone is opened and no
+    # storage device changes on this host -- so a mutation that skipped the
+    # route entirely would survive, and one was replaced rather than scored for
+    # exactly that reason. What IS observable is that the route was given the
+    # runtime's real game handle: CNA validates it, so a wrong one turns an
+    # accepted pump into a refused one.
+    (
+        "dispatcher-handle-not-carried",
+        "the dispatcher pumping against a handle the runtime does not own",
+        DISPATCHER,
+        "runtime.functions.frameworkDispatcherUpdate(runtime.gameHandle)",
+        "runtime.functions.frameworkDispatcherUpdate(0)",
+    ),
     # ---- Foundation 63: vertex and index buffer binding ------------------
     (
         "binding-cache-not-updated",

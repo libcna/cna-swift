@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=185
-TARGET_MEMBERS=2308
-TOTAL_DIAGNOSTICS=108
-COMPLETE_TYPES=179
+TARGET_TYPES=186
+TARGET_MEMBERS=2309
+TOTAL_DIAGNOSTICS=107
+COMPLETE_TYPES=180
 PARTIAL_TYPES=6
-MISSING_TYPES=72
-MISSING_TYPE=72
+MISSING_TYPES=71
+MISSING_TYPE=71
 MISSING_MEMBER=32
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -63,11 +63,11 @@ WRITE_ONLY_PROJECTIONS=0
 MEASURED_ACCESSOR_PROJECTIONS=89
 PENDING_ACCESSOR_PROJECTIONS=25
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=21
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=22
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=19
-XNA_SEALED_CLASS_PROJECTIONS=30
+XNA_SEALED_CLASS_PROJECTIONS=31
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=29
 BCL_ABSTRACT_BASE_WIDENINGS=1
@@ -122,6 +122,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=58
 - `Microsoft.Xna.Framework.CurveTangent`
 - `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.DrawableGameComponent`
+- `Microsoft.Xna.Framework.FrameworkDispatcher`
 - `Microsoft.Xna.Framework.GameComponent`
 - `Microsoft.Xna.Framework.GameComponentCollection`
 - `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
@@ -374,7 +375,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Design.Vector2Converter`
 - `Microsoft.Xna.Framework.Design.Vector3Converter`
 - `Microsoft.Xna.Framework.Design.Vector4Converter`
-- `Microsoft.Xna.Framework.FrameworkDispatcher`
 - `Microsoft.Xna.Framework.GameWindow`
 - `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
 - `Microsoft.Xna.Framework.Graphics.GraphicsAdapter`

@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 185,
-    "TARGET_MEMBERS": 2308,
-    "TOTAL_DIAGNOSTICS": 108,
-    "COMPLETE_TYPES": 179,
+    "TARGET_TYPES": 186,
+    "TARGET_MEMBERS": 2309,
+    "TOTAL_DIAGNOSTICS": 107,
+    "COMPLETE_TYPES": 180,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 72,
-    "MISSING_TYPE": 72,
+    "MISSING_TYPES": 71,
+    "MISSING_TYPE": 71,
     "MISSING_MEMBER": 32,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -66,11 +66,11 @@
     "MEASURED_ACCESSOR_PROJECTIONS": 89,
     "PENDING_ACCESSOR_PROJECTIONS": 25,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 21,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 22,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 19,
-    "XNA_SEALED_CLASS_PROJECTIONS": 30,
+    "XNA_SEALED_CLASS_PROJECTIONS": 31,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 29,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -123,6 +123,7 @@
     "Microsoft.Xna.Framework.CurveTangent",
     "Microsoft.Xna.Framework.DisplayOrientation",
     "Microsoft.Xna.Framework.DrawableGameComponent",
+    "Microsoft.Xna.Framework.FrameworkDispatcher",
     "Microsoft.Xna.Framework.GameComponent",
     "Microsoft.Xna.Framework.GameComponentCollection",
     "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
@@ -314,7 +315,6 @@
     "Microsoft.Xna.Framework.Design.Vector2Converter",
     "Microsoft.Xna.Framework.Design.Vector3Converter",
     "Microsoft.Xna.Framework.Design.Vector4Converter",
-    "Microsoft.Xna.Framework.FrameworkDispatcher",
     "Microsoft.Xna.Framework.GameWindow",
     "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
     "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
@@ -512,11 +512,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Design.Vector4Converter",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.FrameworkDispatcher",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2788,6 +2783,13 @@
   ],
   "nonPublicConstructionProjections": [
     {
+      "type": "Microsoft.Xna.Framework.FrameworkDispatcher",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
       "type": "Microsoft.Xna.Framework.Graphics.DisplayMode",
       "clrSealed": false,
       "referencePublicConstructors": 0,
@@ -4446,6 +4448,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.FrameworkDispatcher",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -10802,16 +10812,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.FrameworkDispatcher",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.FrameworkDispatcher",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Game",
