@@ -819,6 +819,32 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
+### `git add -A` during a mutation run has now corrupted history twice
+
+**Never stage `Sources/` while `.mutation-gate.lock` is held.** A run plants a
+mutation, `git add -A` captures it, and the run restores the file a minute
+later — so the working tree looks right and the damage lands only in history,
+where nothing looks for it.
+
+It happened once at `5513b94`. It happened again on 2026-09-05, to **nine
+consecutive commits**: `fd58b3e` through `d7c45a5`, each a documentation commit
+that also carried one line of a planted mutation in a Graphics source it never
+mentions. They largely cancel — each captured a mutation and the next captured
+its restore — but the net left `TextureCollection.swift` missing
+`slots[resolved] = value` in `HEAD` while the working tree had it.
+
+**`--audit-tree` structurally cannot catch this.** By the time anyone runs it
+the harness has restored the tree; the audit is looking at the right file and
+the wrong place. The check belongs at the commit, and there is now a
+`.githooks/pre-commit` that refuses a staged `Sources/` path while the lock is
+held, wired up with `core.hooksPath`. A fresh clone needs
+`git config core.hooksPath .githooks` before it is protected — that is the
+hook's one weakness and it is worth doing first.
+
+The habit to keep even with the hook: while a run is in flight, commit the paths
+you actually edited (`git add NEXT.md docs/`), never `-A`.
+
+
 ### What a mutation run costs the SSD, measured
 
 **116 MB per mutation. About 33 GB for a full 290-mutation run.** Measured on
