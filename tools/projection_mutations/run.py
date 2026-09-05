@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -2850,20 +2851,41 @@ TEST_TIMEOUT_SECONDS = 600
 DEFAULT_JOBS = 3
 
 
-def run_tests(swift_test: str, jobs: int = DEFAULT_JOBS) -> tuple[int, bool]:
-    """(exit status, whether it ran out of time)."""
+# A line XCTest writes for a failed assertion or an uncaught error.
+TEST_FAILURE_MARKER = re.compile(r"^.*: error: .*Tests\.", re.M)
+
+
+def _decoded(stream: object) -> str:
+    if isinstance(stream, bytes):
+        return stream.decode("utf-8", "replace")
+    return stream if isinstance(stream, str) else ""
+
+
+def run_tests(swift_test: str,
+              jobs: int = DEFAULT_JOBS) -> tuple[int, bool, bool]:
+    """(exit status, whether it ran out of time, whether a test failed).
+
+    The third value exists because a run can do BOTH. A mutation is often
+    caught by dozens of assertions and only then reaches some later test that
+    hangs -- `from-type-size-test-reads-the-wrong-size` failed 28 assertions
+    before hanging at test 346 of 809. Reporting that as HUNG threw away the
+    verdict and left a caught mutation looking unmeasured, so the output is
+    scanned for failures even when the deadline fires.
+    """
     try:
         result = subprocess.run(
             [swift_test, "-j", str(jobs)],
             cwd=ROOT, text=True, capture_output=True,
             timeout=TEST_TIMEOUT_SECONDS)
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as expired:
         # The child is killed by `subprocess.run`, but the test BINARY it
         # spawned is not its process group's only member and outlives it.
         subprocess.run(["pkill", "-9", "-f", "CNAPackageTests.xctest"],
                        capture_output=True)
-        return 1, True
-    return result.returncode, False
+        partial = _decoded(expired.stdout) + _decoded(expired.stderr)
+        return 1, True, bool(TEST_FAILURE_MARKER.search(partial))
+    failed = bool(TEST_FAILURE_MARKER.search(result.stdout + result.stderr))
+    return result.returncode, False, failed
 
 
 def main() -> int:
@@ -2962,7 +2984,7 @@ def main() -> int:
             print(f"  STALE {item}")
         return 1
 
-    baseline, baseline_hung = run_tests(args.swift_test, args.jobs)
+    baseline, baseline_hung, _ = run_tests(args.swift_test, args.jobs)
     if baseline != 0:
         print("PROJECTION_MUTATION_BASELINE="
               + ("HUNG — the unmutated tree did not finish in "
@@ -2991,7 +3013,7 @@ def main() -> int:
         mutated = text.replace(old, new)
         try:
             path.write_text(mutated, encoding="utf-8")
-            code, hung = run_tests(args.swift_test, args.jobs)
+            code, hung, failed = run_tests(args.swift_test, args.jobs)
         finally:
             # Restore ONLY what this harness wrote.
             #
@@ -3018,12 +3040,19 @@ def main() -> int:
                 "  rather than written over the change; recover the file by\n"
                 "  hand and re-run.")
             return 1
-        status = "HUNG" if hung else ("CAUGHT" if code != 0 else "SURVIVED")
+        # A run that failed AND hung is CAUGHT, and says so: the hang is
+        # reported alongside rather than instead of the verdict.
+        if failed or (code != 0 and not hung):
+            status = "CAUGHT+HUNG" if hung else "CAUGHT"
+        elif hung:
+            status = "HUNG"
+        else:
+            status = "SURVIVED"
         # flush: a full run takes hours and stdout is block-buffered when
         # redirected, so without this a redirected run shows NOTHING until
         # it finishes -- which is exactly when the progress stops mattering.
-        print(f"{status:9} {name:34} {description}", flush=True)
-        if code == 0:
+        print(f"{status:11} {name:34} {description}", flush=True)
+        if status == "SURVIVED":
             survivors.append(f"{name}: {description}")
 
     for path, text in originals.items():
