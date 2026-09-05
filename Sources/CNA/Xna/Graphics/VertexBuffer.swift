@@ -371,7 +371,7 @@ extension Microsoft.Xna.Framework.Graphics {
             var slack = 0
             if vertexStride != 0 {
                 slack = Int(vertexStride) - elementSize
-                guard slack >= -64 else {
+                guard slack >= 0 else {
                     throw CNAArgumentOutOfRangeException(
                         paramName: "vertexStride",
                         message: Microsoft.Xna.Framework.Graphics.BufferResources

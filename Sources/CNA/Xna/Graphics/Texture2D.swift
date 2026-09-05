@@ -418,7 +418,7 @@ extension Microsoft.Xna.Framework.Graphics {
             }
             let elementSize = Int32(MemoryLayout<T>.size)
             if elementSize != formatSize {
-                guard formatSize > elementSize, formatSize % elementSize == 0 else {
+                guard false else {
                     throw CNAArgumentException(message: invalidDataSizeMessage)
                 }
             }

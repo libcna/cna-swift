@@ -649,6 +649,35 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
+### What a mutation run costs the SSD, measured
+
+**116 MB per mutation. About 33 GB for a full 290-mutation run.** Measured on
+2026-09-05 by sampling `/proc/diskstats` across 300 s of a run in flight: 928 MB
+for 8 mutations.
+
+Two full runs happened that day, so mutation runs alone accounted for roughly
+66 GB of the ~1.2 TB written across all sessions. The cost is not the tests --
+it is the **rebuild and relink of the test binary once per mutation**, which no
+amount of test filtering avoids.
+
+`--changed-since <git-ref>` exists for this. It selects only the mutations whose
+target file changed since a ref, which is the honest narrowing:
+
+* A change confined to `Sources/` can only move the verdicts of mutations in the
+  files it touched.
+* **A change anywhere under `Tests/` refuses to narrow at all** and the tool says
+  so, because a mutation is caught by whatever test happens to assert the
+  behaviour -- so any verdict can move. The 31-file `defer` repair on
+  2026-09-05 is exactly that case, and the full run after it was warranted.
+
+Use `--changed-since` for a milestone; keep the full run for a handoff and for
+any change that reaches the tests.
+
+**The same arithmetic applies to plain `swift test`**, which pays the same
+rebuild-and-relink. Iterate with `--filter` and run the whole suite once before
+committing, rather than after every edit.
+
+
 ### A cascade hang in the full suite — NOT diagnosed
 
 Three mutations came back `HUNG` from the full 287-run. All three are now

@@ -2938,6 +2938,13 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--swift-test", default="swift-test")
     parser.add_argument(
+        "--changed-since", metavar="GIT_REF",
+        help="run only the mutations whose target file changed since GIT_REF. "
+             "A full run rebuilds and relinks the test binary once per "
+             "mutation -- measured at ~1.3 MB/s, about 11 GB for all 290 -- "
+             "and re-verifies mutations nothing has touched. This selects the "
+             "ones that can actually have changed verdict.")
+    parser.add_argument(
         "--jobs", type=int, default=DEFAULT_JOBS,
         help="compilation parallelism for the inner swift test "
              f"(default {DEFAULT_JOBS})")
@@ -3048,6 +3055,31 @@ def main() -> int:
     if args.only is not None and not selected:
         print(f"PROJECTION_MUTATIONS=NONE no mutation name contains {args.only!r}")
         return 1
+
+    if args.changed_since:
+        changed = subprocess.run(
+            ["git", "diff", "--name-only", args.changed_since, "--"],
+            cwd=ROOT, text=True, capture_output=True)
+        if changed.returncode != 0:
+            print(f"PROJECTION_MUTATION_SELECTION=FAILED — git diff against "
+                  f"{args.changed_since} did not run")
+            return 1
+        touched = {
+            (ROOT / line.strip()).resolve()
+            for line in changed.stdout.splitlines() if line.strip()
+        }
+        # A change under Tests/ can flip any verdict, because a mutation is
+        # caught by whatever test happens to assert the behaviour. Only a
+        # change confined to Sources/ narrows the selection honestly.
+        if any("/Tests/" in str(path) for path in touched):
+            print("PROJECTION_MUTATION_SELECTION=FULL — tests changed, so any "
+                  "verdict can have moved")
+        else:
+            selected = [m for m in selected if m[2].resolve() in touched]
+            print(f"PROJECTION_MUTATION_SELECTION={len(selected)} "
+                  f"of {len(MUTATIONS)} — only files changed since "
+                  f"{args.changed_since}")
+
 
     survivors: list[str] = []
     for name, description, path, old, new in selected:
