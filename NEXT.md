@@ -269,6 +269,27 @@ guessed:
 * `WindowHandle` is `System.IntPtr`, which projects the way
   `GraphicsDevice.Present(overrideWindowHandle:)` already projects it.
 
+**The hard part is WHEN the snapshot is taken, not that it is one.** Every one
+of the fifteen `cna_graphics_adapter_*` routes takes a `CNA_Handle
+graphics_device`, and this project's fifth bounding fact is that CNA's device is
+only real inside a lifecycle callback. XNA's `Adapters` and `DefaultAdapter` are
+static **and infallible**: they read `pAdapterList`, a static field built once by
+enumeration, and they answer anywhere — before a game exists, after it is gone.
+
+Those two cannot both be satisfied. The projection can only populate the list
+from inside a callback, so **before any callback has run, `Adapters` answers an
+empty collection where XNA answers the machine's adapters.** That is a real
+divergence, it is forced, and it has to be written into the type's
+documentation and asserted by a test rather than discovered by a consumer.
+
+`CNA_GraphicsAdapterInfo` covers the identity properties in one read —
+`adapter_index`, `is_default_adapter`, `is_wide_screen`, `use_null_device`,
+`use_reference_device`, `vendor_id`, `device_id`, `revision` — with
+`copy_description` and `copy_device_name` for the two strings, so a whole
+adapter is four routes plus the display modes. Note that CNA documents
+`revision` as **always zero**, which is a value the projection must pass through
+rather than treat as missing.
+
 **`GraphicsAdapter` is a SNAPSHOT, and the fallibility table decides that
 before a line is written.** All fifteen of its accessors are pinned
 `IL_NO_FAILURE_PATH` — every one, including both static ones — so not a single

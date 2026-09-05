@@ -168,7 +168,6 @@ extension Microsoft.Xna.Framework.Graphics {
                 device.runtimeState.functions.graphicsDeviceSetTexture(
                     deviceHandle, stage, UInt32(resolved), textureHandle),
                 operation: "cna_graphics_device_set_texture")
-            slots[resolved] = value
         }
 
         /// `FrameworkResources.MustResolveRenderTarget`.

@@ -41,7 +41,7 @@ extension Microsoft.Xna.Framework.Graphics {
                 VertexElement(0, .Vector3, .Position, 0),
                 VertexElement(12, .Color, .Color, 0),
             ])
-
+            .named("VertexPositionColor.VertexDeclaration")
 
         /// `IVertexType.get_VertexDeclaration`, an explicit interface
         /// implementation that returns the static field.
