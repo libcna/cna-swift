@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 74.** The Foundation 30–36 handoff that used to be
+> **Current as of Foundation 76.** The Foundation 30–36 handoff that used to be
 > this file is kept below, under its own heading, because the measurements it
 > records were real when it was written. `plan.md` remains the authority for
 > project rules; this file is the *state of the work* and *what is left*.
@@ -23,11 +23,11 @@ python3 tools/status_gate/verify.py \
 
 ```text
 791 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=105   COMPLETE_TYPES=182   PARTIAL_TYPES=6
-MISSING_TYPE=69  MISSING_MEMBER=32  OVERLOAD_MAPPING_MISMATCH=4
+TOTAL_DIAGNOSTICS=101   COMPLETE_TYPES=183   PARTIAL_TYPES=5
+MISSING_TYPE=69  MISSING_MEMBER=30  OVERLOAD_MAPPING_MISMATCH=2
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=317  PROTOTYPE_TYPE_POSITIONS=1081  LAYOUTS=54  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=290 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=318  PROTOTYPE_TYPE_POSITIONS=1090  LAYOUTS=54  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=292 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -1077,7 +1077,7 @@ permanent test.
 
 > **The handoff written at the end of the Foundation 30-36 session, kept as
 > that session's record.** It is not the current state and is not maintained:
-> Foundation Milestones 37 through 74 have landed since. Nothing here is
+> Foundation Milestones 37 through 76 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
 
 <!-- status-gate:historical -->
