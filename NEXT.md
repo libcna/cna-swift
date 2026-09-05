@@ -65,6 +65,39 @@ cannot be verified.
 
 ## What is left, classified
 
+### The shape of every remaining family, before any of them starts
+
+Foundation 74 lost time designing `Mouse.WindowHandle` as a throwing forward
+before the gate pointed at the pinned fallibility table and refused it. That
+table can be asked the question **for everything left at once**, and the answer
+decides each milestone's architecture before a line of it is written:
+
+| family | missing types | accessors | fallible getters | shape |
+|---|---:|---:|---:|---|
+| `Media` | 19 | 94 | **68** | throwing forwards |
+| `Design` | 13 | 0 | 0 | methods only — no accessor at all |
+| `Audio` | 10 | 40 | 7 | mostly snapshot |
+| `Model` | 8 | 25 | 2 | **snapshot** |
+| `Content` | 6 | 7 | 0 | **snapshot** |
+| `Graphics` (rest) | 6 | 17 | 1 | mostly snapshot |
+| `Framework` | 4 | 16 | 1 | mostly snapshot |
+| `Storage` | 2 | 6 | 4 | throwing forwards |
+| `GamerServices` | 1 | 0 | 0 | methods only |
+
+**An infallible getter cannot call a CNA route**, because every route can fail
+and a Swift getter cannot throw. So a family whose accessors are infallible has
+to read its values from CNA **once** — at construction or refresh — and cache
+them, with every getter a plain field read. That is what `GraphicsAdapter` (15
+of 15 infallible) and `Model` (23 of 25) both require, and it is the opposite of
+what `Media` requires, where two thirds of the getters throw and forwarding is
+the faithful shape.
+
+Two things this table is not. It reads **getters** only, so a fallible setter on
+an otherwise infallible property still needs the deferred-write treatment
+`Mouse.WindowHandle` got. And it counts accessors, not difficulty: `Design` has
+none at all and is still the milestone that drags in `System.dll`.
+
+
 ### ACTIONABLE_LOCAL — upstream support exists, the managed side is the work
 
 CNA declares **4,076** distinct `cna_*` symbols. Mapping all 72 still-missing

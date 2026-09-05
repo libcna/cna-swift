@@ -702,7 +702,7 @@ extension Microsoft.Xna.Framework.Graphics {
                 }
                 guard format != .None else { return .Target }
                 if format == .Depth24Stencil8 {
-                    return [.Target, .DepthBuffer, .Stencil]
+                    return [.Target, .DepthBuffer]
                 }
                 return [.Target, .DepthBuffer]
             }
