@@ -819,6 +819,53 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
+### `GraphicsAdapter` — built once, reverted, and what it cost to learn
+
+A complete first implementation was written and then **reverted on purpose**: it
+compiled, its six tests passed, and it raised `TOTAL_DIAGNOSTICS` from 105 to
+116. A type that leaves the surface less conformant than it found it is not
+progress, and the fixes it needs are shape decisions rather than typing.
+
+Everything below is measured. None of it needs re-deriving.
+
+**The routes work and the bindings are right.** Twelve `cna_graphics_adapter_*`
+routes bind cleanly; enumeration through them answers **one adapter** on this
+host, default and wide-screen, with a real vendor (4098) and device id (5567),
+`Revision` and `SubSystemId` zero as CNA documents, a non-empty device name and
+description, and **both `Reach` and `HiDef` supported**.
+
+**Three shim structures must be exact**, and two were wrong on the first
+attempt: `CNA_DisplayMode` is **24 bytes** and carries an `aspect_ratio` between
+`height` and `format` that a first reading missed; `CNA_GraphicsFormatSelection`
+is **24** with a `reserved[3]`; `CNA_GraphicsAdapterInfo` is **48**. Each is
+passed with an explicit `struct_size` the runtime validates, so a missing field
+fails the call with *"The DisplayMode output structure is invalid"* rather than
+corrupting anything — a good failure, but only if the sizes are asserted, which
+a test now does.
+
+**`cna_graphics_adapters_refresh` can never be called from here.** It refuses
+while a device exists — *"The active C GraphicsDevice retains its adapter;
+refreshing the global native adapter cache would invalidate that reference"* —
+and a device is exactly what enumeration needs. It rebuilds a global cache,
+which reading the current adapters does not require. Not a route to bind.
+
+**What the gate demands, and the one open question.** `Adapters` must be
+`CNAReadOnlyCollection<GraphicsAdapter>?`, `CurrentDisplayMode` and
+`SupportedDisplayModes` must be Optional, the two `Query*` members must take
+their three results as `inout` parameters the way `TryGetValue` does rather than
+returning a tuple, and **no public member may exist that XNA lacks** — so the
+`Refresh()` that fills the snapshot cannot be public and must be driven from
+device creation instead.
+
+The open question is `DefaultAdapter`. Its nullability is *not proven from the
+registered CIL*, so the rule makes it **non-Optional** — but before any
+enumeration there is no adapter to return, and its getter may not throw. XNA
+reads `pAdapterList[0]`, which traps on an empty list; whether this projection
+should trap likewise, or whether `Refresh` must be guaranteed to have run before
+the type is reachable at all, is a public-API decision and is the first thing the
+next attempt has to settle.
+
+
 ### `git add -A` during a mutation run has now corrupted history twice
 
 **Never stage `Sources/` while `.mutation-gate.lock` is held.** A run plants a
