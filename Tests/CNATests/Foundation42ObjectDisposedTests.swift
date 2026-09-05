@@ -182,8 +182,12 @@ final class Foundation42ObjectDisposedTests: XCTestCase {
             throw XCTSkip("set CNA_NATIVE_LIBRARY to a CNA C ABI 0.21 or later library")
         }
         let game = try DisposedProbeGame()
+        // Dispose unconditionally. A throwing `Run()` skipped it, and the
+        // native game it leaked is the process's ONE active CNA game -- a
+        // later `Game.Run()` then blocks forever, which is how a caught
+        // mutation came back HUNG at test 346 of 809.
+        defer { try? game.Dispose() }
         try game.Run()
-        try game.Dispose()
         if let failure = game.failure { throw failure }
         XCTAssertFalse(
             game.sawCNAError, "a CLR-shaped failure must not stay on CNAError")

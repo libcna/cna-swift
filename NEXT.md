@@ -629,6 +629,43 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
+### A cascade hang in the full suite — NOT diagnosed
+
+Three mutations came back `HUNG` from the full 287-run. All three are now
+confirmed **`CAUGHT`** — the harness was scoring only the exit status, which a
+timeout never produces, and it reads the captured failures now — so nothing is
+unmeasured. What remains is the hang itself, and it is **still unexplained**.
+
+What is known, measured rather than supposed:
+
+* It only happens in the **whole suite**. With
+  `from-type-size-test-reads-the-wrong-size` planted, `swift test` stops at test
+  **346 of 809**, inside
+  `Foundation62ProfileCapabilityTests.testAVertexBufferLargerThanTheProfileIsRefused`.
+* **That test is not the defect.** Run alone with the same mutation it *fails*,
+  correctly, in **0.046 s**.
+* Filtering to `Foundation6[012]` — 32 tests including that one — does **not**
+  hang either. So something in the classes that run before it (53, 54, 55, 57,
+  59 all drive games) is required to reproduce it.
+* By then the mutation has already failed **28 assertions**, so the hang is
+  downstream of the detection, not instead of it.
+
+**A hypothesis was tested and is wrong.** Every probe helper ran
+`try game.Run()` then `try game.Dispose()`, so a throwing `Run()` skipped
+disposal and leaked what CNA calls *"the process's active C-owned CNA game"* —
+a plausible way for a later `Game.Run()` to block forever. Disposal is
+unconditional now (`defer`) in all 31 helpers, and **the hang is unchanged**.
+The change is kept because the leak was real, but it must not be recorded as
+the fix, and the next attempt should start by ruling out this explanation
+rather than re-deriving it.
+
+Worth knowing for whoever picks it up: the first draft of that repair moved
+`Dispose()` *after* the assertions everywhere, which broke
+`Foundation38RenderTargetTests.testParentGameDisposalReleasesTheTarget` — a test
+whose entire subject is what the parent's disposal does to the child. It now
+keeps its explicit `Dispose()` before its assertions with the `defer` as a net.
+
+
 ### The package-qualification gate was red for forty-one commits — closed
 
 `tools/package_qualification/verify.py` carries its own `ArchiveCanary`, and it

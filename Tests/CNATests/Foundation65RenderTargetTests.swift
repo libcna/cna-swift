@@ -54,8 +54,12 @@ final class Foundation65RenderTargetTests: XCTestCase {
         _ body: @escaping (TargetProbeGame, G.GraphicsDevice) throws -> Void
     ) throws -> TargetProbeGame {
         let game = try TargetProbeGame(body)
+        // Dispose unconditionally. A throwing `Run()` skipped it, and the
+        // native game it leaked is the process's ONE active CNA game -- a
+        // later `Game.Run()` then blocks forever, which is how a caught
+        // mutation came back HUNG at test 346 of 809.
+        defer { try? game.Dispose() }
         try game.Run()
-        try game.Dispose()
         if let failure = game.failure { throw failure }
         return game
     }
@@ -364,8 +368,12 @@ final class Foundation65RenderTargetTests: XCTestCase {
 
         let game = try TwoCallbackGame()
         game.manager = try F.GraphicsDeviceManager(game: game)
+        // Dispose unconditionally. A throwing `Run()` skipped it, and the
+        // native game it leaked is the process's ONE active CNA game -- a
+        // later `Game.Run()` then blocks forever, which is how a caught
+        // mutation came back HUNG at test 346 of 809.
+        defer { try? game.Dispose() }
         try game.Run()
-        try game.Dispose()
         if let failure = game.failure { throw failure }
         XCTAssertEqual(game.boundLater, "true")
     }

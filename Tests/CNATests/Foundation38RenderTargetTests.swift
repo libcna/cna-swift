@@ -54,8 +54,12 @@ final class Foundation38RenderTargetTests: XCTestCase {
         _ body: @escaping (RenderTargetProbeGame, G.GraphicsDevice) throws -> Void
     ) throws -> RenderTargetProbeGame {
         let game = try RenderTargetProbeGame(body)
+        // Dispose unconditionally. A throwing `Run()` skipped it, and the
+        // native game it leaked is the process's ONE active CNA game -- a
+        // later `Game.Run()` then blocks forever, which is how a caught
+        // mutation came back HUNG at test 346 of 809.
+        defer { try? game.Dispose() }
         try game.Run()
-        try game.Dispose()
         if let failure = game.failure { throw failure }
         return game
     }
@@ -387,6 +391,13 @@ final class Foundation38RenderTargetTests: XCTestCase {
                 graphicsDevice: device, width: 16, height: 16)
             game.observations["created"] = "true"
         }
+        // The `defer` is only the net for a throwing `Run()`. Here the
+        // explicit `Dispose()` stays where it was, BEFORE the assertions,
+        // because this test's whole subject is what the parent's disposal does
+        // to the child -- moving it after them asserts against a game that has
+        // not been disposed yet, which is exactly what the first draft of this
+        // repair did and what caught it.
+        defer { try? game.Dispose() }
         try game.Run()
         try game.Dispose()
         if let failure = game.failure { throw failure }

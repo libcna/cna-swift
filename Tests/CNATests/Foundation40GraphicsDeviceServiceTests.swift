@@ -64,8 +64,12 @@ final class Foundation40GraphicsDeviceServiceTests: XCTestCase {
         _ body: @escaping (ServiceProbeGame) throws -> Void
     ) throws -> ServiceProbeGame {
         let game = try ServiceProbeGame(withManager: withManager, body)
+        // Dispose unconditionally. A throwing `Run()` skipped it, and the
+        // native game it leaked is the process's ONE active CNA game -- a
+        // later `Game.Run()` then blocks forever, which is how a caught
+        // mutation came back HUNG at test 346 of 809.
+        defer { try? game.Dispose() }
         try game.Run()
-        try game.Dispose()
         if let failure = game.failure { throw failure }
         return game
     }
