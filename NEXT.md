@@ -484,12 +484,32 @@ About 151 members over seven types in two assemblies — roughly two and a half
 `StringBuilder`s, plus **System.dll's first-time admission**, which `mscorlib`
 already went through and `System.dll` has not.
 
-Two things make it smaller than that sounds. Admission pins the full shape as
+One thing makes it smaller than that sounds: admission pins the full shape as
 the authority record and projects a **measured subset**, as `CNAList` is sixteen
-of `List<T>`'s fifty-two. And `CultureInfo` — the one type that would drag
-globalization in — is only ever an opaque parameter here: every converter takes
-it as `ConvertFrom(context, culture, value)` and none reads it, so what has to
-be projected is a type, not a culture engine.
+of `List<T>`'s fifty-two.
+
+**And one thing makes it bigger, corrected at Foundation 74.** This section used
+to claim that `CultureInfo` is *"only ever an opaque parameter here: every
+converter takes it as `ConvertFrom(context, culture, value)` and none reads
+it"*. **That is false**, and it was the load-bearing half of the estimate. The
+IL reads it eight times:
+
+```text
+CultureInfo::get_TextInfo()      x4  -> TextInfo::get_ListSeparator()
+CultureInfo::get_CurrentCulture() x4  -> and then the same TextInfo path
+```
+
+Every converter that parses or formats a multi-component value — a `Vector3`
+from `"1, 2, 3"`, a `Matrix` from sixteen — splits and joins on the **culture's
+list separator**, and falls back to `CurrentCulture` when the caller passes
+none. So `Globalization.TextInfo` joins the closure, `ListSeparator` is
+behaviour that must be reproduced rather than a type that must exist, and the
+milestone carries a genuine culture dependency instead of an opaque parameter.
+
+The lesson is the same one `TitleContainer` taught in Foundation 73 and it is
+now recorded twice: **a signature does not tell you what a member reads.** Grep
+the IL for calls *on* the parameter type before believing any sizing that calls
+it opaque.
 
 `ITypeDescriptorContext` is mentioned 38 times and is a five-member interface;
 `CultureInfo` 21 times; `IDictionary` 12. XNA's own `MathTypeConverter` is the
