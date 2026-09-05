@@ -1,7 +1,7 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 71 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 73 are
 complete: the native migration off the historical `0.7.0` boundary, the
 projected CLR/XNA exception payloads, the graphics resource hierarchy with
 `RenderTarget2D`, `Game`'s timing/host members and four host events, the
@@ -156,16 +156,16 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=185               TARGET_MEMBERS=2308
-COMPLETE_TYPES=179             PARTIAL_TYPES=6      MISSING_TYPE=72
-MISSING_MEMBER=32              TOTAL_DIAGNOSTICS=108
+TARGET_TYPES=187               TARGET_MEMBERS=2310
+COMPLETE_TYPES=181             PARTIAL_TYPES=6      MISSING_TYPE=70
+MISSING_MEMBER=32              TOTAL_DIAGNOSTICS=106
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=4
-XNA_RESOURCE_STRING_PROJECTIONS=73 API_COMPAT_SELF_TESTS=2443
+XNA_RESOURCE_STRING_PROJECTIONS=76 API_COMPAT_SELF_TESTS=2443
 ```
 
 **Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=72`, `MISSING_MEMBER=32`, and `OVERLOAD_MAPPING_MISMATCH=4`,
+`MISSING_TYPE=70`, `MISSING_MEMBER=32`, and `OVERLOAD_MAPPING_MISMATCH=4`,
 whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
 both taking an `Effect`) and the two serialization constructors of
 `ContentLoadException` and `StorageDeviceNotConnectedException`.
@@ -190,12 +190,12 @@ agrees with the pinned metadata; what remains is what has not been written.
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=312  ROUTE_PAIRINGS=312  PROTOTYPE_TYPE_POSITIONS=1063
-CANONICAL_DECLARATION_CHECKS=1063  C_SWIFT_MEASUREMENTS=1063
-LAYOUTS=54  LAYOUT_FIELDS=431  CALLBACKS=6  CONSTANTS=225  SCALAR_FACTS=3
+BOUND_FUNCTIONS=314  ROUTE_PAIRINGS=314  PROTOTYPE_TYPE_POSITIONS=1071
+CANONICAL_DECLARATION_CHECKS=1071  C_SWIFT_MEASUREMENTS=1071
+LAYOUTS=54  LAYOUT_FIELDS=431  CALLBACKS=6  CONSTANTS=228  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  CAUGHT=14  SURVIVORS=0
-PROJECTION_MUTATIONS=278  LAST_FULL_RUN=137  CAUGHT=135
+PROJECTION_MUTATIONS=287  LAST_FULL_RUN=137  CAUGHT=135
 WITHDRAWN_IN_SOURCE=5  REPLACED_NO_OPS_IN_SOURCE=1
 ```
 
