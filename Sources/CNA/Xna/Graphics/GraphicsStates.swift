@@ -304,7 +304,7 @@ extension Microsoft.Xna.Framework.Graphics {
         private var cullMode: CullMode = .CullCounterClockwiseFace
         private var fillMode: FillMode = .Solid
         private var scissorTestEnable = false
-        private var multiSampleAntiAlias = true
+        private var multiSampleAntiAlias = false
         private var depthBias: Float = 0
         private var slopeScaleDepthBias: Float = 0
 

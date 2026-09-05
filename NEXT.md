@@ -65,6 +65,27 @@ cannot be verified.
 
 ## What is left, classified
 
+### How much is actually left, counted
+
+| family | types | members |
+|---|---:|---:|
+| `Media` | 19 | 204 |
+| `Audio` | 10 | 127 |
+| `Graphics`/`Framework` | 10 | 62 |
+| `Design` | 13 | 53 |
+| `Content` | 6 | 39 |
+| `Model` | 8 | 36 |
+| `Storage` | 2 | 31 |
+| `GamerServices` | 1 | 3 |
+| **total** | **69** | **555** |
+
+Plus **32 missing members in types that already stand**, so 587 members in all.
+
+Against 2,313 members across 182 complete types already projected, that is
+**roughly four fifths of the surface done by member count** — and the remainder
+is far from evenly spread: `Media` and `Audio` alone are 331 of the 555, while
+`Storage`, `GamerServices` and `Model` together are 70.
+
 ### The shape of every remaining family, before any of them starts
 
 Foundation 74 lost time designing `Mouse.WindowHandle` as a throwing forward
@@ -294,9 +315,11 @@ should precede either.
 
 ### The `Model` family, sized — and buildable without content
 
-**Twelve types and 48 members**, corrected at Foundation 74. The earlier count
-— "thirteen types, 36 members" — missed the four `+Enumerator` nested types,
-which are three members each: 36 + 12 = 48. `Model` 8, `ModelMesh` 7,
+**Twelve types and 48 members in the family, of which 8 types and 36 members
+remain** — corrected at Foundation 74. The earlier count, "thirteen types, 36
+members", had the type count wrong and the member count right for the wrong
+reason: it missed the four `+Enumerator` nested types at three members each, and
+those four **already stand**, so 48 − 12 = the 36 still to do. `Model` 8, `ModelMesh` 7,
 `ModelBone` 5, `ModelMeshPart` 8, the four collections 3+3+1+1, four
 enumerators 3 apiece. Still small for its place on the roadmap, because most of
 it is properties.
