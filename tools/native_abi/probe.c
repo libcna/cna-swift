@@ -20,6 +20,9 @@ _Static_assert(CNA_ABI_VERSION == CNA_ABI_VERSION_ENCODE(
     "canonical ABI encoding is not major<<16 | minor<<8 | patch");
 _Static_assert(sizeof(CNA_Bool) == 1, "CNA_Bool width");
 _Static_assert(CNA_FALSE == 0 && CNA_TRUE == 1, "CNA_Bool values");
+_Static_assert(CNA_RESULT_SUCCESS == 0, "CNA_Result success");
+_Static_assert(CNA_RESULT_IO == 5, "CNA_Result IO");
+_Static_assert(CNA_RESULT_BUFFER_TOO_SMALL == 14, "CNA_Result buffer too small");
 _Static_assert(CNA_SPRITE_SORT_MODE_DEFERRED == 0, "SpriteSortMode.Deferred");
 _Static_assert(CNA_SPRITE_EFFECT_NONE == 0, "SpriteEffects.None");
 _Static_assert(CNA_SPRITE_EFFECT_FLIP_HORIZONTALLY == 1, "SpriteEffects.FlipHorizontally");

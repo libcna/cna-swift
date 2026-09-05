@@ -160,6 +160,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidTitleContainerName",
+      "value": "Invalid filename. TitleContainer.OpenStream requires a relative URI."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidTotalSize",
       "value": "The size of the data passed in is too large or too small for this resource."
     },
@@ -227,6 +232,16 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OffsetNotValid",
       "value": "The offset must be within the valid range for this resource."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenStreamError",
+      "value": "Error loading \"{0}\". Cannot open file."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenStreamNotFound",
+      "value": "Error loading \"{0}\". File not found."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

@@ -5539,6 +5539,40 @@ def sealed_class_evidence(
     return evidence, diagnostics
 
 
+
+SWIFT_ESCAPES = {
+    '\\"': '"', "\\'": "'", "\\\\": "\\",
+    "\\n": "\n", "\\t": "\t", "\\r": "\r", "\\0": "\0",
+}
+
+
+def unescape_swift_literal(literal: str) -> str:
+    """A Swift literal's source text turned into the string it denotes.
+
+    Both resource-string checks compare a pinned value against what appears in
+    the Swift sources, and both used to compare against the SOURCE SPELLING. No
+    message containing a double quote could ever match:
+    FrameworkResources.OpenStreamNotFound and OpenStreamError both do, and both
+    were reported unreproduced while the sources reproduced them exactly.
+
+    Only the escapes that can appear in a reproduced message are handled. An
+    interpolation is left alone -- a literal carrying one does not denote a
+    fixed string and cannot match a pinned value anyway.
+    """
+    out: list[str] = []
+    index = 0
+    while index < len(literal):
+        if literal[index] == "\\" and index + 1 < len(literal):
+            pair = literal[index:index + 2]
+            if pair in SWIFT_ESCAPES:
+                out.append(SWIFT_ESCAPES[pair])
+                index += 2
+                continue
+        out.append(literal[index])
+        index += 1
+    return "".join(out)
+
+
 def source_bcl_resource_strings(source_root: Path) -> list[str] | None:
     """Every Swift string literal in the BCL exception support source.
 
@@ -5570,7 +5604,9 @@ def source_bcl_resource_strings(source_root: Path) -> list[str] | None:
         # what the program actually produces rather than against however the
         # source happened to wrap it.
         body = re.sub(r'"\s*\+\s*"', "", body)
-        literals.extend(re.findall(r'"((?:[^"\\]|\\.)*)"', body))
+        literals.extend(
+            unescape_swift_literal(literal)
+            for literal in re.findall(r'"((?:[^"\\]|\\.)*)"', body))
     return literals
 
 
@@ -5594,7 +5630,9 @@ def source_string_literals(paths: list[Path]) -> list[str] | None:
             if not line.strip().startswith("//")
         )
         body = re.sub(r'"\s*\+\s*"', "", body)
-        literals.extend(re.findall(r'"((?:[^"\\]|\\.)*)"', body))
+        literals.extend(
+            unescape_swift_literal(literal)
+            for literal in re.findall(r'"((?:[^"\\]|\\.)*)"', body))
     return literals
 
 

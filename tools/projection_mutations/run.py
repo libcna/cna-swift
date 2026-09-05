@@ -32,6 +32,7 @@ TEXTURE2D = ROOT / "Sources/CNA/Xna/Graphics/Texture2D.swift"
 RENDER_TARGET = ROOT / "Sources/CNA/Xna/Graphics/RenderTarget2D.swift"
 GAME = ROOT / "Sources/CNA/Xna/Framework/Game.swift"
 DISPATCHER = ROOT / "Sources/CNA/Xna/Framework/FrameworkDispatcher.swift"
+TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
@@ -112,6 +113,65 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 73: TitleContainer -----------------------------------
+    (
+        "clean-path-strips-leading-dot-once",
+        "the .\\ loop running once instead of to exhaustion, so \".\\.\\a\" "
+        "keeps a segment XNA removes",
+        TITLE,
+        'while path.hasPrefix(".\\\\") { path.removeFirst(2) }',
+        'if path.hasPrefix(".\\\\") { path.removeFirst(2) }',
+    ),
+    (
+        "clean-path-trailing-dot-loses-its-short-arm",
+        "a path that IS \"\\.\" becoming empty instead of a lone separator",
+        TITLE,
+        'if path.count > 2 { path.removeLast(2) } else { path = "\\\\" }',
+        'if path.count > 2 { path.removeLast(2) } else { path = "" }',
+    ),
+    (
+        "collapse-parent-can-answer-zero",
+        "CollapseParentDirectory losing its floor of 1, which is what stops "
+        "GetCleanPath rescanning from the beginning",
+        TITLE,
+        "return max(start - 1, 1)",
+        "return start - 1",
+    ),
+    (
+        "absolute-test-forgets-the-bad-characters",
+        "a name carrying one of the seven refused characters being accepted",
+        TITLE,
+        "if path.contains(where: { badCharacters.contains($0) }) { return true }",
+        "if false { return true }",
+    ),
+    (
+        "absolute-test-forgets-the-embedded-escape",
+        "a\\..\\b being accepted, which escapes the title directory",
+        TITLE,
+        'if path.contains("\\\\..\\\\") { return true }',
+        'if false { return true }',
+    ),
+    (
+        "empty-name-not-refused",
+        "an empty name reaching the route instead of ArgumentNullException",
+        TITLE,
+        "guard let name, !name.isEmpty else {",
+        "guard let name, !name.isEmpty || true else {",
+    ),
+    (
+        "missing-asset-reported-as-cannot-open",
+        "CNA_RESULT_IO mapped to the wrong one of XNA's two branches",
+        TITLE,
+        "if result == TitleContainer.resultIO {",
+        "if result != TitleContainer.resultIO {",
+    ),
+    (
+        "read-ignores-the-reported-size",
+        "the second read told a capacity the file does not fit in",
+        TITLE,
+        "runtime.gameHandle, view, buffer.baseAddress, byteCount, &byteCount)",
+        "runtime.gameHandle, view, buffer.baseAddress, 0, &byteCount)",
+    ),
     # ---- Foundation 72: FrameworkDispatcher ------------------------------
     #
     # Aimed at the handle, not at the pump. Whether the pump did any WORK is

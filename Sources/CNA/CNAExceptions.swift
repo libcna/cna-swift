@@ -832,3 +832,89 @@ public final class CNAIndexOutOfRangeException: CNASystemException {
         HResult = CNAIndexOutOfRangeException.corIndexOutOfRangeHResult
     }
 }
+
+/// `System.IO.IOException`.
+///
+/// Admitted for the chain rather than for a member: nothing in this binding
+/// raises a bare `IOException`. It sits between `CNASystemException` and
+/// `CNAFileNotFoundException`, and a consumer catching it must catch the
+/// missing-title-asset failure too, which is the only reason its identity
+/// matters here.
+open class CNAIOException: CNASystemException {
+    /// `COR_E_IO`, the HResult every constructor assigns.
+    internal static let corIOHResult = Int32(bitPattern: 0x8013_1620)
+
+    /// `Environment.GetResourceString("Arg_IOException")`.
+    internal static let argIOExceptionMessage = "I/O error occurred."
+
+    /// `IOException..ctor()` — substitutes `Arg_IOException`.
+    public override init() {
+        super.init(message: CNAIOException.argIOExceptionMessage)
+        HResult = CNAIOException.corIOHResult
+    }
+
+    /// `IOException..ctor(String message)`.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAIOException.corIOHResult
+    }
+
+    /// `IOException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAIOException.corIOHResult
+    }
+}
+
+/// `System.IO.FileNotFoundException`.
+///
+/// The class `TitleContainer.OpenStream` raises for a missing asset.
+///
+/// **A measured subset, and the boundary is exact.** The CLR type has six
+/// constructors; the three here are the ones whose `Message` is decided
+/// entirely in managed code. The three that carry a `fileName` are not
+/// projected, and the reason is in `SetMessageField`: when such an instance has
+/// no message of its own, `Message` comes from
+/// `FileLoadException.FormatFileLoadExceptionMessage`, which is an internal
+/// call into the CLR. Reproducing those constructors would mean inventing a
+/// message the authority does not give, so `FileName` is `nil` on every
+/// instance this binding can produce — which is exactly what the projected
+/// constructors leave it, and what XNA's own path produces.
+open class CNAFileNotFoundException: CNAIOException {
+    /// `COR_E_FILENOTFOUND`, the HResult every constructor assigns. Note that
+    /// it is a Win32 facility code, not the `0x8013…` the rest of this
+    /// hierarchy uses.
+    internal static let corFileNotFoundHResult = Int32(bitPattern: 0x8007_0002)
+
+    /// `Environment.GetResourceString("IO.FileNotFound")`.
+    internal static let ioFileNotFoundMessage = "Unable to find the specified file."
+
+    /// `FileNotFoundException..ctor()` — substitutes `IO.FileNotFound`.
+    public override init() {
+        super.init(message: CNAFileNotFoundException.ioFileNotFoundMessage)
+        HResult = CNAFileNotFoundException.corFileNotFoundHResult
+    }
+
+    /// `FileNotFoundException..ctor(String message)`.
+    ///
+    /// The whole of XNA's path. `SetMessageField` returns at its first
+    /// instruction for an instance built this way, because `_message` is not
+    /// null, so `Message` is the argument unchanged.
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAFileNotFoundException.corFileNotFoundHResult
+    }
+
+    /// `FileNotFoundException..ctor(String message, Exception innerException)`.
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAFileNotFoundException.corFileNotFoundHResult
+    }
+
+    /// `FileNotFoundException.FileName`, `_fileName` read straight back.
+    ///
+    /// Always `nil` here: see the note on the type. The property is projected
+    /// rather than omitted because it is the shape a consumer writes against,
+    /// and answering `nil` is what the constructors above actually leave.
+    open var FileName: String? { nil }
+}

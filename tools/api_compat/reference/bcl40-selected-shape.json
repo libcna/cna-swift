@@ -4851,6 +4851,358 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "type": "System.IO.FileNotFoundException",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.IO.IOException",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "fileName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "innerException",
+              "type": "System.Exception",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "fileName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "innerException",
+              "type": "System.Exception",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetObjectData",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ToString",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "FileName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "FusionLog",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Message",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.IO.IOException",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.SystemException",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "hresult",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "innerException",
+              "type": "System.Exception",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.IndexOutOfRangeException",
       "kind": "class",
       "sealed": true,
@@ -7218,6 +7570,11 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "Arg_IOException",
+      "value": "I/O error occurred."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "Arg_IndexOutOfRangeException",
       "value": "Index was outside the bounds of the array."
     },
@@ -7330,6 +7687,11 @@
       "assembly": "mscorlib.dll",
       "key": "Exception_WasThrown",
       "value": "Exception of type '{0}' was thrown."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "IO.FileNotFound",
+      "value": "Unable to find the specified file."
     },
     {
       "assembly": "mscorlib.dll",

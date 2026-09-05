@@ -17,7 +17,7 @@
         "CompanyName": "Microsoft Corporation",
         "FileDescription": "Microsoft Common Language Runtime Class Library",
         "FileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
-        "ProductName": "Microsoft\u00ae .NET Framework",
+        "ProductName": "Microsoft® .NET Framework",
         "ProductVersion": "4.0.30319.1",
         "OriginalFilename": "mscorlib.dll",
         "InternalName": "mscorlib.dll"
@@ -170,6 +170,14 @@
           "type": "System.ObjectDisposedException",
           "reason": "The class XNA raises for a use-after-dispose: Helpers.CheckDisposed, which its guarded graphics-resource members call, is `if (pComPtr == IntPtr.Zero) throw new ObjectDisposedException(obj.GetType().Name);`, and all four state objects' Apply open the same way with `ldtoken` on the declaring class instead. A consumer using a resource it disposed must therefore see this class rather than the CNA runtime channel. Projected as CNAObjectDisposedException with the ObjectName payload and the composed Message.",
           "registered": "Foundation 42a"
+        },
+        {
+          "type": "System.IO.IOException",
+          "reason": "The intermediate CLR base between System.SystemException, already admitted, and System.IO.FileNotFoundException, which TitleContainer.OpenStream raises. It is admitted for the chain, not for a member: nothing in this binding raises a bare IOException, and its own surface adds only the HResult COR_E_IO 0x80131620 that FileNotFoundException overrides. Projected as CNAIOException."
+        },
+        {
+          "type": "System.IO.FileNotFoundException",
+          "reason": "The class TitleContainer.OpenStream raises when the asset is absent. Its IL catches FileNotFoundException, DirectoryNotFoundException and ArgumentException out of File.OpenRead and re-raises this one with FrameworkResources.OpenStreamNotFound formatted with the requested name, so it is the class a consumer meets for a missing title asset and is not substitutable by the CNA runtime channel. Only the (String message) constructor is on XNA's path; FileName is therefore null on every instance this binding produces, which is what that constructor leaves it. Projected as CNAFileNotFoundException."
         }
       ],
       "selectedResourceStrings": [
@@ -327,6 +335,16 @@
           "key": "ObjectDisposed_ObjectName_Name",
           "value": "Object name: '{0}'.",
           "reason": "The template ObjectDisposedException.get_Message formats and appends after Environment.NewLine when ObjectName is neither null nor empty."
+        },
+        {
+          "key": "Arg_IOException",
+          "value": "I/O error occurred.",
+          "reason": "IOException's parameterless constructor substitutes it before setting COR_E_IO."
+        },
+        {
+          "key": "IO.FileNotFound",
+          "value": "Unable to find the specified file.",
+          "reason": "FileNotFoundException's parameterless constructor substitutes it, and SetMessageField restores it for an instance deserialized with neither a message nor a file name whose HResult is still COR_E_EXCEPTION."
         }
       ],
       "selectedStaticTables": [

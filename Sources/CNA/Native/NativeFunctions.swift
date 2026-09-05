@@ -54,6 +54,7 @@ internal final class NativeFunctions {
     typealias GameCreateRoute = @convention(c) (UnsafePointer<CNASwift_GameCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GameSetFrameHooksExtRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_GameFrameHooks>?) -> UInt32
     typealias FrameworkDispatcherUpdateRoute = @convention(c) (UInt64) -> UInt32
+    typealias TitleContainerReadExtRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GameRunRoute = @convention(c) (UInt64) -> UInt32
     typealias GameRunOneFrameRoute = @convention(c) (UInt64) -> UInt32
     typealias GameRequestExitRoute = @convention(c) (UInt64) -> UInt32
@@ -377,6 +378,7 @@ internal final class NativeFunctions {
     let gameRun: GameRunRoute
     let gameRunOneFrame: GameRunOneFrameRoute
     let frameworkDispatcherUpdate: FrameworkDispatcherUpdateRoute
+    let titleContainerRead: TitleContainerReadExtRoute
     let gameRequestExit: GameRequestExitRoute
     let gameDestroy: GameDestroyRoute
     let gameGetGraphicsDevice: GameGetGraphicsDeviceRoute
@@ -718,6 +720,7 @@ internal final class NativeFunctions {
         gameRun = try library.resolve("cna_game_run", as: GameRunRoute.self)
         gameRunOneFrame = try library.resolve("cna_game_run_one_frame", as: GameRunOneFrameRoute.self)
         frameworkDispatcherUpdate = try library.resolve("cna_framework_dispatcher_update", as: FrameworkDispatcherUpdateRoute.self)
+        titleContainerRead = try library.resolve("cna_title_container_read_ext", as: TitleContainerReadExtRoute.self)
         gameRequestExit = try library.resolve("cna_game_request_exit", as: GameRequestExitRoute.self)
         gameDestroy = try library.resolve("cna_game_destroy", as: GameDestroyRoute.self)
         gameGetGraphicsDevice = try library.resolve("cna_game_get_graphics_device", as: GameGetGraphicsDeviceRoute.self)

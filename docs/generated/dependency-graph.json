@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 16,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 15,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",

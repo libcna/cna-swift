@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 186,
-    "TARGET_MEMBERS": 2309,
-    "TOTAL_DIAGNOSTICS": 107,
-    "COMPLETE_TYPES": 180,
+    "TARGET_TYPES": 187,
+    "TARGET_MEMBERS": 2310,
+    "TOTAL_DIAGNOSTICS": 106,
+    "COMPLETE_TYPES": 181,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 71,
-    "MISSING_TYPE": 71,
+    "MISSING_TYPES": 70,
+    "MISSING_TYPE": 70,
     "MISSING_MEMBER": 32,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -66,16 +66,16 @@
     "MEASURED_ACCESSOR_PROJECTIONS": 89,
     "PENDING_ACCESSOR_PROJECTIONS": 25,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 22,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 23,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 19,
-    "XNA_SEALED_CLASS_PROJECTIONS": 31,
+    "XNA_SEALED_CLASS_PROJECTIONS": 32,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
-    "BCL_RESOURCE_STRING_PROJECTIONS": 29,
+    "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 73,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 76,
     "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
     "BCL_BASE_PROJECTIONS": 19,
     "PROJECTED_BCL_BASE_TYPES": 15,
@@ -91,8 +91,8 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 184,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 185,
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 185,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 184,
     "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 58
   },
   "completeTypes": [
@@ -273,6 +273,7 @@
     "Microsoft.Xna.Framework.Quaternion",
     "Microsoft.Xna.Framework.Ray",
     "Microsoft.Xna.Framework.Rectangle",
+    "Microsoft.Xna.Framework.TitleContainer",
     "Microsoft.Xna.Framework.Vector2",
     "Microsoft.Xna.Framework.Vector3",
     "Microsoft.Xna.Framework.Vector4"
@@ -355,8 +356,7 @@
     "Microsoft.Xna.Framework.Media.VideoPlayer",
     "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
-    "Microsoft.Xna.Framework.Storage.StorageDevice",
-    "Microsoft.Xna.Framework.TitleContainer"
+    "Microsoft.Xna.Framework.Storage.StorageDevice"
   ],
   "diagnostics": [
     {
@@ -888,11 +888,6 @@
       "category": "OVERLOAD_MAPPING_MISMATCH",
       "subject": "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)",
       "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.TitleContainer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     }
   ],
   "protocolWitnessProjections": [
@@ -2935,6 +2930,13 @@
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.TitleContainer",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
     }
   ],
   "eventSupportProjections": [
@@ -3869,6 +3871,18 @@
       "pinnedValue": "Collection is read-only.",
       "reproducedInSwiftSource": true,
       "reason": "ExceptionResource 28, raised by every Collection<T> mutator for a read-only backing list."
+    },
+    {
+      "resourceKey": "Arg_IOException",
+      "pinnedValue": "I/O error occurred.",
+      "reproducedInSwiftSource": true,
+      "reason": "IOException's parameterless constructor substitutes it before setting COR_E_IO, so CNAIOException() must answer it rather than Exception's Exception_WasThrown default."
+    },
+    {
+      "resourceKey": "IO.FileNotFound",
+      "pinnedValue": "Unable to find the specified file.",
+      "reproducedInSwiftSource": true,
+      "reason": "FileNotFoundException's parameterless constructor substitutes it. XNA's own path uses .ctor(String message) and never reaches it, so this is the one message of the family whose only reader is a consumer constructing the exception directly."
     }
   ],
   "bclStaticTableProjections": [
@@ -4070,6 +4084,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "InvalidTitleContainerName",
+      "pinnedValue": "Invalid filename. TitleContainer.OpenStream requires a relative URI.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "InvalidTotalSize",
       "pinnedValue": "The size of the data passed in is too large or too small for this resource.",
       "reproducedInSwiftSource": true
@@ -4150,6 +4170,18 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "OffsetNotValid",
       "pinnedValue": "The offset must be within the valid range for this resource.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "OpenStreamError",
+      "pinnedValue": "Error loading \"{0}\". Cannot open file.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "OpenStreamNotFound",
+      "pinnedValue": "Error loading \"{0}\". File not found.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4928,6 +4960,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 3,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.TitleContainer",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
       "derivableInReferenceButNotInSwift": false
     }
   ],
@@ -10048,14 +10088,14 @@
       "member": "OpenStream",
       "kind": "method",
       "static": true,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.IO.Stream",
       "swiftReturnType": "Foundation.InputStream",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Foundation.InputStream"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Vector2",
@@ -12605,16 +12645,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.TitleContainer",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.TitleContainer",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Vector2",

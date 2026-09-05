@@ -238,12 +238,25 @@
       "base": null,
       "clrFamily": "System.Text.StringBuilder",
       "requiredMembers": [
-        "Length", "SetLength", "Capacity", "SetCapacity", "MaxCapacity",
-        "Item", "SetItem", "Append", "AppendLine", "Insert", "Remove",
-        "Clear", "ToString", "EnsureCapacity"
+        "Length",
+        "SetLength",
+        "Capacity",
+        "SetCapacity",
+        "MaxCapacity",
+        "Item",
+        "SetItem",
+        "Append",
+        "AppendLine",
+        "Insert",
+        "Remove",
+        "Clear",
+        "ToString",
+        "EnsureCapacity"
       ],
       "openMembers": [],
-      "forbiddenMembers": ["AppendFormat"]
+      "forbiddenMembers": [
+        "AppendFormat"
+      ]
     },
     "CNACollection": {
       "kind": "class",
@@ -868,12 +881,20 @@
     {
       "key": "NotSupported_ReadOnlyCollection",
       "reason": "ExceptionResource 28, raised by every Collection<T> mutator for a read-only backing list."
+    },
+    {
+      "key": "Arg_IOException",
+      "reason": "IOException's parameterless constructor substitutes it before setting COR_E_IO, so CNAIOException() must answer it rather than Exception's Exception_WasThrown default."
+    },
+    {
+      "key": "IO.FileNotFound",
+      "reason": "FileNotFoundException's parameterless constructor substitutes it. XNA's own path uses .ctor(String message) and never reaches it, so this is the one message of the family whose only reader is a consumer constructing the exception directly."
     }
   ],
   "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "7235e93878b4d36d145f734ca7b89ec26436393472fe70a89d8981647a75ed62",
+  "bclSelectedShapeSha256": "7b30963201a17e6cf6d4c31ef2c9f274691e577618e69ccf50c5ae274f54ac45",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class",
@@ -1193,6 +1214,12 @@
       "member": "SetRenderTargets",
       "parameter": "renderTargets",
       "reason": "The params array is null-tested and the null branch calls SetRenderTargets(null, 0), restoring the backbuffer -- the same selected operation as the two single-target overloads' null. An EMPTY array takes the identical branch, so both spellings of 'nothing' mean the backbuffer."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.TitleContainer",
+      "member": "OpenStream",
+      "parameter": "name",
+      "reason": "OpenStream's first instruction is String.IsNullOrEmpty(name), which is a test a caller can only reach by passing null. Declaring the parameter non-Optional would make the ArgumentNullException branch unreachable from Swift and would hide half of a refusal the IL spends its opening instructions on."
     }
   ],
   "globalOperatorProjections": [
