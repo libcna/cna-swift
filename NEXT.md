@@ -552,7 +552,26 @@ two of the messages were transcribed wrong in the first draft — mscorlib says
 "MaxCapacity must be one or greater.", not "…greater than zero." Extract every
 message; never write the plausible one.
 
-### The BLOCKED list, re-measured at Foundation 60
+### The BLOCKED list, re-measured at Foundation 60 — status at Foundation 74
+
+**Read the "not blocked" half as a to-do list, not as a report.** Fourteen
+milestones on, four of its seven entries have landed and three have not, and the
+wording did not distinguish "we measured that it works" from "we built it":
+
+| entry | status at Foundation 74 |
+|---|---|
+| `GraphicsDevice.GraphicsProfile` | **landed**, Foundation 62, with the pinned `ProfileCapabilities` table |
+| `DisplayMode`, `PresentationParameters` | **landed** — both types stand |
+| `TextureCollection` | **landed**, Foundation 66 |
+| Audio, Media, Touch, Storage, GamerServices routes | measured only; **none of the five families is projected** |
+| `GraphicsAdapter` | **not built** — 18 members, and the next milestone |
+| `GameWindow`, `Game.Window` | **not built** — 20 members under the no-visible-window rule |
+| `GraphicsDevice.Present`, `Reset` | **not built** — measured "both accepted" and left there for fourteen milestones |
+
+That last row is the one worth remembering. *"Both accepted"* is a statement
+about the runtime, and it was silently read as though the members existed. They
+are in the 32-member list above.
+
 
 Most of what stood here was **inference, not measurement**: "HEADLESS has no
 window" was carried into eight entries, three of which had never been asked.
