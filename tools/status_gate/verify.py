@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import importlib.util
 import json
 import re
 import subprocess
@@ -409,6 +410,34 @@ def regenerate_and_compare(
             )
             compare(GENERATED / "dependency-graph.json", graph,
                     "tools/api_compat/dependency_graph.py")
+
+        # Package qualification is not regenerated here -- it costs two
+        # consumer builds -- so its freshness is checked by recomputing the
+        # digest of the inputs it depends on. Without this the report goes
+        # stale invisibly, which is exactly what happened between 805b4cd and
+        # c7b1072: a canary that had not compiled for forty-one commits, and a
+        # committed PASS that nobody had earned.
+        qualification = GENERATED / "package-qualification-report.json"
+        if qualification.exists():
+            spec = importlib.util.spec_from_file_location(
+                "package_qualification_verify",
+                root / "tools" / "package_qualification" / "verify.py")
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            recorded = json.loads(qualification.read_text(encoding="utf-8")).get(
+                "QUALIFIED_INPUTS_SHA256")
+            actual = module.qualified_inputs_digest(root)
+            compared += 1
+            if recorded is None:
+                findings.append(
+                    "docs/generated/package-qualification-report.json records no "
+                    "QUALIFIED_INPUTS_SHA256, so its PASS cannot be shown to be "
+                    "about the current sources")
+            elif recorded != actual:
+                findings.append(
+                    "docs/generated/package-qualification-report.json is stale: it "
+                    f"qualified inputs {recorded[:12]} but the tree is {actual[:12]}; "
+                    "re-run tools/package_qualification/verify.py")
 
         if cna_include is not None and library is not None:
             abi = temporary / "native-abi-report.json"

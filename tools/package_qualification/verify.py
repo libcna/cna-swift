@@ -31,6 +31,15 @@ let package = Package(
 SOURCE = r'''import CNA
 import Foundation
 
+// The canary's own way of reporting a mismatch. It is deliberately NOT one of
+// the projected exceptions: a qualification failure is this file's verdict,
+// not the package's behaviour, and the two must never be mistaken for each
+// other. It doubles as the "arbitrary consumer error" the event-dispatch
+// qualification needs, which is why it carries a message.
+enum QualificationFailure: Error {
+    case failed(String)
+}
+
 func qualifyManagedCurve() throws {
     typealias F = Microsoft.Xna.Framework
     let curve = F.Curve()
@@ -39,25 +48,25 @@ func qualifyManagedCurve() throws {
     curve.Keys.Add(last)
     curve.Keys.Add(first)
     guard curve.Keys.Count == 2, try curve.Keys.Item(0) === first else {
-        throw CNAError.argument("isolated Curve collection qualification failed")
+        throw QualificationFailure.failed("isolated Curve collection qualification failed")
     }
     curve.ComputeTangents(.Smooth)
     curve.PreLoop = .CycleOffset
     curve.PostLoop = .Oscillate
     guard curve.Evaluate(1) == curve.Evaluate(4) - 12,
           curve.Evaluate(6).bitPattern == curve.Evaluate(4).bitPattern else {
-        throw CNAError.argument("isolated Curve loop qualification failed")
+        throw QualificationFailure.failed("isolated Curve loop qualification failed")
     }
     let nan = F.CurveKey(position: .nan, value: 0)
     guard try nan.CompareTo(first) == 1, try first.CompareTo(nan) == 1 else {
-        throw CNAError.argument("isolated Curve CompareTo qualification failed")
+        throw QualificationFailure.failed("isolated Curve CompareTo qualification failed")
     }
     let enumerator = curve.Keys.GetEnumerator()
     curve.Keys.Add(F.CurveKey(position: 8, value: 30))
     do {
         _ = try enumerator.Next()
-        throw CNAError.argument("isolated Curve enumerator did not invalidate")
-    } catch CNAError.collectionModified {
+        throw QualificationFailure.failed("isolated Curve enumerator did not invalidate")
+    } catch is CNAInvalidOperationException {
         // Exact expected mutation failure.
     }
 }
@@ -77,7 +86,7 @@ func qualifyPublicDisplayModeSurface() throws {
     }
     _ = read
     guard String(describing: Mode.self) == "DisplayMode" else {
-        throw CNAError.argument("isolated DisplayMode type qualification failed")
+        throw QualificationFailure.failed("isolated DisplayMode type qualification failed")
     }
 }
 
@@ -97,7 +106,15 @@ final class ArchiveGame: Microsoft.Xna.Framework.Game {
 
     override func LoadContent() throws {
         let bytes = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+Xw2kWQAAAABJRU5ErkJggg==")!
-        let device = try GraphicsDevice
+        // `Game.GraphicsDevice` is Optional -- it reads the device service,
+        // which has none before one is created. Nil is a FAILURE here, not a
+        // reason to skip: LoadContent running without a device would mean the
+        // manager never made one, and a canary that quietly returned would
+        // report PASS for a run that drew nothing.
+        guard let device = try GraphicsDevice else {
+            throw QualificationFailure.failed(
+                "isolated LoadContent ran with no GraphicsDevice")
+        }
         texture = try Microsoft.Xna.Framework.Graphics.Texture2D.FromStream(
             device, stream: InputStream(data: bytes))
         batch = try Microsoft.Xna.Framework.Graphics.SpriteBatch(graphicsDevice: device)
@@ -109,8 +126,11 @@ final class ArchiveGame: Microsoft.Xna.Framework.Game {
     }
 
     override func Draw(_ gameTime: Microsoft.Xna.Framework.GameTime) throws {
-        guard let texture, let batch else { return }
-        try GraphicsDevice.Clear(.CornflowerBlue)
+        guard let texture, let batch, let device = try GraphicsDevice else {
+            throw QualificationFailure.failed(
+                "isolated Draw ran with no device, texture or batch")
+        }
+        try device.Clear(.CornflowerBlue)
         try batch.Begin()
         try batch.Draw(texture, position: .Zero, color: .White)
         try batch.End()
@@ -133,12 +153,12 @@ func qualifyPublicRenderTargetUsageSurface() throws {
     for (rawValue, value) in table {
         let observed: Int32 = value.rawValue
         guard observed == rawValue, Usage(rawValue: rawValue) == value else {
-            throw CNAError.argument("isolated RenderTargetUsage table qualification failed")
+            throw QualificationFailure.failed("isolated RenderTargetUsage table qualification failed")
         }
     }
     guard Usage(rawValue: 3) == nil, Usage(rawValue: -1) == nil,
           String(describing: Usage.self) == "RenderTargetUsage" else {
-        throw CNAError.argument("isolated RenderTargetUsage projection qualification failed")
+        throw QualificationFailure.failed("isolated RenderTargetUsage projection qualification failed")
     }
 }
 
@@ -188,7 +208,7 @@ func qualifyFoundation14ManagedSurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-14 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-14 \(what) qualification failed")
         }
     }
 
@@ -354,7 +374,7 @@ func qualifyFoundation20ManagedSurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-20 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-20 \(what) qualification failed")
         }
     }
 
@@ -458,7 +478,7 @@ func qualifyFoundation19EventSurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-19 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-19 \(what) qualification failed")
         }
     }
 
@@ -538,13 +558,13 @@ func qualifyFoundation19EventSurface() throws {
     source.Event.Add { _, _ in visited.append(1) }
     source.Event.Add { _, _ in
         visited.append(2)
-        throw CNAError.argument("external handler failed")
+        throw QualificationFailure.failed("external handler failed")
     }
     source.Event.Add { _, _ in visited.append(3) }
     do {
         try source.Raise(nil, args: CNAEventArgs.Empty)
-        throw CNAError.argument("isolated Foundation-19 handler error was swallowed")
-    } catch CNAError.argument(let message) where message == "external handler failed" {
+        throw QualificationFailure.failed("isolated Foundation-19 handler error was swallowed")
+    } catch QualificationFailure.failed(let message) where message == "external handler failed" {
         // Exactly the handler's own error, unwrapped.
     }
     try check(visited == [1, 2], "throwing handler stops later handlers")
@@ -615,7 +635,7 @@ func qualifyFoundation15To18ManagedSurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-15..18 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-15..18 \(what) qualification failed")
         }
     }
 
@@ -704,7 +724,7 @@ func qualifyFoundation22AccessorSurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-22 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-22 \(what) qualification failed")
         }
     }
 
@@ -733,9 +753,9 @@ func qualifyFoundation22AccessorSurface() throws {
     try emitter.SetDopplerScale(3)
     do {
         try emitter.SetDopplerScale(-Float.leastNonzeroMagnitude)
-        throw CNAError.argument("isolated AudioEmitter negative DopplerScale was accepted")
-    } catch CNAError.argumentOutOfRange(let parameter) {
-        try check(parameter == "value", "AudioEmitter DopplerScale failure parameter")
+        throw QualificationFailure.failed("isolated AudioEmitter negative DopplerScale was accepted")
+    } catch let failure as CNAArgumentOutOfRangeException {
+        try check(failure.ParamName == "value", "AudioEmitter DopplerScale failure parameter")
     }
     try check(emitter.DopplerScale.bitPattern == Float(3).bitPattern,
               "AudioEmitter rejected DopplerScale left the value intact")
@@ -759,8 +779,8 @@ func qualifyFoundation22AccessorSurface() throws {
     try check(!cursor.MoveNext(), "TouchCollection enumerator exhaustion")
     do {
         _ = try cursor.Current
-        throw CNAError.argument("isolated exhausted Current did not throw")
-    } catch CNAError.argumentOutOfRange {
+        throw QualificationFailure.failed("isolated exhausted Current did not throw")
+    } catch is CNAArgumentOutOfRangeException {
         // Exact expected indexer failure past the last element.
     }
 }
@@ -770,7 +790,7 @@ func qualifyFoundation23NullabilitySurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-23 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-23 \(what) qualification failed")
         }
     }
 
@@ -802,7 +822,7 @@ func qualifyFoundation23NullabilitySurface() throws {
     let sphere = try F.BoundingSphere(F.Vector3(0, 0, 0), 1)
     let hit: Float? = F.Ray(F.Vector3(0, 0, -5), F.Vector3(0, 0, 1)).Intersects(sphere)
     guard let distance = hit else {
-        throw CNAError.argument("isolated nullable intersection returned nil")
+        throw QualificationFailure.failed("isolated nullable intersection returned nil")
     }
     try check(distance == 4, "infallible Optional return unwraps without try")
     let miss: Float? = F.Ray(F.Vector3(0, 0, -5), F.Vector3(0, 1, 0)).Intersects(sphere)
@@ -815,8 +835,8 @@ func qualifyFoundation23NullabilitySurface() throws {
     try check(try keys.Item(0).Value == 2, "fallible reader still requires try")
     do {
         _ = try keys.Item(1)
-        throw CNAError.argument("isolated out-of-range Item did not throw")
-    } catch CNAError.argumentOutOfRange {
+        throw QualificationFailure.failed("isolated out-of-range Item did not throw")
+    } catch is CNAArgumentOutOfRangeException {
         // A real failure is an error. It is never nil.
     }
 }
@@ -850,7 +870,7 @@ func qualifyFoundation24ServiceSurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-24 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-24 \(what) qualification failed")
         }
     }
 
@@ -883,7 +903,7 @@ func qualifyFoundation27To29BclSurface() throws {
 
     func check(_ condition: Bool, _ what: String) throws {
         guard condition else {
-            throw CNAError.argument("isolated Foundation-27/29 \(what) qualification failed")
+            throw QualificationFailure.failed("isolated Foundation-27/29 \(what) qualification failed")
         }
     }
 
@@ -941,8 +961,8 @@ func qualifyFoundation27To29BclSurface() throws {
     // A duplicate is refused and announces nothing.
     do {
         try collection.Add(third)
-        throw CNAError.argument("isolated duplicate component was accepted")
-    } catch CNAError.argument {
+        throw QualificationFailure.failed("isolated duplicate component was accepted")
+    } catch is CNAArgumentException {
         // Exact expected refusal.
     }
     try check(events == ["added:third:true"], "duplicate raises no event")
@@ -951,8 +971,8 @@ func qualifyFoundation27To29BclSurface() throws {
     // Indexed assignment is refused outright.
     do {
         try collection.SetItem(0, ExternalComponent("replacement"))
-        throw CNAError.argument("isolated indexed assignment was accepted")
-    } catch CNAError.notSupported {
+        throw QualificationFailure.failed("isolated indexed assignment was accepted")
+    } catch is CNANotSupportedException {
         // Exact expected refusal.
     }
 
@@ -1171,6 +1191,40 @@ def validate_canary(output: str, requested: int) -> bool:
     )
 
 
+
+# The freshness half of this gate.
+#
+# This report used to go stale silently: the canary stopped compiling in
+# 805b4cd and the committed report kept reporting PASS for forty-one commits,
+# because the status gate's freshness check regenerates four reports and this
+# was not one of them. Regenerating it there is not an option -- it costs two
+# consumer builds -- so instead the report records a digest of the inputs the
+# qualification actually depends on, and the status gate recomputes THAT.
+#
+# Hashing the archive would not work: the report is itself committed, so the
+# archive of the commit carrying the report can never match the archive the
+# report was generated from. These three inputs have no such circularity --
+# committing a regenerated report changes none of them.
+QUALIFIED_INPUT_ROOTS = ("Sources",)
+QUALIFIED_INPUT_FILES = ("Package.swift", "tools/package_qualification/verify.py")
+
+
+def qualified_inputs_digest(root: Path) -> str:
+    """SHA-256 over every input that can change what the qualification proves."""
+    digest = hashlib.sha256()
+    paths: list[Path] = []
+    for directory in QUALIFIED_INPUT_ROOTS:
+        paths.extend(sorted((root / directory).rglob("*")))
+    paths.extend(root / name for name in QUALIFIED_INPUT_FILES)
+    for path in sorted(set(paths)):
+        if not path.is_file():
+            continue
+        digest.update(str(path.relative_to(root)).encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(hashlib.sha256(path.read_bytes()).digest())
+    return digest.hexdigest()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--archive", required=True, type=Path)
@@ -1227,10 +1281,33 @@ def main() -> int:
         # nothing of the working tree. What is kept across runs is the
         # `.build` scratch inside it, which is the whole point -- a second
         # qualification recompiles what changed instead of everything.
+        # The extracted dependency is left READ-ONLY below, which is what makes
+        # "the consumer never writes into its dependency" a demonstrated claim
+        # rather than an assumption. That also means a previous run's tree
+        # cannot simply be deleted: the write bit has to be restored first.
+        #
+        # This is emphatically not `ignore_errors=True`. A silent failure to
+        # empty would leave a stale tree in place and the next run would qualify
+        # the PREVIOUS archive while reporting the current one -- the same
+        # shape of lie as a stale report. Removal is retried with the write bit
+        # restored, and then verified.
+        def _drop_read_only(func, path, _exc):
+            # Unlinking needs the write bit on the containing DIRECTORY, not on
+            # the file, so both are restored before the retry.
+            parent = os.path.dirname(path)
+            if parent:
+                os.chmod(parent, os.stat(parent).st_mode | stat.S_IWUSR | stat.S_IXUSR)
+            os.chmod(path, os.stat(path).st_mode | stat.S_IWUSR)
+            func(path)
+
         root = Path(__file__).resolve().parents[2] / "build-consumer"
-        if root.exists():
-            shutil.rmtree(root / "extracted", ignore_errors=True)
-            shutil.rmtree(root / "consumer", ignore_errors=True)
+        for stale in (root / "extracted", root / "consumer"):
+            if stale.exists():
+                shutil.rmtree(stale, onerror=_drop_read_only)
+            if stale.exists():
+                raise RuntimeError(
+                    f"{stale} survived removal; the consumer would not be "
+                    "independent of the previous run")
         root.mkdir(parents=True, exist_ok=True)
         if True:
             extracted = root / "extracted"
@@ -1297,6 +1374,8 @@ def main() -> int:
         "SOURCE_ARCHIVE_FILENAME": args.archive.name,
         "SOURCE_ARCHIVE_SHA256": hashlib.sha256(args.archive.read_bytes()).hexdigest(),
         "SOURCE_ARCHIVE_ENTRIES": len(entries),
+        "QUALIFIED_INPUTS_SHA256": qualified_inputs_digest(
+            Path(__file__).resolve().parents[2]),
         "FORBIDDEN_ENTRIES": forbidden,
         "NATIVE_LIBRARIES": native_libraries,
         "MICROSOFT_REFERENCE_BINARIES": microsoft_reference_binaries,
