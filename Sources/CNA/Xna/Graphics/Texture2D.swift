@@ -478,7 +478,7 @@ extension Microsoft.Xna.Framework.Graphics {
             transfer.struct_size = UInt32(MemoryLayout<CNASwift_Texture2DTransfer>.size)
             transfer.struct_version = 1
             transfer.level = level
-            if let rect, false {
+            if let rect {
                 transfer.has_rectangle = 1
                 transfer.rectangle = CNASwift_Rectangle(
                     x: rect.X, y: rect.Y, width: rect.Width, height: rect.Height)

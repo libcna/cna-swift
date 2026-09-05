@@ -261,9 +261,22 @@ should precede either.
 
 ### The `Model` family, sized — and buildable without content
 
-Thirteen types but only **36 members**: `Model` 8, `ModelMesh` 7, `ModelBone` 5,
-`ModelMeshPart` 8, and the four collections 3+3+1+1 with an enumerator apiece.
-Small for its size on the roadmap, because most of it is properties.
+**Twelve types and 48 members**, corrected at Foundation 74. The earlier count
+— "thirteen types, 36 members" — missed the four `+Enumerator` nested types,
+which are three members each: 36 + 12 = 48. `Model` 8, `ModelMesh` 7,
+`ModelBone` 5, `ModelMeshPart` 8, the four collections 3+3+1+1, four
+enumerators 3 apiece. Still small for its place on the roadmap, because most of
+it is properties.
+
+**And those properties decide the architecture, exactly as `GraphicsAdapter`'s
+do.** Of the family's 29 accessors, **27 are pinned infallible** and only two
+getters may throw: `ModelBoneCollection.Item` and `ModelMeshCollection.Item`,
+both `IL_DIRECT_THROW` raising `KeyNotFoundException` — the name-keyed lookups.
+So `Model`, `ModelMesh`, `ModelBone` and `ModelMeshPart` are **snapshots**: read
+from CNA once at construction and cached, with every getter a plain field read.
+Only the two name lookups are throwing members. Do not design this family as
+throwing forwards; the gate will reject it, as it did for `Mouse.WindowHandle`
+in Foundation 74.
 
 **It can be built in memory.** `cna_model_create(graphics_device, bones,
 bone_count, meshes, mesh_count, out_model)` takes arrays of bone and mesh

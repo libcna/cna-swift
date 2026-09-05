@@ -563,7 +563,7 @@ extension Microsoft.Xna.Framework {
                 // subclass that overrides one sees the device events it
                 // overrode for.
                 case GraphicsDeviceManager.eventDeviceCreated:
-                    try OnDeviceCreated(self, args: CNAEventArgs.Empty)
+                    try deviceCreatedSource.Raise(self, args: CNAEventArgs.Empty)
                 case GraphicsDeviceManager.eventDeviceDisposing:
                     try OnDeviceDisposing(self, args: CNAEventArgs.Empty)
                 case GraphicsDeviceManager.eventDeviceReset:
