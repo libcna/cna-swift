@@ -526,6 +526,17 @@ typedef struct CNASwift_SpriteScaledCommand {
     float layer_depth;
 } CNASwift_SpriteScaledCommand;
 
+typedef struct CNASwift_MouseState {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t x;
+    int32_t y;
+    int32_t scroll_wheel;
+    int32_t horizontal_scroll_wheel;
+    uint32_t pressed_buttons;
+    uint32_t reserved;
+} CNASwift_MouseState;
+
 typedef struct CNASwift_KeyboardState {
     uint32_t struct_size;
     uint32_t struct_version;

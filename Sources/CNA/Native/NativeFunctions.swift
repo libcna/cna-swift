@@ -126,6 +126,9 @@ internal final class NativeFunctions {
     typealias SpriteBatchSubmitManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteCommand>?, UInt64) -> UInt32
     typealias SpriteBatchEndRoute = @convention(c) (UInt64) -> UInt32
     typealias SpriteBatchDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias MouseGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_MouseState>?) -> UInt32
+    typealias MouseSetPositionRoute = @convention(c) (UInt64, Int32, Int32) -> UInt32
+    typealias MouseSetWindowHandleRoute = @convention(c) (UInt64, UInt64) -> UInt32
     typealias KeyboardGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_KeyboardState>?) -> UInt32
     typealias KeyboardGetStateForPlayerRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_KeyboardState>?) -> UInt32
     typealias GamepadGetStateRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_GamePadState>?) -> UInt32
@@ -448,6 +451,9 @@ internal final class NativeFunctions {
     let spriteBatchSubmit: SpriteBatchSubmitManyRoute
     let spriteBatchEnd: SpriteBatchEndRoute
     let spriteBatchDestroy: SpriteBatchDestroyRoute
+    let mouseGetState: MouseGetStateRoute
+    let mouseSetPosition: MouseSetPositionRoute
+    let mouseSetWindowHandle: MouseSetWindowHandleRoute
     let keyboardGetState: KeyboardGetStateRoute
     let keyboardGetStateForPlayer: KeyboardGetStateForPlayerRoute
     let gamePadGetState: GamepadGetStateRoute
@@ -790,6 +796,9 @@ internal final class NativeFunctions {
         spriteBatchSubmit = try library.resolve("cna_sprite_batch_submit_many", as: SpriteBatchSubmitManyRoute.self)
         spriteBatchEnd = try library.resolve("cna_sprite_batch_end", as: SpriteBatchEndRoute.self)
         spriteBatchDestroy = try library.resolve("cna_sprite_batch_destroy", as: SpriteBatchDestroyRoute.self)
+        mouseGetState = try library.resolve("cna_mouse_get_state", as: MouseGetStateRoute.self)
+        mouseSetPosition = try library.resolve("cna_mouse_set_position", as: MouseSetPositionRoute.self)
+        mouseSetWindowHandle = try library.resolve("cna_mouse_set_window_handle", as: MouseSetWindowHandleRoute.self)
         keyboardGetState = try library.resolve("cna_keyboard_get_state", as: KeyboardGetStateRoute.self)
         keyboardGetStateForPlayer = try library.resolve("cna_keyboard_get_state_for_player", as: KeyboardGetStateForPlayerRoute.self)
         gamePadGetState = try library.resolve("cna_gamepad_get_state", as: GamepadGetStateRoute.self)

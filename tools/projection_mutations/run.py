@@ -34,6 +34,7 @@ RENDER_TARGET = ROOT / "Sources/CNA/Xna/Graphics/RenderTarget2D.swift"
 GAME = ROOT / "Sources/CNA/Xna/Framework/Game.swift"
 DISPATCHER = ROOT / "Sources/CNA/Xna/Framework/FrameworkDispatcher.swift"
 TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
+MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
@@ -114,6 +115,51 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 74: Input.Mouse --------------------------------------
+    (
+        "mouse-middle-and-right-transposed",
+        "the middle and right button bits exchanged, which reports a "
+        "right-click as a middle-click",
+        MOUSE,
+        "                button(pressed, Mouse.buttonMiddle),\n"
+        "                button(pressed, Mouse.buttonRight),",
+        "                button(pressed, Mouse.buttonRight),\n"
+        "                button(pressed, Mouse.buttonMiddle),",
+    ),
+    # WITHDRAWN: "mouse-window-handle-not-zero-initialised" -- poisoning the
+    # handle buffer to prove the zero-initialisation load-bearing.
+    #
+    # It survived, twice, and measuring rather than re-guessing is what settled
+    # it. `build-probe/f74_mouse.c` seeded the buffer with 123 and read 123 back
+    # from a successful `cna_mouse_get_window_handle` with no window bound --
+    # the route had not written, though its own header promises "zero when none
+    # is bound". `build-probe/f74_when.c` then called the same route FIRST, in
+    # both `load_content` and `update`, and it wrote zero every time. The only
+    # difference is whether `cna_mouse_get_state` ran before it.
+    #
+    # So the no-write case is real but this host cannot say when it happens.
+    #
+    # It stopped mattering anyway, and for a better reason than the measurement:
+    # the api-compat gate then showed that XNA's `get_WindowHandle` is
+    # `ldsfld hHookedHandle; ret` -- infallible, reading its own static field
+    # and never asking the platform. The projection reads a stored value now
+    # and `cna_mouse_get_window_handle` has no consuming member at all, so it
+    # is not bound. The buffer this mutation poisoned no longer exists.
+    (
+        "mouse-position-y-carries-x",
+        "SetPosition passing x for both coordinates",
+        MOUSE,
+        "runtime.functions.mouseSetPosition(runtime.gameHandle, x, y)",
+        "runtime.functions.mouseSetPosition(runtime.gameHandle, x, x)",
+    ),
+    (
+        "mouse-state-reads-the-horizontal-wheel",
+        "the horizontal wheel reported as XNA's single ScrollWheelValue, a "
+        "number XNA never produces",
+        MOUSE,
+        "                scrollWheel,",
+        "                horizontalScrollWheel,",
+    ),
     # ---- Foundation 73: TitleContainer -----------------------------------
     (
         "clean-path-strips-leading-dot-once",

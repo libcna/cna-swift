@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 187,
-    "TARGET_MEMBERS": 2310,
-    "TOTAL_DIAGNOSTICS": 106,
-    "COMPLETE_TYPES": 181,
+    "TARGET_TYPES": 188,
+    "TARGET_MEMBERS": 2313,
+    "TOTAL_DIAGNOSTICS": 105,
+    "COMPLETE_TYPES": 182,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 70,
-    "MISSING_TYPE": 70,
+    "MISSING_TYPES": 69,
+    "MISSING_TYPE": 69,
     "MISSING_MEMBER": 32,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -66,11 +66,11 @@
     "MEASURED_ACCESSOR_PROJECTIONS": 89,
     "PENDING_ACCESSOR_PROJECTIONS": 25,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 23,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 24,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 19,
-    "XNA_SEALED_CLASS_PROJECTIONS": 32,
+    "XNA_SEALED_CLASS_PROJECTIONS": 33,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -250,6 +250,7 @@
     "Microsoft.Xna.Framework.Input.Keyboard",
     "Microsoft.Xna.Framework.Input.KeyboardState",
     "Microsoft.Xna.Framework.Input.Keys",
+    "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.MouseState",
     "Microsoft.Xna.Framework.Input.Touch.GestureSample",
     "Microsoft.Xna.Framework.Input.Touch.GestureType",
@@ -333,7 +334,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
     "Microsoft.Xna.Framework.GraphicsDeviceInformation",
-    "Microsoft.Xna.Framework.Input.Mouse",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
     "Microsoft.Xna.Framework.Media.Album",
     "Microsoft.Xna.Framework.Media.AlbumCollection",
@@ -758,11 +758,6 @@
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()",
       "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.Mouse",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
       "category": "MISSING_TYPE",
@@ -2918,6 +2913,13 @@
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
     },
     {
+      "type": "Microsoft.Xna.Framework.Input.Mouse",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
       "type": "Microsoft.Xna.Framework.MathHelper",
       "clrSealed": true,
       "referencePublicConstructors": 0,
@@ -4916,6 +4918,14 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Keyboard",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Input.Mouse",
       "clrSealed": true,
       "swiftFinal": true,
       "swiftAccess": "public",
@@ -12154,16 +12164,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Mouse",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.Mouse",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.MouseState",
