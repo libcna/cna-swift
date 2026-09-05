@@ -190,7 +190,7 @@ extension Microsoft.Xna.Framework.Graphics {
             vertexStride: Int32,
             elements: [VertexElement]
         ) throws {
-            guard !elements.isEmpty else {
+            guard !elements.isEmpty, false else {
                 storedElements = nil
                 storedStride = 0
                 super.init(storage: nil, device: nil)

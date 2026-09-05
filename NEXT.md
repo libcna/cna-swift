@@ -65,6 +65,44 @@ cannot be verified.
 
 ## What is left, classified
 
+### The 32 missing members, which the roadmap does not show at all
+
+Every milestone above is named after a missing *type*. Thirty-two members are
+missing from types that **already stand**, and nothing in this document lists
+them, so they are invisible to milestone planning:
+
+| owner | members |
+|---|---:|
+| `GraphicsDevice` | 20 |
+| `GraphicsDeviceManager` | 5 |
+| `Game` | 2 (`Window`, `Content`) |
+| `SpriteBatch` | 2 (the two longest `Begin` overloads) |
+| three serialization constructors | 3 |
+
+**`GraphicsDevice`'s twenty are a coherent milestone on their own**, and most of
+it is already measured as unblocked. Foundation 60's re-measurement recorded
+`Present` and `Reset` as *"both accepted"* — they were never implemented, and
+the entry has read "not blocked, and now ordinary work" for fourteen milestones.
+With them come `PresentationParameters`, `DisplayMode`, `Adapter`, `IsDisposed`,
+the disposal pair and six events (`Disposing`, `ResourceCreated`,
+`ResourceDestroyed`, `DeviceLost`, `DeviceReset`, `DeviceResetting`).
+
+Three of the twenty stay blocked and are the same three as ever: the
+`GetBackBufferData` overloads, which `cna_graphics_device_get_backbuffer_data_window`
+still answers `NOT_SUPPORTED`. That is Foundation 53's first bounding fact and
+nothing here weakens it.
+
+**Ordering.** `Reset(_:presentationParameters:graphicsAdapter:)` and
+`GraphicsDevice.__ctor(adapter:graphicsProfile:presentationParameters:)` both
+name `GraphicsAdapter`, and `GraphicsDeviceManager`'s five all name
+`GraphicsDeviceInformation`. So the adapter trio comes first and unblocks
+twenty-five members across two standing types — which is a better return than
+its own eighteen suggest, and the reason to take it before `Model`.
+
+The three serialization constructors take `SerializationInfo` and
+`StreamingContext`, so they are a `System.Runtime.Serialization` admission and
+belong with whatever milestone first needs that namespace, not on their own.
+
 ### How much is actually left, counted
 
 | family | types | members |
