@@ -115,6 +115,27 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 76: SpriteBatch.Begin with an effect -------------------
+    (
+        "begin-effect-skips-the-pair-check",
+        "the effect overloads reaching the device without the inBeginEndPair "
+        "test XNA does first",
+        BATCH,
+        "            guard !inBeginEndPair else {\n"
+        "                throw CNAInvalidOperationException(",
+        "            guard true else {\n"
+        "                throw CNAInvalidOperationException(",
+    ),
+    (
+        "begin-six-argument-invents-a-matrix",
+        "the six-argument overload passing something other than the "
+        "Matrix.Identity XNA pushes",
+        BATCH,
+        "                          rasterizerState, effect, .Identity)\n"
+        "        }\n\n        /// `Begin(..., Effect, Matrix)`",
+        "                          rasterizerState, effect, Microsoft.Xna.Framework.Matrix())\n"
+        "        }\n\n        /// `Begin(..., Effect, Matrix)`",
+    ),
     # ---- Foundation 74: Input.Mouse --------------------------------------
     (
         "mouse-middle-and-right-transposed",

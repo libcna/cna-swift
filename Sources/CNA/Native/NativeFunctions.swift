@@ -112,6 +112,7 @@ internal final class NativeFunctions {
     typealias Texture3dSetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Texture3DTransfer>?, UnsafePointer<CNASwift_Color>?, UInt64) -> UInt32
     typealias Texture3dGetDataRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Texture3DTransfer>?, UnsafeMutablePointer<CNASwift_Color>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteBatchCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SpriteBatchBeginWithEffectRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?, UInt64, UnsafePointer<CNASwift_Matrix>?) -> UInt32
     typealias SpriteBatchBeginWithStatesRoute = @convention(c) (UInt64, UInt32, UnsafePointer<CNASwift_BlendState>?, UnsafePointer<CNASwift_SamplerState>?, UnsafePointer<CNASwift_DepthStencilState>?, UnsafePointer<CNASwift_RasterizerState>?) -> UInt32
     typealias SpriteFontCreateRoute = @convention(c) (UnsafePointer<CNASwift_SpriteFontCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SpriteFontDestroyRoute = @convention(c) (UInt64) -> UInt32
@@ -437,6 +438,7 @@ internal final class NativeFunctions {
     let texture3DSetData: Texture3dSetDataRoute
     let texture3DGetData: Texture3dGetDataRoute
     let spriteBatchCreate: SpriteBatchCreateRoute
+    let spriteBatchBeginWithEffect: SpriteBatchBeginWithEffectRoute
     let spriteBatchBeginWithStates: SpriteBatchBeginWithStatesRoute
     let spriteBatchSubmitScaled: SpriteBatchSubmitScaledManyRoute
     let spriteFontCreate: SpriteFontCreateRoute
@@ -782,6 +784,7 @@ internal final class NativeFunctions {
         texture3DSetData = try library.resolve("cna_texture3d_set_data", as: Texture3dSetDataRoute.self)
         texture3DGetData = try library.resolve("cna_texture3d_get_data", as: Texture3dGetDataRoute.self)
         spriteBatchCreate = try library.resolve("cna_sprite_batch_create", as: SpriteBatchCreateRoute.self)
+        spriteBatchBeginWithEffect = try library.resolve("cna_sprite_batch_begin_with_effect", as: SpriteBatchBeginWithEffectRoute.self)
         spriteBatchBeginWithStates = try library.resolve("cna_sprite_batch_begin_with_states", as: SpriteBatchBeginWithStatesRoute.self)
         spriteBatchSubmitScaled = try library.resolve("cna_sprite_batch_submit_scaled_many", as: SpriteBatchSubmitScaledManyRoute.self)
         spriteFontCreate = try library.resolve("cna_sprite_font_create", as: SpriteFontCreateRoute.self)

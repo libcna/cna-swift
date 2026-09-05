@@ -27,7 +27,6 @@
       "transitivePartialReverseReach": [
         "Microsoft.Xna.Framework.Game",
         "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-        "Microsoft.Xna.Framework.Graphics.SpriteBatch",
         "Microsoft.Xna.Framework.GraphicsDeviceManager"
       ]
     },

@@ -112,6 +112,12 @@ extension Microsoft.Xna.Framework.Graphics {
         private var depthStencilState: DepthStencilState?
         private var rasterizerState: RasterizerState?
 
+        /// `SpriteBatch.spriteEffect` and `transformMatrix`, the two fields the
+        /// seven-argument `Begin` stores that the five-argument one leaves at
+        /// their defaults.
+        private var spriteEffect: Effect?
+        private var transformMatrix: Microsoft.Xna.Framework.Matrix = .Identity
+
         /// `SpriteBatch.Begin()`, which is
         /// `ldc.i4.0; ldnull x5; Matrix.Identity` -- Deferred and five nulls.
         public func Begin() throws {
@@ -161,6 +167,57 @@ extension Microsoft.Xna.Framework.Graphics {
             depthStencilState: DepthStencilState?,
             rasterizerState: RasterizerState?
         ) throws {
+            try beginCore(sortMode, blendState, samplerState, depthStencilState,
+                          rasterizerState, nil, .Identity)
+        }
+
+        /// `Begin(SpriteSortMode, BlendState, SamplerState, DepthStencilState,
+        /// RasterizerState, Effect)`.
+        ///
+        /// XNA's body is twenty-one bytes: it loads its five arguments, pushes
+        /// `Matrix.Identity`, and calls the seven-argument overload. **The
+        /// identity matrix is XNA's default, not this binding's**, which is
+        /// why the five-argument overload above passes it too.
+        public func Begin(
+            _ sortMode: SpriteSortMode,
+            blendState: BlendState?,
+            samplerState: SamplerState?,
+            depthStencilState: DepthStencilState?,
+            rasterizerState: RasterizerState?,
+            effect: Effect
+        ) throws {
+            try beginCore(sortMode, blendState, samplerState, depthStencilState,
+                          rasterizerState, effect, .Identity)
+        }
+
+        /// `Begin(..., Effect, Matrix)` — the one the other four forward to.
+        ///
+        /// The `effect` parameter is **not Optional**, because the registered
+        /// CIL does not prove that XNA accepts null there and the projection is
+        /// deliberately non-Optional until it does. The nulls the other
+        /// overloads pass are internal.
+        public func Begin(
+            _ sortMode: SpriteSortMode,
+            blendState: BlendState?,
+            samplerState: SamplerState?,
+            depthStencilState: DepthStencilState?,
+            rasterizerState: RasterizerState?,
+            effect: Effect,
+            transformMatrix: Microsoft.Xna.Framework.Matrix
+        ) throws {
+            try beginCore(sortMode, blendState, samplerState, depthStencilState,
+                          rasterizerState, effect, transformMatrix)
+        }
+
+        private func beginCore(
+            _ sortMode: SpriteSortMode,
+            _ blendState: BlendState?,
+            _ samplerState: SamplerState?,
+            _ depthStencilState: DepthStencilState?,
+            _ rasterizerState: RasterizerState?,
+            _ effect: Effect?,
+            _ transformMatrix: Microsoft.Xna.Framework.Matrix
+        ) throws {
             guard !inBeginEndPair else {
                 throw CNAInvalidOperationException(
                     message: endMustBeCalledBeforeBeginMessage)
@@ -171,16 +228,35 @@ extension Microsoft.Xna.Framework.Graphics {
             self.samplerState = samplerState
             self.depthStencilState = depthStencilState
             self.rasterizerState = rasterizerState
+            self.spriteEffect = effect
+            self.transformMatrix = transformMatrix
 
             var blend = resolvedBlendState.nativeDescriptor()
             var sampler = resolvedSamplerState.nativeDescriptor()
             var depth = resolvedDepthStencilState.nativeDescriptor()
             var raster = resolvedRasterizerState.nativeDescriptor()
-            try nativeStorage.runtime.functions.check(
-                nativeStorage.runtime.functions.spriteBatchBeginWithStates(
-                    handle, sortMode.rawValue, &blend, &sampler, &depth, &raster),
-                operation: "cna_sprite_batch_begin_with_states"
-            )
+            // The effect-carrying route is taken only when there is something
+            // for it to carry. CNA reads `CNA_INVALID_HANDLE` as "the default
+            // sprite effect", so passing it would be equivalent -- but the
+            // stateful route is the one Foundation 54's probe measured, and a
+            // batch with neither an effect nor a transform keeps using it.
+            if let effect, let effectHandle = try? effect.validatedHandle(
+                "SpriteBatch.Begin(effect:)") {
+                var matrix = Microsoft.Xna.Framework.Graphics.nativeMatrix(
+                    from: transformMatrix)
+                try nativeStorage.runtime.functions.check(
+                    nativeStorage.runtime.functions.spriteBatchBeginWithEffect(
+                        handle, sortMode.rawValue, &blend, &sampler, &depth,
+                        &raster, effectHandle, &matrix),
+                    operation: "cna_sprite_batch_begin_with_effect"
+                )
+            } else {
+                try nativeStorage.runtime.functions.check(
+                    nativeStorage.runtime.functions.spriteBatchBeginWithStates(
+                        handle, sortMode.rawValue, &blend, &sampler, &depth, &raster),
+                    operation: "cna_sprite_batch_begin_with_states"
+                )
+            }
             if sortMode == .Immediate {
                 try setRenderState()
             }

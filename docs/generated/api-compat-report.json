@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 188,
-    "TARGET_MEMBERS": 2313,
-    "TOTAL_DIAGNOSTICS": 105,
-    "COMPLETE_TYPES": 182,
-    "PARTIAL_TYPES": 6,
+    "TARGET_MEMBERS": 2315,
+    "TOTAL_DIAGNOSTICS": 101,
+    "COMPLETE_TYPES": 183,
+    "PARTIAL_TYPES": 5,
     "MISSING_TYPES": 69,
     "MISSING_TYPE": 69,
-    "MISSING_MEMBER": 32,
+    "MISSING_MEMBER": 30,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -29,7 +29,7 @@
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 4,
+    "OVERLOAD_MAPPING_MISMATCH": 2,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -208,6 +208,7 @@
     "Microsoft.Xna.Framework.Graphics.SamplerStateCollection",
     "Microsoft.Xna.Framework.Graphics.SetDataOptions",
     "Microsoft.Xna.Framework.Graphics.SkinnedEffect",
+    "Microsoft.Xna.Framework.Graphics.SpriteBatch",
     "Microsoft.Xna.Framework.Graphics.SpriteEffects",
     "Microsoft.Xna.Framework.Graphics.SpriteFont",
     "Microsoft.Xna.Framework.Graphics.SpriteSortMode",
@@ -283,7 +284,6 @@
     "Microsoft.Xna.Framework.Content.ContentLoadException",
     "Microsoft.Xna.Framework.Game",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-    "Microsoft.Xna.Framework.Graphics.SpriteBatch",
     "Microsoft.Xna.Framework.GraphicsDeviceManager",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ],
@@ -708,26 +708,6 @@
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)",
-      "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "OVERLOAD_MAPPING_MISMATCH",
-      "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)",
-      "detail": "required overload is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -11796,31 +11776,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SpriteBatch",
-      "status": "PARTIAL",
+      "status": "COMPLETE",
       "expectedMembers": 21,
-      "targetMembers": 19,
-      "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect)",
-          "detail": "required overload is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "OVERLOAD_MAPPING_MISMATCH",
-          "subject": "Microsoft.Xna.Framework.Graphics.SpriteBatch.Begin(_:Microsoft.Xna.Framework.Graphics.SpriteSortMode,blendState:Microsoft.Xna.Framework.Graphics.BlendState?,samplerState:Microsoft.Xna.Framework.Graphics.SamplerState?,depthStencilState:Microsoft.Xna.Framework.Graphics.DepthStencilState?,rasterizerState:Microsoft.Xna.Framework.Graphics.RasterizerState?,effect:Microsoft.Xna.Framework.Graphics.Effect,transformMatrix:Microsoft.Xna.Framework.Matrix)",
-          "detail": "required overload is absent"
-        }
-      ]
+      "targetMembers": 21,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Graphics.SpriteEffects",
