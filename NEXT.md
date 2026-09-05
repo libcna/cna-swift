@@ -143,7 +143,7 @@ routes behind them:
 | type | members | routes | note |
 |---|---:|---:|---|
 | `GameWindow` | 20 | 19 | `abstract`-shaped in XNA, and under the **no-visible-window rule** |
-| `GraphicsAdapter` | 18 | 13 | plus `display_mode` 2; Foundation 60 measured the device answering an adapter index and an 800x480 mode |
+| `GraphicsAdapter` | 18 | 15 |
 | `GraphicsDeviceInformation` | 7 | — | pure managed: it carries an adapter, a profile and presentation parameters |
 | `OcclusionQuery` | 6 | 8 | standalone |
 | `PreparingDeviceSettingsEventArgs` | 2 | — | pure managed; it is the event payload that carries the one above |
@@ -176,6 +176,29 @@ guessed:
   narrow one, as Foundation 72's was.
 * `WindowHandle` is `System.IntPtr`, which projects the way
   `GraphicsDevice.Present(overrideWindowHandle:)` already projects it.
+
+**`GraphicsAdapter` is a SNAPSHOT, and the fallibility table decides that
+before a line is written.** All fifteen of its accessors are pinned
+`IL_NO_FAILURE_PATH` — every one, including both static ones — so not a single
+Swift getter here may throw. The IL is plain field reads: `get_VendorId` is
+`ldfld _vendorId`, `get_Adapters` is `ldsfld pAdapterList`. XNA populates an
+adapter once by enumeration and its properties read fields.
+
+So the projection must read every value from CNA **once**, at construction or
+refresh, and cache it — exactly the shape `Mouse.WindowHandle` was forced into
+in Foundation 74, but for a whole type instead of one property. Designing it as
+throwing forwards first and letting the gate reject it would waste the milestone;
+this is written down so it is not discovered twice.
+
+The two `Query*` methods are the exception: they are **methods**, not accessors,
+so they may throw — and each carries three `out` parameters
+(`SurfaceFormat&`, `DepthFormat&`, `Int32&`), which is the ref/out projection
+rule's largest case so far.
+
+All four types it depends on already stand — `DisplayModeCollection`,
+`DisplayMode`, `PresentationParameters` and `GraphicsProfile` — and CNA
+publishes fifteen `cna_graphics_adapter_*` routes covering every member,
+`set_device_preferences` included for the two static flags.
 
 `GraphicsDeviceInformation` and `PreparingDeviceSettingsEventArgs` need **no CNA
 route at all** — they are managed carriers — but they depend on `GraphicsAdapter`

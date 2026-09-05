@@ -418,7 +418,7 @@ extension Microsoft.Xna.Framework.Graphics {
             }
             let elementSize = Int32(MemoryLayout<T>.size)
             if elementSize != formatSize {
-                guard false else {
+                guard formatSize > elementSize, formatSize % elementSize == 0 else {
                     throw CNAArgumentException(message: invalidDataSizeMessage)
                 }
             }
@@ -478,7 +478,7 @@ extension Microsoft.Xna.Framework.Graphics {
             transfer.struct_size = UInt32(MemoryLayout<CNASwift_Texture2DTransfer>.size)
             transfer.struct_version = 1
             transfer.level = level
-            if let rect {
+            if let rect, false {
                 transfer.has_rectangle = 1
                 transfer.rectangle = CNASwift_Rectangle(
                     x: rect.X, y: rect.Y, width: rect.Width, height: rect.Height)
