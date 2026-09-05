@@ -519,4 +519,24 @@ final class Foundation64VolumeTextureTests: XCTestCase {
                            "box (\(left),\(top),\(right),\(bottom),\(front),\(back))")
         }
     }
+
+    /// The volume aspect ratio takes its extremes over **all three** extents.
+    ///
+    /// Tested directly because it cannot be reached through `Texture3D`: every
+    /// extent is bounded by `maxVolumeExtent` first -- 256 on HiDef, and Reach
+    /// refuses volumes outright -- so the ratio never exceeds 256 against a
+    /// limit of 2048. A mutation taking the extremes over width and height
+    /// only survived the entire public surface, and this is what catches it.
+    func testVolumeAspectExtremesUseTheDepth() {
+        typealias Caps = Microsoft.Xna.Framework.Graphics.ProfileCapabilities
+        // Depth is the longest extent.
+        let deep = Caps.volumeAspectExtremes(4, 4, 64)
+        XCTAssertEqual(deep.longer, 64, "depth must be able to be the longest")
+        XCTAssertEqual(deep.shorter, 4)
+        // Depth is the shortest extent.
+        let flat = Caps.volumeAspectExtremes(64, 64, 4)
+        XCTAssertEqual(flat.longer, 64)
+        XCTAssertEqual(flat.shorter, 4, "depth must be able to be the shortest")
+    }
+
 }

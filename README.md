@@ -509,6 +509,22 @@ reproduces XNA's sequence exactly. The whole sequence is pinned by
 
 ## Verification
 
+Everything below runs **headless, on a virtual screen**. Three layers, and the
+third exists because the second was found doing nothing:
+
+```bash
+export CNA_RENDERER=HEADLESS     # the CNA renderer never opens a window
+export SDL_VIDEODRIVER=dummy     # and SDL never opens one either
+export DISPLAY=:99               # and if either is ever forgotten, X goes here
+xdpyinfo -display :99 >/dev/null 2>&1 || \
+  setsid Xvfb :99 -screen 0 1280x800x24 -nolisten tcp -noreset &
+```
+
+`DISPLAY=:99` on its own is **not** a virtual screen. Until Foundation 73 no X
+server was running on it, so a fallback to x11 would have failed rather than
+been contained — and the whole protection rested on `SDL_VIDEODRIVER=dummy`.
+Start the Xvfb. The physical desktop is `:0` and nothing here may address it.
+
 ```bash
 swift build
 swift build -c release

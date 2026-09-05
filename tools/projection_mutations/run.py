@@ -1720,10 +1720,8 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "volume-aspect-ratio-ignores-the-depth",
         "Max/Min taken over width and height only, never over all three extents",
         PROFILECAPS,
-        "            let longer = max(max(width, height), depth)\n"
-        "            let shorter = min(min(width, height), depth)",
-        "            let longer = max(width, height)\n"
-        "            let shorter = min(width, height)",
+        "            (max(max(width, height), depth), min(min(width, height), depth))",
+        "            (max(width, height), min(width, height))",
     ),
     (
         "cube-empty-array-not-reported-as-null",
@@ -2843,11 +2841,21 @@ def require_native_library() -> str | None:
 TEST_TIMEOUT_SECONDS = 600
 
 
-def run_tests(swift_test: str) -> tuple[int, bool]:
+# Compilation parallelism for the inner `swift test`.
+#
+# Three, deliberately. A full run is a few hundred rebuilds back to back, and
+# an unrestricted one saturates the machine for hours -- a desktop session on
+# this host froze under one on 2026-09-05 and had to be restarted. Three keeps
+# a full run to roughly the same wall clock while leaving the machine usable.
+DEFAULT_JOBS = 3
+
+
+def run_tests(swift_test: str, jobs: int = DEFAULT_JOBS) -> tuple[int, bool]:
     """(exit status, whether it ran out of time)."""
     try:
         result = subprocess.run(
-            [swift_test], cwd=ROOT, text=True, capture_output=True,
+            [swift_test, "-j", str(jobs)],
+            cwd=ROOT, text=True, capture_output=True,
             timeout=TEST_TIMEOUT_SECONDS)
     except subprocess.TimeoutExpired:
         # The child is killed by `subprocess.run`, but the test BINARY it
@@ -2861,6 +2869,10 @@ def run_tests(swift_test: str) -> tuple[int, bool]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--swift-test", default="swift-test")
+    parser.add_argument(
+        "--jobs", type=int, default=DEFAULT_JOBS,
+        help="compilation parallelism for the inner swift test "
+             f"(default {DEFAULT_JOBS})")
     # Running one milestone's own mutations, while the STALENESS check below
     # still runs over all of them.
     #
@@ -2950,7 +2962,7 @@ def main() -> int:
             print(f"  STALE {item}")
         return 1
 
-    baseline, baseline_hung = run_tests(args.swift_test)
+    baseline, baseline_hung = run_tests(args.swift_test, args.jobs)
     if baseline != 0:
         print("PROJECTION_MUTATION_BASELINE="
               + ("HUNG — the unmutated tree did not finish in "
@@ -2979,7 +2991,7 @@ def main() -> int:
         mutated = text.replace(old, new)
         try:
             path.write_text(mutated, encoding="utf-8")
-            code, hung = run_tests(args.swift_test)
+            code, hung = run_tests(args.swift_test, args.jobs)
         finally:
             # Restore ONLY what this harness wrote.
             #
@@ -3007,7 +3019,10 @@ def main() -> int:
                 "  hand and re-run.")
             return 1
         status = "HUNG" if hung else ("CAUGHT" if code != 0 else "SURVIVED")
-        print(f"{status:9} {name:34} {description}")
+        # flush: a full run takes hours and stdout is block-buffered when
+        # redirected, so without this a redirected run shows NOTHING until
+        # it finishes -- which is exactly when the progress stops mattering.
+        print(f"{status:9} {name:34} {description}", flush=True)
         if code == 0:
             survivors.append(f"{name}: {description}")
 

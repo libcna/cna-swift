@@ -147,14 +147,35 @@ routes behind them:
 | `GraphicsDeviceInformation` | 7 | — | pure managed: it carries an adapter, a profile and presentation parameters |
 | `OcclusionQuery` | 6 | 8 | standalone |
 | `PreparingDeviceSettingsEventArgs` | 2 | — | pure managed; it is the event payload that carries the one above |
-| `TitleContainer` | 1 | 1 | one static `OpenStream` |
-| `FrameworkDispatcher` | 1 | 1 | one static `Update` |
+| ~~`TitleContainer`~~ | 1 | 1 | **landed, Foundation 73** |
+| ~~`FrameworkDispatcher`~~ | 1 | 1 | **landed, Foundation 72** |
+| `Input.Mouse` | 3 | 3 | `MouseState` and `ButtonState` already stand |
 
-`TitleContainer` and `FrameworkDispatcher` are **one member each** and one route
-each — the cheapest two types left in the whole surface, and both are
-prerequisites elsewhere (`TitleContainer.OpenStream` is what
-`ContentManager.OpenStream` is measured against; `FrameworkDispatcher.Update` is
-what the audio and media namespaces expect a game to pump).
+`TitleContainer` and `FrameworkDispatcher` were sized here as the cheapest two
+types left, one member and one route each. **One of those two sizings was
+wrong, and the way it was wrong is worth keeping.** `FrameworkDispatcher` was
+exactly what it looked like. `TitleContainer` was not: its single public member
+is 213 bytes of IL over three private helpers totalling 383 more, it needed an
+`System.IO` exception family admitted, and it needed a decision about a branch
+CNA cannot distinguish. **A member count is not a milestone size.** Read the IL
+of the member before believing the count — that reading is what stopped
+`TitleContainer` from being rushed in as an appendix to Foundation 72.
+
+**The next milestone is `Input.Mouse`**, and it is measured rather than
+guessed:
+
+* Three members — `GetState()`, `SetPosition(Int32, Int32)` and the static
+  `WindowHandle` property — and `cna_mouse_get_state`, `cna_mouse_set_position`
+  and `cna_mouse_get_window_handle`/`cna_mouse_set_window_handle` behind them.
+* `MouseState` (14 members) and `ButtonState` **already stand**, so this is the
+  last piece of its own family rather than the first.
+* **There is no managed half at all.** `Mouse.GetState`'s IL is Win32 P/Invoke
+  end to end — `GetCursorPos`, then `ScreenToClient` when a window handle is
+  hooked, then `GetAsyncKeyState` per button. Nothing in it is a managed
+  decision this binding could reproduce, so the milestone's honest claim is the
+  narrow one, as Foundation 72's was.
+* `WindowHandle` is `System.IntPtr`, which projects the way
+  `GraphicsDevice.Present(overrideWindowHandle:)` already projects it.
 
 `GraphicsDeviceInformation` and `PreparingDeviceSettingsEventArgs` need **no CNA
 route at all** — they are managed carriers — but they depend on `GraphicsAdapter`
@@ -579,9 +600,28 @@ cd ../cna-swift-template && swift run HelloGame --frames 600
 
 Two operational notes worth the seconds they save:
 
-* **Every run must be headless.** `$SCRATCH/env.sh` exports
-  `CNA_RENDERER=HEADLESS`, `SDL_VIDEODRIVER=dummy` and a private `DISPLAY`, so
-  nothing can paint on the real desktop even if one layer is forgotten.
+* **Every run must be headless, and there must be a real virtual screen.**
+  `$SCRATCH/env.sh` exports `CNA_RENDERER=HEADLESS`, `SDL_VIDEODRIVER=dummy`
+  and `DISPLAY=:99`.
+
+  **`DISPLAY=:99` alone was not a virtual screen.** Checked at Foundation 73:
+  no X server was running on `:99` at all, so the only real protection was
+  `SDL_VIDEODRIVER=dummy` — one layer, with nothing behind it. A private
+  `DISPLAY` pointing at nothing is not defence in depth; it is a single point
+  of failure that reads like two.
+
+  `env.sh` now starts one if it is not already up, and a session that does not
+  source `env.sh` must start it by hand before running anything:
+
+  ```bash
+  xdpyinfo -display :99 >/dev/null 2>&1 || \
+    setsid Xvfb :99 -screen 0 1280x800x24 -nolisten tcp -noreset &
+  ```
+
+  `env.sh` lives in the per-session scratchpad and is thrown away with it,
+  which is why the requirement is written down **here** rather than only
+  there. The user's physical desktop is `:0` and nothing in this project may
+  ever address it.
 * **If the template canary fails with compile errors in code that is fine**,
   delete the consumer's `.build/build.db`: SwiftPM caches a path dependency's
   source file list, and a new file in the library is invisible until it is

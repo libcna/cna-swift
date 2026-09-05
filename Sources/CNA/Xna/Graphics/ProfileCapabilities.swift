@@ -311,10 +311,8 @@ extension Microsoft.Xna.Framework.Graphics {
                 try throwNotSupported(
                     ProfileCapabilities.profileTooBig, "Texture3D", "\(maxVolumeExtent)")
             }
-            // `Max(Max(width, height), depth)` over `Min(Min(width, height),
-            // depth)` -- all THREE extents, not the two `Texture2D` compares.
-            let longer = max(max(width, height), depth)
-            let shorter = min(min(width, height), depth)
+            let (longer, shorter) =
+                ProfileCapabilities.volumeAspectExtremes(width, height, depth)
             guard (longer + shorter - 1) / shorter <= maxTextureAspectRatio else {
                 try throwNotSupported(
                     ProfileCapabilities.profileAspectRatio,
@@ -327,6 +325,28 @@ extension Microsoft.Xna.Framework.Graphics {
                 try throwNotSupported(
                     ProfileCapabilities.profileNotPowerOfTwo, "Texture3D")
             }
+        }
+
+        /// `Max(Max(width, height), depth)` over `Min(Min(width, height),
+        /// depth)` -- all THREE extents, not the two `Texture2D` compares.
+        ///
+        /// **Extracted so it can be tested at all.** The guard it feeds cannot
+        /// fire on either profile: every extent is bounded by
+        /// `maxVolumeExtent` several instructions earlier -- 256 on HiDef, and
+        /// Reach refuses `Texture3D` outright with 0 -- so the ratio is at most
+        /// 256 while `maxTextureAspectRatio` is 2048. XNA computes it anyway
+        /// and so does this.
+        ///
+        /// A mutation taking the extremes over width and height only therefore
+        /// survived every public route, which is how the unreachability was
+        /// found rather than assumed. Same remedy as Foundation 68's
+        /// `arrayHolds` and Foundation 65's `sameRenderTargetShape`: when a
+        /// comparison cannot be reached through a member, make it a function of
+        /// its numbers and test the function.
+        internal static func volumeAspectExtremes(
+            _ width: Int32, _ height: Int32, _ depth: Int32
+        ) -> (longer: Int32, shorter: Int32) {
+            (max(max(width, height), depth), min(min(width, height), depth))
         }
 
         /// `Texture.CheckCompressedTexture`, which answers true for the three
