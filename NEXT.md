@@ -589,57 +589,39 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
-### The package-qualification gate has been red since commit `805b4cd`
+### The package-qualification gate was red for forty-one commits — closed
 
-**Found at the Foundation 71 handoff, by running a gate that plan.md names as a
-completion requirement and that nothing had actually run for forty-one
-commits.**
+`tools/package_qualification/verify.py` carries its own `ArchiveCanary`, and it
+had not compiled since `805b4cd` *"raise the exact projected CLR and XNA
+exceptions"* removed the four `CNAError` cases it asserted refusals through:
+**111 compile errors**. The report on disk was last written by that same commit,
+so it recorded `DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS`
+for forty-one commits against an archive whose SHA matched nothing.
 
-`tools/package_qualification/verify.py` carries its own `ArchiveCanary` source,
-which a fresh consumer compiles against the archived package. That canary
-asserts refusals through `CNAError.argument`, `.argumentOutOfRange`,
-`.collectionModified` and `.notSupported` — **111 compile errors**, because
-commit `805b4cd` *"raise the exact projected CLR and XNA exceptions"* removed
-those cases in favour of the projected CLR exception classes. The canary was
-never updated with them.
+Repaired in `1c651f4`. Twenty-three sites were the canary's own "I found a
+mismatch" signal and now throw a canary-local `QualificationFailure`, so a
+qualification verdict can never be confused with the package's behaviour; the
+seven real behavioural assertions were re-aimed by reading each projection.
+A second drift surfaced underneath — `Game.GraphicsDevice` is Optional now —
+and is bound with a guard that **throws** on nil, because a canary that quietly
+returned would report PASS for a run that drew nothing.
 
-The report on disk was **last written by that same commit**, so it has recorded
-`DEBUG_BUILD=PASS RELEASE_BUILD=PASS RUN_60=PASS RUN_600=PASS` ever since,
-against an archive whose SHA no longer matches anything. Forty-one commits and
-a great many milestones have claimed this gate green.
+**The proposal this section used to make was wrong, and the reason is worth
+keeping.** It said to compare the report's recorded archive SHA against a fresh
+`git archive` of `HEAD`. That is circular: the report is itself committed, so
+the archive of the commit carrying the report can never match the archive the
+report was generated from — the check would have been permanently red, which is
+no better than permanently green. What actually shipped is
+`QUALIFIED_INPUTS_SHA256`, a digest over `Sources/`, `Package.swift` and the
+canary tool, recomputed by the status gate. Committing a regenerated report
+changes none of those three, so there is no circularity, and it needs no
+consumer build. Both directions are demonstrated: a report with no digest and a
+report whose digest disagrees each produce `FINDINGS=1 STATUS=FAIL`.
 
-**Why nothing caught it.** The status gate's freshness half regenerates and
-byte-compares four reports — api-compat, missing-type-inventory,
-dependency-graph, native-abi. `package-qualification-report.json` is not among
-them, so a stale copy of it is read as truth, which is precisely the failure
-that half of the gate exists to prevent. Adding it costs a consumer build per
-verification, which is why it presumably was not; **the cheap alternative is to
-compare the report's recorded archive SHA against a fresh `git archive` of
-`HEAD` and fail when they differ**, which needs no build at all.
-
-**What is needed.** Rewrite the canary's assertions against the projected
-exception classes (`CNAArgumentException`, `CNAArgumentOutOfRangeException`,
-`CNANotSupportedException`, and whatever now carries the collection-modified
-refusal), re-run the qualification, and wire the SHA check into the status gate
-so it cannot go stale again. Twenty-nine call sites inside the tool; the errors
-cluster into four patterns.
-
-**Not attempted here on purpose.** It was found at the end of a long session
-and a rushed rewrite of a canary — the thing whose whole job is to be exactly
-right about refusals — is worse than an honest red gate written down. The
-qualification is the ONE handoff gate that is not green; everything else in
-this session's sequence passes, including ASan, TSan and the twenty-gate
-sequence.
-
-**One repair was made** while the failure was being diagnosed: the tool built
-its consumer in a `tempfile.TemporaryDirectory` under `/tmp`, which the build
-rules forbid outright — measured at 3.5 TB of SSD writes in five days. It now
-builds in `build-consumer/`, which those same rules name for exactly this
-("standalone consumer fixtures, ALL tickets share this one"). Independence is
-kept by emptying the extraction and consumer directories first; what survives
-is the `.build` scratch, which is the point.
-
-
+**What this costs going forward.** Any change under `Sources/` makes the report
+stale, so package qualification has to be re-run once per handoff — which is
+the cadence it was always supposed to have, and the reason the staleness went
+unnoticed is that it never had it.
 
 ### `CNAStringBuilder.Capacity` is a lower bound, and now says so
 
