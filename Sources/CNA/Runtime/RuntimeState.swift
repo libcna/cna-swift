@@ -81,6 +81,12 @@ internal final class RuntimeState {
     // is called once, where a failure can still be reported, and the getter
     // reads the answer.
     var cachedGraphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile?
+    /// The device's presentation parameters and adapter, read once at the
+    /// same moment the profile is, because all three back accessors the CLR
+    /// declares infallible.
+    var cachedPresentationParameters:
+        Microsoft.Xna.Framework.Graphics.PresentationParameters?
+    var cachedAdapter: Microsoft.Xna.Framework.Graphics.GraphicsAdapter?
 
     // The bound vertex-buffer bindings and index buffer, as MANAGED objects.
     //

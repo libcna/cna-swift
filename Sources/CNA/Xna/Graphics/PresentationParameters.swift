@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+import CNAShim
+
 extension Microsoft.Xna.Framework.Graphics {
     // The pinned XNA 4.0 Windows metadata declares
     // `.class public auto ansi beforefieldinit PresentationParameters
@@ -54,6 +56,54 @@ extension Microsoft.Xna.Framework.Graphics {
         // `PresentationParameters` is full-screen. This is read out of the
         // pinned IL and is deliberately not the remembered MonoGame/FNA
         // default.
+        /// Builds the value CNA reports for the device it owns.
+        ///
+        /// Every field is copied; nothing is defaulted here, because a value
+        /// this binding invented would be indistinguishable from one the
+        /// runtime chose.
+        internal convenience init(native: CNASwift_PresentationParameters) throws {
+            self.init()
+            guard let backBuffer = Microsoft.Xna.Framework.Graphics
+                    .SurfaceFormat(rawValue: Int32(native.back_buffer_format)),
+                  let depth = Microsoft.Xna.Framework.Graphics
+                    .DepthFormat(rawValue: Int32(native.depth_stencil_format)),
+                  let interval = Microsoft.Xna.Framework.Graphics
+                    .PresentInterval(rawValue: Int32(native.presentation_interval)),
+                  let usage = Microsoft.Xna.Framework.Graphics
+                    .RenderTargetUsage(rawValue: Int32(native.render_target_usage)) else {
+                throw CNAError.producerInvariant(
+                    "the device reported presentation parameters carrying a value "
+                    + "outside one of the pinned enumerations")
+            }
+            BackBufferWidth = native.back_buffer_width
+            BackBufferHeight = native.back_buffer_height
+            BackBufferFormat = backBuffer
+            DepthStencilFormat = depth
+            MultiSampleCount = native.multi_sample_count
+            PresentationInterval = interval
+            DisplayOrientation = Microsoft.Xna.Framework
+                .DisplayOrientation(rawValue: Int32(native.display_orientation))
+            RenderTargetUsage = usage
+            IsFullScreen = native.is_full_screen != 0
+        }
+
+        /// The C-safe descriptor the reset route consumes.
+        internal func nativeDescriptor() -> CNASwift_PresentationParameters {
+            var native = CNASwift_PresentationParameters()
+            native.struct_size = UInt32(MemoryLayout<CNASwift_PresentationParameters>.size)
+            native.struct_version = 1
+            native.back_buffer_format = UInt32(BackBufferFormat.rawValue)
+            native.back_buffer_width = BackBufferWidth
+            native.back_buffer_height = BackBufferHeight
+            native.depth_stencil_format = UInt32(DepthStencilFormat.rawValue)
+            native.multi_sample_count = MultiSampleCount
+            native.presentation_interval = UInt32(PresentationInterval.rawValue)
+            native.display_orientation = UInt32(DisplayOrientation.rawValue)
+            native.render_target_usage = UInt32(RenderTargetUsage.rawValue)
+            native.is_full_screen = IsFullScreen ? 1 : 0
+            return native
+        }
+
         public init() {
             IsFullScreen = true
         }

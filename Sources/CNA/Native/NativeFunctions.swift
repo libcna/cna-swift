@@ -337,6 +337,9 @@ internal final class NativeFunctions {
     typealias EffectAnnotationCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias EffectAnnotationCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceClearOptionsRoute = @convention(c) (UInt64, UInt32, CNASwift_Color, Float, Int32) -> UInt32
+    typealias GraphicsDevicePresentRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsDeviceResetRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsDeviceResetWithParametersRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_PresentationParameters>?, UnsafePointer<UInt32>?) -> UInt32
     typealias GraphicsDeviceGetPresentationParametersRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_PresentationParameters>?) -> UInt32
     typealias GraphicsDeviceSetViewportRoute = @convention(c) (UInt64, CNASwift_Viewport) -> UInt32
     typealias GraphicsDeviceGetScissorRectangleRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Rectangle>?) -> UInt32
@@ -674,6 +677,9 @@ internal final class NativeFunctions {
     let effectAnnotationCollectionGetCount: EffectAnnotationCollectionGetCountRoute
     let effectAnnotationCollectionGetAt: EffectAnnotationCollectionGetAtRoute
     let graphicsDeviceClearOptions: GraphicsDeviceClearOptionsRoute
+    let graphicsDevicePresent: GraphicsDevicePresentRoute
+    let graphicsDeviceReset: GraphicsDeviceResetRoute
+    let graphicsDeviceResetWithParameters: GraphicsDeviceResetWithParametersRoute
     let graphicsDeviceGetPresentationParameters: GraphicsDeviceGetPresentationParametersRoute
     let graphicsDeviceSetViewport: GraphicsDeviceSetViewportRoute
     let graphicsDeviceGetScissorRectangle: GraphicsDeviceGetScissorRectangleRoute
@@ -1031,6 +1037,9 @@ internal final class NativeFunctions {
         effectAnnotationCollectionGetCount = try library.resolve("cna_effect_annotation_collection_get_count", as: EffectAnnotationCollectionGetCountRoute.self)
         effectAnnotationCollectionGetAt = try library.resolve("cna_effect_annotation_collection_get_at", as: EffectAnnotationCollectionGetAtRoute.self)
         graphicsDeviceClearOptions = try library.resolve("cna_graphics_device_clear_options", as: GraphicsDeviceClearOptionsRoute.self)
+        graphicsDevicePresent = try library.resolve("cna_graphics_device_present", as: GraphicsDevicePresentRoute.self)
+        graphicsDeviceReset = try library.resolve("cna_graphics_device_reset", as: GraphicsDeviceResetRoute.self)
+        graphicsDeviceResetWithParameters = try library.resolve("cna_graphics_device_reset_with_parameters", as: GraphicsDeviceResetWithParametersRoute.self)
         graphicsDeviceGetPresentationParameters = try library.resolve("cna_graphics_device_get_presentation_parameters", as: GraphicsDeviceGetPresentationParametersRoute.self)
         graphicsDeviceSetViewport = try library.resolve("cna_graphics_device_set_viewport", as: GraphicsDeviceSetViewportRoute.self)
         graphicsDeviceGetScissorRectangle = try library.resolve("cna_graphics_device_get_scissor_rectangle", as: GraphicsDeviceGetScissorRectangleRoute.self)

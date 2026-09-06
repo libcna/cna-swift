@@ -116,6 +116,35 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 78: GraphicsDevice presentation ------------------------
+    (
+        "reset-caches-parameters-before-the-device-takes-them",
+        "the reported parameters replaced before the reset is accepted, so a "
+        "refused reset reports values the device does not have",
+        DEVICE,
+        "                operation: \"cna_graphics_device_reset_with_parameters\")\n"
+        "            runtime.cachedPresentationParameters = presentationParameters\n"
+        "        }\n\n        /// `GraphicsDevice.Reset(PresentationParameters, GraphicsAdapter)`.",
+        "                operation: \"cna_graphics_device_reset_with_parameters\")\n"
+        "        }\n\n        /// `GraphicsDevice.Reset(PresentationParameters, GraphicsAdapter)`.",
+    ),
+    (
+        "device-adapter-read-fresh-every-time",
+        "the adapter looked up per read instead of recorded once, so the "
+        "device stops reporting a stable identity",
+        DEVICE,
+        "            runtime.cachedAdapter\n        }",
+        "            Microsoft.Xna.Framework.Graphics.GraphicsAdapter\n"
+        "                .Adapters.flatMap { try? $0.Item(0) }\n        }",
+    ),
+    (
+        "reset-with-adapter-drops-the-index",
+        "the three-argument Reset passing null where the adapter's index "
+        "belongs, which is what a first draft did",
+        DEVICE,
+        "                    handle, &native, &index),",
+        "                    handle, &native, nil),",
+    ),
     # ---- Foundation 77: GraphicsAdapter ------------------------------------
     (
         "adapter-list-refilled-every-borrow",

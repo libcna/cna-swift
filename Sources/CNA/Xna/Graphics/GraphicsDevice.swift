@@ -23,6 +23,7 @@ extension Microsoft.Xna.Framework.Graphics {
         internal convenience init(borrowedHandle: UInt64, runtime: RuntimeState) throws {
             try GraphicsDevice.cacheProfile(runtime, handle: borrowedHandle)
             GraphicsAdapter.populateIfNeeded(runtime, device: borrowedHandle)
+            try GraphicsDevice.cacheDeviceSnapshot(runtime, handle: borrowedHandle)
             self.init(handle: borrowedHandle, runtime: runtime)
         }
 
@@ -53,6 +54,38 @@ extension Microsoft.Xna.Framework.Graphics {
                     message: "native graphics profile \(raw) is not an XNA GraphicsProfile")
             }
             runtime.cachedGraphicsProfile = profile
+        }
+
+        /// The device's presentation parameters and adapter, cached at the same
+        /// moment as the profile and for the same reason.
+        ///
+        /// `get_PresentationParameters` and `get_Adapter` are both seven bytes
+        /// -- `ldarg.0; ldfld; ret` -- and both pinned `IL_NO_FAILURE_PATH`, so
+        /// neither Swift accessor may throw while the only source for either
+        /// value is a fallible route. XNA caches them when the device is
+        /// created; this caches them at the first facade, which is the moment
+        /// Foundation 77 established as this binding's device-creation
+        /// equivalent.
+        private static func cacheDeviceSnapshot(
+            _ runtime: RuntimeState, handle: UInt64
+        ) throws {
+            if runtime.cachedPresentationParameters == nil {
+                var native = CNASwift_PresentationParameters()
+                native.struct_size =
+                    UInt32(MemoryLayout<CNASwift_PresentationParameters>.size)
+                native.struct_version = 1
+                try runtime.functions.check(
+                    runtime.functions.graphicsDeviceGetPresentationParameters(
+                        handle, &native),
+                    operation: "cna_graphics_device_get_presentation_parameters")
+                runtime.cachedPresentationParameters =
+                    try Microsoft.Xna.Framework.Graphics.PresentationParameters(
+                        native: native)
+            }
+            if runtime.cachedAdapter == nil {
+                runtime.cachedAdapter = Microsoft.Xna.Framework.Graphics
+                    .GraphicsAdapter.Adapters.flatMap { try? $0.Item(0) }
+            }
         }
 
         /// `GraphicsDevice.GraphicsProfile`.
@@ -88,6 +121,7 @@ extension Microsoft.Xna.Framework.Graphics {
             // This is the first moment a device exists, which is the closest
             // this binding can get to that.
             GraphicsAdapter.populateIfNeeded(runtime, device: handle)
+            try cacheDeviceSnapshot(runtime, handle: handle)
             return GraphicsDevice(handle: handle, runtime: runtime)
         }
 
@@ -657,17 +691,120 @@ extension Microsoft.Xna.Framework.Graphics {
             }
         }
 
-        /// The device's applied presentation parameters, as CNA reports them.
+        /// `GraphicsDevice.PresentationParameters`.
         ///
-        /// Deliberately internal. XNA's public `PresentationParameters`
-        /// getter is `IL_NO_FAILURE_PATH` because it reads
-        /// `pInternalCachedParams`, a field written when the device was
-        /// created or reset. This binding has exactly one source for those
-        /// values — a fallible CNA route — and no device-creation moment it
-        /// observes at which to cache them infallibly, so the public property
-        /// stays absent rather than being projected as `get throws` against
-        /// the pinned verdict, or backed by an invented default XNA never
-        /// had. The route is bound because `defaultClearOptions` consumes it.
+        /// Seven bytes of IL -- `ldarg.0; ldfld pPublicCachedParams; ret` --
+        /// and pinned `IL_NO_FAILURE_PATH`, so this may not throw.
+        ///
+        /// **This property was absent until Foundation 78, and the reason it
+        /// was absent stopped being true.** The note here used to read: "this
+        /// binding has exactly one source for those values -- a fallible CNA
+        /// route -- and no device-creation moment it observes at which to cache
+        /// them infallibly". Foundation 77 created that moment, because
+        /// `GraphicsAdapter` needed one for the same reason, and the value is
+        /// read there beside the profile.
+        public var PresentationParameters:
+            Microsoft.Xna.Framework.Graphics.PresentationParameters? {
+            runtime.cachedPresentationParameters
+        }
+
+        /// `GraphicsDevice.Adapter`, also seven bytes and also infallible.
+        ///
+        /// The adapter the device was created against. CNA has no per-device
+        /// adapter route, so this is the enumerated default -- which on this
+        /// host is the only one there is.
+        public var Adapter: Microsoft.Xna.Framework.Graphics.GraphicsAdapter? {
+            runtime.cachedAdapter
+        }
+
+        /// `GraphicsDevice.DisplayMode`.
+        ///
+        /// **The one accessor of this group that may throw**, and the table
+        /// says why: `IL_DIRECT_THROW`. Its first instructions are
+        /// `Helpers.CheckDisposed(this, pComPtr)`, so a disposed device reports
+        /// `ObjectDisposedException` before anything is read.
+        ///
+        /// XNA then asks D3D for the adapter's current mode. This asks the
+        /// adapter this device recorded, which is the same question routed
+        /// through the type that owns the answer.
+        public var DisplayMode: Microsoft.Xna.Framework.Graphics.DisplayMode? {
+            get throws {
+                _ = try validatedHandle("GraphicsDevice.DisplayMode")
+                return runtime.cachedAdapter?.CurrentDisplayMode
+            }
+        }
+
+        /// `GraphicsDevice.Present()`.
+        ///
+        /// Foundation 60 measured this route as accepted and nobody built the
+        /// member for fourteen milestones.
+        ///
+        /// **What a returning `Present` means here is narrow**: the device took
+        /// the request. Nothing observes a frame reaching a display, because
+        /// this host has no display -- the same bound Foundation 68's draws
+        /// live inside.
+        public func Present() throws {
+            let handle = try validatedHandle("GraphicsDevice.Present")
+            try runtime.functions.check(
+                runtime.functions.graphicsDevicePresent(handle),
+                operation: "cna_graphics_device_present")
+        }
+
+        /// `GraphicsDevice.Reset()`.
+        ///
+        /// Resets with the parameters the device already has.
+        public func Reset() throws {
+            let handle = try validatedHandle("GraphicsDevice.Reset")
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceReset(handle),
+                operation: "cna_graphics_device_reset")
+        }
+
+        /// `GraphicsDevice.Reset(PresentationParameters)`.
+        ///
+        /// The new parameters replace the cached ones **only if the reset is
+        /// accepted**, which is the order XNA uses: its own body applies them
+        /// to the device first and updates `pPublicCachedParams` afterwards, so
+        /// a refused reset leaves the property reading what the device still
+        /// actually has.
+        public func Reset(
+            _ presentationParameters:
+                Microsoft.Xna.Framework.Graphics.PresentationParameters
+        ) throws {
+            let handle = try validatedHandle("GraphicsDevice.Reset")
+            var native = presentationParameters.nativeDescriptor()
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceResetWithParameters(
+                    handle, &native, nil),
+                operation: "cna_graphics_device_reset_with_parameters")
+            runtime.cachedPresentationParameters = presentationParameters
+        }
+
+        /// `GraphicsDevice.Reset(PresentationParameters, GraphicsAdapter)`.
+        ///
+        /// **The adapter is carried, not discarded.** CNA's reset route ends
+        /// in `const uint32_t* adapter_index`, which the two-argument overload
+        /// passes as null -- "keep the adapter you have" -- and this one fills
+        /// with the adapter's own index. A first draft of this member claimed
+        /// the route took no adapter and quietly dropped the argument; reading
+        /// the declaration rather than the first three parameters is what
+        /// caught it.
+        public func Reset(
+            _ presentationParameters:
+                Microsoft.Xna.Framework.Graphics.PresentationParameters,
+            graphicsAdapter: Microsoft.Xna.Framework.Graphics.GraphicsAdapter
+        ) throws {
+            let handle = try validatedHandle("GraphicsDevice.Reset")
+            var native = presentationParameters.nativeDescriptor()
+            var index = graphicsAdapter.adapterIndex
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceResetWithParameters(
+                    handle, &native, &index),
+                operation: "cna_graphics_device_reset_with_parameters")
+            runtime.cachedPresentationParameters = presentationParameters
+            runtime.cachedAdapter = graphicsAdapter
+        }
+
         internal func nativePresentationParameters() throws -> CNASwift_PresentationParameters {
             let handle = try validatedHandle("GraphicsDevice.PresentationParameters")
             var native = CNASwift_PresentationParameters()
