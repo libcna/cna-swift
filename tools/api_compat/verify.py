@@ -1480,7 +1480,8 @@ def is_inherited_language_projection(
     return False
 
 
-def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> list[dict[str, str]]:
+def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel],
+            rules: dict[str, Any] | None = None) -> list[dict[str, str]]:
     result: list[dict[str, str]] = []
     consumed: dict[str, set[str]] = collections.defaultdict(set)
 
@@ -1570,8 +1571,31 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel]) -> lis
         # absent overloads. A greedy name-only walk can otherwise consume the
         # one real nine-parameter Draw while diagnosing an absent four-
         # parameter Draw, and then falsely call the real overload missing.
+        # A type that declares BOTH a property with a fallible setter and its
+        # own `Set<Name>` method expects that name twice: once as the derived
+        # property writer, once as the declared method. Swift cannot hold two
+        # members of one name and one shape, and the accessor rule has already
+        # decided what that shape must be.
+        #
+        # `GameWindow` is the case: `Title { get; set; }` with an
+        # IL_DIRECT_THROW setter, beside `protected SetTitle(String)`. The
+        # protocol path already recombines exactly this pair for
+        # `IEffectLights`; `recombinedPropertyWriters` extends it to classes,
+        # naming the property whose writer IS the declared member.
+        recombined = {
+            item.get("property")
+            for item in (rules or {}).get("recombinedPropertyWriters", [])
+            if item.get("owner") == name
+        }
+        expected_members_to_check = [
+            member for member in expected_type.members
+            if not (recombined
+                    and member.name.startswith("Set")
+                    and member.name[len("Set"):] in recombined
+                    and member.kind == "method")
+        ]
         ordered_expected_members = sorted(
-            enumerate(expected_type.members),
+            enumerate(expected_members_to_check),
             key=lambda pair: (not exact_shape_exists(pair[1]), pair[0]),
         )
         for _, expected_member_model in ordered_expected_members:
@@ -5322,7 +5346,7 @@ def symbol_graph_self_test(path: Path) -> None:
         )
         return {
             (item["category"], item["subject"], item["detail"])
-            for item in compare(expected, actual) + parser_diagnostics
+            for item in compare(expected, actual, rules) + parser_diagnostics
         }
 
     emitter = "Microsoft.Xna.Framework.Audio.AudioEmitter"
@@ -6913,7 +6937,7 @@ def main() -> int:
         system_interface_projection_evidence(contract, rules)
     )
     diagnostics, applied_suppressions = apply_manual_suppressions(
-        compare(expected, actual) + parser_diagnostics + witness_diagnostics +
+        compare(expected, actual, rules) + parser_diagnostics + witness_diagnostics +
         system_interface_diagnostics + support_diagnostics + bcl_diagnostics +
         sealed_diagnostics + resource_diagnostics,
         rules.get("manualDiagnosticSuppressions", []),

@@ -138,6 +138,18 @@ internal final class NativeFunctions {
     typealias GraphicsAdapterIsProfileSupportedRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias GraphicsAdapterQueryBackbufferFormatRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UInt32, Int32, UnsafeMutablePointer<CNASwift_GraphicsFormatSelection>?) -> UInt32
     typealias GraphicsAdapterQueryRenderTargetFormatRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UInt32, Int32, UnsafeMutablePointer<CNASwift_GraphicsFormatSelection>?) -> UInt32
+    typealias GameWindowGetTitleSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GameWindowCopyTitleRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GameWindowGetScreenDeviceNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GameWindowCopyScreenDeviceNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GameWindowGetNativeHandleExtRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GameWindowGetClientBoundsRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Rectangle>?) -> UInt32
+    typealias GameWindowGetCurrentOrientationRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias GameWindowGetAllowUserResizingRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GameWindowSetAllowUserResizingRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias GameWindowBeginScreenDeviceChangeRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias GameWindowEndScreenDeviceChangeRoute = @convention(c) (UInt64, CNASwift_StringView, Int32, Int32) -> UInt32
+    typealias GameSetWindowTitleRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
     typealias MouseGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_MouseState>?) -> UInt32
     typealias MouseSetPositionRoute = @convention(c) (UInt64, Int32, Int32) -> UInt32
     typealias MouseSetWindowHandleRoute = @convention(c) (UInt64, UInt64) -> UInt32
@@ -478,6 +490,18 @@ internal final class NativeFunctions {
     let graphicsAdapterIsProfileSupported: GraphicsAdapterIsProfileSupportedRoute
     let graphicsAdapterQueryBackbufferFormat: GraphicsAdapterQueryBackbufferFormatRoute
     let graphicsAdapterQueryRenderTargetFormat: GraphicsAdapterQueryRenderTargetFormatRoute
+    let gameWindowGetTitleSize: GameWindowGetTitleSizeRoute
+    let gameWindowCopyTitle: GameWindowCopyTitleRoute
+    let gameWindowGetScreenDeviceNameSize: GameWindowGetScreenDeviceNameSizeRoute
+    let gameWindowCopyScreenDeviceName: GameWindowCopyScreenDeviceNameRoute
+    let gameWindowGetNativeHandle: GameWindowGetNativeHandleExtRoute
+    let gameWindowGetClientBounds: GameWindowGetClientBoundsRoute
+    let gameWindowGetCurrentOrientation: GameWindowGetCurrentOrientationRoute
+    let gameWindowGetAllowUserResizing: GameWindowGetAllowUserResizingRoute
+    let gameWindowSetAllowUserResizing: GameWindowSetAllowUserResizingRoute
+    let gameWindowBeginScreenDeviceChange: GameWindowBeginScreenDeviceChangeRoute
+    let gameWindowEndScreenDeviceChange: GameWindowEndScreenDeviceChangeRoute
+    let gameSetWindowTitle: GameSetWindowTitleRoute
     let mouseGetState: MouseGetStateRoute
     let mouseSetPosition: MouseSetPositionRoute
     let mouseSetWindowHandle: MouseSetWindowHandleRoute
@@ -838,6 +862,18 @@ internal final class NativeFunctions {
         graphicsAdapterIsProfileSupported = try library.resolve("cna_graphics_adapter_is_profile_supported", as: GraphicsAdapterIsProfileSupportedRoute.self)
         graphicsAdapterQueryBackbufferFormat = try library.resolve("cna_graphics_adapter_query_backbuffer_format", as: GraphicsAdapterQueryBackbufferFormatRoute.self)
         graphicsAdapterQueryRenderTargetFormat = try library.resolve("cna_graphics_adapter_query_render_target_format", as: GraphicsAdapterQueryRenderTargetFormatRoute.self)
+        gameWindowGetTitleSize = try library.resolve("cna_game_window_get_title_size", as: GameWindowGetTitleSizeRoute.self)
+        gameWindowCopyTitle = try library.resolve("cna_game_window_copy_title", as: GameWindowCopyTitleRoute.self)
+        gameWindowGetScreenDeviceNameSize = try library.resolve("cna_game_window_get_screen_device_name_size", as: GameWindowGetScreenDeviceNameSizeRoute.self)
+        gameWindowCopyScreenDeviceName = try library.resolve("cna_game_window_copy_screen_device_name", as: GameWindowCopyScreenDeviceNameRoute.self)
+        gameWindowGetNativeHandle = try library.resolve("cna_game_window_get_native_handle_ext", as: GameWindowGetNativeHandleExtRoute.self)
+        gameWindowGetClientBounds = try library.resolve("cna_game_window_get_client_bounds", as: GameWindowGetClientBoundsRoute.self)
+        gameWindowGetCurrentOrientation = try library.resolve("cna_game_window_get_current_orientation", as: GameWindowGetCurrentOrientationRoute.self)
+        gameWindowGetAllowUserResizing = try library.resolve("cna_game_window_get_allow_user_resizing", as: GameWindowGetAllowUserResizingRoute.self)
+        gameWindowSetAllowUserResizing = try library.resolve("cna_game_window_set_allow_user_resizing", as: GameWindowSetAllowUserResizingRoute.self)
+        gameWindowBeginScreenDeviceChange = try library.resolve("cna_game_window_begin_screen_device_change", as: GameWindowBeginScreenDeviceChangeRoute.self)
+        gameWindowEndScreenDeviceChange = try library.resolve("cna_game_window_end_screen_device_change", as: GameWindowEndScreenDeviceChangeRoute.self)
+        gameSetWindowTitle = try library.resolve("cna_game_set_window_title", as: GameSetWindowTitleRoute.self)
         mouseGetState = try library.resolve("cna_mouse_get_state", as: MouseGetStateRoute.self)
         mouseSetPosition = try library.resolve("cna_mouse_set_position", as: MouseSetPositionRoute.self)
         mouseSetWindowHandle = try library.resolve("cna_mouse_set_window_handle", as: MouseSetWindowHandleRoute.self)

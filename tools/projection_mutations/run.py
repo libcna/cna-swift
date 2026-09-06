@@ -38,6 +38,7 @@ MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
+WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
@@ -118,6 +119,37 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 82: GameWindow -----------------------------------------
+    # WITHDRAWN: "window-title-skips-the-change-test" -- removing the
+    # `storedTitle != value` guard so an unchanged title is pushed again.
+    #
+    # It survived, and the reason is structural rather than a missing test.
+    # The guard's only effect is how many times `cna_game_set_window_title` is
+    # called, and nothing on this host can count that: the Swift member IS the
+    # overridable hook (the setter and XNA's protected SetTitle collapse into
+    # one identity here), so an override sees both calls either way and there
+    # is no second observation point behind it.
+    #
+    # The guard stays -- it is XNA's, in fifty-three bytes that test before
+    # storing -- but the claim that a test can observe it is withdrawn rather
+    # than dressed up in a mutation that passes for the wrong reason.
+    (
+        "window-title-accepts-nil",
+        "a nil title stored instead of refused",
+        WINDOW,
+        "            guard let value else {\n"
+        "                throw CNAArgumentNullException(",
+        "            guard let value = value ?? \"\" as String? else {\n"
+        "                throw CNAArgumentNullException(",
+    ),
+    (
+        "window-facade-rebuilt-every-read",
+        "Game.Window building a new facade per read, so the window a caller "
+        "holds stops being the game's",
+        GAME,
+        "            if let cachedWindow, cachedWindowGeneration == currentGeneration {",
+        "            if false, cachedWindowGeneration == currentGeneration {",
+    ),
     # ---- Foundation 81: the device ranking ---------------------------------
     (
         "ranking-prefers-the-lower-profile",

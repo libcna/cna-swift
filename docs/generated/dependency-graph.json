@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 13,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 12,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Design.MathTypeConverter",
@@ -144,21 +144,15 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.GameWindow",
+      "type": "Microsoft.Xna.Framework.Audio.Microphone",
       "dependencies": [
-        "Microsoft.Xna.Framework.DisplayOrientation",
-        "Microsoft.Xna.Framework.Rectangle"
+        "Microsoft.Xna.Framework.Audio.MicrophoneState"
       ],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.Game"
-      ],
-      "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
     }
   ]
 }

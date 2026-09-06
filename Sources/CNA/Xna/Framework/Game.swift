@@ -245,6 +245,38 @@ extension Microsoft.Xna.Framework {
             try runtime.functions.check(result, operation: "cna_game_run_one_frame")
         }
 
+/// `Game.Window`.
+        ///
+        /// Infallible — `ldarg.0; ldfld window; ret` — so it reads a field
+        /// here too. The window facade is built the first time it is asked
+        /// for, inside a lifecycle callback, and kept for the runtime's
+        /// generation: building it needs the game handle, and reading it must
+        /// not throw.
+        ///
+        /// **Optional, and nil outside a callback.** XNA's is never null once
+        /// the game is constructed; this cannot build one without a runtime,
+        /// and a getter that may not throw has nowhere else to put that. The
+        /// same divergence `GraphicsAdapter.Adapters` carries, for the same
+        /// reason.
+        public var Window: Microsoft.Xna.Framework.GameWindow? {
+            if let cachedWindow, cachedWindowGeneration == currentGeneration {
+                return cachedWindow
+            }
+            guard let runtime = try? RuntimeRegistry.current(),
+                  let window = try? Microsoft.Xna.Framework.GameWindow(runtime: runtime)
+            else { return nil }
+            cachedWindow = window
+            cachedWindowGeneration = runtime.generation
+            return window
+        }
+
+        private var currentGeneration: UInt64? {
+            (try? RuntimeRegistry.current())?.generation
+        }
+
+                private var cachedWindow: Microsoft.Xna.Framework.GameWindow?
+        private var cachedWindowGeneration: UInt64?
+
         public func Exit() throws {
             let handle = try validatedHandle("Game.Exit")
             try runtime.functions.check(

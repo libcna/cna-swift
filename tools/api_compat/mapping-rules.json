@@ -1220,6 +1220,12 @@
       "member": "OpenStream",
       "parameter": "name",
       "reason": "OpenStream's first instruction is String.IsNullOrEmpty(name), which is a test a caller can only reach by passing null. Declaring the parameter non-Optional would make the ArgumentNullException branch unreachable from Swift and would hide half of a refusal the IL spends its opening instructions on."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.GameWindow",
+      "member": "SetTitle",
+      "parameter": "title",
+      "reason": "GameWindow declares BOTH a Title property whose setter is fallible and a protected SetTitle(String) hook. The accessor rule derives the writer's name as Set+Title, which is the hook's own name, so the two expected identities collide and Swift cannot overload them apart -- a String literal binds to the non-Optional one, which is how the collision was found. Declaring this parameter Optional makes the hook's identity and the derived writer's identity the SAME, so one member satisfies both: it performs set_Title's null check (the branch this Optional makes reachable), its change test, and the platform push the hook is for."
     }
   ],
   "globalOperatorProjections": [
@@ -1282,6 +1288,13 @@
       "owner": "Microsoft.Xna.Framework.Graphics.Texture3D",
       "member": "GetData",
       "parameter": "data"
+    }
+  ],
+  "recombinedPropertyWriters": [
+    {
+      "owner": "Microsoft.Xna.Framework.GameWindow",
+      "property": "Title",
+      "reason": "GameWindow declares Title { get; set; } with an IL_DIRECT_THROW setter AND a protected SetTitle(String). The accessor rule derives the writer's name as Set+Title, so the type expects that name twice with one shape, which Swift cannot hold. The declared method IS the writer: it performs the setter's null check, its change test and the platform push the hook exists for. The protocol path already recombines this pair for IEffectLights; this is the same recombination for a class."
     }
   ]
 }

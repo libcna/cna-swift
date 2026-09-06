@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 191,
-    "TARGET_MEMBERS": 2353,
-    "TOTAL_DIAGNOSTICS": 88,
-    "COMPLETE_TYPES": 186,
+    "TARGET_TYPES": 192,
+    "TARGET_MEMBERS": 2373,
+    "TOTAL_DIAGNOSTICS": 86,
+    "COMPLETE_TYPES": 187,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 66,
-    "MISSING_TYPE": 66,
-    "MISSING_MEMBER": 19,
+    "MISSING_TYPES": 65,
+    "MISSING_TYPE": 65,
+    "MISSING_MEMBER": 18,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -63,10 +63,10 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 90,
-    "PENDING_ACCESSOR_PROJECTIONS": 24,
+    "MEASURED_ACCESSOR_PROJECTIONS": 91,
+    "PENDING_ACCESSOR_PROJECTIONS": 23,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 25,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 26,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 19,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 198,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 171,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 65
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 201,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 168,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 68
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -129,6 +129,7 @@
     "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
     "Microsoft.Xna.Framework.GameServiceContainer",
     "Microsoft.Xna.Framework.GameTime",
+    "Microsoft.Xna.Framework.GameWindow",
     "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
     "Microsoft.Xna.Framework.Graphics.BasicEffect",
     "Microsoft.Xna.Framework.Graphics.Blend",
@@ -320,7 +321,6 @@
     "Microsoft.Xna.Framework.Design.Vector2Converter",
     "Microsoft.Xna.Framework.Design.Vector3Converter",
     "Microsoft.Xna.Framework.Design.Vector4Converter",
-    "Microsoft.Xna.Framework.GameWindow",
     "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
     "Microsoft.Xna.Framework.Graphics.Model",
     "Microsoft.Xna.Framework.Graphics.ModelBone",
@@ -516,18 +516,8 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Game.Window()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Game.Content()",
       "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.GameWindow",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
       "category": "MISSING_TYPE",
@@ -1269,6 +1259,20 @@
       "writerThrows": true,
       "readerObserved": false,
       "writerObserved": false,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.GameWindow",
+      "sourceProperty": "Title",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.GameWindow.Title()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.GameWindow.SetTitle(_:String?)",
+      "writerName": "SetTitle",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2570,16 +2574,6 @@
       "static": false
     },
     {
-      "ownerType": "Microsoft.Xna.Framework.GameWindow",
-      "sourceProperty": "Title",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetTitle",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
       "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
       "sourceProperty": "EnabledGestures",
       "typeState": "missing",
@@ -2694,6 +2688,13 @@
     {
       "type": "Microsoft.Xna.Framework.FrameworkDispatcher",
       "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GameWindow",
+      "clrSealed": false,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
@@ -4467,6 +4468,14 @@
       "derivableInReferenceButNotInSwift": false
     },
     {
+      "type": "Microsoft.Xna.Framework.GameWindow",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
       "type": "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
       "clrSealed": false,
       "swiftFinal": false,
@@ -6064,8 +6073,8 @@
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.GameWindow?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Game",
@@ -6142,28 +6151,28 @@
       "member": "Title",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.GameWindow",
       "member": "ScreenDeviceName",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Graphics.AlphaTestEffect",
@@ -10821,13 +10830,8 @@
       "type": "Microsoft.Xna.Framework.Game",
       "status": "PARTIAL",
       "expectedMembers": 37,
-      "targetMembers": 35,
+      "targetMembers": 36,
       "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Game.Window()",
-          "detail": "mapped member is absent"
-        },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Game.Content()",
@@ -10872,16 +10876,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.GameWindow",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 20,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.GameWindow",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 19,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
