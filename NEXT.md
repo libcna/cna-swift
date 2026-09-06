@@ -526,6 +526,34 @@ all eight is caught by a host with no touch device reporting phantom touches.
 structure, after `CNA_VISUALIZATION_DATA_SIZE` -- the parser that learned about
 those in Foundation 96 needed no further change.
 
+### Everything left is behind four decisions, and here they are
+
+With Media, Input and GamerServices complete, the remaining **38 types and 10
+members** are not a queue of work but four questions. Nothing is left that can
+simply be written.
+
+| what | types | what it needs | costed? |
+|---|---:|---|---|
+| `Design` converters | 13 | **`System.dll`'s ComponentModel closure** admitted to the same non-vacuous standard `mscorlib` met: 7 types, ~151 members, and System.dll's first-time admission | yes, in this file |
+| `Model` family | 12 | a way to **produce** a `.xnb`, or shipped fixtures -- `cna_content_manager_load_model` reads one and this repository has none | partly |
+| XACT family | 6 | a `.xgs` settings file and `.xsb`/`.xwb` banks, same question one asset kind over | no |
+| `Content` readers | 5 | **`System.IO.BinaryReader`** (`ContentReader` derives from it) and `System.Resources.ResourceManager` | no |
+| `Storage` | 2 | `System.IAsyncResult`, `System.AsyncCallback`, and the three `System.IO` file enums | no |
+
+The ten missing members are the same four questions in miniature, plus three
+that are **measured impossibilities** rather than decisions:
+`GraphicsDevice.GetBackBufferData` (both native routes answer `NOT_SUPPORTED`,
+now measured rather than assumed), `MediaLibrary.SavePicture(Stream)` (CNA wants
+a stream handle this binding cannot make), and
+`DynamicSoundEffectInstance.Play`/`IsLooped` (C#'s `new`, which Swift has no
+word for).
+
+**The order that costs least.** `Design` is the only one already costed, needs
+no CNA route at all, and unblocks the largest single group; the content question
+unblocks eighteen types across two families but is a design decision about what
+this repository ships. Everything else waits on a BCL admission whose size has
+not been measured.
+
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 
 Worth stating plainly, because the two neighbouring families are blocked and
@@ -1243,6 +1271,13 @@ Still blocked, and now measured rather than inferred:
   clear that succeeds. Foundation 53's first bounding fact stands, and
   Foundation 68 landed the draws **without** weakening it: a draw that returns
   is a draw the device accepted, and no test claims a pixel arrived anywhere.
+
+  **Re-measured at Foundation 99 against the OTHER route.** CNA publishes two:
+  `cna_graphics_device_get_backbuffer_data_window` and
+  `..._data_rgba8`, and only the first had ever been tried. The second was bound
+  on purpose, measured -- size query 384,000 with result 14, read with result 6,
+  `NOT_SUPPORTED` again -- and **unbound**, because nothing consumes it. Both
+  doors are shut, and that is now a fact rather than an assumption about one.
 * **`GamePad.InvalidController`, `Keyboard.CouldNotReadKeyboard`** — the
   error-channel halves that need a native input failure this environment cannot
   produce. CNA already matches the "not connected" half.
