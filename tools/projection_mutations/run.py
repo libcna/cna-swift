@@ -4108,8 +4108,13 @@ def main() -> int:
             survivors.append(f"{path} was not restored")
 
     scope = "" if args.only is None else f" SELECTED={args.only!r}"
+    # Qualified names, not a bare CAUGHT=. Both this harness and the native
+    # ABI one printed `CAUGHT=`, the documents quoted both, and a status-gate
+    # fact key can only mean one thing -- so the gate could derive neither and
+    # skipped both in silence. One key, one meaning (Foundation 100).
     print(f"PROJECTION_MUTATIONS={len(selected)} "
-          f"CAUGHT={len(selected) - len(survivors)} SURVIVORS={len(survivors)}"
+          f"PROJECTION_MUTATIONS_CAUGHT={len(selected) - len(survivors)} "
+          f"PROJECTION_MUTATION_SURVIVORS={len(survivors)}"
           f"{scope} DECLARED={len(MUTATIONS)}")
     for survivor in survivors:
         print(f"  SURVIVOR {survivor}")

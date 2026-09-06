@@ -197,9 +197,12 @@ def main() -> int:
         if path.read_text(encoding="utf-8") != text:
             survivors.append(f"{path} was not restored")
 
+    # See the note in tools/projection_mutations/run.py: a bare CAUGHT= meant
+    # two different numbers across the documents, so neither was policed.
     print(f"NATIVE_ABI_MUTATIONS={len(MUTATIONS)} "
-          f"CAUGHT={len(MUTATIONS) - len([s for s in survivors if not s.endswith('restored')])} "
-          f"SURVIVORS={len(survivors)}")
+          f"NATIVE_ABI_MUTATIONS_CAUGHT="
+          f"{len(MUTATIONS) - len([s for s in survivors if not s.endswith('restored')])} "
+          f"NATIVE_ABI_MUTATION_SURVIVORS={len(survivors)}")
     for survivor in survivors:
         print(f"  SURVIVOR {survivor}")
     return 1 if survivors else 0

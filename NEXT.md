@@ -45,9 +45,11 @@ TOTAL_DIAGNOSTICS=51   COMPLETE_TYPES=213   PARTIAL_TYPES=6
 MISSING_TYPE=38  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
 BOUND_FUNCTIONS=612  PROTOTYPE_TYPE_POSITIONS=2052  LAYOUTS=64  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=375 (last full run 137, CAUGHT=135)
-5 withdrawn with the reason written where they stood, 1 no-op replaced
-NATIVE_ABI_MUTATIONS=14 CAUGHT=14
+PROJECTION_MUTATIONS=375  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
+PROJECTION_MUTATIONS_CAUGHT=135
+WITHDRAWN_IN_SOURCE=26 with the reason written where each stood
+REPLACED_NO_OPS_IN_SOURCE=2
+NATIVE_ABI_MUTATIONS=14 NATIVE_ABI_MUTATIONS_CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
 API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=497
 BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=39  BCL_SENTINEL_CHECKS=585
@@ -1429,6 +1431,47 @@ authoritative rather than a recollection about a framework, it hardened the
 audit by 143 sentinel checks and 35 mutations, and it is a precondition for
 anything that ever does consume `System.dll`.
 
+### And the same defect, found twice more by looking for it
+
+The stale BCL report was not a one-off. `if key not in facts: continue` meant
+the status gate skipped, in silence, every claim whose key it could not derive
+— so a claim nobody could check looked exactly like a claim that passed. Three
+were rotting behind it:
+
+* the withdrawal count, written once as five and never moved. The source
+  records **26** withdrawals, in 18 comment blocks, each naming its mutations.
+  This one is not cosmetic: the withdrawal record is what this project offers
+  as evidence that unfalsifiable claims are retired rather than quietly kept,
+  and it was understating itself five-fold.
+* the replaced-no-op count, claimed as one; the source records two.
+* `CAUGHT=`, which meant 14 in one line of `plan.md` and 135 in the next. A
+  fact key can only mean one thing, so the gate could derive neither and
+  policed neither. Both harnesses now print qualified names.
+
+And the committed `accessor-fallibility-inventory.md` was stale the same way
+`bcl-authority-audit.json` was — it recorded 113 fallible setters where a live
+run finds **114**, missing `IEffectLights.LightingEnabled` and its
+`NotSupportedException`. `api_compat` has reported 114 throughout. Two
+generated artefacts disagreed for several Foundations and no gate compared
+them, because one of them was never re-run.
+
+An unrecognised claim key is now a **finding**. A key that genuinely cannot be
+derived has to be entered in `UNPOLICED_CLAIMS` with the reason in writing;
+seven claims sit there now, all of them outcomes of a harness *run* rather
+than properties of the tree, and the summary prints
+`STATUS_GATE_UNPOLICED_CLAIMS` so the residue is visible. Shrinking it is the
+work; adding to it is a decision someone has to write down.
+
+The self-test that guarded this had asserted *"an underived key must not be
+policed"* — the defect encoded as a passing test. Worth remembering when a
+test looks like it is protecting a behaviour: check that the behaviour is the
+one you want.
+
+The cheap next step, left undone deliberately: `tools/native_abi/mutations.py`
+runs 14 C probes and writes no report, so its CAUGHT and SURVIVORS stay
+unpoliced for want of an `--output`. The projection harness is the same shape
+and 137 runs, so its report is worth having and its run is not free.
+
 ## Rules a next session must not quietly break
 
 **Before the engineering rules, the three standing safety constraints**, which
@@ -1761,7 +1804,11 @@ no better than permanently green. What actually shipped is
 canary tool, recomputed by the status gate. Committing a regenerated report
 changes none of those three, so there is no circularity, and it needs no
 consumer build. Both directions are demonstrated: a report with no digest and a
-report whose digest disagrees each produce `FINDINGS=1 STATUS=FAIL`.
+report whose digest disagrees each produce one finding and a FAIL. (Written
+without the `KEY=value` spelling: the status gate cannot tell a quoted example
+of a tool's output from a live claim about this repository, and since
+Foundation 100 an unrecognised claim key is a finding rather than a silent
+skip.)
 
 **What this costs going forward.** Any change under `Sources/` makes the report
 stale, so package qualification has to be re-run once per handoff — which is

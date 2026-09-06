@@ -61,6 +61,28 @@ NORMATIVE_DOCUMENTS = ["plan.md", "README.md", "NEXT.md"]
 # Generated reports the derived facts are read out of. Each entry is
 # (path, prefix-free keys to take). A key present in two reports with two
 # different values is refused rather than silently policed against one of them.
+# A claim key the gate cannot derive, and why. Anything NOT listed here and not
+# derivable is a finding: `if key not in facts: continue` used to skip every
+# unknown key in silence, which is how WITHDRAWN_IN_SOURCE sat at 5 while the
+# source held 26, and how a bare CAUGHT= meaning two different numbers was
+# policed as neither. Shrinking this table is the work; adding to it is a
+# decision that has to be written down.
+UNPOLICED_CLAIMS = {
+    "PROJECTION_MUTATIONS_LAST_FULL_RUN":
+        "how many mutations the last full harness pass selected -- an event, "
+        "not a property of the tree. Only a full run can produce it and the "
+        "harness writes no report, so nothing here can check it.",
+    "PROJECTION_MUTATIONS_CAUGHT":
+        "the outcome of that same pass. Deriving it means running 137 "
+        "mutations, each a build and a test run; the fix is for the harness "
+        "to write a report, not for this gate to run it.",
+    "NATIVE_ABI_MUTATIONS_CAUGHT":
+        "the outcome of the native ABI pass, which needs a compiler and the "
+        "selected library. Same fix as above and much cheaper -- 14 C probes.",
+    "NATIVE_ABI_MUTATION_SURVIVORS":
+        "the same pass's survivor count.",
+}
+
 FACT_REPORTS = [
     "api-compat-report.json",
     "native-abi-report.json",
@@ -70,6 +92,7 @@ FACT_REPORTS = [
     "native-stress-report.json",
     "package-qualification-report.json",
     "message-coverage.json",
+    "accessor-fallibility.json",
 ]
 
 # A category whose non-zero value would mean the projection DISAGREES with the
@@ -161,6 +184,57 @@ def mutation_harness_sizes(root: Path = ROOT) -> dict[str, int]:
             raise Failure(f"{path.name} has no MUTATIONS list literal")
         sizes[name] = len(found.elts)
     return sizes
+
+
+def mutation_record_counts(root: Path = ROOT) -> dict[str, int]:
+    """Withdrawals and replaced no-ops, counted from the harness source.
+
+    Both numbers were claimed in the documents and derivable from neither
+    report, so nothing checked them: `WITHDRAWN_IN_SOURCE=5` was introduced
+    once and never moved while the source grew to 26, and the replaced no-ops
+    were claimed as 1 while the source records 2. An honest withdrawal record
+    is the thing this project's discipline rests on, so a count of it that
+    only a human maintains is the wrong shape.
+
+    The rule the source already follows: a withdrawal is a comment block
+    containing the word WITHDRAWN which NAMES the mutations it withdraws, in
+    double quotes or backticks. A block that names none is a failure here
+    rather than a zero -- that is how the record degrades quietly.
+    """
+    source = (root / "tools/projection_mutations/run.py").read_text(encoding="utf-8")
+    blocks: list[list[str]] = []
+    current: list[str] = []
+    for line in source.split("\n"):
+        if line.lstrip().startswith("#"):
+            current.append(line)
+        else:
+            if current:
+                blocks.append(current)
+            current = []
+    if current:
+        blocks.append(current)
+
+    name = re.compile(r"[`\"]([a-z][a-z0-9-]{6,})[`\"]")
+    withdrawn: set[str] = set()
+    replaced = 0
+    for block in blocks:
+        text = " ".join(block)
+        names = name.findall(text)
+        if "WITHDRAWN" in text:
+            if not names:
+                raise Failure(
+                    "a WITHDRAWN block in tools/projection_mutations/run.py "
+                    "names no mutation, so the withdrawal cannot be counted"
+                )
+            withdrawn.update(names)
+        if re.search(r"NO-OP|no-op", text) and "SURVIVED" in text:
+            # The no-op itself is the first name in the block; the others are
+            # the mutations that replaced it.
+            replaced += 1
+    return {
+        "WITHDRAWN_IN_SOURCE": len(withdrawn),
+        "REPLACED_NO_OPS_IN_SOURCE": replaced,
+    }
 
 
 def api_compat_self_tests(root: Path = ROOT) -> dict[str, int]:
@@ -288,6 +362,8 @@ def derive_facts(root: Path = ROOT, with_self_tests: bool = True) -> dict[str, i
 
     for key, value in mutation_harness_sizes(root).items():
         add(key, value, "mutation harness")
+    for key, value in mutation_record_counts(root).items():
+        add(key, value, "mutation harness source")
     if with_self_tests:
         for key, value in api_compat_self_tests(root).items():
             add(key, value, "verify.py --self-test")
@@ -320,16 +396,29 @@ def normative_lines(text: str) -> list[tuple[int, str]]:
     return out
 
 
-def check_document(path: Path, facts: dict[str, int], relative: str) -> tuple[list[str], int]:
+def check_document(
+    path: Path, facts: dict[str, int], relative: str,
+) -> tuple[list[str], int, int]:
     findings: list[str] = []
     checked = 0
+    unpoliced = 0
     foundation = facts["FOUNDATION"]
     lines = normative_lines(path.read_text(encoding="utf-8"))
 
     for number, line in lines:
         for match in TOKEN.finditer(line):
             key, value = match.group(1), int(match.group(2))
-            if key not in facts or key == "FOUNDATION":
+            if key == "FOUNDATION":
+                continue
+            if key not in facts:
+                if key not in UNPOLICED_CLAIMS:
+                    findings.append(
+                        f"{relative}:{number}: {key}={value} is a claim no "
+                        f"generated evidence can check. Derive it, or record "
+                        f"in UNPOLICED_CLAIMS why it cannot be."
+                    )
+                else:
+                    unpoliced += 1
                 continue
             checked += 1
             if value != facts[key]:
@@ -361,7 +450,7 @@ def check_document(path: Path, facts: dict[str, int], relative: str) -> tuple[li
                     f"Foundation {match.group(1)} but the current Foundation is "
                     f"{foundation}"
                 )
-    return findings, checked
+    return findings, checked, unpoliced
 
 
 def regenerate_and_compare(
@@ -478,6 +567,21 @@ def regenerate_and_compare(
             compare(GENERATED / "message-coverage.json", coverage,
                     "tools/api_compat/message_coverage.py")
 
+            accessors = temporary / "accessor-fallibility.json"
+            inventory = temporary / "accessor-fallibility-inventory.md"
+            subprocess.run(
+                [sys.executable, "tools/api_compat/accessor_fallibility.py",
+                 "--assembly-dir", str(assembly_dir),
+                 "--il-cache", str(il_cache),
+                 "--output", str(accessors),
+                 "--markdown", str(inventory)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(GENERATED / "accessor-fallibility.json", accessors,
+                    "tools/api_compat/accessor_fallibility.py")
+            compare(GENERATED / "accessor-fallibility-inventory.md", inventory,
+                    "tools/api_compat/accessor_fallibility.py --markdown")
+
         # bcl-authority-audit.json is READ for five derived facts and, until
         # Foundation 100, was never re-run either. Foundation 100 admitted
         # System.dll and moved BCL_SENTINEL_CHECKS from 442 to 585 and
@@ -512,7 +616,7 @@ Foundation Milestones 1 through 3 are complete. COMPLETE_TYPES=1
 
 Foundation Milestones 1 through 57 are
 complete.
-COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 UNPOLICED_KEY=999
+COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 NATIVE_ABI_MUTATIONS_CAUGHT=999
 """
 
 
@@ -532,7 +636,7 @@ def self_test() -> int:
         temporary = Path(raw)
         clean = temporary / "clean.md"
         clean.write_text(SELF_TEST_DOCUMENT, encoding="utf-8")
-        findings, checked = check_document(clean, facts, "clean.md")
+        findings, checked, _ = check_document(clean, facts, "clean.md")
         expect(findings == [], f"the clean document must pass, got {findings}")
         expect(checked == 3, f"the clean document must check 3 claims, got {checked}")
 
@@ -541,7 +645,7 @@ def self_test() -> int:
         stale_count.write_text(
             SELF_TEST_DOCUMENT.replace("COMPLETE_TYPES=150", "COMPLETE_TYPES=135"),
             encoding="utf-8")
-        findings, _ = check_document(stale_count, facts, "count.md")
+        findings, _, _ = check_document(stale_count, facts, "count.md")
         expect(len(findings) == 1 and "COMPLETE_TYPES=135" in findings[0],
                f"a stale count must be caught, got {findings}")
 
@@ -550,7 +654,7 @@ def self_test() -> int:
         stale_abi.write_text(
             SELF_TEST_DOCUMENT.replace("BOUND_FUNCTIONS=87", "BOUND_FUNCTIONS=55"),
             encoding="utf-8")
-        findings, _ = check_document(stale_abi, facts, "abi.md")
+        findings, _, _ = check_document(stale_abi, facts, "abi.md")
         expect(len(findings) == 1 and "BOUND_FUNCTIONS=55" in findings[0],
                f"a stale ABI count must be caught, got {findings}")
 
@@ -563,7 +667,7 @@ def self_test() -> int:
                 "Foundation Milestones 1 through 57 are\ncomplete.",
                 "Foundation Milestones 1 through 47 are\ncomplete."),
             encoding="utf-8")
-        findings, _ = check_document(stale_foundation, facts, "foundation.md")
+        findings, _, _ = check_document(stale_foundation, facts, "foundation.md")
         expect(len(findings) == 1 and "Foundation 47" in findings[0],
                f"a stale Foundation number must be caught, got {findings}")
         expect("foundation.md:7:" in (findings[0] if findings else ""),
@@ -575,7 +679,7 @@ def self_test() -> int:
         without_markers.write_text(
             SELF_TEST_DOCUMENT.replace(HISTORICAL_OPEN, "").replace(HISTORICAL_CLOSE, ""),
             encoding="utf-8")
-        findings, _ = check_document(without_markers, facts, "unmarked.md")
+        findings, _, _ = check_document(without_markers, facts, "unmarked.md")
         expect(len(findings) == 2,
                f"unmarking the historical region must expose its two stale claims, "
                f"got {findings}")
@@ -586,11 +690,12 @@ def self_test() -> int:
         names_marker = temporary / "names.md"
         names_marker.write_text(
             SELF_TEST_DOCUMENT.replace(
-                "COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 UNPOLICED_KEY=999",
+                "COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 NATIVE_ABI_MUTATIONS_CAUGHT=999",
                 f"prose that mentions `{HISTORICAL_OPEN}` in passing.\n"
-                f"COMPLETE_TYPES=135 BOUND_FUNCTIONS=87 UNPOLICED_KEY=999"),
+                f"COMPLETE_TYPES=135 BOUND_FUNCTIONS=87 "
+                f"NATIVE_ABI_MUTATIONS_CAUGHT=999"),
             encoding="utf-8")
-        findings, _ = check_document(names_marker, facts, "names.md")
+        findings, _, _ = check_document(names_marker, facts, "names.md")
         expect(len(findings) == 1 and "COMPLETE_TYPES=135" in findings[0],
                f"naming the marker in prose must not disable policing, got {findings}")
 
@@ -613,13 +718,31 @@ def self_test() -> int:
         expect(disagreements({"PARAMETER_MAPPING_MISMATCH": 0}) == {},
                "a zero category must not be reported")
 
-        # A key no generated report derives is not invented into a claim.
+        # A key no generated report derives used to be skipped in silence,
+        # and this self-test asserted that skipping as correct behaviour. It
+        # was the bug, encoded as a passing test: WITHDRAWN_IN_SOURCE sat at 5
+        # while the harness source held 26, and a bare CAUGHT= meaning two
+        # different numbers in two documents was policed as neither. An
+        # unrecognised claim is now a finding unless UNPOLICED_CLAIMS says in
+        # writing why it cannot be derived.
         unpoliced = temporary / "unpoliced.md"
         unpoliced.write_text(
-            SELF_TEST_DOCUMENT.replace("UNPOLICED_KEY=999", "UNPOLICED_KEY=1"),
+            SELF_TEST_DOCUMENT.replace(
+                "NATIVE_ABI_MUTATIONS_CAUGHT=999", "UNPOLICED_KEY=1"),
             encoding="utf-8")
-        findings, _ = check_document(unpoliced, facts, "unpoliced.md")
-        expect(findings == [], "an underived key must not be policed")
+        findings, _, count = check_document(unpoliced, facts, "unpoliced.md")
+        expect(len(findings) == 1 and "UNPOLICED_KEY" in findings[0],
+               "an underived key that nothing excuses must be a finding")
+        expect(count == 0, "an unexcused key is not counted as excused")
+
+        excused = temporary / "excused.md"
+        excused.write_text(SELF_TEST_DOCUMENT, encoding="utf-8")
+        findings, _, count = check_document(excused, facts, "excused.md")
+        expect(findings == [],
+               "a key listed in UNPOLICED_CLAIMS must not be a finding")
+        expect(count == 1, "an excused key must still be counted")
+        expect(all(reason.strip() for reason in UNPOLICED_CLAIMS.values()),
+               "every excused key must carry a written reason")
 
         # The current Foundation is read off the evidence files, so a new
         # milestone's evidence moves it and prose alone cannot.
@@ -706,14 +829,17 @@ def main() -> int:
 
     findings: list[str] = []
     checked = 0
+    unpoliced = 0
     for relative in NORMATIVE_DOCUMENTS:
         path = ROOT / relative
         if not path.exists():
             findings.append(f"{relative} is absent")
             continue
-        document_findings, document_checked = check_document(path, facts, relative)
+        document_findings, document_checked, document_unpoliced = check_document(
+            path, facts, relative)
         findings += document_findings
         checked += document_checked
+        unpoliced += document_unpoliced
 
     fresh_findings, compared, skipped = regenerate_and_compare(
         ROOT, args.symbol_graph, args.cna_include, args.library,
@@ -736,6 +862,7 @@ def main() -> int:
     print(f"STATUS_GATE_FOUNDATION={facts['FOUNDATION']} "
           f"STATUS_GATE_DERIVED_FACTS={len(facts)} "
           f"STATUS_GATE_CLAIMS_CHECKED={checked} "
+          f"STATUS_GATE_UNPOLICED_CLAIMS={unpoliced} "
           f"STATUS_GATE_DISAGREEMENTS={len(nonzero)} "
           f"STATUS_GATE_REPORTS_COMPARED={compared} "
           f"STATUS_GATE_REPORTS_SKIPPED={skipped} "

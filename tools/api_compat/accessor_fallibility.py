@@ -1183,7 +1183,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"| Indexed properties | {report['INDEXED_PROPERTIES']} |",
         f"| Fallible getters | {report['THROWING_GETTERS']} |",
         f"| Fallible setters | {report['THROWING_SETTERS']} |",
-        f"| Self-tests | {report['SELF_TESTS']} {report['SELF_TEST_STATUS']} |",
+        f"| Self-tests | {report['ACCESSOR_SELF_TESTS']} {report['SELF_TEST_STATUS']} |",
         "",
         "## Registered assemblies",
         "",
@@ -1277,7 +1277,7 @@ def main() -> int:
             EVIDENCE_UNRESOLVED:
                 "the contract declares an accessor the IL does not; a hard error",
         },
-        "SELF_TESTS": checks,
+        "ACCESSOR_SELF_TESTS": checks,
         "SELF_TEST_STATUS": "FAIL" if failures else "PASS",
         "selfTestFailures": failures,
         "PROPERTIES": len(entries),
@@ -1300,7 +1300,8 @@ def main() -> int:
           f"SETTERS={report['SETTERS']} INDEXED={report['INDEXED_PROPERTIES']}")
     print(f"THROWING_GETTERS={report['THROWING_GETTERS']} "
           f"THROWING_SETTERS={report['THROWING_SETTERS']}")
-    print(f"ACCESSOR_SELF_TESTS={checks} STATUS={report['SELF_TEST_STATUS']}")
+    print(f"ACCESSOR_SELF_TESTS={report['ACCESSOR_SELF_TESTS']} "
+          f"STATUS={report['SELF_TEST_STATUS']}")
     print(f"UNRESOLVED_ACCESSORS={len(report['UNRESOLVED_ACCESSORS'])}")
     for line in failures + report["UNRESOLVED_ACCESSORS"]:
         print(f"  {line}", file=sys.stderr)

@@ -12,8 +12,8 @@ machine-local path is recorded. The pinned machine-readable form is
 | Declared setters | 279 |
 | Indexed properties | 24 |
 | Fallible getters | 114 |
-| Fallible setters | 113 |
-| Self-tests | 34 PASS |
+| Fallible setters | 114 |
+| Self-tests | 41 PASS |
 
 ## Registered assemblies
 
@@ -238,6 +238,7 @@ machine-local path is recorded. The pinned machine-readable form is
 | `Microsoft.Xna.Framework.Graphics.GraphicsDevice` | `BlendFactor` | `IL_REACHABLE_THROW` | System.ObjectDisposedException | set_BlendFactor/1 → CheckDisposed/2 |
 | `Microsoft.Xna.Framework.Graphics.GraphicsDevice` | `BlendState` | `IL_DIRECT_THROW` | System.ArgumentNullException | — |
 | `Microsoft.Xna.Framework.Graphics.IEffectFog` | `FogColor` | `IL_ABSTRACT_DECLARATION` | System.InvalidCastException, System.InvalidOperationException | set_FogColor/1 → set_FogColor/1 → set_FogColor/1 → set_FogColor/1 → set_FogColor/1 |
+| `Microsoft.Xna.Framework.Graphics.IEffectLights` | `LightingEnabled` | `IL_ABSTRACT_DECLARATION` | System.NotSupportedException | EnvironmentMapEffect::set_LightingEnabled/1 → SkinnedEffect::set_LightingEnabled/1 |
 | `Microsoft.Xna.Framework.Graphics.RasterizerState` | `SlopeScaleDepthBias` | `IL_REACHABLE_THROW` | System.InvalidOperationException | set_SlopeScaleDepthBias/1 → ThrowIfBound/0 |
 | `Microsoft.Xna.Framework.Graphics.RasterizerState` | `DepthBias` | `IL_REACHABLE_THROW` | System.InvalidOperationException | set_DepthBias/1 → ThrowIfBound/0 |
 | `Microsoft.Xna.Framework.Graphics.RasterizerState` | `MultiSampleAntiAlias` | `IL_REACHABLE_THROW` | System.InvalidOperationException | set_MultiSampleAntiAlias/1 → ThrowIfBound/0 |
