@@ -819,6 +819,36 @@ Two operational notes worth the seconds they save:
 
 ## Open items carried forward
 
+### `FindBestDevice` and `RankDevices` — sized, and bigger than they look
+
+The last two of `GraphicsDeviceManager`'s five missing members. Both are eight
+bytes of IL and both forward to a private platform half, which is where the work
+is:
+
+* `RankDevices` → `RankDevicesPlatform`, thirteen bytes:
+  `foundDevices.Sort(new GraphicsDeviceInformationComparer(this))`. The whole
+  behaviour is that comparer, whose `Compare` is **638 bytes** with two private
+  helpers of 48 and 37. It is XNA's device-preference ordering — profile,
+  multisampling, format ranks, resolution distance — and it is exactly the kind
+  of thing that must be transcribed rather than approximated, because a
+  consumer's device choice depends on the order.
+* `FindBestDevice` → `FindBestPlatformDevice`, 132 bytes: build a list, call
+  `AddDevices` (about a hundred lines of IL), retry once with
+  `PreferMultiSampling` flipped, raise `NoCompatibleDevices` if the list is
+  empty, `RankDevices`, raise `NoCompatibleDevicesAfterRanking` if it is still
+  empty, return `[0]`.
+
+So the pair needs the comparer, `AddDevices`, and two resource strings — a
+milestone of its own, not an appendix to the three members Foundation 80
+landed. The three that did land are the ones whose IL is fully determined and
+short: `CanResetDevice` (23 bytes), `OnPreparingDeviceSettings` (22) and the
+event they belong to.
+
+Everything the pair needs already exists: `GraphicsAdapter` enumerates,
+`SupportedDisplayModes` is populated, and `GraphicsDeviceInformation` compares
+and clones.
+
+
 ### `GraphicsAdapter` — built once, reverted, and what it cost to learn
 
 A complete first implementation was written and then **reverted on purpose**: it

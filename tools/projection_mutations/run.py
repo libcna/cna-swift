@@ -117,6 +117,25 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 80: the manager's reset rule and settings event --------
+    (
+        "can-reset-device-also-compares-the-back-buffer",
+        "CanResetDevice widened past the single profile comparison XNA's "
+        "twenty-three bytes perform",
+        MANAGER,
+        "            return device.GraphicsProfile == newDeviceInfo.GraphicsProfile",
+        "            return device.GraphicsProfile == newDeviceInfo.GraphicsProfile\n"
+        "                && device.PresentationParameters?.BackBufferWidth\n"
+        "                    == newDeviceInfo.PresentationParameters.BackBufferWidth",
+    ),
+    (
+        "preparing-settings-raises-with-the-manager-as-sender",
+        "the settings raiser substituting itself for the caller's sender, "
+        "which is what Game's raisers do and this one does not",
+        MANAGER,
+        "            try preparingDeviceSettingsSource.Raise(sender, args: args)",
+        "            try preparingDeviceSettingsSource.Raise(self, args: args)",
+    ),
     # ---- Foundation 79: the two managed device carriers --------------------
     (
         "device-information-equals-compares-the-objects",

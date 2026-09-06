@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 191,
-    "TARGET_MEMBERS": 2349,
-    "TOTAL_DIAGNOSTICS": 92,
+    "TARGET_MEMBERS": 2352,
+    "TOTAL_DIAGNOSTICS": 89,
     "COMPLETE_TYPES": 186,
     "PARTIAL_TYPES": 5,
     "MISSING_TYPES": 66,
     "MISSING_TYPE": 66,
-    "MISSING_MEMBER": 23,
+    "MISSING_MEMBER": 20,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -681,22 +681,7 @@
     },
     {
       "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.CanResetDevice(_:Microsoft.Xna.Framework.GraphicsDeviceInformation)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnPreparingDeviceSettings(_:Any?,args:Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()",
       "detail": "mapped member is absent"
     },
     {
@@ -11907,7 +11892,7 @@
       "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "status": "PARTIAL",
       "expectedMembers": 30,
-      "targetMembers": 26,
+      "targetMembers": 29,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -11916,22 +11901,7 @@
         },
         {
           "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.CanResetDevice(_:Microsoft.Xna.Framework.GraphicsDeviceInformation)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.OnPreparingDeviceSettings(_:Any?,args:Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.PreparingDeviceSettings()",
           "detail": "mapped member is absent"
         }
       ]

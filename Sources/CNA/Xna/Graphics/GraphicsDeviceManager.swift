@@ -37,6 +37,8 @@ extension Microsoft.Xna.Framework {
         private let deviceResetSource = CNAEventSource<CNAEventArgs>()
         private let deviceResettingSource = CNAEventSource<CNAEventArgs>()
         private let disposedSource = CNAEventSource<CNAEventArgs>()
+        private let preparingDeviceSettingsSource =
+            CNAEventSource<Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs>()
         private var eventRegistrations: [UInt32: UInt64] = [:]
         private var eventBoxes: [Unmanaged<GraphicsDeviceManagerEventBox>] = []
 
@@ -162,6 +164,20 @@ extension Microsoft.Xna.Framework {
         /// the ordinary `Delegate.Combine`/`Remove` accessors.
         public var Disposed: CNAEvent<CNAEventArgs> { disposedSource.Event }
 
+        /// `GraphicsDeviceManager.PreparingDeviceSettings`.
+        ///
+        /// The one event whose payload a handler is meant to **change**: it
+        /// carries the `GraphicsDeviceInformation` the manager is about to
+        /// create a device from, and the manager reads that same object back
+        /// afterwards.
+        ///
+        /// It is the only event on this type that is not
+        /// `EventHandler<EventArgs>`, which is why it needs its own source.
+        public var PreparingDeviceSettings:
+            CNAEvent<Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs> {
+            preparingDeviceSettingsSource.Event
+        }
+
         /// `protected virtual void OnDeviceCreated(object sender, EventArgs args)`.
         ///
         /// ```text
@@ -177,7 +193,49 @@ extension Microsoft.Xna.Framework {
             try deviceCreatedSource.Raise(sender, args: args)
         }
 
-        /// `protected virtual void OnDeviceDisposing(object sender, EventArgs args)`.
+/// `protected virtual void OnPreparingDeviceSettings(object sender,
+        /// PreparingDeviceSettingsEventArgs args)`.
+        ///
+        /// Twenty-two bytes: the null test, then the invoke. The same
+        /// caller's-sender forwarding as the raisers around it.
+        open func OnPreparingDeviceSettings(
+            _ sender: Any?,
+            args: Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs
+        ) throws {
+            try preparingDeviceSettingsSource.Raise(sender, args: args)
+        }
+
+        /// `protected virtual bool CanResetDevice(GraphicsDeviceInformation
+        /// newDeviceInfo)`.
+        ///
+        /// **Twenty-three bytes, and one comparison.** The whole rule is that
+        /// the candidate's `GraphicsProfile` equals the current device's:
+        ///
+        /// ```text
+        /// ldfld device; callvirt get_GraphicsProfile
+        /// ldarg.1;      callvirt get_GraphicsProfile
+        /// ceq; ret
+        /// ```
+        ///
+        /// Nothing about back-buffer size, format or full screen enters it — a
+        /// device can be reset into a different resolution but not into a
+        /// different profile. That is narrower than the name suggests and is
+        /// reproduced rather than widened.
+        ///
+        /// It is `throws` where XNA's is not, because reading the device's
+        /// profile crosses the runtime boundary here; a manager with no device
+        /// yet cannot answer at all, which XNA expresses as a
+        /// `NullReferenceException` from `ldfld device`.
+        open func CanResetDevice(
+            _ newDeviceInfo: Microsoft.Xna.Framework.GraphicsDeviceInformation
+        ) throws -> Bool {
+            guard let device = GraphicsDevice else {
+                throw CNANullReferenceException()
+            }
+            return device.GraphicsProfile == newDeviceInfo.GraphicsProfile
+        }
+
+                /// `protected virtual void OnDeviceDisposing(object sender, EventArgs args)`.
         open func OnDeviceDisposing(_ sender: Any?, args: CNAEventArgs) throws {
             try deviceDisposingSource.Raise(sender, args: args)
         }
