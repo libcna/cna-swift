@@ -24,12 +24,12 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-927 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=52   COMPLETE_TYPES=212   PARTIAL_TYPES=6
-MISSING_TYPE=39  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
+931 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=51   COMPLETE_TYPES=213   PARTIAL_TYPES=6
+MISSING_TYPE=38  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=598  PROTOTYPE_TYPE_POSITIONS=2010  LAYOUTS=60  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=371 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=612  PROTOTYPE_TYPE_POSITIONS=2052  LAYOUTS=64  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=375 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -500,6 +500,31 @@ consumes it, so the Foundation 67 rule forbids binding it; and without it a
 component that pumps the dispatcher and one that does nothing are
 indistinguishable, because both routes simply accept here. The test asserts what
 it *can*: that both accept, which is worth failing on if it ever changes.
+
+### Foundation 99 — `TouchPanel`, and the Input namespace is complete
+
+Every supporting type it answers -- `TouchPanelCapabilities`,
+`TouchCollection`, `GestureSample`, `TouchLocation` -- had been projected
+earlier, so this milestone was the panel alone, and it closed the last gap in
+`Microsoft.Xna.Framework.Input`.
+
+**It carries this binding's only settable properties.** `WindowHandle`,
+`DisplayWidth` and `DisplayHeight` have setters that are `IL_NO_FAILURE_PATH`,
+so the accessor rule keeps them as *properties* where every other fallible
+setter became a `Set<Name>` writer. A setter that cannot refuse still has to
+reach CNA, so the value is stored and pushed on the same call, and a push that
+fails is kept in `lastPushFailure` -- the shape `GraphicsAdapter`'s device
+preferences already use. `EnabledGestures` and `DisplayOrientation` have
+fallible setters and are writers, so the two shapes sit side by side in one
+type, which is the clearest place in the binding to see the rule at work.
+
+`GetState` reads only the **counted prefix** of CNA's fixed eight-slot array;
+the rest is whatever the previous frame left there, and a mutation that reads
+all eight is caught by a host with no touch device reporting phantom touches.
+
+`CNA_TOUCH_MAX_TOUCHES` is the second macro array bound in a mirrored
+structure, after `CNA_VISUALIZATION_DATA_SIZE` -- the parser that learned about
+those in Foundation 96 needed no further change.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 

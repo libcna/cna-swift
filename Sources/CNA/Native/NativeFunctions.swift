@@ -405,6 +405,20 @@ internal final class NativeFunctions {
     typealias VideoGetSoundtrackTypeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
     typealias GamerServicesDispatcherInitializeRoute = @convention(c) (UInt64) -> UInt32
     typealias GamerServicesDispatcherUpdateRoute = @convention(c) () -> UInt32
+    typealias TouchGetCapabilitiesRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_TouchCapabilities>?) -> UInt32
+    typealias TouchGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_TouchState>?) -> UInt32
+    typealias TouchPanelReadGestureRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_GestureSample>?) -> UInt32
+    typealias TouchPanelGetIsGestureAvailableRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias TouchPanelGetEnabledGesturesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias TouchPanelSetEnabledGesturesRoute = @convention(c) (UInt64, UInt32) -> UInt32
+    typealias TouchPanelGetWindowHandleRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias TouchPanelSetWindowHandleRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias TouchPanelGetDisplayOrientationRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias TouchPanelSetDisplayOrientationRoute = @convention(c) (UInt64, UInt32) -> UInt32
+    typealias TouchPanelGetDisplayWidthRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias TouchPanelSetDisplayWidthRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias TouchPanelGetDisplayHeightRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias TouchPanelSetDisplayHeightRoute = @convention(c) (UInt64, Int32) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -774,6 +788,20 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let touchGetCapabilities: TouchGetCapabilitiesRoute
+    let touchGetState: TouchGetStateRoute
+    let touchPanelReadGesture: TouchPanelReadGestureRoute
+    let touchPanelGetIsGestureAvailable: TouchPanelGetIsGestureAvailableRoute
+    let touchPanelGetEnabledGestures: TouchPanelGetEnabledGesturesRoute
+    let touchPanelSetEnabledGestures: TouchPanelSetEnabledGesturesRoute
+    let touchPanelGetWindowHandle: TouchPanelGetWindowHandleRoute
+    let touchPanelSetWindowHandle: TouchPanelSetWindowHandleRoute
+    let touchPanelGetDisplayOrientation: TouchPanelGetDisplayOrientationRoute
+    let touchPanelSetDisplayOrientation: TouchPanelSetDisplayOrientationRoute
+    let touchPanelGetDisplayWidth: TouchPanelGetDisplayWidthRoute
+    let touchPanelSetDisplayWidth: TouchPanelSetDisplayWidthRoute
+    let touchPanelGetDisplayHeight: TouchPanelGetDisplayHeightRoute
+    let touchPanelSetDisplayHeight: TouchPanelSetDisplayHeightRoute
     let gamerServicesDispatcherInitialize: GamerServicesDispatcherInitializeRoute
     let gamerServicesDispatcherUpdate: GamerServicesDispatcherUpdateRoute
     let videoPlayerCreate: VideoPlayerCreateRoute
@@ -1400,6 +1428,20 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        touchGetCapabilities = try library.resolve("cna_touch_get_capabilities", as: TouchGetCapabilitiesRoute.self)
+        touchGetState = try library.resolve("cna_touch_get_state", as: TouchGetStateRoute.self)
+        touchPanelReadGesture = try library.resolve("cna_touch_panel_read_gesture", as: TouchPanelReadGestureRoute.self)
+        touchPanelGetIsGestureAvailable = try library.resolve("cna_touch_panel_get_is_gesture_available", as: TouchPanelGetIsGestureAvailableRoute.self)
+        touchPanelGetEnabledGestures = try library.resolve("cna_touch_panel_get_enabled_gestures", as: TouchPanelGetEnabledGesturesRoute.self)
+        touchPanelSetEnabledGestures = try library.resolve("cna_touch_panel_set_enabled_gestures", as: TouchPanelSetEnabledGesturesRoute.self)
+        touchPanelGetWindowHandle = try library.resolve("cna_touch_panel_get_window_handle", as: TouchPanelGetWindowHandleRoute.self)
+        touchPanelSetWindowHandle = try library.resolve("cna_touch_panel_set_window_handle", as: TouchPanelSetWindowHandleRoute.self)
+        touchPanelGetDisplayOrientation = try library.resolve("cna_touch_panel_get_display_orientation", as: TouchPanelGetDisplayOrientationRoute.self)
+        touchPanelSetDisplayOrientation = try library.resolve("cna_touch_panel_set_display_orientation", as: TouchPanelSetDisplayOrientationRoute.self)
+        touchPanelGetDisplayWidth = try library.resolve("cna_touch_panel_get_display_width", as: TouchPanelGetDisplayWidthRoute.self)
+        touchPanelSetDisplayWidth = try library.resolve("cna_touch_panel_set_display_width", as: TouchPanelSetDisplayWidthRoute.self)
+        touchPanelGetDisplayHeight = try library.resolve("cna_touch_panel_get_display_height", as: TouchPanelGetDisplayHeightRoute.self)
+        touchPanelSetDisplayHeight = try library.resolve("cna_touch_panel_set_display_height", as: TouchPanelSetDisplayHeightRoute.self)
         gamerServicesDispatcherInitialize = try library.resolve("cna_gamer_services_dispatcher_initialize", as: GamerServicesDispatcherInitializeRoute.self)
         gamerServicesDispatcherUpdate = try library.resolve("cna_gamer_services_dispatcher_update", as: GamerServicesDispatcherUpdateRoute.self)
         videoPlayerCreate = try library.resolve("cna_video_player_create", as: VideoPlayerCreateRoute.self)

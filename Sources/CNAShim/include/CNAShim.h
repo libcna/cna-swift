@@ -526,6 +526,46 @@ typedef struct CNASwift_SpriteScaledCommand {
     float layer_depth;
 } CNASwift_SpriteScaledCommand;
 
+typedef struct CNASwift_TouchCapabilities {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint8_t is_connected;
+    uint8_t reserved[3];
+    uint32_t maximum_touch_count;
+} CNASwift_TouchCapabilities;
+
+typedef struct CNASwift_TouchLocation {
+    int32_t id;
+    uint32_t state;
+    CNASwift_Vector2 position;
+    uint32_t previous_state;
+    CNASwift_Vector2 previous_position;
+    float pressure;
+} CNASwift_TouchLocation;
+
+typedef struct CNASwift_TouchState {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint8_t is_connected;
+    uint8_t reserved[3];
+    uint32_t touch_count;
+    CNASwift_TouchLocation touches[8];
+} CNASwift_TouchState;
+
+typedef struct CNASwift_GestureSample {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t gesture_type;
+    int32_t finger_id_ext;
+    int32_t finger_id2_ext;
+    uint32_t reserved;
+    int64_t timestamp_ticks;
+    CNASwift_Vector2 position;
+    CNASwift_Vector2 position2;
+    CNASwift_Vector2 delta;
+    CNASwift_Vector2 delta2;
+} CNASwift_GestureSample;
+
 typedef void (*CNASwift_MediaPlayerEventCallback)(void* context);
 
 typedef struct CNASwift_VisualizationData {

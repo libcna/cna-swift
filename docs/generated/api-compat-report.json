@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 218,
-    "TARGET_MEMBERS": 2636,
-    "TOTAL_DIAGNOSTICS": 52,
-    "COMPLETE_TYPES": 212,
+    "TARGET_TYPES": 219,
+    "TARGET_MEMBERS": 2645,
+    "TOTAL_DIAGNOSTICS": 51,
+    "COMPLETE_TYPES": 213,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 39,
-    "MISSING_TYPE": 39,
+    "MISSING_TYPES": 38,
+    "MISSING_TYPE": 38,
     "MISSING_MEMBER": 10,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -63,14 +63,14 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 111,
-    "PENDING_ACCESSOR_PROJECTIONS": 3,
+    "MEASURED_ACCESSOR_PROJECTIONS": 113,
+    "PENDING_ACCESSOR_PROJECTIONS": 1,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 44,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 45,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 20,
-    "XNA_SEALED_CLASS_PROJECTIONS": 55,
+    "XNA_SEALED_CLASS_PROJECTIONS": 56,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -269,6 +269,7 @@
     "Microsoft.Xna.Framework.Input.Touch.TouchCollection.Enumerator",
     "Microsoft.Xna.Framework.Input.Touch.TouchLocation",
     "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
+    "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",
     "Microsoft.Xna.Framework.LaunchParameters",
     "Microsoft.Xna.Framework.MathHelper",
@@ -354,7 +355,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPart",
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection",
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
-    "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
     "Microsoft.Xna.Framework.Storage.StorageDevice"
   ],
@@ -582,11 +582,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2436,6 +2431,34 @@
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
+      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
+      "sourceProperty": "EnabledGestures",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchPanel.EnabledGestures()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchPanel.SetEnabledGestures(_:Microsoft.Xna.Framework.Input.Touch.GestureType)",
+      "writerName": "SetEnabledGestures",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
+      "sourceProperty": "DisplayOrientation",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchPanel.DisplayOrientation()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Input.Touch.TouchPanel.SetDisplayOrientation(_:Microsoft.Xna.Framework.DisplayOrientation)",
+      "writerName": "SetDisplayOrientation",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
       "sourceProperty": "IsShuffled",
       "indexed": false,
@@ -2572,26 +2595,6 @@
       "writerThrows": true,
       "indexed": false,
       "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-      "sourceProperty": "EnabledGestures",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetEnabledGestures",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-      "sourceProperty": "DisplayOrientation",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetDisplayOrientation",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
     }
   ],
   "nonPublicConstructionProjections": [
@@ -2758,6 +2761,13 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Mouse",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
       "clrSealed": true,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
@@ -5001,6 +5011,14 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Mouse",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
       "clrSealed": true,
       "swiftFinal": true,
       "swiftAccess": "public",
@@ -12269,16 +12287,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 9,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 9,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",

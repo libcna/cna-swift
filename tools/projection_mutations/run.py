@@ -52,6 +52,7 @@ MEDIA_PLAYER = ROOT / "Sources/CNA/Xna/Media/MediaPlayer.swift"
 MEDIA_QUEUE = ROOT / "Sources/CNA/Xna/Media/MediaQueue.swift"
 VIDEO_PLAYER = ROOT / "Sources/CNA/Xna/Media/VideoPlayer.swift"
 GAMER_SERVICES = ROOT / "Sources/CNA/Xna/GamerServices/GamerServicesComponent.swift"
+TOUCH_PANEL = ROOT / "Sources/CNA/Xna/Input/Touch/TouchPanel.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -135,6 +136,46 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 99: the touch panel --------------------------------------
+    (
+        "touch-state-reads-past-the-count",
+        "GetState reading all eight native slots instead of the counted "
+        "prefix, so last frame's leftovers arrive as live touches",
+        TOUCH_PANEL,
+        "            for raw in all.prefix(Int(native.touch_count)) {",
+        "            for raw in all {",
+    ),
+    (
+        "touch-width-setter-does-not-push",
+        "DisplayWidth stored without reaching the runtime, so the panel and "
+        "the property disagree about the display",
+        TOUCH_PANEL,
+        "                storedDisplayWidth = newValue\n"
+        "                push { rt in\n"
+        "                    rt.functions.touchPanelSetDisplayWidth(rt.gameHandle, newValue)\n"
+        "                }",
+        "                storedDisplayWidth = newValue",
+    ),
+    (
+        "touch-height-reads-the-width",
+        "DisplayHeight answering from the width route, so a non-square display "
+        "reports itself square",
+        TOUCH_PANEL,
+        "                ? rt.functions.touchPanelGetDisplayWidth(rt.gameHandle, &value)\n"
+        "                : rt.functions.touchPanelGetDisplayHeight(rt.gameHandle, &value)",
+        "                ? rt.functions.touchPanelGetDisplayWidth(rt.gameHandle, &value)\n"
+        "                : rt.functions.touchPanelGetDisplayWidth(rt.gameHandle, &value)",
+    ),
+    (
+        "touch-gesture-mask-loses-its-bits",
+        "SetEnabledGestures sending an empty mask, so no gesture is ever "
+        "reported however many a caller asked for",
+        TOUCH_PANEL,
+        "                rt.functions.touchPanelSetEnabledGestures(\n"
+        "                    rt.gameHandle, UInt32(bitPattern: value.rawValue)),",
+        "                rt.functions.touchPanelSetEnabledGestures(\n"
+        "                    rt.gameHandle, 0),",
+    ),
     # ---- Foundation 98: the gamer-services component -------------------------
     # WITHDRAWN, both: "gamer-component-initialize-does-nothing" and
     # "gamer-component-update-initialises-instead". Neither is falsifiable
