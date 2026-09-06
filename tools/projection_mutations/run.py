@@ -3065,11 +3065,17 @@ TEST_TIMEOUT_SECONDS = 600
 
 # Compilation parallelism for the inner `swift test`.
 #
-# Three, deliberately. A full run is a few hundred rebuilds back to back, and
-# an unrestricted one saturates the machine for hours -- a desktop session on
-# this host froze under one on 2026-09-05 and had to be restarted. Three keeps
-# a full run to roughly the same wall clock while leaving the machine usable.
-DEFAULT_JOBS = 3
+# The DEFAULT follows the openeggbert build rules, whose Rule 5 says
+# parallelism is not capped and that the old -j3 ceiling existed for a cooling
+# fault repaired on 2026-08-22. This tool is shared, so its default is the
+# project's, not one session's.
+#
+# `--jobs` exists because a full run is a few hundred rebuilds back to back and
+# is one of the "heavy jobs" Rule 5 warns against running concurrently: a
+# desktop session on this host froze under an unrestricted one on 2026-09-05
+# and had to be restarted. A session told to cap itself passes `--jobs 3`,
+# which costs roughly nothing in wall clock and leaves the machine usable.
+DEFAULT_JOBS = os.cpu_count() or 4
 
 
 # A line XCTest writes for a failed assertion or an uncaught error.
