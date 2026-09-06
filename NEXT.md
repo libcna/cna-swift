@@ -1354,6 +1354,81 @@ it opaque.
 `CultureInfo` 21 times; `IDictionary` 12. XNA's own `MathTypeConverter` is the
 shared base of all thirteen and is eight members.
 
+### Foundation 100 did the admission — and it closed the section the other way
+
+`System.dll` `c3182e40…` is admitted. The seven-type closure above is extracted,
+sentinelled and pinned: `BCL_AUTHORITY_ASSEMBLIES=2`, 39 types, 487 members,
+`BCL_SENTINEL_CHECKS=585`. Two side-effects were worth the milestone on their
+own — a real regex defect that only a second assembly could expose (the audit
+read an assembly's own name from the first `.assembly` line, which is
+`.assembly extern mscorlib` in anything that references another), and a gate
+that had never re-run its own BCL report, so `plan.md`'s sentinel count had
+been stale for several Foundations with every gate green.
+
+**And then the admitted authority answered the question it was admitted to
+open, in the negative.** The measurement that does it is two branches long:
+
+```text
+TypeConverter::CanConvertTo(context, t)   ->  t == System.String
+TypeConverter::CanConvertFrom(context, t) ->  t == InstanceDescriptor
+MathTypeConverter::CanConvertTo(ctx, t)   ->  t == InstanceDescriptor, else base
+```
+
+`System.ComponentModel.Design.Serialization.InstanceDescriptor` is not a corner
+case of these converters. It is the **only** destination `MathTypeConverter`
+advertises for itself, and the **only** source the base type accepts — the
+first branch of two of the four capability methods, in the base class every one
+of the thirteen inherits. Note the asymmetry, which is easy to get backwards
+from memory: the base converts *to* a string and *from* a descriptor, not the
+other way round.
+
+An `InstanceDescriptor` is a design-time code-serialization record: a
+`MemberInfo` — in practice the `ConstructorInfo` found by
+`Type.GetConstructor(Type[])` — plus the argument list to pass it, so a form
+designer can emit `new Vector2(1f, 2f)` as source text. Projecting it needs a
+reflection surface Swift does not have: a Swift metatype cannot yield a
+constructor reference selected by parameter-type list, and there is no
+consumer for the record if it could.
+
+So the thirteen are blocked, and the reason is stronger than "design-time IDE
+types unreachable from a running game", which is what this file and `plan.md`
+said before. Either
+
+* `InstanceDescriptor` and a `MemberInfo`/`ConstructorInfo` surface get
+  projected — reflection Swift cannot supply faithfully; or
+* `CanConvertFrom`/`CanConvertTo` answer `false` where XNA answers `true` —
+  which would be this project's **first disagreement** with the pinned
+  metadata. Every one of the 51 diagnostics today is an *absence*. Nothing
+  implemented disagrees, and trading that for thirteen design-time types would
+  be a bad trade made quietly.
+
+The reflection dependency is not confined to that one type either. Measured
+over the IL, all thirteen public converters together reach reflection 318
+times and `InstanceDescriptor` 25 times; the three private `PropertyDescriptor`
+subclasses that `GetProperties` actually returns are reflection wrappers and
+nothing else. Only the private half of that could be hand-written as a static
+descriptor table, because private types are not projected — the public half
+cannot.
+
+**The costing above is therefore superseded, and the earlier claim it rests on
+was mine.** "The thirteen converters are pure managed and need no CNA route at
+all" is true and was never the constraint. They need no *route*; they need a
+*runtime facility*. This is the third time in this file the same lesson is
+recorded, after `TitleContainer` at Foundation 73 and `CultureInfo` at
+Foundation 74: **a signature does not tell you what a member reads.** Here it
+did not even take reading a body — `CanConvertTo` is nine instructions and
+names the blocker in the second one.
+
+Design therefore joins the blocked set as a **fifth** decision, and it is not a
+decision about effort. It is: *is a faithful `InstanceDescriptor` possible in
+Swift, and if not, is answering `false` acceptable?* Only the project owner
+can trade away "nothing disagrees".
+
+The admission is still worth keeping. It is what made the measurement
+authoritative rather than a recollection about a framework, it hardened the
+audit by 143 sentinel checks and 35 mutations, and it is a precondition for
+anything that ever does consume `System.dll`.
+
 ## Rules a next session must not quietly break
 
 **Before the engineering rules, the three standing safety constraints**, which

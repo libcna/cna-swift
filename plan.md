@@ -235,8 +235,15 @@ converters are built from — `TypeConverter`, `ExpandableObjectConverter`,
 `PropertyDescriptorCollection`, 98 members — together with
 `Globalization.CultureInfo` and `Collections.IDictionary` from mscorlib, which
 those signatures reach for. The converters themselves are design-time IDE
-types unreachable from a running game; the admission is what makes projecting
-them possible, not a decision that they will be projected.
+types unreachable from a running game — and the admitted authority then showed
+they are not projectable at all without a disagreement: `MathTypeConverter`
+advertises exactly one conversion target of its own,
+`ComponentModel.Design.Serialization.InstanceDescriptor`, which the base type
+also accepts as its only source. That type is a reflected `ConstructorInfo`
+plus an argument list, for a design-time source emitter. Swift has neither.
+`NEXT.md` records the measurement; the choice between projecting a reflection
+surface and answering `false` where XNA answers `true` is the project owner's,
+because the second trades away "nothing implemented disagrees".
 
 The identity work found a defect worth recording: the audit read an assembly's
 own name with a regex that matched the FIRST `.assembly` line, which in any
