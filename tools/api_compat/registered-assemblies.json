@@ -286,7 +286,7 @@
     {
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "VertexElementOffsetNotMultipleFour",
-      "reason": "VertexElementValidator.Validate raises ArgumentException with this for a vertex stride that is not a multiple of four, and again for an element offset that is not — which is why the one message names both."
+      "reason": "VertexElementValidator.Validate raises ArgumentException with this for a vertex stride that is not a multiple of four, and again for an element offset that is not \u2014 which is why the one message names both."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -387,6 +387,36 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidInstanceStreams",
       "reason": "DrawInstancedPrimitives raises InvalidOperationException with this when the bound bindings are ALL instanced or ALL non-instanced -- it needs per-instance data and per-vertex data, and either extreme supplies only half. Derived from the same cached bindings GetVertexBuffers reads."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "NoCompatibleDevices",
+      "reason": "GraphicsDeviceManager.CreateDevice raises NoSuitableGraphicsDeviceException with this when no adapter supports the requested profile. The message takes the profile name as {0}, so the projection formats it rather than quoting a fixed string."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "NoCompatibleDevicesAfterRanking",
+      "reason": "The second, distinct failure of the same path: adapters were found and then ranked away. XNA reports the two separately and so does this projection."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "TitleCannotBeNull",
+      "reason": "GameWindow.set_Title raises ArgumentNullException with this. Note the two spaces after the full stop -- they are in the assembly, so they are in the message."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidTitleContainerName",
+      "reason": "TitleContainer.OpenStream raises ArgumentException with this for a path that is not a relative URI (Foundation 73)."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenStreamError",
+      "reason": "TitleContainer.OpenStream raises FileNotFoundException with this when the file exists but cannot be opened; {0} is the name."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenStreamNotFound",
+      "reason": "The same path's other half: the file is not there at all. Two messages, two causes, and the projection must not collapse them into one."
     }
   ]
 }

@@ -53,7 +53,7 @@ NATIVE_ABI_MUTATIONS=14 NATIVE_ABI_MUTATIONS_CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
 API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=497
 BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=39  BCL_SENTINEL_CHECKS=585
-RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
+RESOURCE_STRINGS_REPRODUCED=79  ACCESSOR_SELF_TESTS=41
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -1480,6 +1480,44 @@ The self-test that guarded this had asserted *"an underived key must not be
 policed"* — the defect encoded as a passing test. Worth remembering when a
 test looks like it is protecting a behaviour: check that the behaviour is the
 one you want.
+
+### The sweep that found the worst one
+
+Having hit the same defect three times, the right move was to stop finding it
+by accident. Enumerating `docs/generated/` against what the gate regenerates
+showed seven artefacts read but never re-run. One of them mattered a great
+deal.
+
+`pinned-assembly-audit.json` is deterministic given the pinned binaries and
+supplies four derived facts. The committed copy said `CALIBRATION_STATUS: PASS`
+over 73 resource strings. A live run said **FAIL** over 79, with six pinned
+strings it could not extract:
+
+```text
+NoCompatibleDevices  NoCompatibleDevicesAfterRanking  TitleCannotBeNull
+InvalidTitleContainerName  OpenStreamError  OpenStreamNotFound
+```
+
+They were in the pinned reference file and in `Sources/` — `GameWindow`,
+`TitleContainer` and `GraphicsDeviceManager` all raise with them — but they had
+never been entered in `registered-assemblies.json`. The audit therefore
+extracted 73 and compared against 79, and the committed report predated the
+whole discrepancy. **Six user-visible XNA messages were shipping without the
+provenance check this project exists to provide.**
+
+Registering the six settles it: all six extract from the registered binaries
+and every value matches the pinned text exactly, so the messages were right all
+along — `RESOURCE_STRINGS_REPRODUCED` 73 → 79. The point is that nothing was
+checking. Note `TitleCannotBeNull` carries two spaces after its full stop; that
+is what the assembly holds, so that is what the projection says, and only a
+mechanical read keeps such a thing honest.
+
+The audit now regenerates and byte-compares with the rest — ten reports rather
+than nine — proven by dropping one string from the registry and watching the
+gate call the report stale. (Spelled in words, not as a token: this is the
+third time in this file that writing about the gate's own output in
+`KEY=value` form made the gate read it as a claim about the repository. Prose
+about counters, numerals in words.)
 
 One more thing the summary line now says: `STATUS_GATE_REPORTS_SKIPPED`. A
 regeneration nobody asked for is not a regeneration that passed, and a gate

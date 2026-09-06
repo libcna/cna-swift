@@ -570,6 +570,23 @@ def regenerate_and_compare(
             compare(GENERATED / "message-coverage.json", coverage,
                     "tools/api_compat/message_coverage.py")
 
+            # The pinned-assembly audit is deterministic given the pinned
+            # binaries, was READ for four derived facts, and was never re-run:
+            # the committed copy said CALIBRATION_STATUS=PASS over 73 resource
+            # strings while a live run said FAIL over 79. Six user-visible XNA
+            # messages had been pinned and used in Sources/ without being
+            # registered, so nothing checked that they came from the authority.
+            pinned = temporary / "pinned-assembly-audit.json"
+            subprocess.run(
+                [sys.executable, "tools/api_compat/pinned_assembly_audit.py",
+                 "--assembly-dir", str(assembly_dir),
+                 "--il-cache", str(il_cache),
+                 "--output", str(pinned)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(GENERATED / "pinned-assembly-audit.json", pinned,
+                    "tools/api_compat/pinned_assembly_audit.py")
+
             accessors = temporary / "accessor-fallibility.json"
             inventory = temporary / "accessor-fallibility-inventory.md"
             subprocess.run(
