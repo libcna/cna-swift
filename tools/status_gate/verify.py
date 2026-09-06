@@ -619,8 +619,20 @@ Foundation Milestones 1 through 3 are complete. COMPLETE_TYPES=1
 
 Foundation Milestones 1 through 57 are
 complete.
-COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 NATIVE_ABI_MUTATIONS_CAUGHT=999
+COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 EXCUSED_KEY=999
 """
+
+
+def excused_fixture(document: str) -> str:
+    """`EXCUSED_KEY` stands for whatever UNPOLICED_CLAIMS currently excuses.
+
+    Naming a real key here once meant that making that key derivable -- the
+    whole point of the table -- broke every self-test that counts findings
+    exactly. An empty table is the goal, and then the token simply goes away.
+    """
+    if not UNPOLICED_CLAIMS:
+        return document.replace(" EXCUSED_KEY=999", "")
+    return document.replace("EXCUSED_KEY", sorted(UNPOLICED_CLAIMS)[0])
 
 
 def self_test() -> int:
@@ -638,7 +650,7 @@ def self_test() -> int:
     with tempfile.TemporaryDirectory(prefix="cna-status-gate-self-") as raw:
         temporary = Path(raw)
         clean = temporary / "clean.md"
-        clean.write_text(SELF_TEST_DOCUMENT, encoding="utf-8")
+        clean.write_text(excused_fixture(SELF_TEST_DOCUMENT), encoding="utf-8")
         findings, checked, _ = check_document(clean, facts, "clean.md")
         expect(findings == [], f"the clean document must pass, got {findings}")
         expect(checked == 3, f"the clean document must check 3 claims, got {checked}")
@@ -646,7 +658,7 @@ def self_test() -> int:
         # A stale count.
         stale_count = temporary / "count.md"
         stale_count.write_text(
-            SELF_TEST_DOCUMENT.replace("COMPLETE_TYPES=150", "COMPLETE_TYPES=135"),
+            excused_fixture(SELF_TEST_DOCUMENT).replace("COMPLETE_TYPES=150", "COMPLETE_TYPES=135"),
             encoding="utf-8")
         findings, _, _ = check_document(stale_count, facts, "count.md")
         expect(len(findings) == 1 and "COMPLETE_TYPES=135" in findings[0],
@@ -655,7 +667,7 @@ def self_test() -> int:
         # A stale native-ABI count, which is the second class that drifted.
         stale_abi = temporary / "abi.md"
         stale_abi.write_text(
-            SELF_TEST_DOCUMENT.replace("BOUND_FUNCTIONS=87", "BOUND_FUNCTIONS=55"),
+            excused_fixture(SELF_TEST_DOCUMENT).replace("BOUND_FUNCTIONS=87", "BOUND_FUNCTIONS=55"),
             encoding="utf-8")
         findings, _, _ = check_document(stale_abi, facts, "abi.md")
         expect(len(findings) == 1 and "BOUND_FUNCTIONS=55" in findings[0],
@@ -666,7 +678,7 @@ def self_test() -> int:
         # because a line-by-line gate does not see that one at all.
         stale_foundation = temporary / "foundation.md"
         stale_foundation.write_text(
-            SELF_TEST_DOCUMENT.replace(
+            excused_fixture(SELF_TEST_DOCUMENT).replace(
                 "Foundation Milestones 1 through 57 are\ncomplete.",
                 "Foundation Milestones 1 through 47 are\ncomplete."),
             encoding="utf-8")
@@ -680,7 +692,7 @@ def self_test() -> int:
         # the clean document passes either.
         without_markers = temporary / "unmarked.md"
         without_markers.write_text(
-            SELF_TEST_DOCUMENT.replace(HISTORICAL_OPEN, "").replace(HISTORICAL_CLOSE, ""),
+            excused_fixture(SELF_TEST_DOCUMENT).replace(HISTORICAL_OPEN, "").replace(HISTORICAL_CLOSE, ""),
             encoding="utf-8")
         findings, _, _ = check_document(without_markers, facts, "unmarked.md")
         expect(len(findings) == 2,
@@ -692,11 +704,10 @@ def self_test() -> int:
         # the moment rule 11 described the marker.
         names_marker = temporary / "names.md"
         names_marker.write_text(
-            SELF_TEST_DOCUMENT.replace(
-                "COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 NATIVE_ABI_MUTATIONS_CAUGHT=999",
+            excused_fixture(SELF_TEST_DOCUMENT.replace(
+                "COMPLETE_TYPES=150 BOUND_FUNCTIONS=87 EXCUSED_KEY=999",
                 f"prose that mentions `{HISTORICAL_OPEN}` in passing.\n"
-                f"COMPLETE_TYPES=135 BOUND_FUNCTIONS=87 "
-                f"NATIVE_ABI_MUTATIONS_CAUGHT=999"),
+                f"COMPLETE_TYPES=135 BOUND_FUNCTIONS=87 EXCUSED_KEY=999")),
             encoding="utf-8")
         findings, _, _ = check_document(names_marker, facts, "names.md")
         expect(len(findings) == 1 and "COMPLETE_TYPES=135" in findings[0],
@@ -730,8 +741,7 @@ def self_test() -> int:
         # writing why it cannot be derived.
         unpoliced = temporary / "unpoliced.md"
         unpoliced.write_text(
-            SELF_TEST_DOCUMENT.replace(
-                "NATIVE_ABI_MUTATIONS_CAUGHT=999", "UNPOLICED_KEY=1"),
+            SELF_TEST_DOCUMENT.replace("EXCUSED_KEY=999", "UNPOLICED_KEY=1"),
             encoding="utf-8")
         findings, _, count = check_document(unpoliced, facts, "unpoliced.md")
         expect(len(findings) == 1 and "UNPOLICED_KEY" in findings[0],
@@ -739,7 +749,7 @@ def self_test() -> int:
         expect(count == 0, "an unexcused key is not counted as excused")
 
         excused = temporary / "excused.md"
-        excused.write_text(SELF_TEST_DOCUMENT, encoding="utf-8")
+        excused.write_text(excused_fixture(SELF_TEST_DOCUMENT), encoding="utf-8")
         findings, _, count = check_document(excused, facts, "excused.md")
         expect(findings == [],
                "a key listed in UNPOLICED_CLAIMS must not be a finding")
