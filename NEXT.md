@@ -208,6 +208,43 @@ the road is long: this is a per-namespace campaign, not a handful of milestones.
 | The five unwired content loaders | 0 types, 0 members | `ContentManager` landed in Foundation 87 with **one** loader bound, `load_texture2d`, because adopting what the other five produce needs machinery those types do not have yet. Each is unblocked by its own type's milestone, not by content work. |
 | `ContentManager.OpenStream` / `ReadAsset` | 0 types, 2 members | The two protected members Foundation 87 left absent. `OpenStream` returns a `Stream` over an asset this binding never opens itself, and `ReadAsset` takes `Action<IDisposable>`; both wait on decisions about `System.IO` and delegate projection. |
 
+### The XACT family is blocked on a settings file, like `Model` on its `.xnb`
+
+`AudioEngine`, `SoundBank`, `WaveBank`, `Cue` and `AudioCategory` are five of
+the eight audio types still missing, and CNA publishes 52 routes for them --
+but `cna_audio_engine_create` takes *"Path to the `.xgs` settings file"*, and
+`SoundBank` and `WaveBank` take an `.xsb` and an `.xwb`. This repository has
+none, and hand-writing an XACT settings binary would be inventing pinned data,
+which is the one thing this project does not do.
+
+So the family waits on the **same** question the `Model` family waits on: does
+this binding grow a way to produce content, or does it ship fixtures? Answering
+it once unblocks twelve model types and five XACT types together.
+
+### `DynamicSoundEffectInstance` is the next reachable audio type
+
+It is **not** blocked: `cna_dynamic_sound_effect_instance_create` takes a sample
+rate and a channel count, exactly as XNA's constructor does, and all twelve of
+its routes exist including `submit_buffer` and `subscribe_buffer_needed`.
+
+One question is already identified and should not be rediscovered at the
+keyboard. XNA declares `IsLooped` and `Play` on this type **again**, hiding the
+base's with C#'s `new`, and the accessor table shows why they differ: the base's
+`IsLooped` getter is `IL_NO_FAILURE_PATH` while this one is `IL_DIRECT_THROW`
+in **both** directions -- a dynamic instance cannot loop, so reading the
+property refuses rather than answering false.
+
+**Swift has no member hiding, and cannot override an infallible property with a
+fallible one.** So the subclass cannot express either redeclaration. The
+projection has to choose between inheriting the base's members (and losing the
+stricter refusal) and some rule-level exception, and whichever it is has to be
+written down as a language divergence rather than left to look like an
+oversight. `Play` is the easier half: CNA dispatches on the handle, so the
+inherited call reaches the dynamic instance's own behaviour anyway.
+
+`Microphone` stays out of scope. It is the one remaining audio type this
+session will not implement, because it records from a physical device.
+
 ### Foundation 89 — `SoundEffect` and `SoundEffectInstance`
 
 Two audio types, thirty-five routes, and **no asset**:
