@@ -50,6 +50,7 @@ PICTURE = ROOT / "Sources/CNA/Xna/Media/PictureEntities.swift"
 MEDIA_SOURCE = ROOT / "Sources/CNA/Xna/Media/MediaSource.swift"
 MEDIA_PLAYER = ROOT / "Sources/CNA/Xna/Media/MediaPlayer.swift"
 MEDIA_QUEUE = ROOT / "Sources/CNA/Xna/Media/MediaQueue.swift"
+VIDEO_PLAYER = ROOT / "Sources/CNA/Xna/Media/VideoPlayer.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -133,6 +134,43 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 97: the video player ------------------------------------
+    (
+        "video-play-accepts-a-handleless-video",
+        "Play passing a zero handle to the ABI for a video built from values, "
+        "instead of saying it cannot be played",
+        VIDEO_PLAYER,
+        "            guard video.handle != 0 else {",
+        "            if false {",
+    ),
+    (
+        "video-texture-invented",
+        "GetTexture building a texture from an out-parameter CNA never wrote, "
+        "because nothing is playing",
+        VIDEO_PLAYER,
+        "            guard available != 0 else {\n"
+        "                throw CNAError.nativeFailure(\n"
+        "                    operation: \"VideoPlayer.GetTexture\", result: 1,",
+        "            if false {\n"
+        "                throw CNAError.nativeFailure(\n"
+        "                    operation: \"VideoPlayer.GetTexture\", result: 1,",
+    ),
+    (
+        "video-looped-writer-does-not-reach-the-runtime",
+        "SetIsLooped accepted without reaching CNA, so the flag a caller sets "
+        "and the flag the getter answers disagree",
+        VIDEO_PLAYER,
+        "                runtime.functions.videoPlayerSetIsLooped(live, value ? 1 : 0),",
+        "                runtime.functions.videoPlayerSetIsLooped(live, 0),",
+    ),
+    (
+        "video-volume-reads-the-mute-flag",
+        "Volume answering from the mute route, so a muted player reports a "
+        "volume of one and an unmuted one reports zero",
+        VIDEO_PLAYER,
+        "            guard runtime.functions.videoPlayerGetVolume(handle, &value) == 0",
+        "            guard runtime.functions.videoPlayerGetVolume(handle, &value) == 1",
+    ),
     # ---- Foundation 96: the media player ------------------------------------
     # WITHDRAWN: "player-play-index-overload-ignores-its-index" -- the
     # three-argument Play discarding its index. Reaching it needs a

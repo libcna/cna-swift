@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "profile": "messages reachable from implemented members",
   "summary": {
-    "MESSAGE_COVERAGE_TYPES": 216,
+    "MESSAGE_COVERAGE_TYPES": 217,
     "RESOLVED_TYPES": 203,
-    "UNRESOLVED_TYPES": 13,
+    "UNRESOLVED_TYPES": 14,
     "STRING_TABLES_READ": 2,
     "MEMBERS_READ": 1935,
     "MESSAGES_REPRODUCED": 402,
@@ -26,6 +26,7 @@
     "Microsoft.Xna.Framework.Input.Touch.TouchLocationState",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities",
     "Microsoft.Xna.Framework.Media.Video",
+    "Microsoft.Xna.Framework.Media.VideoPlayer",
     "Microsoft.Xna.Framework.Media.VideoSoundtrackType",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ]

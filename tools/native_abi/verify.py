@@ -227,6 +227,9 @@ def canonical_type(value: str) -> str:
         "CNA_MediaSourceType": "uint32_t",
         "CNA_MediaState": "uint32_t",
         "CNA_MediaQueueHandle": "uint64_t",
+        "CNA_VideoHandle": "uint64_t",
+        "CNA_VideoPlayerHandle": "uint64_t",
+        "CNA_VideoSoundtrackType": "uint32_t",
         "CNA_MediaPlayerEventRegistrationHandle": "uint64_t",
         # effects.h gives every effect object its own handle alias, and two
         # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,

@@ -24,12 +24,12 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-920 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=54   COMPLETE_TYPES=210   PARTIAL_TYPES=6
-MISSING_TYPE=41  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
+924 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=53   COMPLETE_TYPES=211   PARTIAL_TYPES=6
+MISSING_TYPE=40  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=573  PROTOTYPE_TYPE_POSITIONS=1941  LAYOUTS=60  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=367 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=596  PROTOTYPE_TYPE_POSITIONS=2007  LAYOUTS=60  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=371 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -451,6 +451,32 @@ flag needs an empty queue the suite cannot arrange.
 The ABI gate's struct parser learned one thing too: an array bound may be a
 **macro** rather than a literal, which `CNA_VisualizationData` is the first to
 use.
+
+### Foundation 97 — `VideoPlayer`, and the Media namespace is complete
+
+**All nineteen Media types are projected**, from `Song` to `VideoPlayer`. The
+namespace went from entirely absent to entirely present in six milestones, and
+the thing that made it possible was measured at the start: Media needs no asset
+where XACT and `Model` do.
+
+`Video` now carries a **handle as well as its values**, and both shapes are
+real. XNA's videos come out of a content pipeline this binding cannot load, so
+the value-built form is what the type was; a player answers a handle and
+`Play` needs one back, so a video that came from a player carries it. A
+value-built one **cannot** be played, and that is said in the refusal rather
+than passed to the ABI as a zero.
+
+`VideoPlayer` is also the only Media type that reaches back into Graphics:
+`GetTexture` answers the current frame as a `Texture2D`, adopted through the
+same path `Texture2D.fromStream` uses. With nothing playing there is no frame,
+and CNA reports that with an availability flag -- so the absence is reported
+rather than a texture built from an out-parameter nobody wrote.
+
+**The mutation harness earned its keep again.** `PROJECTION_MUTATION_BASELINE=RED`
+came back twice, and this time it was not the flake recorded earlier: the
+manifest count in `NativeABIPolicyTests` was one short of the routes actually
+bound. A filtered `swift test` had not run that suite. Two identical RED
+baselines in a row are a real failure; one is worth re-running first.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 

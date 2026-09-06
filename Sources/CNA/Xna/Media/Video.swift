@@ -45,6 +45,55 @@ extension Microsoft.Xna.Framework.Media {
             self.height = height
             self.framesPerSecond = framesPerSecond
             self.soundtrackType = soundtrackType
+            self.handle = 0
+        }
+
+        /// The native handle a video carries when it came from a player, and
+        /// `0` when it was built from values.
+        ///
+        /// **Both shapes exist because both are real.** XNA's `Video` comes out
+        /// of a content pipeline and this binding cannot load one, so the
+        /// value-built form is what the type was until `VideoPlayer` arrived.
+        /// A player answers a *handle*, and `VideoPlayer.Play` needs one back,
+        /// so a video that came from a player carries it -- and a value-built
+        /// one cannot be played, which is stated rather than crashed on.
+        internal let handle: UInt64
+
+        /// Adopts the video a player is holding, reading every published value
+        /// from the runtime rather than echoing anything.
+        internal init(adopting handle: UInt64, runtime: RuntimeState) throws {
+            self.handle = handle
+            var ticks: Int64 = 0
+            try runtime.functions.check(
+                runtime.functions.videoGetDuration(handle, &ticks),
+                operation: "cna_video_get_duration")
+            duration = Microsoft.Xna.Framework.Audio.SoundEffect
+                .duration(fromTicks: ticks)
+            var value: Int32 = 0
+            try runtime.functions.check(
+                runtime.functions.videoGetWidth(handle, &value),
+                operation: "cna_video_get_width")
+            width = value
+            try runtime.functions.check(
+                runtime.functions.videoGetHeight(handle, &value),
+                operation: "cna_video_get_height")
+            height = value
+            var fps: Float = 0
+            try runtime.functions.check(
+                runtime.functions.videoGetFramesPerSecond(handle, &fps),
+                operation: "cna_video_get_frames_per_second")
+            framesPerSecond = fps
+            var raw: UInt32 = 0
+            try runtime.functions.check(
+                runtime.functions.videoGetSoundtrackType(handle, &raw),
+                operation: "cna_video_get_soundtrack_type")
+            guard let type = Microsoft.Xna.Framework.Media.VideoSoundtrackType(
+                rawValue: Int32(bitPattern: raw)) else {
+                throw CNAError.nativeFailure(
+                    operation: "Video.VideoSoundtrackType", result: 1,
+                    message: "native soundtrack type \(raw) is not an XNA VideoSoundtrackType")
+            }
+            soundtrackType = type
         }
 
         public var Duration: Swift.Duration { duration }

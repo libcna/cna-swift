@@ -380,6 +380,29 @@ internal final class NativeFunctions {
     typealias MediaPlayerSubscribeActiveSongChangedExtRoute = @convention(c) (CNASwift_MediaPlayerEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaPlayerSubscribeMediaStateChangedExtRoute = @convention(c) (CNASwift_MediaPlayerEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaPlayerUnsubscribeExtRoute = @convention(c) (UInt64) -> UInt32
+    typealias VideoPlayerCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias VideoPlayerDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias VideoPlayerDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias VideoPlayerGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias VideoPlayerPlayRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias VideoPlayerPauseRoute = @convention(c) (UInt64) -> UInt32
+    typealias VideoPlayerResumeRoute = @convention(c) (UInt64) -> UInt32
+    typealias VideoPlayerStopRoute = @convention(c) (UInt64) -> UInt32
+    typealias VideoPlayerGetVideoRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias VideoPlayerGetTextureRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias VideoPlayerGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias VideoPlayerGetPlayPositionTicksRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias VideoPlayerGetIsLoopedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias VideoPlayerSetIsLoopedRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias VideoPlayerGetIsMutedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias VideoPlayerSetIsMutedRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias VideoPlayerGetVolumeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias VideoPlayerSetVolumeRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias VideoGetDurationRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias VideoGetWidthRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias VideoGetHeightRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias VideoGetFramesPerSecondRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias VideoGetSoundtrackTypeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -749,6 +772,29 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let videoPlayerCreate: VideoPlayerCreateRoute
+    let videoPlayerDispose: VideoPlayerDisposeRoute
+    let videoPlayerDestroy: VideoPlayerDestroyRoute
+    let videoPlayerGetIsDisposed: VideoPlayerGetIsDisposedRoute
+    let videoPlayerPlay: VideoPlayerPlayRoute
+    let videoPlayerPause: VideoPlayerPauseRoute
+    let videoPlayerResume: VideoPlayerResumeRoute
+    let videoPlayerStop: VideoPlayerStopRoute
+    let videoPlayerGetVideo: VideoPlayerGetVideoRoute
+    let videoPlayerGetTexture: VideoPlayerGetTextureRoute
+    let videoPlayerGetState: VideoPlayerGetStateRoute
+    let videoPlayerGetPlayPositionTicks: VideoPlayerGetPlayPositionTicksRoute
+    let videoPlayerGetIsLooped: VideoPlayerGetIsLoopedRoute
+    let videoPlayerSetIsLooped: VideoPlayerSetIsLoopedRoute
+    let videoPlayerGetIsMuted: VideoPlayerGetIsMutedRoute
+    let videoPlayerSetIsMuted: VideoPlayerSetIsMutedRoute
+    let videoPlayerGetVolume: VideoPlayerGetVolumeRoute
+    let videoPlayerSetVolume: VideoPlayerSetVolumeRoute
+    let videoGetDuration: VideoGetDurationRoute
+    let videoGetWidth: VideoGetWidthRoute
+    let videoGetHeight: VideoGetHeightRoute
+    let videoGetFramesPerSecond: VideoGetFramesPerSecondRoute
+    let videoGetSoundtrackType: VideoGetSoundtrackTypeRoute
     let mediaQueueGetCount: MediaQueueGetCountRoute
     let mediaQueueGetActiveSongIndex: MediaQueueGetActiveSongIndexRoute
     let mediaQueueSetActiveSongIndex: MediaQueueSetActiveSongIndexRoute
@@ -1350,6 +1396,29 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        videoPlayerCreate = try library.resolve("cna_video_player_create", as: VideoPlayerCreateRoute.self)
+        videoPlayerDispose = try library.resolve("cna_video_player_dispose", as: VideoPlayerDisposeRoute.self)
+        videoPlayerDestroy = try library.resolve("cna_video_player_destroy", as: VideoPlayerDestroyRoute.self)
+        videoPlayerGetIsDisposed = try library.resolve("cna_video_player_get_is_disposed", as: VideoPlayerGetIsDisposedRoute.self)
+        videoPlayerPlay = try library.resolve("cna_video_player_play", as: VideoPlayerPlayRoute.self)
+        videoPlayerPause = try library.resolve("cna_video_player_pause", as: VideoPlayerPauseRoute.self)
+        videoPlayerResume = try library.resolve("cna_video_player_resume", as: VideoPlayerResumeRoute.self)
+        videoPlayerStop = try library.resolve("cna_video_player_stop", as: VideoPlayerStopRoute.self)
+        videoPlayerGetVideo = try library.resolve("cna_video_player_get_video", as: VideoPlayerGetVideoRoute.self)
+        videoPlayerGetTexture = try library.resolve("cna_video_player_get_texture", as: VideoPlayerGetTextureRoute.self)
+        videoPlayerGetState = try library.resolve("cna_video_player_get_state", as: VideoPlayerGetStateRoute.self)
+        videoPlayerGetPlayPositionTicks = try library.resolve("cna_video_player_get_play_position_ticks", as: VideoPlayerGetPlayPositionTicksRoute.self)
+        videoPlayerGetIsLooped = try library.resolve("cna_video_player_get_is_looped", as: VideoPlayerGetIsLoopedRoute.self)
+        videoPlayerSetIsLooped = try library.resolve("cna_video_player_set_is_looped", as: VideoPlayerSetIsLoopedRoute.self)
+        videoPlayerGetIsMuted = try library.resolve("cna_video_player_get_is_muted", as: VideoPlayerGetIsMutedRoute.self)
+        videoPlayerSetIsMuted = try library.resolve("cna_video_player_set_is_muted", as: VideoPlayerSetIsMutedRoute.self)
+        videoPlayerGetVolume = try library.resolve("cna_video_player_get_volume", as: VideoPlayerGetVolumeRoute.self)
+        videoPlayerSetVolume = try library.resolve("cna_video_player_set_volume", as: VideoPlayerSetVolumeRoute.self)
+        videoGetDuration = try library.resolve("cna_video_get_duration", as: VideoGetDurationRoute.self)
+        videoGetWidth = try library.resolve("cna_video_get_width", as: VideoGetWidthRoute.self)
+        videoGetHeight = try library.resolve("cna_video_get_height", as: VideoGetHeightRoute.self)
+        videoGetFramesPerSecond = try library.resolve("cna_video_get_frames_per_second", as: VideoGetFramesPerSecondRoute.self)
+        videoGetSoundtrackType = try library.resolve("cna_video_get_soundtrack_type", as: VideoGetSoundtrackTypeRoute.self)
         mediaQueueGetCount = try library.resolve("cna_media_queue_get_count", as: MediaQueueGetCountRoute.self)
         mediaQueueGetActiveSongIndex = try library.resolve("cna_media_queue_get_active_song_index", as: MediaQueueGetActiveSongIndexRoute.self)
         mediaQueueSetActiveSongIndex = try library.resolve("cna_media_queue_set_active_song_index", as: MediaQueueSetActiveSongIndexRoute.self)
