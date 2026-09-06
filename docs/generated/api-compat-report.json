@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 192,
-    "TARGET_MEMBERS": 2374,
-    "TOTAL_DIAGNOSTICS": 85,
+    "TARGET_MEMBERS": 2383,
+    "TOTAL_DIAGNOSTICS": 76,
     "COMPLETE_TYPES": 188,
     "PARTIAL_TYPES": 4,
     "MISSING_TYPES": 65,
     "MISSING_TYPE": 65,
-    "MISSING_MEMBER": 17,
+    "MISSING_MEMBER": 8,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -552,51 +552,6 @@
     {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T])",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose(_:Bool)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.IsDisposed()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Disposing()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceDestroyed()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceCreated()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceLost()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceReset()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceResetting()",
       "detail": "mapped member is absent"
     },
     {
@@ -11163,7 +11118,7 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 42,
+      "targetMembers": 51,
       "diagnostics": [
         {
           "category": "MISSING_MEMBER",
@@ -11193,51 +11148,6 @@
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T])",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose(_:Bool)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Dispose()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.IsDisposed()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.Disposing()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceDestroyed()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.ResourceCreated()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceLost()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceReset()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceResetting()",
           "detail": "mapped member is absent"
         }
       ]

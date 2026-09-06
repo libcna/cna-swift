@@ -119,6 +119,25 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 84: device disposal and its events ---------------------
+    (
+        "dispose-swallows-the-refusal",
+        "Dispose reporting success where CNA refuses, so a caller believes the "
+        "device was released while the game still draws into it",
+        DEVICE,
+        "                runtime.functions.graphicsDeviceDispose(handle),\n"
+        "                operation: \"cna_graphics_device_dispose\")",
+        "                0,\n"
+        "                operation: \"cna_graphics_device_dispose\")",
+    ),
+    (
+        "is-disposed-answers-yes-while-live",
+        "a live facade reporting itself disposed, which would make every "
+        "guarded member look unusable",
+        DEVICE,
+        "        public var IsDisposed: Bool { runtime.generation != generation }",
+        "        public var IsDisposed: Bool { runtime.generation == generation }",
+    ),
     # ---- Foundation 83: FindBestDevice -------------------------------------
     # WITHDRAWN: "find-best-restores-the-multisampling-flag" -- undoing the
     # destructive retry.

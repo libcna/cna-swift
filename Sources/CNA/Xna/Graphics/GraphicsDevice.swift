@@ -14,6 +14,14 @@ extension Microsoft.Xna.Framework.Graphics {
         private let handle: UInt64
         private let runtime: RuntimeState
         private let generation: UInt64
+        private let disposingSource = CNAEventSource<CNAEventArgs>()
+        private let deviceLostSource = CNAEventSource<CNAEventArgs>()
+        private let deviceResetSource = CNAEventSource<CNAEventArgs>()
+        private let deviceResettingSource = CNAEventSource<CNAEventArgs>()
+        private let resourceCreatedSource = CNAEventSource<
+            Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs>()
+        private let resourceDestroyedSource = CNAEventSource<
+            Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs>()
         private let callbackEpoch: UInt64
 
         /// Wraps a device handle the graphics device manager handed out.
@@ -734,7 +742,78 @@ extension Microsoft.Xna.Framework.Graphics {
             }
         }
 
-        /// `GraphicsDevice.Present()`.
+/// `GraphicsDevice.IsDisposed`.
+        ///
+        /// Seven bytes of `ldfld isDisposed`, pinned infallible — so this may
+        /// not throw and may not call a route.
+        ///
+        /// **The facade's generation is the answer.** This binding's device is
+        /// a per-callback facade over a handle the runtime owns; the device is
+        /// disposed exactly when the game that owned it is gone, which is what
+        /// a stale generation already means here. Asking
+        /// `cna_graphics_device_get_is_disposed` would need a handle that is by
+        /// then invalid, and the getter could not report the failure anyway.
+        public var IsDisposed: Bool { runtime.generation != generation }
+
+        /// `GraphicsDevice.Dispose()` and `Dispose(Boolean)`.
+        ///
+        /// **They refuse, and that is CNA's design rather than a gap.** The
+        /// route exists precisely to say so: *"Reports that C cannot dispose
+        /// the graphics device owned by the active game"*, answering
+        /// `CNA_RESULT_NOT_SUPPORTED` for a valid handle, because *"disposing
+        /// it through a borrowed handle would leave that game drawing into a
+        /// destroyed device"*. Canonical disposal is `cna_game_destroy`, which
+        /// is `Game.Dispose`'s business and not this type's.
+        ///
+        /// XNA's own `Dispose()` is `Dispose(true); GC.SuppressFinalize(this)`
+        /// and does not throw. This one does, and the refusal is deliberate: a
+        /// `Dispose` that silently did nothing would leave a caller believing
+        /// the device was released. An honest failure is the better half of
+        /// that trade, and it is the only half this runtime allows.
+        public func Dispose() throws {
+            try Dispose(true)
+        }
+
+        /// `protected virtual void Dispose(Boolean disposing)`.
+        ///
+        /// XNA branches on `disposing` to pick the destructor or the finalizer;
+        /// both end at the same native teardown, and neither is reachable here,
+        /// so the argument changes nothing and the route is asked either way.
+        open func Dispose(_ disposing: Bool) throws {
+            let handle = try validatedHandle("GraphicsDevice.Dispose")
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceDispose(handle),
+                operation: "cna_graphics_device_dispose")
+        }
+
+        /// The six events `GraphicsDevice` declares.
+        ///
+        /// Four carry `EventArgs`; `ResourceCreated` and `ResourceDestroyed`
+        /// carry their own payloads, which is why they need their own sources.
+        ///
+        /// **Nothing on this host raises them.** XNA's are raised by the
+        /// platform when a device is lost, reset or torn down, and by every
+        /// resource as it is created or destroyed. CNA publishes no
+        /// subscription for any of that, so a handler added here fires only if
+        /// a consumer raises it. That is a stated absence rather than a
+        /// pretence: the events exist because the surface has them, and the
+        /// raisers are the honest way to reach them.
+        public var Disposing: CNAEvent<CNAEventArgs> { disposingSource.Event }
+        public var DeviceLost: CNAEvent<CNAEventArgs> { deviceLostSource.Event }
+        public var DeviceReset: CNAEvent<CNAEventArgs> { deviceResetSource.Event }
+        public var DeviceResetting: CNAEvent<CNAEventArgs> {
+            deviceResettingSource.Event
+        }
+        public var ResourceCreated:
+            CNAEvent<Microsoft.Xna.Framework.Graphics.ResourceCreatedEventArgs> {
+            resourceCreatedSource.Event
+        }
+        public var ResourceDestroyed:
+            CNAEvent<Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs> {
+            resourceDestroyedSource.Event
+        }
+
+                /// `GraphicsDevice.Present()`.
         ///
         /// Foundation 60 measured this route as accepted and nobody built the
         /// member for fourteen milestones.
