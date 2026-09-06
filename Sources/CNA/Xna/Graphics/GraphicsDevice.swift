@@ -14,6 +14,10 @@ extension Microsoft.Xna.Framework.Graphics {
         private let handle: UInt64
         private let runtime: RuntimeState
         private let generation: UInt64
+        /// True only for a device this binding created, which is the one
+        /// kind CNA lets a caller destroy.
+        private let callerCreated: Bool
+        private var callerCreatedDisposed = false
         private let disposingSource = CNAEventSource<CNAEventArgs>()
         private let deviceLostSource = CNAEventSource<CNAEventArgs>()
         private let deviceResetSource = CNAEventSource<CNAEventArgs>()
@@ -35,11 +39,43 @@ extension Microsoft.Xna.Framework.Graphics {
             self.init(handle: borrowedHandle, runtime: runtime)
         }
 
-        private init(handle: UInt64, runtime: RuntimeState) {
+        private init(handle: UInt64, runtime: RuntimeState,
+                     callerCreated: Bool = false) {
             self.handle = handle
             self.runtime = runtime
+            self.callerCreated = callerCreated
             generation = runtime.generation
             callbackEpoch = runtime.callbackEpoch
+        }
+
+        /// `GraphicsDevice(GraphicsAdapter adapter, GraphicsProfile
+        /// graphicsProfile, PresentationParameters presentationParameters)`.
+        ///
+        /// **A caller-created device is a different thing from the game's**,
+        /// and CNA says so in both directions: `cna_graphics_device_create`
+        /// hands back an OWNED handle, and `cna_graphics_device_destroy`
+        /// accepts only such a handle while refusing a game's borrowed one.
+        /// Resources remember which device made them, and mixing one device's
+        /// resource into another's call is refused whichever pair it is.
+        ///
+        /// So this constructor exists and works, where `Dispose` on the game's
+        /// device does not — the two are not in tension, they are the two
+        /// halves of one ownership rule.
+        public convenience init(
+            adapter: Microsoft.Xna.Framework.Graphics.GraphicsAdapter,
+            graphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile,
+            presentationParameters:
+                Microsoft.Xna.Framework.Graphics.PresentationParameters
+        ) throws {
+            let runtime = try RuntimeRegistry.current()
+            var native = presentationParameters.nativeDescriptor()
+            var created: UInt64 = 0
+            try runtime.functions.check(
+                runtime.functions.graphicsDeviceCreate(
+                    adapter.adapterIndex, UInt32(graphicsProfile.rawValue),
+                    &native, &created),
+                operation: "cna_graphics_device_create")
+            self.init(handle: created, runtime: runtime, callerCreated: true)
         }
 
         /// Reads the device's own `GraphicsProfile` once and caches it.
@@ -753,7 +789,11 @@ extension Microsoft.Xna.Framework.Graphics {
         /// a stale generation already means here. Asking
         /// `cna_graphics_device_get_is_disposed` would need a handle that is by
         /// then invalid, and the getter could not report the failure anyway.
-        public var IsDisposed: Bool { runtime.generation != generation }
+        public var IsDisposed: Bool {
+            callerCreated
+                ? callerCreatedDisposed
+                : runtime.generation != generation
+        }
 
         /// `GraphicsDevice.Dispose()` and `Dispose(Boolean)`.
         ///
@@ -780,10 +820,23 @@ extension Microsoft.Xna.Framework.Graphics {
         /// both end at the same native teardown, and neither is reachable here,
         /// so the argument changes nothing and the route is asked either way.
         open func Dispose(_ disposing: Bool) throws {
+            guard callerCreated else {
+                // The game's device: the route exists to refuse, and it does.
+                let handle = try validatedHandle("GraphicsDevice.Dispose")
+                try runtime.functions.check(
+                    runtime.functions.graphicsDeviceDispose(handle),
+                    operation: "cna_graphics_device_dispose")
+                return
+            }
+            // A device this binding created is ours to release, and releasing
+            // it twice is not an error -- XNA's Dispose is idempotent and so
+            // is this.
+            guard !callerCreatedDisposed else { return }
             let handle = try validatedHandle("GraphicsDevice.Dispose")
             try runtime.functions.check(
-                runtime.functions.graphicsDeviceDispose(handle),
-                operation: "cna_graphics_device_dispose")
+                runtime.functions.graphicsDeviceDestroy(handle),
+                operation: "cna_graphics_device_destroy")
+            callerCreatedDisposed = true
         }
 
         /// The six events `GraphicsDevice` declares.

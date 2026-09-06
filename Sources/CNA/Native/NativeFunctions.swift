@@ -349,6 +349,8 @@ internal final class NativeFunctions {
     typealias EffectAnnotationCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias EffectAnnotationCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias GraphicsDeviceClearOptionsRoute = @convention(c) (UInt64, UInt32, CNASwift_Color, Float, Int32) -> UInt32
+    typealias GraphicsDeviceCreateRoute = @convention(c) (UInt32, UInt32, UnsafePointer<CNASwift_PresentationParameters>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsDeviceDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias GraphicsDeviceDisposeRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDevicePresentRoute = @convention(c) (UInt64) -> UInt32
@@ -703,6 +705,8 @@ internal final class NativeFunctions {
     let effectAnnotationCollectionGetCount: EffectAnnotationCollectionGetCountRoute
     let effectAnnotationCollectionGetAt: EffectAnnotationCollectionGetAtRoute
     let graphicsDeviceClearOptions: GraphicsDeviceClearOptionsRoute
+    let graphicsDeviceCreate: GraphicsDeviceCreateRoute
+    let graphicsDeviceDestroy: GraphicsDeviceDestroyRoute
     let graphicsDeviceGetIsDisposed: GraphicsDeviceGetIsDisposedRoute
     let graphicsDeviceDispose: GraphicsDeviceDisposeRoute
     let graphicsDevicePresent: GraphicsDevicePresentRoute
@@ -1077,6 +1081,8 @@ internal final class NativeFunctions {
         effectAnnotationCollectionGetCount = try library.resolve("cna_effect_annotation_collection_get_count", as: EffectAnnotationCollectionGetCountRoute.self)
         effectAnnotationCollectionGetAt = try library.resolve("cna_effect_annotation_collection_get_at", as: EffectAnnotationCollectionGetAtRoute.self)
         graphicsDeviceClearOptions = try library.resolve("cna_graphics_device_clear_options", as: GraphicsDeviceClearOptionsRoute.self)
+        graphicsDeviceCreate = try library.resolve("cna_graphics_device_create", as: GraphicsDeviceCreateRoute.self)
+        graphicsDeviceDestroy = try library.resolve("cna_graphics_device_destroy", as: GraphicsDeviceDestroyRoute.self)
         graphicsDeviceGetIsDisposed = try library.resolve("cna_graphics_device_get_is_disposed", as: GraphicsDeviceGetIsDisposedRoute.self)
         graphicsDeviceDispose = try library.resolve("cna_graphics_device_dispose", as: GraphicsDeviceDisposeRoute.self)
         graphicsDevicePresent = try library.resolve("cna_graphics_device_present", as: GraphicsDevicePresentRoute.self)

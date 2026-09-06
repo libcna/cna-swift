@@ -27,6 +27,27 @@ final class Foundation84DeviceDisposalTests: XCTestCase {
                        "the runtime's own diagnosis reaches the caller")
     }
 
+    /// **A caller-created device is a different thing, and both halves of the
+    /// ownership rule are asserted together.**
+    ///
+    /// `cna_graphics_device_create` hands back an OWNED handle;
+    /// `cna_graphics_device_destroy` accepts only such a handle and refuses a
+    /// game's borrowed one. So the constructor works where `Dispose` on the
+    /// game's device does not — those are not in tension, they are one rule
+    /// seen from two sides.
+    func testACallerCreatedDeviceIsCreatedAndDisposed() throws {
+        let game = try DisposalProbeGame(createOwnDevice: true)
+        try game.Run()
+        if let failure = game.failure { throw failure }
+
+        XCTAssertEqual(game.ownDeviceCreated, true, "the constructor works")
+        XCTAssertEqual(game.ownDeviceDisposedBefore, false)
+        XCTAssertEqual(game.ownDeviceDisposedAfter, true,
+                       "and disposing it succeeds, unlike the game's")
+        XCTAssertEqual(game.secondDisposeThrew, false,
+                       "a second Dispose is idempotent, as XNA's is")
+    }
+
     /// **The three-argument `Present` refuses rather than silently widening.**
     ///
     /// CNA's only presentation route takes a game handle and nothing else, so a
@@ -90,6 +111,7 @@ final class Foundation84DeviceDisposalTests: XCTestCase {
 private final class DisposalProbeGame: Microsoft.Xna.Framework.Game {
     let addHandlers: Bool
     let exercisePresent: Bool
+    let createOwnDevice: Bool
     var manager: Microsoft.Xna.Framework.GraphicsDeviceManager?
     var failure: Error?
     var disposeFailure: Error?
@@ -98,10 +120,16 @@ private final class DisposalProbeGame: Microsoft.Xna.Framework.Game {
     var payloadShapes: [String] = []
     var defaultsAccepted: Bool?
     var presentRefusals: [(String, Error)] = []
+    var ownDeviceCreated: Bool?
+    var ownDeviceDisposedBefore: Bool?
+    var ownDeviceDisposedAfter: Bool?
+    var secondDisposeThrew: Bool?
 
-    init(addHandlers: Bool = false, exercisePresent: Bool = false) throws {
+    init(addHandlers: Bool = false, exercisePresent: Bool = false,
+         createOwnDevice: Bool = false) throws {
         self.addHandlers = addHandlers
         self.exercisePresent = exercisePresent
+        self.createOwnDevice = createOwnDevice
         try super.init()
         manager = try Microsoft.Xna.Framework.GraphicsDeviceManager(game: self)
     }
@@ -113,6 +141,25 @@ private final class DisposalProbeGame: Microsoft.Xna.Framework.Game {
             wasDisposed = device.IsDisposed
             do { try device.Dispose() } catch { disposeFailure = error }
 
+            if createOwnDevice {
+                guard let adapter = device.Adapter,
+                      let parameters = device.PresentationParameters else { return }
+                let own = try Microsoft.Xna.Framework.Graphics.GraphicsDevice(
+                    adapter: adapter,
+                    graphicsProfile: device.GraphicsProfile,
+                    presentationParameters: parameters)
+                ownDeviceCreated = true
+                ownDeviceDisposedBefore = own.IsDisposed
+                try own.Dispose()
+                ownDeviceDisposedAfter = own.IsDisposed
+                do {
+                    try own.Dispose()
+                    secondDisposeThrew = false
+                } catch {
+                    secondDisposeThrew = true
+                }
+                return
+            }
             if exercisePresent {
                 try device.Present(nil, destinationRectangle: nil,
                                    overrideWindowHandle: 0)

@@ -12,13 +12,13 @@
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
     "TARGET_TYPES": 192,
-    "TARGET_MEMBERS": 2384,
-    "TOTAL_DIAGNOSTICS": 74,
+    "TARGET_MEMBERS": 2385,
+    "TOTAL_DIAGNOSTICS": 73,
     "COMPLETE_TYPES": 188,
     "PARTIAL_TYPES": 4,
     "MISSING_TYPES": 65,
     "MISSING_TYPE": 65,
-    "MISSING_MEMBER": 7,
+    "MISSING_MEMBER": 6,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -523,11 +523,6 @@
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)",
-      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_MEMBER",
@@ -11108,13 +11103,8 @@
       "type": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "status": "PARTIAL",
       "expectedMembers": 56,
-      "targetMembers": 52,
+      "targetMembers": 53,
       "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)",
-          "detail": "mapped member is absent"
-        },
         {
           "category": "MISSING_MEMBER",
           "subject": "Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)",

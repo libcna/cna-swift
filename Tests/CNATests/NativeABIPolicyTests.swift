@@ -72,7 +72,7 @@ final class NativeABIPolicyTests: XCTestCase {
     func testManifestRoutesAreDistinctAndDerivable() {
         // The count is asserted so a route cannot be added without a
         // deliberate edit here; the three checks below are what actually hold.
-        XCTAssertEqual(nativeManifest.count, 346)
+        XCTAssertEqual(nativeManifest.count, 348)
         XCTAssertEqual(Set(nativeManifest.map(\.symbol)).count, nativeManifest.count)
         XCTAssertEqual(Set(nativeManifest.map(\.swiftField)).count, nativeManifest.count)
         XCTAssertEqual(Set(nativeManifest.map(\.routeType)).count, nativeManifest.count)

@@ -119,6 +119,27 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 86: the device ownership rule --------------------------
+    (
+        "own-device-disposed-through-the-refusing-route",
+        "a caller-created device released through the route that only accepts "
+        "a game's borrowed handle, so releasing it fails",
+        DEVICE,
+        "                runtime.functions.graphicsDeviceDestroy(handle),\n"
+        "                operation: \"cna_graphics_device_destroy\")",
+        "                runtime.functions.graphicsDeviceDispose(handle),\n"
+        "                operation: \"cna_graphics_device_destroy\")",
+    ),
+    (
+        "own-device-never-reports-itself-disposed",
+        "a caller-created device answering the game device's staleness test, "
+        "so it never reports disposed",
+        DEVICE,
+        "            callerCreated\n"
+        "                ? callerCreatedDisposed\n"
+        "                : runtime.generation != generation",
+        "            runtime.generation != generation",
+    ),
     # ---- Foundation 85: Present's refused arguments ------------------------
     (
         "present-widens-a-sub-rectangle",
@@ -135,18 +156,18 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "Dispose reporting success where CNA refuses, so a caller believes the "
         "device was released while the game still draws into it",
         DEVICE,
-        "                runtime.functions.graphicsDeviceDispose(handle),\n"
-        "                operation: \"cna_graphics_device_dispose\")",
-        "                0,\n"
-        "                operation: \"cna_graphics_device_dispose\")",
+        "                    runtime.functions.graphicsDeviceDispose(handle),\n"
+        "                    operation: \"cna_graphics_device_dispose\")",
+        "                    0,\n"
+        "                    operation: \"cna_graphics_device_dispose\")",
     ),
     (
         "is-disposed-answers-yes-while-live",
         "a live facade reporting itself disposed, which would make every "
         "guarded member look unusable",
         DEVICE,
-        "        public var IsDisposed: Bool { runtime.generation != generation }",
-        "        public var IsDisposed: Bool { runtime.generation == generation }",
+        "                : runtime.generation != generation",
+        "                : runtime.generation == generation",
     ),
     # ---- Foundation 83: FindBestDevice -------------------------------------
     # WITHDRAWN: "find-best-restores-the-multisampling-flag" -- undoing the
