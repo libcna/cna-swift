@@ -266,6 +266,36 @@ The hash deliberately does not claim to be Microsoft's. `String.GetHashCode` is
 unspecified across CLR runtimes, so the test asserts that equal values hash
 equally -- the contract a hash actually has -- and never a particular number.
 
+### Media is NOT asset-blocked — it is a deep type graph, and one mapping
+
+Worth stating plainly, because the two neighbouring families are blocked and
+this one looks like it should be: **Media needs no asset**. `Song` has a public
+factory, `Song.FromUri(String name, Uri uri)`, and CNA publishes
+`cna_song_create_from_uri` for it -- a consuming member for a bindable route.
+There are 25 `cna_song_*` routes, 32 for `MediaPlayer`, 23 for `MediaLibrary`.
+
+Two things stand between here and it.
+
+**One mapping decision.** `System.Uri` is not projected, and `FromUri` is the
+only member that needs it. The cheap answer already has precedent:
+`System.IO.Stream` maps to `Foundation.InputStream`, so `System.Uri` mapping to
+`Foundation.URL` is the same move -- a platform type standing in for a BCL one,
+recorded in `typeMappings` with its reason. Admitting `System.Uri` as a BCL
+family instead would be a much larger piece of work for one parameter.
+
+**A graph, not a chain.** `Song.Artist`, `.Album` and `.Genre` answer three
+types that are themselves missing, and each of those carries collections back
+to songs and albums. `MediaQueue` and `MediaPlayer` then need `Song` and
+`SongCollection`. Nineteen Media types are one connected component, and picking
+a starting point means deciding how much of it lands in one milestone --
+`Song` alone would be PARTIAL by three members, which is honest but leaves the
+type closed to nobody.
+
+The order that keeps every commit green: map `System.Uri`, then take
+`Artist`/`Album`/`Genre` **with** their collections, then `Song`, then
+`SongCollection`, `MediaQueue` and `MediaPlayer` last -- the player is the only
+one that needs all of them.
+
 ### The XACT family is blocked on a settings file, like `Model` on its `.xnb`
 
 `AudioEngine`, `SoundBank`, `WaveBank`, `Cue` and `AudioCategory` are five of
