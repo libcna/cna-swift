@@ -24,12 +24,12 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-915 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=56   COMPLETE_TYPES=208   PARTIAL_TYPES=6
-MISSING_TYPE=43  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
+920 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=54   COMPLETE_TYPES=210   PARTIAL_TYPES=6
+MISSING_TYPE=41  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=541  PROTOTYPE_TYPE_POSITIONS=1847  LAYOUTS=59  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=365 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=573  PROTOTYPE_TYPE_POSITIONS=1941  LAYOUTS=60  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=367 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -414,6 +414,43 @@ it published.
 Two mutations are withdrawn with their reasons: one needs a machine with two
 media sources, and this host publishes one, so index zero is the right answer
 and the mutant is indistinguishable.
+
+### Foundation 96 — `MediaPlayer` and `MediaQueue`: the music half is done
+
+Eighteen of the nineteen Media types are projected. Only `VideoPlayer` remains,
+and `MediaLibrary` is one member short.
+
+`MediaPlayer` is a **`final class` with only static members**, not an enum: the
+CLR seals the type and declares it a class, and the strict comparison named the
+difference. `Queue` is non-Optional and traps when there is no runtime -- the
+third member decided by that pair of facts, after `DefaultAdapter` and
+`Game.Content`.
+
+**Measured, and it cost a red test to learn: the media queue is process-wide.**
+It outlives the game that filled it, exactly as
+`cna_media_player_get_queue`'s own words say ("a view of the process-wide media
+queue"). A test that played a song left it queued for the next test, whose game
+was a different one -- and whose fixture file had already been deleted, so the
+failure arrived as `Could not find file`. Nothing in that suite asserts an empty
+queue now.
+
+**And a third crash from the same forbidden shape.** A helper taking
+`{ $0.someRoute }` crashed SILGen again -- a `@convention(c)` pointer behind a
+Swift closure parameter. It has now crashed `SoundEffect` at compile time,
+segfaulted the media collections at run time, and crashed `MediaPlayer` at
+compile time. **Write the call out.** Every such site in this binding is now
+spelled in full, and the rule is in three doc comments so the fourth author
+meets it before the compiler does.
+
+Three mutations are withdrawn with their reasons, all limits of the host rather
+than of the code: the three-argument `Play` needs a collection with two songs,
+the visualisation swap needs a renderer that produces data (this one answers 256
+zeros in both buffers, which the test records), and the queue's availability
+flag needs an empty queue the suite cannot arrange.
+
+The ABI gate's struct parser learned one thing too: an array bound may be a
+**macro** rather than a literal, which `CNA_VisualizationData` is the first to
+use.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 

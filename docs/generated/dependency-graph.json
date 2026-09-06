@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 10,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 9,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Design.MathTypeConverter",
@@ -81,19 +81,6 @@
       "dependencyComplete": true,
       "directMissingReverseConsumers": [
         "Microsoft.Xna.Framework.Audio.SoundBank"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Media.MediaQueue",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Media.Song"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Media.MediaPlayer"
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 1,

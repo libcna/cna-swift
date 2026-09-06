@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 214,
-    "TARGET_MEMBERS": 2595,
-    "TOTAL_DIAGNOSTICS": 56,
-    "COMPLETE_TYPES": 208,
+    "TARGET_TYPES": 216,
+    "TARGET_MEMBERS": 2619,
+    "TOTAL_DIAGNOSTICS": 54,
+    "COMPLETE_TYPES": 210,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 43,
-    "MISSING_TYPE": 43,
+    "MISSING_TYPES": 41,
+    "MISSING_TYPE": 41,
     "MISSING_MEMBER": 10,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -63,14 +63,14 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 102,
-    "PENDING_ACCESSOR_PROJECTIONS": 12,
+    "MEASURED_ACCESSOR_PROJECTIONS": 108,
+    "PENDING_ACCESSOR_PROJECTIONS": 6,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 42,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 44,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 20,
-    "XNA_SEALED_CLASS_PROJECTIONS": 52,
+    "XNA_SEALED_CLASS_PROJECTIONS": 54,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 273,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 96,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 98
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 276,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 93,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 99
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -278,6 +278,8 @@
     "Microsoft.Xna.Framework.Media.ArtistCollection",
     "Microsoft.Xna.Framework.Media.Genre",
     "Microsoft.Xna.Framework.Media.GenreCollection",
+    "Microsoft.Xna.Framework.Media.MediaPlayer",
+    "Microsoft.Xna.Framework.Media.MediaQueue",
     "Microsoft.Xna.Framework.Media.MediaSource",
     "Microsoft.Xna.Framework.Media.MediaSourceType",
     "Microsoft.Xna.Framework.Media.MediaState",
@@ -352,8 +354,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection",
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-    "Microsoft.Xna.Framework.Media.MediaPlayer",
-    "Microsoft.Xna.Framework.Media.MediaQueue",
     "Microsoft.Xna.Framework.Media.VideoPlayer",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
     "Microsoft.Xna.Framework.Storage.StorageDevice"
@@ -603,16 +603,6 @@
       "category": "OVERLOAD_MAPPING_MISMATCH",
       "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String?,source:Foundation.InputStream)",
       "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.MediaPlayer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.MediaQueue",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
       "category": "MISSING_TYPE",
@@ -2454,6 +2444,90 @@
       "readerObserved": true,
       "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsShuffled",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.IsShuffled()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.SetIsShuffled(_:Bool)",
+      "writerName": "SetIsShuffled",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsRepeating",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.IsRepeating()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.SetIsRepeating(_:Bool)",
+      "writerName": "SetIsRepeating",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "Volume",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.Volume()",
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.SetVolume(_:Float)",
+      "writerName": "SetVolume",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsMuted",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.IsMuted()",
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.SetIsMuted(_:Bool)",
+      "writerName": "SetIsMuted",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "sourceProperty": "IsVisualizationEnabled",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.IsVisualizationEnabled()",
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Media.MediaPlayer.SetIsVisualizationEnabled(_:Bool)",
+      "writerName": "SetIsVisualizationEnabled",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Media.MediaQueue",
+      "sourceProperty": "ActiveSongIndex",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Media.MediaQueue.ActiveSongIndex()",
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": "Microsoft.Xna.Framework.Media.MediaQueue.SetActiveSongIndex(_:Int32)",
+      "writerName": "SetActiveSongIndex",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     }
   ],
   "pendingAccessorProjections": [
@@ -2486,66 +2560,6 @@
       "writerThrows": true,
       "indexed": false,
       "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
-      "sourceProperty": "IsShuffled",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetIsShuffled",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
-      "sourceProperty": "IsRepeating",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetIsRepeating",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
-      "sourceProperty": "Volume",
-      "typeState": "missing",
-      "readerThrows": true,
-      "writerName": "SetVolume",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
-      "sourceProperty": "IsMuted",
-      "typeState": "missing",
-      "readerThrows": true,
-      "writerName": "SetIsMuted",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
-      "sourceProperty": "IsVisualizationEnabled",
-      "typeState": "missing",
-      "readerThrows": true,
-      "writerName": "SetIsVisualizationEnabled",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Media.MediaQueue",
-      "sourceProperty": "ActiveSongIndex",
-      "typeState": "missing",
-      "readerThrows": true,
-      "writerName": "SetActiveSongIndex",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.VideoPlayer",
@@ -2791,6 +2805,20 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Media.GenreCollection",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.MediaQueue",
       "clrSealed": true,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
@@ -5039,6 +5067,22 @@
       "swiftFinal": true,
       "swiftAccess": "public",
       "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.MediaQueue",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -9431,42 +9475,42 @@
       "member": "Queue",
       "kind": "property",
       "static": true,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.MediaQueue",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.MediaQueue",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.MediaQueue"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaQueue",
       "member": "ActiveSong",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Song",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Song?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Song?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaQueue",
       "member": "Item",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Song",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Song",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Song"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaSource",
@@ -12314,29 +12358,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Media.MediaPlayer",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 20,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.MediaPlayer",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 20,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.MediaQueue",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 4,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.MediaQueue",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 4,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.MediaSource",

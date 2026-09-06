@@ -21,6 +21,9 @@ extension Microsoft.Xna.Framework.Media {
             runtime.register(self)
         }
 
+        /// The handle `MediaPlayer.Play` needs. Internal, as the storage's is.
+        internal var nativeHandle: UInt64 { storage.nativeHandle }
+
         /// `SongCollection.IsDisposed`.
         public var IsDisposed: Bool { storage.isDisposed }
 

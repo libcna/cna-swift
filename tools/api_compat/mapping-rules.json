@@ -1349,6 +1349,24 @@
       "member": "Equals",
       "parameter": "other",
       "reason": "`IEquatable<T>.Equals` is defined for null and answers false."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "member": "Play",
+      "parameter": "song",
+      "reason": "Play null-tests its argument, and that branch is one a caller can only reach by passing null."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "member": "Play",
+      "parameter": "songs",
+      "reason": "Both collection overloads null-test the collection before it reaches the runtime; an EMPTY collection is a different input that plays nothing."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.MediaPlayer",
+      "member": "GetVisualizationData",
+      "parameter": "visualizationData",
+      "reason": "The method fills the caller's object, so a null one is the first thing it tests -- and a non-Optional parameter would make that refusal unreachable."
     }
   ],
   "globalOperatorProjections": [

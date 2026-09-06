@@ -65,6 +65,7 @@ MIRRORED_STRUCTS = [
     # looked at the structure, so only a run caught it.
     "ContentManagerCreateInfo",
     "SoundEffectCreateInfo", "SoundEffectInstanceInfo",
+    "VisualizationData",
     "AudioEmitter", "AudioListener",
     "VertexElement", "VertexBufferCreateInfo", "VertexBufferBinding",
     "IndexBufferCreateInfo", "IndexBufferTransfer",
@@ -79,7 +80,7 @@ MIRRORED_CALLBACKS = [
     "VertexBufferContentLostCallback", "IndexBufferContentLostCallback",
     # The audio event callback carries no data at all -- `void (*)(void*)` --
     # and DynamicSoundEffectInstance.BufferNeeded is what consumes it.
-    "AudioEventCallback",
+    "AudioEventCallback", "MediaPlayerEventCallback",
 ]
 
 # The scalar typedefs a mirrored declaration may name on either side. The
@@ -224,6 +225,9 @@ def canonical_type(value: str) -> str:
         "CNA_PlaylistHandle": "uint64_t",
         "CNA_PlaylistCollectionHandle": "uint64_t",
         "CNA_MediaSourceType": "uint32_t",
+        "CNA_MediaState": "uint32_t",
+        "CNA_MediaQueueHandle": "uint64_t",
+        "CNA_MediaPlayerEventRegistrationHandle": "uint64_t",
         # effects.h gives every effect object its own handle alias, and two
         # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,
         # and it is the header being precise about which handle a route wants
@@ -380,7 +384,15 @@ def struct_fields(text: str, prefix: str, names: list[str]) -> dict[str, list[tu
             line = re.sub(r"\s+", " ", line).strip()
             if not line:
                 continue
-            member = re.fullmatch(r"(.+?)\s*\*?\s*([A-Za-z_][A-Za-z0-9_]*)(\[\d+\])?", line)
+            # An array bound may be a macro rather than a literal --
+            # `float samples[CNA_VISUALIZATION_DATA_SIZE]` is the first one in
+            # this ABI. The NAME is what the layout comparison uses, and the
+            # generated static assertions compare `offsetof` and `sizeof` on
+            # both sides, so an unresolved bound is not a hole: whatever the
+            # macro expands to, the two structures are still measured against
+            # each other by the C compiler.
+            member = re.fullmatch(
+                r"(.+?)\s*\*?\s*([A-Za-z_][A-Za-z0-9_]*)(\[[A-Za-z0-9_]+\])?", line)
             if not member:
                 raise RuntimeError(f"unparsed member in {full}: {line!r}")
             fields.append((line, member.group(2)))

@@ -49,6 +49,10 @@ internal final class MediaCollectionStorage {
         self.family = family
     }
 
+    /// The handle a caller outside this file needs -- `MediaPlayer.Play`
+    /// takes a song collection by handle. Internal: no XNA member publishes it.
+    var nativeHandle: UInt64 { handle }
+
     /// `IsDisposed`, which is `IL_NO_FAILURE_PATH` on every one of the four --
     /// so it reads CNA and falls back to this facade's own state.
     var isDisposed: Bool {

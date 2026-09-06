@@ -348,6 +348,38 @@ internal final class NativeFunctions {
     typealias MediaSourceGetNameSizeAtRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaSourceCopyNameAtRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaSourceGetTypeAtRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias MediaQueueGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias MediaQueueGetActiveSongIndexRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias MediaQueueSetActiveSongIndexRoute = @convention(c) (UInt64, Int32) -> UInt32
+    typealias MediaQueueGetActiveSongRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaQueueGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaQueueDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaPlayerPlaySongRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias MediaPlayerPlaySongsRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias MediaPlayerPlaySongsFromRoute = @convention(c) (UInt64, UInt64, Int32) -> UInt32
+    typealias MediaPlayerPauseRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaPlayerResumeRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaPlayerStopRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaPlayerMoveNextRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaPlayerMovePreviousRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaPlayerGetVisualizationDataRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_VisualizationData>?) -> UInt32
+    typealias MediaPlayerGetQueueRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaPlayerGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias MediaPlayerGetPlayPositionTicksRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias MediaPlayerGetVolumeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias MediaPlayerSetVolumeRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias MediaPlayerGetIsMutedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaPlayerSetIsMutedRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias MediaPlayerGetIsRepeatingRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaPlayerSetIsRepeatingRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias MediaPlayerGetIsShuffledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaPlayerSetIsShuffledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias MediaPlayerGetIsVisualizationEnabledRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaPlayerSetIsVisualizationEnabledRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias MediaPlayerGetGameHasControlRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaPlayerSubscribeActiveSongChangedExtRoute = @convention(c) (CNASwift_MediaPlayerEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaPlayerSubscribeMediaStateChangedExtRoute = @convention(c) (CNASwift_MediaPlayerEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaPlayerUnsubscribeExtRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -717,6 +749,38 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let mediaQueueGetCount: MediaQueueGetCountRoute
+    let mediaQueueGetActiveSongIndex: MediaQueueGetActiveSongIndexRoute
+    let mediaQueueSetActiveSongIndex: MediaQueueSetActiveSongIndexRoute
+    let mediaQueueGetActiveSong: MediaQueueGetActiveSongRoute
+    let mediaQueueGetAt: MediaQueueGetAtRoute
+    let mediaQueueDestroy: MediaQueueDestroyRoute
+    let mediaPlayerPlaySong: MediaPlayerPlaySongRoute
+    let mediaPlayerPlaySongs: MediaPlayerPlaySongsRoute
+    let mediaPlayerPlaySongsFrom: MediaPlayerPlaySongsFromRoute
+    let mediaPlayerPause: MediaPlayerPauseRoute
+    let mediaPlayerResume: MediaPlayerResumeRoute
+    let mediaPlayerStop: MediaPlayerStopRoute
+    let mediaPlayerMoveNext: MediaPlayerMoveNextRoute
+    let mediaPlayerMovePrevious: MediaPlayerMovePreviousRoute
+    let mediaPlayerGetVisualizationData: MediaPlayerGetVisualizationDataRoute
+    let mediaPlayerGetQueue: MediaPlayerGetQueueRoute
+    let mediaPlayerGetState: MediaPlayerGetStateRoute
+    let mediaPlayerGetPlayPositionTicks: MediaPlayerGetPlayPositionTicksRoute
+    let mediaPlayerGetVolume: MediaPlayerGetVolumeRoute
+    let mediaPlayerSetVolume: MediaPlayerSetVolumeRoute
+    let mediaPlayerGetIsMuted: MediaPlayerGetIsMutedRoute
+    let mediaPlayerSetIsMuted: MediaPlayerSetIsMutedRoute
+    let mediaPlayerGetIsRepeating: MediaPlayerGetIsRepeatingRoute
+    let mediaPlayerSetIsRepeating: MediaPlayerSetIsRepeatingRoute
+    let mediaPlayerGetIsShuffled: MediaPlayerGetIsShuffledRoute
+    let mediaPlayerSetIsShuffled: MediaPlayerSetIsShuffledRoute
+    let mediaPlayerGetIsVisualizationEnabled: MediaPlayerGetIsVisualizationEnabledRoute
+    let mediaPlayerSetIsVisualizationEnabled: MediaPlayerSetIsVisualizationEnabledRoute
+    let mediaPlayerGetGameHasControl: MediaPlayerGetGameHasControlRoute
+    let mediaPlayerSubscribeActiveSongChanged: MediaPlayerSubscribeActiveSongChangedExtRoute
+    let mediaPlayerSubscribeMediaStateChanged: MediaPlayerSubscribeMediaStateChangedExtRoute
+    let mediaPlayerUnsubscribe: MediaPlayerUnsubscribeExtRoute
     let playlistCollectionGetAt: PlaylistCollectionGetAtRoute
     let playlistCollectionGetCount: PlaylistCollectionGetCountRoute
     let playlistCollectionGetIsDisposed: PlaylistCollectionGetIsDisposedRoute
@@ -1286,6 +1350,38 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        mediaQueueGetCount = try library.resolve("cna_media_queue_get_count", as: MediaQueueGetCountRoute.self)
+        mediaQueueGetActiveSongIndex = try library.resolve("cna_media_queue_get_active_song_index", as: MediaQueueGetActiveSongIndexRoute.self)
+        mediaQueueSetActiveSongIndex = try library.resolve("cna_media_queue_set_active_song_index", as: MediaQueueSetActiveSongIndexRoute.self)
+        mediaQueueGetActiveSong = try library.resolve("cna_media_queue_get_active_song", as: MediaQueueGetActiveSongRoute.self)
+        mediaQueueGetAt = try library.resolve("cna_media_queue_get_at", as: MediaQueueGetAtRoute.self)
+        mediaQueueDestroy = try library.resolve("cna_media_queue_destroy", as: MediaQueueDestroyRoute.self)
+        mediaPlayerPlaySong = try library.resolve("cna_media_player_play_song", as: MediaPlayerPlaySongRoute.self)
+        mediaPlayerPlaySongs = try library.resolve("cna_media_player_play_songs", as: MediaPlayerPlaySongsRoute.self)
+        mediaPlayerPlaySongsFrom = try library.resolve("cna_media_player_play_songs_from", as: MediaPlayerPlaySongsFromRoute.self)
+        mediaPlayerPause = try library.resolve("cna_media_player_pause", as: MediaPlayerPauseRoute.self)
+        mediaPlayerResume = try library.resolve("cna_media_player_resume", as: MediaPlayerResumeRoute.self)
+        mediaPlayerStop = try library.resolve("cna_media_player_stop", as: MediaPlayerStopRoute.self)
+        mediaPlayerMoveNext = try library.resolve("cna_media_player_move_next", as: MediaPlayerMoveNextRoute.self)
+        mediaPlayerMovePrevious = try library.resolve("cna_media_player_move_previous", as: MediaPlayerMovePreviousRoute.self)
+        mediaPlayerGetVisualizationData = try library.resolve("cna_media_player_get_visualization_data", as: MediaPlayerGetVisualizationDataRoute.self)
+        mediaPlayerGetQueue = try library.resolve("cna_media_player_get_queue", as: MediaPlayerGetQueueRoute.self)
+        mediaPlayerGetState = try library.resolve("cna_media_player_get_state", as: MediaPlayerGetStateRoute.self)
+        mediaPlayerGetPlayPositionTicks = try library.resolve("cna_media_player_get_play_position_ticks", as: MediaPlayerGetPlayPositionTicksRoute.self)
+        mediaPlayerGetVolume = try library.resolve("cna_media_player_get_volume", as: MediaPlayerGetVolumeRoute.self)
+        mediaPlayerSetVolume = try library.resolve("cna_media_player_set_volume", as: MediaPlayerSetVolumeRoute.self)
+        mediaPlayerGetIsMuted = try library.resolve("cna_media_player_get_is_muted", as: MediaPlayerGetIsMutedRoute.self)
+        mediaPlayerSetIsMuted = try library.resolve("cna_media_player_set_is_muted", as: MediaPlayerSetIsMutedRoute.self)
+        mediaPlayerGetIsRepeating = try library.resolve("cna_media_player_get_is_repeating", as: MediaPlayerGetIsRepeatingRoute.self)
+        mediaPlayerSetIsRepeating = try library.resolve("cna_media_player_set_is_repeating", as: MediaPlayerSetIsRepeatingRoute.self)
+        mediaPlayerGetIsShuffled = try library.resolve("cna_media_player_get_is_shuffled", as: MediaPlayerGetIsShuffledRoute.self)
+        mediaPlayerSetIsShuffled = try library.resolve("cna_media_player_set_is_shuffled", as: MediaPlayerSetIsShuffledRoute.self)
+        mediaPlayerGetIsVisualizationEnabled = try library.resolve("cna_media_player_get_is_visualization_enabled", as: MediaPlayerGetIsVisualizationEnabledRoute.self)
+        mediaPlayerSetIsVisualizationEnabled = try library.resolve("cna_media_player_set_is_visualization_enabled", as: MediaPlayerSetIsVisualizationEnabledRoute.self)
+        mediaPlayerGetGameHasControl = try library.resolve("cna_media_player_get_game_has_control", as: MediaPlayerGetGameHasControlRoute.self)
+        mediaPlayerSubscribeActiveSongChanged = try library.resolve("cna_media_player_subscribe_active_song_changed_ext", as: MediaPlayerSubscribeActiveSongChangedExtRoute.self)
+        mediaPlayerSubscribeMediaStateChanged = try library.resolve("cna_media_player_subscribe_media_state_changed_ext", as: MediaPlayerSubscribeMediaStateChangedExtRoute.self)
+        mediaPlayerUnsubscribe = try library.resolve("cna_media_player_unsubscribe_ext", as: MediaPlayerUnsubscribeExtRoute.self)
         playlistCollectionGetAt = try library.resolve("cna_playlist_collection_get_at", as: PlaylistCollectionGetAtRoute.self)
         playlistCollectionGetCount = try library.resolve("cna_playlist_collection_get_count", as: PlaylistCollectionGetCountRoute.self)
         playlistCollectionGetIsDisposed = try library.resolve("cna_playlist_collection_get_is_disposed", as: PlaylistCollectionGetIsDisposedRoute.self)

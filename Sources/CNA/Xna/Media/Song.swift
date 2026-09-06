@@ -29,9 +29,15 @@ extension Microsoft.Xna.Framework.Media {
         private var handle: UInt64
         private var disposed = false
 
-        internal init(handle: UInt64, runtime: RuntimeState) {
+        /// A song the queue or a collection lends out is **borrowed**: the
+        /// owner releases it, and a facade that destroyed the handle would
+        /// release something it never took.
+        private let borrowed: Bool
+
+        internal init(handle: UInt64, runtime: RuntimeState, borrowed: Bool = false) {
             self.runtime = runtime
             self.handle = handle
+            self.borrowed = borrowed
             runtime.register(self)
         }
 
@@ -65,6 +71,10 @@ extension Microsoft.Xna.Framework.Media {
                 operation: "cna_song_create_from_uri")
             return Song(handle: created, runtime: rt)
         }
+
+        /// The handle `MediaPlayer.Play` hands to the runtime. Internal:
+        /// no XNA member publishes it.
+        internal var nativeHandle: UInt64 { handle }
 
         /// `Song.IsDisposed`, the one accessor with no failure path.
         ///
@@ -267,6 +277,7 @@ extension Microsoft.Xna.Framework.Media {
             try runtime.functions.check(
                 runtime.functions.songDispose(live),
                 operation: "cna_song_dispose")
+            guard !borrowed else { return }
             try runtime.functions.check(
                 runtime.functions.songDestroy(live),
                 operation: "cna_song_destroy")

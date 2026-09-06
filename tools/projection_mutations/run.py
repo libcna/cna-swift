@@ -48,6 +48,8 @@ MEDIA_ENTITIES = ROOT / "Sources/CNA/Xna/Media/MediaEntities.swift"
 MEDIA_LIBRARY = ROOT / "Sources/CNA/Xna/Media/MediaLibrary.swift"
 PICTURE = ROOT / "Sources/CNA/Xna/Media/PictureEntities.swift"
 MEDIA_SOURCE = ROOT / "Sources/CNA/Xna/Media/MediaSource.swift"
+MEDIA_PLAYER = ROOT / "Sources/CNA/Xna/Media/MediaPlayer.swift"
+MEDIA_QUEUE = ROOT / "Sources/CNA/Xna/Media/MediaQueue.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -131,6 +133,40 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 96: the media player ------------------------------------
+    # WITHDRAWN: "player-play-index-overload-ignores-its-index" -- the
+    # three-argument Play discarding its index. Reaching it needs a
+    # SongCollection with two songs, and the only producer of one is a media
+    # library; this machine's music store is empty and filling it is not the
+    # suite's to do. Reinstate on a host with music.
+    # WITHDRAWN: "player-visualization-copies-frequencies-twice" -- filling
+    # the samples buffer from the frequencies. Measured unfalsifiable: this
+    # renderer answers 256 zeros in BOTH buffers with nothing playing, so the
+    # two are indistinguishable. The test records that measurement rather than
+    # asserting a number it did not check. Reinstate where a renderer produces
+    # real visualisation data.
+    (
+        "player-volume-writer-does-not-reach-the-runtime",
+        "SetVolume accepted without reaching CNA, so the value a caller sets "
+        "and the value the getter answers disagree",
+        MEDIA_PLAYER,
+        "                rt.functions.mediaPlayerSetVolume(rt.gameHandle, value),",
+        "                rt.functions.mediaPlayerSetVolume(rt.gameHandle, 1),",
+    ),
+    (
+        "queue-index-unchecked",
+        "the queue's indexer accepting an index it does not have, so CNA's own "
+        "failure reaches the caller instead of the exception XNA declares",
+        MEDIA_QUEUE,
+        "                guard index >= 0, index < total else {",
+        "                if false {",
+    ),
+    # WITHDRAWN: "queue-active-song-invented" -- ignoring the availability
+    # flag for the queue's active song. Falsifiable only against an EMPTY
+    # queue, and the queue is process-wide: it outlives the game that filled
+    # it, so whether it is empty depends on what ran before in the same
+    # process. A test cannot arrange that, and clearing the queue is not a
+    # member XNA declares.
     # ---- Foundation 95: playlists and media sources -------------------------
     (
         "media-source-list-stops-one-short",
