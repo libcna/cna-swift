@@ -612,6 +612,10 @@ def normalize_swift_type(text: str) -> str:
         value = "Foundation." + value
     elif value in ("InputStream?", "OutputStream?"):
         value = "Foundation." + value
+    # `System.Uri` maps to Foundation.URL, and the compiler emits it
+    # unqualified for the same reason it does the two stream classes.
+    elif value in ("URL", "URL?"):
+        value = "Foundation." + value
     value = value.replace("()", "Void") if value == "()" else value
     return value
 
@@ -1835,6 +1839,8 @@ def normalizer_self_test() -> list[str]:
         ("Swift.Int32", "Int32"),
         ("InputStream", "Foundation.InputStream"),
         ("InputStream?", "Foundation.InputStream?"),
+        ("URL", "Foundation.URL"),
+        ("URL?", "Foundation.URL?"),
         ("OutputStream?", "Foundation.OutputStream?"),
     ]
     for text, want in cases:
@@ -5354,7 +5360,7 @@ def self_test() -> None:
 
     normalizer_failures = normalizer_self_test()
     failures.extend(normalizer_failures)
-    normalizer_self_tests = 12
+    normalizer_self_tests = 14
 
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))

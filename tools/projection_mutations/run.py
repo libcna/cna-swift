@@ -42,6 +42,7 @@ SOUND = ROOT / "Sources/CNA/Xna/Audio/SoundEffect.swift"
 SOUND_INSTANCE = ROOT / "Sources/CNA/Xna/Audio/SoundEffectInstance.swift"
 DYNAMIC_SOUND = ROOT / "Sources/CNA/Xna/Audio/DynamicSoundEffectInstance.swift"
 RENDERER_DETAIL = ROOT / "Sources/CNA/Xna/Audio/RendererDetail.swift"
+SONG = ROOT / "Sources/CNA/Xna/Media/Song.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -125,6 +126,47 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 92: the song -------------------------------------------
+    (
+        "song-equality-compares-handles",
+        "Song.Equals testing handles instead of asking CNA, so two facades "
+        "over one song read as two songs",
+        SONG,
+        "            var equal: UInt8 = 0\n"
+        "            guard runtime.functions.songEquals(\n"
+        "                handle, other.handle, &equal) == 0 else { return self === other }\n"
+        "            return equal != 0",
+        "            return handle == other.handle",
+    ),
+    (
+        "song-hash-is-invented",
+        "GetHashCode answering a local value instead of CNA's, so two equal "
+        "songs hash differently",
+        SONG,
+        "            guard runtime.functions.songGetHashCode(handle, &value) == 0 else {\n"
+        "                return 0\n"
+        "            }\n"
+        "            return value",
+        "            _ = value\n"
+        "            return Int32(truncatingIfNeeded: handle)",
+    ),
+    # WITHDRAWN: "song-dispose-skips-the-managed-half" -- releasing the handle
+    # without CNA's own dispose. Unobservable through the projection today, and
+    # the reason is the shape of the type rather than a missing test: the only
+    # reference that could see the disposal MARK is the one being released in
+    # the same call, and `cna_song_destroy` follows immediately. Two facades
+    # over an equal song were measured to be separate objects with independent
+    # disposal, so a second reference cannot see it either. It becomes
+    # observable when SongCollection lands and can hold a song the caller also
+    # disposes directly; reinstate it then.
+    (
+        "song-tostring-hides-a-refusal",
+        "ToString answering the name for a disposed song, which cannot be read "
+        "at all",
+        SONG,
+        "            (try? Name) ?? \"\"",
+        "            (try? Name) ?? \"probe song\"",
+    ),
     # ---- Foundation 91: the renderer detail --------------------------------
     (
         "renderer-detail-compares-the-label",

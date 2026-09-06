@@ -206,6 +206,13 @@ def canonical_type(value: str) -> str:
         "CNA_SoundState": "uint32_t",
         # audio.h:608 -- one owned handle per audio event subscription.
         "CNA_AudioEventRegistrationHandle": "uint64_t",
+        # media.h gives each media entity its own handle alias, the same way
+        # effects.h does; every one of them is `uint64_t`.
+        "CNA_SongHandle": "uint64_t",
+        "CNA_SongCollectionHandle": "uint64_t",
+        "CNA_ArtistHandle": "uint64_t",
+        "CNA_AlbumHandle": "uint64_t",
+        "CNA_GenreHandle": "uint64_t",
         # effects.h gives every effect object its own handle alias, and two
         # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,
         # and it is the header being precise about which handle a route wants

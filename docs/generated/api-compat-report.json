@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 198,
-    "TARGET_MEMBERS": 2446,
-    "TOTAL_DIAGNOSTICS": 70,
+    "TARGET_TYPES": 199,
+    "TARGET_MEMBERS": 2462,
+    "TOTAL_DIAGNOSTICS": 72,
     "COMPLETE_TYPES": 193,
-    "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 59,
-    "MISSING_TYPE": 59,
-    "MISSING_MEMBER": 9,
+    "PARTIAL_TYPES": 6,
+    "MISSING_TYPES": 58,
+    "MISSING_TYPE": 58,
+    "MISSING_MEMBER": 12,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -66,11 +66,11 @@
     "MEASURED_ACCESSOR_PROJECTIONS": 102,
     "PENDING_ACCESSOR_PROJECTIONS": 12,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 27,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 28,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 20,
-    "XNA_SEALED_CLASS_PROJECTIONS": 36,
+    "XNA_SEALED_CLASS_PROJECTIONS": 37,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 211,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 158,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 71
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 214,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 155,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 73
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -295,6 +295,7 @@
     "Microsoft.Xna.Framework.Content.ContentLoadException",
     "Microsoft.Xna.Framework.Content.ContentManager",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+    "Microsoft.Xna.Framework.Media.Song",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ],
   "missingTypes": [
@@ -352,7 +353,6 @@
     "Microsoft.Xna.Framework.Media.PictureCollection",
     "Microsoft.Xna.Framework.Media.Playlist",
     "Microsoft.Xna.Framework.Media.PlaylistCollection",
-    "Microsoft.Xna.Framework.Media.Song",
     "Microsoft.Xna.Framework.Media.SongCollection",
     "Microsoft.Xna.Framework.Media.VideoPlayer",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
@@ -675,9 +675,19 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.Song",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.Song.Artist()",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.Song.Album()",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.Song.Genre()",
+      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -2825,6 +2835,13 @@
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
     },
     {
+      "type": "Microsoft.Xna.Framework.Media.Song",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
       "type": "Microsoft.Xna.Framework.Media.Video",
       "clrSealed": true,
       "referencePublicConstructors": 0,
@@ -4944,6 +4961,14 @@
     },
     {
       "type": "Microsoft.Xna.Framework.MathHelper",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.Song",
       "clrSealed": true,
       "swiftFinal": true,
       "swiftAccess": "public",
@@ -9618,49 +9643,49 @@
       "member": "FromUri",
       "kind": "method",
       "static": true,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Song",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Song",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Song"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Song",
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Song",
       "member": "Name",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Song",
       "member": "Artist",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "optional": false,
@@ -9674,7 +9699,7 @@
       "member": "Album",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Album",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Album",
       "optional": false,
@@ -9688,7 +9713,7 @@
       "member": "Genre",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "optional": false,
@@ -12313,14 +12338,24 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Media.Song",
-      "status": "MISSING",
+      "status": "PARTIAL",
       "expectedMembers": 19,
-      "targetMembers": 0,
+      "targetMembers": 16,
       "diagnostics": [
         {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.Song",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.Song.Artist()",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.Song.Album()",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.Song.Genre()",
+          "detail": "mapped member is absent"
         }
       ]
     },

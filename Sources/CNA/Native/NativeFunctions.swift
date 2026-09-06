@@ -209,6 +209,20 @@ internal final class NativeFunctions {
     typealias DynamicSoundEffectInstanceGetSampleSizeInBytesRoute = @convention(c) (UInt64, Int64, UnsafeMutablePointer<Int32>?) -> UInt32
     typealias DynamicSoundEffectInstanceSubscribeBufferNeededRoute = @convention(c) (UInt64, CNASwift_AudioEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias AudioUnsubscribeExtRoute = @convention(c) (UInt64) -> UInt32
+    typealias SongCreateFromUriRoute = @convention(c) (UInt64, CNASwift_StringView, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SongDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias SongDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias SongGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SongGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SongCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SongGetDurationRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias SongGetIsRatedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SongGetRatingRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias SongGetPlayCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias SongGetTrackNumberRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias SongGetIsProtectedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SongGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias SongEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -578,6 +592,20 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let songCreateFromUri: SongCreateFromUriRoute
+    let songDestroy: SongDestroyRoute
+    let songDispose: SongDisposeRoute
+    let songGetIsDisposed: SongGetIsDisposedRoute
+    let songGetNameSize: SongGetNameSizeRoute
+    let songCopyName: SongCopyNameRoute
+    let songGetDuration: SongGetDurationRoute
+    let songGetIsRated: SongGetIsRatedRoute
+    let songGetRating: SongGetRatingRoute
+    let songGetPlayCount: SongGetPlayCountRoute
+    let songGetTrackNumber: SongGetTrackNumberRoute
+    let songGetIsProtected: SongGetIsProtectedRoute
+    let songGetHashCode: SongGetHashCodeRoute
+    let songEquals: SongEqualsRoute
     let dynamicSoundEffectInstanceCreate: DynamicSoundEffectInstanceCreateRoute
     let dynamicSoundEffectInstanceSubmitBuffer: DynamicSoundEffectInstanceSubmitBufferRoute
     let dynamicSoundEffectInstanceGetPendingBufferCount: DynamicSoundEffectInstanceGetPendingBufferCountRoute
@@ -1008,6 +1036,20 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        songCreateFromUri = try library.resolve("cna_song_create_from_uri", as: SongCreateFromUriRoute.self)
+        songDestroy = try library.resolve("cna_song_destroy", as: SongDestroyRoute.self)
+        songDispose = try library.resolve("cna_song_dispose", as: SongDisposeRoute.self)
+        songGetIsDisposed = try library.resolve("cna_song_get_is_disposed", as: SongGetIsDisposedRoute.self)
+        songGetNameSize = try library.resolve("cna_song_get_name_size", as: SongGetNameSizeRoute.self)
+        songCopyName = try library.resolve("cna_song_copy_name", as: SongCopyNameRoute.self)
+        songGetDuration = try library.resolve("cna_song_get_duration", as: SongGetDurationRoute.self)
+        songGetIsRated = try library.resolve("cna_song_get_is_rated", as: SongGetIsRatedRoute.self)
+        songGetRating = try library.resolve("cna_song_get_rating", as: SongGetRatingRoute.self)
+        songGetPlayCount = try library.resolve("cna_song_get_play_count", as: SongGetPlayCountRoute.self)
+        songGetTrackNumber = try library.resolve("cna_song_get_track_number", as: SongGetTrackNumberRoute.self)
+        songGetIsProtected = try library.resolve("cna_song_get_is_protected", as: SongGetIsProtectedRoute.self)
+        songGetHashCode = try library.resolve("cna_song_get_hash_code", as: SongGetHashCodeRoute.self)
+        songEquals = try library.resolve("cna_song_equals", as: SongEqualsRoute.self)
         dynamicSoundEffectInstanceCreate = try library.resolve("cna_dynamic_sound_effect_instance_create", as: DynamicSoundEffectInstanceCreateRoute.self)
         dynamicSoundEffectInstanceSubmitBuffer = try library.resolve("cna_dynamic_sound_effect_instance_submit_buffer", as: DynamicSoundEffectInstanceSubmitBufferRoute.self)
         dynamicSoundEffectInstanceGetPendingBufferCount = try library.resolve("cna_dynamic_sound_effect_instance_get_pending_buffer_count", as: DynamicSoundEffectInstanceGetPendingBufferCountRoute.self)

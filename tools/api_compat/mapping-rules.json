@@ -116,6 +116,7 @@
     "System.EventArgs": "CNAEventArgs",
     "System.TimeSpan": "Duration",
     "System.IO.Stream": "Foundation.InputStream",
+    "System.Uri": "Foundation.URL",
     "System.IntPtr": "Int",
     "System.Type": "Any.Type"
   },
@@ -1268,6 +1269,24 @@
       "member": "SubmitBuffer",
       "parameter": "buffer",
       "reason": "Both overloads open with a null test on the buffer, and an EMPTY array is a different input that reaches the alignment check instead. A non-Optional parameter would collapse the two and leave the ArgumentNullException unreachable, which is the same reason SoundEffectInstance.Apply3D's listener array is Optional."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Song",
+      "member": "FromUri",
+      "parameter": "name",
+      "reason": "FromUri's first instruction is a null test on the name, and that branch is one a caller can only reach by passing null."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Song",
+      "member": "FromUri",
+      "parameter": "uri",
+      "reason": "The same factory null-tests the uri as well, and a URL is a reference a caller can fail to supply just as easily as a name."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Song",
+      "member": "Equals",
+      "parameter": "other",
+      "reason": "`IEquatable<T>.Equals` is DEFINED for null: XNA answers false rather than refusing, so the null case is a normal input with a normal answer. A non-Optional parameter would remove the only interesting half of the comparison -- the same reason CurveKey.Equals(other) is Optional."
     }
   ],
   "globalOperatorProjections": [
@@ -1297,7 +1316,8 @@
     "System.Collections.Generic.ICollection`1": "the concrete XNA Add/Clear/Contains/CopyTo/Remove/Count/IsReadOnly members represent the direct interface; no automatic Swift Collection conformance",
     "System.Collections.Generic.IList`1": "the concrete XNA members represent the direct interface: the seven inherited ICollection<T> members plus IndexOf/Insert/RemoveAt and the indexed Item; no automatic Swift Collection, MutableCollection or RandomAccessCollection conformance",
     "System.Collections.Generic.IEnumerable`1": "GetEnumerator maps to CNAEnumerator<T>; no automatic Swift Sequence conformance",
-    "System.Collections.IEnumerable": "GetEnumerator mapping only; no automatic Swift Sequence conformance"
+    "System.Collections.IEnumerable": "GetEnumerator mapping only; no automatic Swift Sequence conformance",
+    "System.Uri": "Not an interface: recorded here beside System.IDisposable because it is the same kind of decision. System.Uri is a BCL class this binding does not project, and Song.FromUri is the only member that names it. It maps to Foundation.URL, the platform type that already stands in for a BCL one wherever System.IO.Stream appears -- a caller holding a URL is holding what XNA's Uri carries, and admitting the whole Uri family for one parameter would earn authority nothing else consumes."
   },
   "requiredSystemInterfaceProjections": [
     "System.IComparable`1",

@@ -24,16 +24,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-896 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=70   COMPLETE_TYPES=193   PARTIAL_TYPES=5
-MISSING_TYPE=59  MISSING_MEMBER=9  OVERLOAD_MAPPING_MISMATCH=2
+901 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=72   COMPLETE_TYPES=193   PARTIAL_TYPES=6
+MISSING_TYPE=58  MISSING_MEMBER=12  OVERLOAD_MAPPING_MISMATCH=2
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=402  PROTOTYPE_TYPE_POSITIONS=1403  LAYOUTS=59  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=354 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=416  PROTOTYPE_TYPE_POSITIONS=1448  LAYOUTS=59  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=357 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2459  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+API_COMPAT_SELF_TESTS=2461  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
 ```
 
@@ -265,6 +265,44 @@ the strict comparison working exactly as intended.
 The hash deliberately does not claim to be Microsoft's. `String.GetHashCode` is
 unspecified across CLR runtimes, so the test asserts that equal values hash
 equally -- the contract a hash actually has -- and never a particular number.
+
+### Foundation 92 — `Song`, and two guesses the runtime corrected
+
+The Media leaf, and the only member of that family with a public factory.
+`System.Uri` maps to **`Foundation.URL`**, recorded beside `System.IDisposable`
+with its reason: it is the same move `System.IO.Stream` already makes, and
+admitting the whole `Uri` family for one parameter would earn authority nothing
+else consumes.
+
+Every getter but `IsDisposed` is `IL_REACHABLE_THROW` with
+`ObjectDisposedException`, so all ten are throwing getters. `Artist`, `Album`
+and `Genre` are **not** projected: they answer three missing types that carry
+collections back to songs, so the cycle lands together or not at all, and this
+type is partial by exactly those three members until it does.
+
+**Two guesses the runtime corrected, both worth keeping.**
+
+`cna_song_create_from_uri` **requires the file to exist** -- a URL naming
+nothing comes back `Could not find file`. So the test writes a minimal 8 kHz
+mono PCM16 WAV, opens a real song through it and removes it afterwards. No
+asset ships with this repository and none needs to.
+
+And two `FromUri` calls on one file are **equal but not the same instance**.
+`cna_song_equals` answers true, and disposing one leaves the other reporting
+alive -- so equality means "the same track", not "the same object". The first
+draft assumed the opposite and documented a divergence that does not exist;
+the test now pins what was measured instead. Anything that later caches songs
+by equality needs this fact.
+
+`IsDisposed` reads CNA rather than a local flag, which is what gives
+`cna_song_get_is_disposed` a consuming member -- it was bound and unused in the
+first draft, which is the Foundation 67 rule broken by a type's own author.
+
+One mutation is **withdrawn with its reason in place**: dropping
+`cna_song_dispose` and keeping only `cna_song_destroy` is unobservable here,
+because the only reference that could see the disposal mark is the one being
+released in the same call. It becomes observable when `SongCollection` can hold
+a song the caller also disposes directly, and should be reinstated then.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 
