@@ -51,6 +51,7 @@ MEDIA_SOURCE = ROOT / "Sources/CNA/Xna/Media/MediaSource.swift"
 MEDIA_PLAYER = ROOT / "Sources/CNA/Xna/Media/MediaPlayer.swift"
 MEDIA_QUEUE = ROOT / "Sources/CNA/Xna/Media/MediaQueue.swift"
 VIDEO_PLAYER = ROOT / "Sources/CNA/Xna/Media/VideoPlayer.swift"
+GAMER_SERVICES = ROOT / "Sources/CNA/Xna/GamerServices/GamerServicesComponent.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -134,6 +135,22 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 98: the gamer-services component -------------------------
+    # WITHDRAWN, both: "gamer-component-initialize-does-nothing" and
+    # "gamer-component-update-initialises-instead". Neither is falsifiable
+    # through the projected surface, and the reason is the PROFILE rather than
+    # the code: the XNA 4.0 Windows contract declares exactly one type in this
+    # namespace, GamerServicesComponent, and no GamerServicesDispatcher. CNA
+    # does publish the dispatcher's state --
+    # cna_gamer_services_dispatcher_get_is_initialized -- but no projected
+    # member consumes it, so the Foundation 67 rule forbids binding it, and
+    # without it Initialize and Update are indistinguishable from doing
+    # nothing: both routes accept on this host and neither reports back.
+    #
+    # Reinstate if a profile that declares GamerServicesDispatcher is ever
+    # admitted, which would give that route a member and this pair an
+    # observable.
+
     # ---- Foundation 97: the video player ------------------------------------
     (
         "video-play-accepts-a-handleless-video",

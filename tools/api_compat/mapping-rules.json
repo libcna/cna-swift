@@ -13,7 +13,8 @@
     "Microsoft.Xna.Framework.Audio",
     "Microsoft.Xna.Framework.Content",
     "Microsoft.Xna.Framework.Media",
-    "Microsoft.Xna.Framework.Storage"
+    "Microsoft.Xna.Framework.Storage",
+    "Microsoft.Xna.Framework.GamerServices"
   ],
   "typeKinds": {
     "class": "class",

@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=217
-TARGET_MEMBERS=2633
-TOTAL_DIAGNOSTICS=53
-COMPLETE_TYPES=211
+TARGET_TYPES=218
+TARGET_MEMBERS=2636
+TOTAL_DIAGNOSTICS=52
+COMPLETE_TYPES=212
 PARTIAL_TYPES=6
-MISSING_TYPES=40
-MISSING_TYPE=40
+MISSING_TYPES=39
+MISSING_TYPE=39
 MISSING_MEMBER=10
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -41,10 +41,10 @@ INHERITANCE_MAPPING_MISMATCH=0
 UNMEASURED_STRUCTURAL_CATEGORY=0
 ALLOWLIST_ENTRIES=0
 APPLIED_ALLOWLIST_ENTRIES=0
-LANGUAGE_PROJECTION_EXCLUSIONS=130
+LANGUAGE_PROJECTION_EXCLUSIONS=131
 ENUM_STORAGE_FIELD_EXCLUSIONS=49
 FINALIZER_LANGUAGE_MAPPINGS=28
-NAMESPACE_MARKERS=11
+NAMESPACE_MARKERS=12
 INHERITED_MEMBER_PROJECTIONS=4
 PROTOCOL_WITNESS_MEMBER_PROJECTIONS=38
 ARRAY_MUTATION_MAPPINGS=20
@@ -133,6 +133,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=100
 - `Microsoft.Xna.Framework.GameServiceContainer`
 - `Microsoft.Xna.Framework.GameTime`
 - `Microsoft.Xna.Framework.GameWindow`
+- `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
 - `Microsoft.Xna.Framework.Graphics.AlphaTestEffect`
 - `Microsoft.Xna.Framework.Graphics.BasicEffect`
 - `Microsoft.Xna.Framework.Graphics.Blend`
@@ -378,7 +379,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Design.Vector2Converter`
 - `Microsoft.Xna.Framework.Design.Vector3Converter`
 - `Microsoft.Xna.Framework.Design.Vector4Converter`
-- `Microsoft.Xna.Framework.GamerServices.GamerServicesComponent`
 - `Microsoft.Xna.Framework.Graphics.Model`
 - `Microsoft.Xna.Framework.Graphics.ModelBone`
 - `Microsoft.Xna.Framework.Graphics.ModelBoneCollection`

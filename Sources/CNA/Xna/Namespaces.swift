@@ -26,6 +26,7 @@ public enum Microsoft {
 
             /// Namespace marker only; excluded from XNA type counts.
             public enum Media {}
+            public enum GamerServices {}
 
             /// Namespace marker only; excluded from XNA type counts.
             public enum Storage {}

@@ -24,11 +24,11 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-924 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=53   COMPLETE_TYPES=211   PARTIAL_TYPES=6
-MISSING_TYPE=40  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
+927 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=52   COMPLETE_TYPES=212   PARTIAL_TYPES=6
+MISSING_TYPE=39  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=596  PROTOTYPE_TYPE_POSITIONS=2007  LAYOUTS=60  ABI_MISMATCHES=0
+BOUND_FUNCTIONS=598  PROTOTYPE_TYPE_POSITIONS=2010  LAYOUTS=60  ABI_MISMATCHES=0
 PROJECTION_MUTATIONS=371 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
@@ -477,6 +477,29 @@ came back twice, and this time it was not the flake recorded earlier: the
 manifest count in `NativeABIPolicyTests` was one short of the routes actually
 bound. A filtered `swift test` had not run that suite. Two identical RED
 baselines in a row are a real failure; one is worth re-running first.
+
+### Foundation 98 — `GamerServicesComponent`, and a namespace with one type
+
+The whole of `Microsoft.Xna.Framework.GamerServices` in this profile: one
+`GameComponent` whose job is to pump the gamer-services dispatcher. XNA's
+`Initialize` calls `GamerServicesDispatcher.Initialize(Game)` and its `Update`
+calls `GamerServicesDispatcher.Update()`, and this does exactly those two
+things. The `gameTime` is **ignored**, because XNA's own call takes no argument.
+
+`cna_gamer_services_component_create` is deliberately **not bound**. It makes a
+*canonical* component whose initialize and update belong to the runtime, which
+is right for a C caller assembling a component set and wrong here: this type is
+the component, and a consumer overriding `Update` has to be able to decide
+whether the base runs.
+
+**Both mutations on it are withdrawn, and the reason is the profile.** The XNA
+4.0 Windows contract declares exactly one type in this namespace and no
+`GamerServicesDispatcher`. CNA does publish the dispatcher's state --
+`cna_gamer_services_dispatcher_get_is_initialized` -- but no projected member
+consumes it, so the Foundation 67 rule forbids binding it; and without it a
+component that pumps the dispatcher and one that does nothing are
+indistinguishable, because both routes simply accept here. The test asserts what
+it *can*: that both accept, which is worth failing on if it ever changes.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 
@@ -1753,7 +1776,7 @@ PROJECTED_BCL_BASE_TYPES=15          (1 -> 15)
 PENDING_BCL_BASE_TYPES=4             unchanged
 BCL_INHERITED_MEMBER_PROJECTIONS=77  (16 -> 77)
 MEASURED_SUPPORT_BASE_PROJECTIONS=23 (9 -> 23)
-NAMESPACE_MARKERS=11                 (10 -> 11, Storage)
+NAMESPACE_MARKERS=12                 (10 -> 11, Storage)
 
 BCL_RESOURCE_STRING_PROJECTIONS=8    new
 BCL_STATIC_TABLE_PROJECTIONS=1       new

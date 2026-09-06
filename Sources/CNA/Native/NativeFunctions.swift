@@ -403,6 +403,8 @@ internal final class NativeFunctions {
     typealias VideoGetHeightRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
     typealias VideoGetFramesPerSecondRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
     typealias VideoGetSoundtrackTypeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias GamerServicesDispatcherInitializeRoute = @convention(c) (UInt64) -> UInt32
+    typealias GamerServicesDispatcherUpdateRoute = @convention(c) () -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -772,6 +774,8 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let gamerServicesDispatcherInitialize: GamerServicesDispatcherInitializeRoute
+    let gamerServicesDispatcherUpdate: GamerServicesDispatcherUpdateRoute
     let videoPlayerCreate: VideoPlayerCreateRoute
     let videoPlayerDispose: VideoPlayerDisposeRoute
     let videoPlayerDestroy: VideoPlayerDestroyRoute
@@ -1396,6 +1400,8 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        gamerServicesDispatcherInitialize = try library.resolve("cna_gamer_services_dispatcher_initialize", as: GamerServicesDispatcherInitializeRoute.self)
+        gamerServicesDispatcherUpdate = try library.resolve("cna_gamer_services_dispatcher_update", as: GamerServicesDispatcherUpdateRoute.self)
         videoPlayerCreate = try library.resolve("cna_video_player_create", as: VideoPlayerCreateRoute.self)
         videoPlayerDispose = try library.resolve("cna_video_player_dispose", as: VideoPlayerDisposeRoute.self)
         videoPlayerDestroy = try library.resolve("cna_video_player_destroy", as: VideoPlayerDestroyRoute.self)
