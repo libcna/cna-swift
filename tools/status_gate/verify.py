@@ -369,6 +369,8 @@ def regenerate_and_compare(
     symbol_graph: Path | None,
     cna_include: Path | None,
     library: Path | None,
+    assembly_dir: Path | None = None,
+    il_cache: Path | None = None,
 ) -> tuple[list[str], int]:
     """A committed generated report must be what a live run writes now."""
     findings: list[str] = []
@@ -450,6 +452,23 @@ def regenerate_and_compare(
             )
             compare(GENERATED / "native-abi-report.json", abi,
                     "tools/native_abi/verify.py")
+
+        # The message-coverage report is READ for derived facts, and until
+        # Foundation 88 it was never re-run: the committed copy recorded zero
+        # findings while a live run returned eleven, several of them from
+        # milestones committed the same day. That is the same drift this gate's
+        # own header describes for the native ABI report, one report over.
+        if assembly_dir is not None and il_cache is not None:
+            coverage = temporary / "message-coverage.json"
+            subprocess.run(
+                [sys.executable, "tools/api_compat/message_coverage.py",
+                 "--assembly-dir", str(assembly_dir),
+                 "--il-cache", str(il_cache),
+                 "--output", str(coverage)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(GENERATED / "message-coverage.json", coverage,
+                    "tools/api_compat/message_coverage.py")
     return findings, compared
 
 
@@ -626,6 +645,11 @@ def main() -> int:
                         help="regenerate the native ABI report and require the "
                              "committed copy to match")
     parser.add_argument("--library", type=Path)
+    parser.add_argument("--assembly-dir", type=Path,
+                        help="regenerate the message-coverage report from the "
+                             "pinned XNA assemblies and require the committed "
+                             "copy to match")
+    parser.add_argument("--il-cache", type=Path)
     args = parser.parse_args()
 
     if args.self_test:
@@ -649,7 +673,8 @@ def main() -> int:
         checked += document_checked
 
     fresh_findings, compared = regenerate_and_compare(
-        ROOT, args.symbol_graph, args.cna_include, args.library)
+        ROOT, args.symbol_graph, args.cna_include, args.library,
+        args.assembly_dir, args.il_cache)
     findings += fresh_findings
 
     findings += planted_mutations(ROOT)

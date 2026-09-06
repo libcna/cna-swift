@@ -18,7 +18,9 @@ python3 tools/api_compat/verify.py --symbol-graph \
 python3 tools/status_gate/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
   --cna-include /path/to/cnanext/modules/c-api/include \
-  --library "$CNA_NATIVE_LIBRARY"
+  --library "$CNA_NATIVE_LIBRARY" \
+  --assembly-dir /path/to/xna/redistributable \
+  --il-cache ~/deps/xna-il-cache
 ```
 
 ```text
@@ -205,6 +207,19 @@ the road is long: this is a per-namespace campaign, not a handful of milestones.
 |---|---|---|
 | The five unwired content loaders | 0 types, 0 members | `ContentManager` landed in Foundation 87 with **one** loader bound, `load_texture2d`, because adopting what the other five produce needs machinery those types do not have yet. Each is unblocked by its own type's milestone, not by content work. |
 | `ContentManager.OpenStream` / `ReadAsset` | 0 types, 2 members | The two protected members Foundation 87 left absent. `OpenStream` returns a `Stream` over an asset this binding never opens itself, and `ReadAsset` takes `Action<IDisposable>`; both wait on decisions about `System.IO` and delegate projection. |
+
+### The status gate now re-runs the message-coverage report too
+
+The eleven findings above were invisible for a specific, fixable reason: the
+status gate **reads** `docs/generated/message-coverage.json` for derived facts
+but never re-ran the tool, so the committed copy could record zero findings
+indefinitely while a live run returned eleven. That is exactly the drift the
+gate's own header describes for the native ABI report, one report over.
+
+It now regenerates and byte-compares that report as well, given
+`--assembly-dir` and `--il-cache`, and both arguments are in the documented
+invocation in `README.md` and above. `REPORTS_COMPARED` is 5 → 6. Proved by
+editing one number in the committed copy and watching the gate fail on it.
 
 ### Foundation 88 — `OcclusionQuery`, and a gate nobody had been running
 
@@ -958,7 +973,9 @@ python3 tools/status_gate/verify.py --self-test
 python3 tools/status_gate/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
   --cna-include /path/to/cnanext/modules/c-api/include \
-  --library "$CNA_NATIVE_LIBRARY"
+  --library "$CNA_NATIVE_LIBRARY" \
+  --assembly-dir /path/to/xna/redistributable \
+  --il-cache ~/deps/xna-il-cache
 python3 tools/gamepad_native/run.py --library … --output …
 cd ../cna-swift-template && swift run HelloGame --frames 600
 ```

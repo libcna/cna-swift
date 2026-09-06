@@ -576,7 +576,9 @@ python3 tools/status_gate/verify.py --self-test
 python3 tools/status_gate/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
   --cna-include /path/to/cnanext/modules/c-api/include \
-  --library "$CNA_NATIVE_LIBRARY"
+  --library "$CNA_NATIVE_LIBRARY" \
+  --assembly-dir /path/to/xna/redistributable \
+  --il-cache ~/deps/xna-il-cache
 python3 tools/gamepad_native/run.py \
   --library "$CNA_NATIVE_LIBRARY" \
   --output docs/generated/gamepad-native-report.json
