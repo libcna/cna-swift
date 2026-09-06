@@ -115,6 +115,7 @@
     "System.Object": "Any?",
     "System.EventArgs": "CNAEventArgs",
     "System.TimeSpan": "Duration",
+    "System.DateTime": "Foundation.Date",
     "System.IO.Stream": "Foundation.InputStream",
     "System.Uri": "Foundation.URL",
     "System.IntPtr": "Int",
@@ -1305,6 +1306,36 @@
       "member": "Equals",
       "parameter": "other",
       "reason": "`IEquatable<T>.Equals` is defined for null and answers false, so the null case is a normal input with a normal answer -- the same reason Song.Equals(other) is Optional."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.MediaLibrary",
+      "member": "SavePicture",
+      "parameter": "name",
+      "reason": "SavePicture null-tests both arguments before it reaches the library."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.MediaLibrary",
+      "member": "SavePicture",
+      "parameter": "imageBuffer",
+      "reason": "The image buffer is null-tested too, and an EMPTY array is a different input that reaches the library and saves nothing."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.MediaLibrary",
+      "member": "GetPictureFromToken",
+      "parameter": "token",
+      "reason": "A null token is refused before the lookup; an empty one is a token the library simply does not have."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Picture",
+      "member": "Equals",
+      "parameter": "other",
+      "reason": "`IEquatable<T>.Equals` is defined for null and answers false."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.PictureAlbum",
+      "member": "Equals",
+      "parameter": "other",
+      "reason": "`IEquatable<T>.Equals` is defined for null and answers false."
     }
   ],
   "globalOperatorProjections": [
@@ -1335,7 +1366,8 @@
     "System.Collections.Generic.IList`1": "the concrete XNA members represent the direct interface: the seven inherited ICollection<T> members plus IndexOf/Insert/RemoveAt and the indexed Item; no automatic Swift Collection, MutableCollection or RandomAccessCollection conformance",
     "System.Collections.Generic.IEnumerable`1": "GetEnumerator maps to CNAEnumerator<T>; no automatic Swift Sequence conformance",
     "System.Collections.IEnumerable": "GetEnumerator mapping only; no automatic Swift Sequence conformance",
-    "System.Uri": "Not an interface: recorded here beside System.IDisposable because it is the same kind of decision. System.Uri is a BCL class this binding does not project, and Song.FromUri is the only member that names it. It maps to Foundation.URL, the platform type that already stands in for a BCL one wherever System.IO.Stream appears -- a caller holding a URL is holding what XNA's Uri carries, and admitting the whole Uri family for one parameter would earn authority nothing else consumes."
+    "System.Uri": "Not an interface: recorded here beside System.IDisposable because it is the same kind of decision. System.Uri is a BCL class this binding does not project, and Song.FromUri is the only member that names it. It maps to Foundation.URL, the platform type that already stands in for a BCL one wherever System.IO.Stream appears -- a caller holding a URL is holding what XNA's Uri carries, and admitting the whole Uri family for one parameter would earn authority nothing else consumes.",
+    "System.DateTime": "Not an interface: recorded here for the same reason System.Uri is. System.DateTime is a BCL value type this binding does not project, and Picture.Date is the only member that names it. It maps to Foundation.Date, the platform type that stands in for a BCL one wherever System.TimeSpan maps to Duration -- CNA answers the instant as Unix ticks, which is what a Date carries. XNA's DateTime also has a Kind this projection does not reproduce; CNA publishes a UTC instant and nothing else, so there is nothing to reproduce it from."
   },
   "requiredSystemInterfaceProjections": [
     "System.IComparable`1",

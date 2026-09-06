@@ -24,16 +24,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-906 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=71   COMPLETE_TYPES=201   PARTIAL_TYPES=6
-MISSING_TYPE=50  MISSING_MEMBER=18  OVERLOAD_MAPPING_MISMATCH=3
+911 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=63   COMPLETE_TYPES=205   PARTIAL_TYPES=6
+MISSING_TYPE=46  MISSING_MEMBER=13  OVERLOAD_MAPPING_MISMATCH=4
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=481  PROTOTYPE_TYPE_POSITIONS=1649  LAYOUTS=59  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=361 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=521  PROTOTYPE_TYPE_POSITIONS=1781  LAYOUTS=59  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=362 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2461  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+API_COMPAT_SELF_TESTS=2463  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
 ```
 
@@ -350,6 +350,39 @@ opposite of `Song`, where two equal songs are separate objects. What is not
 established is which native half does it; removing
 `cna_..._collection_dispose` leaves the observation unchanged, so `destroy`
 alone suffices, and the mutation on it is withdrawn with that reason.
+
+### Foundation 94 — the picture branch, and a test that had to be deleted
+
+`Picture`, `PictureAlbum` and their two collections, plus the picture half of
+`MediaLibrary`. `System.DateTime` maps to **`Foundation.Date`**, the same move
+`System.TimeSpan` makes to `Duration`: CNA answers a Unix instant, which is what
+a `Date` carries. XNA's `DateTime` also has a `Kind` and there is nothing here
+to reproduce it from.
+
+**A test was written, passed, and then deleted — with the file it created.**
+`MediaLibrary.SavePicture` works on this host, so the obvious round trip was to
+save a picture and read it back. It did, and it left `canary picture.png` in
+`~/Pictures/Saved Pictures/` -- the **user's own photo album** -- beside files
+earlier probes from other bindings had left there. CNA publishes no route to
+remove one. The file was deleted and the test with it.
+
+A suite may not leave things in a person's photo album. Four mutations are
+withdrawn as a result, each with the reason in place: three need a real picture
+to reach `SavedPictures`, `GetThumbnail` and `Picture.Date`, and the fourth
+needs a media store with **no** pictures, which is equally the user's business.
+They wait for a host whose media store already holds pictures the suite did not
+have to create.
+
+**The normalizer gap was fixed properly this time.** `InputStream`, then `URL`,
+then `Date` each turned a correct projection into a reported mismatch, and each
+had been patched with another `elif`. It is a set now, so the fourth Foundation
+type will not repeat it.
+
+`MediaLibrary` is still partial, by less: `Playlists` needs
+`PlaylistCollection`, `MediaSource` is its own type with the constructor that
+takes one, and the `SavePicture` overload taking a `Stream` is blocked
+differently -- `cna_media_library_save_picture_from_stream` wants a CNA stream
+handle, which this binding cannot make from a `Foundation.InputStream`.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 

@@ -578,6 +578,11 @@ def declaration(symbol: dict[str, Any]) -> str:
     return "".join(part.get("spelling", "") for part in symbol.get("declarationFragments", []))
 
 
+FOUNDATION_UNQUALIFIED_TYPES = frozenset({
+    "InputStream", "OutputStream", "URL", "Date",
+})
+
+
 def normalize_swift_type(text: str) -> str:
     value = re.sub(r"\s+", " ", text.strip())
     value = value.replace("Swift.", "").replace("CNA.", "")
@@ -608,13 +613,14 @@ def normalize_swift_type(text: str) -> str:
     # matched until Foundation 89, so an `InputStream?` parameter compared
     # unequal to `Foundation.InputStream?` and a correct projection looked
     # wrong -- the same defect the paragraph above describes, one `?` over.
-    if value in ("InputStream", "OutputStream"):
-        value = "Foundation." + value
-    elif value in ("InputStream?", "OutputStream?"):
-        value = "Foundation." + value
-    # `System.Uri` maps to Foundation.URL, and the compiler emits it
-    # unqualified for the same reason it does the two stream classes.
-    elif value in ("URL", "URL?"):
+    # Every Foundation type a BCL family maps to is emitted UNQUALIFIED by the
+    # compiler and named qualified by the mapping, so each one needs the
+    # prefix restored -- in both the plain and the Optional spelling.
+    #
+    # This was three separate `if`s before Foundation 94, added one at a time
+    # as InputStream, then URL, then Date each turned a correct projection into
+    # a reported mismatch. A set is what stops the fourth.
+    if value.rstrip("?") in FOUNDATION_UNQUALIFIED_TYPES:
         value = "Foundation." + value
     value = value.replace("()", "Void") if value == "()" else value
     return value
@@ -1841,6 +1847,8 @@ def normalizer_self_test() -> list[str]:
         ("InputStream?", "Foundation.InputStream?"),
         ("URL", "Foundation.URL"),
         ("URL?", "Foundation.URL?"),
+        ("Date", "Foundation.Date"),
+        ("Date?", "Foundation.Date?"),
         ("OutputStream?", "Foundation.OutputStream?"),
     ]
     for text, want in cases:
@@ -5360,7 +5368,7 @@ def self_test() -> None:
 
     normalizer_failures = normalizer_self_test()
     failures.extend(normalizer_failures)
-    normalizer_self_tests = 14
+    normalizer_self_tests = 16
 
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))

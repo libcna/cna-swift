@@ -288,6 +288,46 @@ internal final class NativeFunctions {
     typealias MediaLibraryGetArtistsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaLibraryGetAlbumsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaLibraryGetGenresRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PictureCollectionGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PictureCollectionDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureAlbumCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureAlbumCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PictureAlbumCollectionGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PictureAlbumCollectionDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureAlbumCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PictureDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PictureGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PictureAlbumGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureAlbumCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureAlbumGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PictureAlbumDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureAlbumDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias PictureAlbumEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PictureAlbumGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PictureGetAlbumRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PictureGetWidthRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PictureGetHeightRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PictureGetDateUnixTicksRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias PictureGetImageSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureCopyImageRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureGetThumbnailSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureCopyThumbnailRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureAlbumGetAlbumsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureAlbumGetPicturesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PictureAlbumGetParentRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaLibraryGetPicturesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryGetSavedPicturesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryGetRootPictureAlbumRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaLibrarySavePictureRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryGetPictureFromTokenRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -657,6 +697,46 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let pictureCollectionGetAt: PictureCollectionGetAtRoute
+    let pictureCollectionGetCount: PictureCollectionGetCountRoute
+    let pictureCollectionGetIsDisposed: PictureCollectionGetIsDisposedRoute
+    let pictureCollectionDispose: PictureCollectionDisposeRoute
+    let pictureCollectionDestroy: PictureCollectionDestroyRoute
+    let pictureAlbumCollectionGetAt: PictureAlbumCollectionGetAtRoute
+    let pictureAlbumCollectionGetCount: PictureAlbumCollectionGetCountRoute
+    let pictureAlbumCollectionGetIsDisposed: PictureAlbumCollectionGetIsDisposedRoute
+    let pictureAlbumCollectionDispose: PictureAlbumCollectionDisposeRoute
+    let pictureAlbumCollectionDestroy: PictureAlbumCollectionDestroyRoute
+    let pictureGetNameSize: PictureGetNameSizeRoute
+    let pictureCopyName: PictureCopyNameRoute
+    let pictureGetIsDisposed: PictureGetIsDisposedRoute
+    let pictureDispose: PictureDisposeRoute
+    let pictureDestroy: PictureDestroyRoute
+    let pictureEquals: PictureEqualsRoute
+    let pictureGetHashCode: PictureGetHashCodeRoute
+    let pictureAlbumGetNameSize: PictureAlbumGetNameSizeRoute
+    let pictureAlbumCopyName: PictureAlbumCopyNameRoute
+    let pictureAlbumGetIsDisposed: PictureAlbumGetIsDisposedRoute
+    let pictureAlbumDispose: PictureAlbumDisposeRoute
+    let pictureAlbumDestroy: PictureAlbumDestroyRoute
+    let pictureAlbumEquals: PictureAlbumEqualsRoute
+    let pictureAlbumGetHashCode: PictureAlbumGetHashCodeRoute
+    let pictureGetAlbum: PictureGetAlbumRoute
+    let pictureGetWidth: PictureGetWidthRoute
+    let pictureGetHeight: PictureGetHeightRoute
+    let pictureGetDateUnixTicks: PictureGetDateUnixTicksRoute
+    let pictureGetImageSize: PictureGetImageSizeRoute
+    let pictureCopyImage: PictureCopyImageRoute
+    let pictureGetThumbnailSize: PictureGetThumbnailSizeRoute
+    let pictureCopyThumbnail: PictureCopyThumbnailRoute
+    let pictureAlbumGetAlbums: PictureAlbumGetAlbumsRoute
+    let pictureAlbumGetPictures: PictureAlbumGetPicturesRoute
+    let pictureAlbumGetParent: PictureAlbumGetParentRoute
+    let mediaLibraryGetPictures: MediaLibraryGetPicturesRoute
+    let mediaLibraryGetSavedPictures: MediaLibraryGetSavedPicturesRoute
+    let mediaLibraryGetRootPictureAlbum: MediaLibraryGetRootPictureAlbumRoute
+    let mediaLibrarySavePicture: MediaLibrarySavePictureRoute
+    let mediaLibraryGetPictureFromToken: MediaLibraryGetPictureFromTokenRoute
     let mediaLibraryCreate: MediaLibraryCreateRoute
     let mediaLibraryDispose: MediaLibraryDisposeRoute
     let mediaLibraryDestroy: MediaLibraryDestroyRoute
@@ -1166,6 +1246,46 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        pictureCollectionGetAt = try library.resolve("cna_picture_collection_get_at", as: PictureCollectionGetAtRoute.self)
+        pictureCollectionGetCount = try library.resolve("cna_picture_collection_get_count", as: PictureCollectionGetCountRoute.self)
+        pictureCollectionGetIsDisposed = try library.resolve("cna_picture_collection_get_is_disposed", as: PictureCollectionGetIsDisposedRoute.self)
+        pictureCollectionDispose = try library.resolve("cna_picture_collection_dispose", as: PictureCollectionDisposeRoute.self)
+        pictureCollectionDestroy = try library.resolve("cna_picture_collection_destroy", as: PictureCollectionDestroyRoute.self)
+        pictureAlbumCollectionGetAt = try library.resolve("cna_picture_album_collection_get_at", as: PictureAlbumCollectionGetAtRoute.self)
+        pictureAlbumCollectionGetCount = try library.resolve("cna_picture_album_collection_get_count", as: PictureAlbumCollectionGetCountRoute.self)
+        pictureAlbumCollectionGetIsDisposed = try library.resolve("cna_picture_album_collection_get_is_disposed", as: PictureAlbumCollectionGetIsDisposedRoute.self)
+        pictureAlbumCollectionDispose = try library.resolve("cna_picture_album_collection_dispose", as: PictureAlbumCollectionDisposeRoute.self)
+        pictureAlbumCollectionDestroy = try library.resolve("cna_picture_album_collection_destroy", as: PictureAlbumCollectionDestroyRoute.self)
+        pictureGetNameSize = try library.resolve("cna_picture_get_name_size", as: PictureGetNameSizeRoute.self)
+        pictureCopyName = try library.resolve("cna_picture_copy_name", as: PictureCopyNameRoute.self)
+        pictureGetIsDisposed = try library.resolve("cna_picture_get_is_disposed", as: PictureGetIsDisposedRoute.self)
+        pictureDispose = try library.resolve("cna_picture_dispose", as: PictureDisposeRoute.self)
+        pictureDestroy = try library.resolve("cna_picture_destroy", as: PictureDestroyRoute.self)
+        pictureEquals = try library.resolve("cna_picture_equals", as: PictureEqualsRoute.self)
+        pictureGetHashCode = try library.resolve("cna_picture_get_hash_code", as: PictureGetHashCodeRoute.self)
+        pictureAlbumGetNameSize = try library.resolve("cna_picture_album_get_name_size", as: PictureAlbumGetNameSizeRoute.self)
+        pictureAlbumCopyName = try library.resolve("cna_picture_album_copy_name", as: PictureAlbumCopyNameRoute.self)
+        pictureAlbumGetIsDisposed = try library.resolve("cna_picture_album_get_is_disposed", as: PictureAlbumGetIsDisposedRoute.self)
+        pictureAlbumDispose = try library.resolve("cna_picture_album_dispose", as: PictureAlbumDisposeRoute.self)
+        pictureAlbumDestroy = try library.resolve("cna_picture_album_destroy", as: PictureAlbumDestroyRoute.self)
+        pictureAlbumEquals = try library.resolve("cna_picture_album_equals", as: PictureAlbumEqualsRoute.self)
+        pictureAlbumGetHashCode = try library.resolve("cna_picture_album_get_hash_code", as: PictureAlbumGetHashCodeRoute.self)
+        pictureGetAlbum = try library.resolve("cna_picture_get_album", as: PictureGetAlbumRoute.self)
+        pictureGetWidth = try library.resolve("cna_picture_get_width", as: PictureGetWidthRoute.self)
+        pictureGetHeight = try library.resolve("cna_picture_get_height", as: PictureGetHeightRoute.self)
+        pictureGetDateUnixTicks = try library.resolve("cna_picture_get_date_unix_ticks", as: PictureGetDateUnixTicksRoute.self)
+        pictureGetImageSize = try library.resolve("cna_picture_get_image_size", as: PictureGetImageSizeRoute.self)
+        pictureCopyImage = try library.resolve("cna_picture_copy_image", as: PictureCopyImageRoute.self)
+        pictureGetThumbnailSize = try library.resolve("cna_picture_get_thumbnail_size", as: PictureGetThumbnailSizeRoute.self)
+        pictureCopyThumbnail = try library.resolve("cna_picture_copy_thumbnail", as: PictureCopyThumbnailRoute.self)
+        pictureAlbumGetAlbums = try library.resolve("cna_picture_album_get_albums", as: PictureAlbumGetAlbumsRoute.self)
+        pictureAlbumGetPictures = try library.resolve("cna_picture_album_get_pictures", as: PictureAlbumGetPicturesRoute.self)
+        pictureAlbumGetParent = try library.resolve("cna_picture_album_get_parent", as: PictureAlbumGetParentRoute.self)
+        mediaLibraryGetPictures = try library.resolve("cna_media_library_get_pictures", as: MediaLibraryGetPicturesRoute.self)
+        mediaLibraryGetSavedPictures = try library.resolve("cna_media_library_get_saved_pictures", as: MediaLibraryGetSavedPicturesRoute.self)
+        mediaLibraryGetRootPictureAlbum = try library.resolve("cna_media_library_get_root_picture_album", as: MediaLibraryGetRootPictureAlbumRoute.self)
+        mediaLibrarySavePicture = try library.resolve("cna_media_library_save_picture", as: MediaLibrarySavePictureRoute.self)
+        mediaLibraryGetPictureFromToken = try library.resolve("cna_media_library_get_picture_from_token", as: MediaLibraryGetPictureFromTokenRoute.self)
         mediaLibraryCreate = try library.resolve("cna_media_library_create", as: MediaLibraryCreateRoute.self)
         mediaLibraryDispose = try library.resolve("cna_media_library_dispose", as: MediaLibraryDisposeRoute.self)
         mediaLibraryDestroy = try library.resolve("cna_media_library_destroy", as: MediaLibraryDestroyRoute.self)

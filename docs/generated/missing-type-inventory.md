@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=207
-TARGET_MEMBERS=2530
-TOTAL_DIAGNOSTICS=71
-COMPLETE_TYPES=201
+TARGET_TYPES=211
+TARGET_MEMBERS=2572
+TOTAL_DIAGNOSTICS=63
+COMPLETE_TYPES=205
 PARTIAL_TYPES=6
-MISSING_TYPES=50
-MISSING_TYPE=50
-MISSING_MEMBER=18
+MISSING_TYPES=46
+MISSING_TYPE=46
+MISSING_MEMBER=13
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=3
+OVERLOAD_MAPPING_MISMATCH=4
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -63,11 +63,11 @@ WRITE_ONLY_PROJECTIONS=0
 MEASURED_ACCESSOR_PROJECTIONS=102
 PENDING_ACCESSOR_PROJECTIONS=12
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=35
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=39
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=20
-XNA_SEALED_CLASS_PROJECTIONS=45
+XNA_SEALED_CLASS_PROJECTIONS=49
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=31
 BCL_ABSTRACT_BASE_WIDENINGS=1
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=244
-PENDING_RETURN_NULLABILITY_PROJECTIONS=125
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=85
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=263
+PENDING_RETURN_NULLABILITY_PROJECTIONS=106
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=94
 ```
 
 ## Complete types
@@ -279,6 +279,10 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=85
 - `Microsoft.Xna.Framework.Media.GenreCollection`
 - `Microsoft.Xna.Framework.Media.MediaSourceType`
 - `Microsoft.Xna.Framework.Media.MediaState`
+- `Microsoft.Xna.Framework.Media.Picture`
+- `Microsoft.Xna.Framework.Media.PictureAlbum`
+- `Microsoft.Xna.Framework.Media.PictureAlbumCollection`
+- `Microsoft.Xna.Framework.Media.PictureCollection`
 - `Microsoft.Xna.Framework.Media.Song`
 - `Microsoft.Xna.Framework.Media.SongCollection`
 - `Microsoft.Xna.Framework.Media.Video`
@@ -330,16 +334,12 @@ Expected members: 56; emitted members: 53.
 
 ### `Microsoft.Xna.Framework.Media.MediaLibrary`
 
-Expected members: 16; emitted members: 7.
+Expected members: 16; emitted members: 12.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary..ctor(mediaSource:Microsoft.Xna.Framework.Media.MediaSource)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Media.MediaLibrary..ctor(mediaSource:Microsoft.Xna.Framework.Media.MediaSource)`: required overload is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String,imageBuffer:[UInt8])`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String,source:Foundation.InputStream)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.GetPictureFromToken(_:String)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.Pictures()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.RootPictureAlbum()`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.SavedPictures()`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String?,source:Foundation.InputStream)`: mapped member is absent
+- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String?,source:Foundation.InputStream)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.MediaSource()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.Playlists()`: mapped member is absent
 
@@ -393,10 +393,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Media.MediaPlayer`
 - `Microsoft.Xna.Framework.Media.MediaQueue`
 - `Microsoft.Xna.Framework.Media.MediaSource`
-- `Microsoft.Xna.Framework.Media.Picture`
-- `Microsoft.Xna.Framework.Media.PictureAlbum`
-- `Microsoft.Xna.Framework.Media.PictureAlbumCollection`
-- `Microsoft.Xna.Framework.Media.PictureCollection`
 - `Microsoft.Xna.Framework.Media.Playlist`
 - `Microsoft.Xna.Framework.Media.PlaylistCollection`
 - `Microsoft.Xna.Framework.Media.VideoPlayer`

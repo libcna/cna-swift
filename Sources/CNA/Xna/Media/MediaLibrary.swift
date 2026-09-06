@@ -12,13 +12,13 @@ extension Microsoft.Xna.Framework.Media {
     /// can obtain one. A song created from a file path has no library context
     /// at all -- CNA says so and `Song.Artist` reports it.
     ///
-    /// **Partial, deliberately.** The picture half -- `Pictures`,
-    /// `SavedPictures`, `RootPictureAlbum`, `SavePicture`,
-    /// `GetPictureFromToken` -- reaches `Picture`, `PictureCollection` and
-    /// `PictureAlbum`, and `Playlists` reaches `PlaylistCollection`; those are
-    /// four more missing types and their own milestone. `MediaSource` is a
-    /// fifth. What is here is the half that makes the rest of this family
-    /// reachable and testable.
+    /// **Still partial, and by less.** `Playlists` reaches
+    /// `PlaylistCollection` and `MediaSource` is its own type; the constructor
+    /// that takes one, and the `SavePicture` overload that takes a `Stream`,
+    /// wait with them. The `Stream` overload is blocked differently from the
+    /// rest: `cna_media_library_save_picture_from_stream` wants a CNA stream
+    /// handle, and this binding has no way to make one from a
+    /// `Foundation.InputStream`.
     public final class MediaLibrary: RuntimeOwnedChild {
 
         private let runtime: RuntimeState
@@ -98,6 +98,109 @@ extension Microsoft.Xna.Framework.Media {
                     runtime.functions.mediaLibraryGetGenres(live, &produced),
                     operation: "cna_media_library_get_genres")
                 return GenreCollection(handle: produced, runtime: runtime)
+            }
+        }
+
+        /// `MediaLibrary.Pictures`.
+        public var Pictures: PictureCollection? {
+            get throws {
+                let live = try validated()
+                var produced: UInt64 = 0
+                try runtime.functions.check(
+                    runtime.functions.mediaLibraryGetPictures(live, &produced),
+                    operation: "cna_media_library_get_pictures")
+                return PictureCollection(handle: produced, runtime: runtime)
+            }
+        }
+
+        /// `MediaLibrary.SavedPictures`.
+        public var SavedPictures: PictureCollection? {
+            get throws {
+                let live = try validated()
+                var produced: UInt64 = 0
+                try runtime.functions.check(
+                    runtime.functions.mediaLibraryGetSavedPictures(live, &produced),
+                    operation: "cna_media_library_get_saved_pictures")
+                return PictureCollection(handle: produced, runtime: runtime)
+            }
+        }
+
+        /// `MediaLibrary.RootPictureAlbum`.
+        ///
+        /// A library with no pictures has no root album, and CNA reports that
+        /// with an availability flag rather than a failure.
+        public var RootPictureAlbum: PictureAlbum? {
+            get throws {
+                let live = try validated()
+                var produced: UInt64 = 0
+                var available: UInt8 = 0
+                try runtime.functions.check(
+                    runtime.functions.mediaLibraryGetRootPictureAlbum(
+                        live, &produced, &available),
+                    operation: "cna_media_library_get_root_picture_album")
+                guard available != 0 else { return nil }
+                return PictureAlbum(handle: produced, runtime: runtime, borrowed: true)
+            }
+        }
+
+        /// `MediaLibrary.SavePicture(String name, Byte[] imageBuffer)`.
+        public func SavePicture(_ name: String?, imageBuffer: [UInt8]?) throws -> Picture {
+            guard let name else {
+                throw CNAArgumentNullException(paramName: "name")
+            }
+            guard let imageBuffer else {
+                throw CNAArgumentNullException(paramName: "imageBuffer")
+            }
+            let live = try validated()
+            var utf8 = Array(name.utf8)
+            var produced: UInt64 = 0
+            try runtime.functions.check(
+                MediaLibrary.withStringView(&utf8) { view in
+                    imageBuffer.withUnsafeBufferPointer { bytes in
+                        runtime.functions.mediaLibrarySavePicture(
+                            live, view, bytes.baseAddress,
+                            UInt64(bytes.count), &produced)
+                    }
+                },
+                operation: "cna_media_library_save_picture")
+            return Picture(handle: produced, runtime: runtime)
+        }
+
+        /// `MediaLibrary.GetPictureFromToken(String token)`.
+        ///
+        /// A token naming nothing is reported rather than answered as nil: the
+        /// return is proven non-null, so there is nothing to hand back.
+        public func GetPictureFromToken(_ token: String?) throws -> Picture {
+            guard let token else {
+                throw CNAArgumentNullException(paramName: "token")
+            }
+            let live = try validated()
+            var utf8 = Array(token.utf8)
+            var produced: UInt64 = 0
+            var available: UInt8 = 0
+            try runtime.functions.check(
+                MediaLibrary.withStringView(&utf8) { view in
+                    runtime.functions.mediaLibraryGetPictureFromToken(
+                        live, view, &produced, &available)
+                },
+                operation: "cna_media_library_get_picture_from_token")
+            guard available != 0 else {
+                throw CNAError.nativeFailure(
+                    operation: "MediaLibrary.GetPictureFromToken", result: 1,
+                    message: "no picture in this library carries that token")
+            }
+            return Picture(handle: produced, runtime: runtime)
+        }
+
+        private static func withStringView(
+            _ utf8: inout [UInt8], _ body: (CNASwift_StringView) -> UInt32
+        ) -> UInt32 {
+            utf8.withUnsafeMutableBufferPointer { buffer -> UInt32 in
+                var view = CNASwift_StringView()
+                view.data = UnsafeRawPointer(buffer.baseAddress)?
+                    .assumingMemoryBound(to: CChar.self)
+                view.byte_length = UInt64(buffer.count)
+                return body(view)
             }
         }
 

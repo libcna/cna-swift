@@ -46,6 +46,7 @@ SONG = ROOT / "Sources/CNA/Xna/Media/Song.swift"
 MEDIA_COLLECTIONS = ROOT / "Sources/CNA/Xna/Media/MediaCollections.swift"
 MEDIA_ENTITIES = ROOT / "Sources/CNA/Xna/Media/MediaEntities.swift"
 MEDIA_LIBRARY = ROOT / "Sources/CNA/Xna/Media/MediaLibrary.swift"
+PICTURE = ROOT / "Sources/CNA/Xna/Media/PictureEntities.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -129,6 +130,35 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 94: the picture branch ---------------------------------
+    # WITHDRAWN, all three together: "library-saved-pictures-come-from-the-wrong-route",
+    # "picture-thumbnail-reads-the-full-image" and "picture-date-loses-its-epoch".
+    # Falsifying any of them needs a REAL picture, and the only way to get one
+    # on this host is MediaLibrary.SavePicture -- which writes into the user's
+    # own media library, where CNA publishes no route to remove what it put
+    # there. That test was written, passed, and was removed along with the file
+    # it left in ~/Pictures. A suite may not leave things in a person's photo
+    # album. Reinstate all three on a host whose media store already holds
+    # pictures the suite did not have to create.
+    # WITHDRAWN: "library-root-album-invented" -- ignoring the availability
+    # flag for the root picture album. Falsifiable only when the library has NO
+    # pictures, because with any picture present the flag is true and the
+    # mutant behaves identically. Whether this machine's media store is empty
+    # is the user's business, and the suite must not arrange it either way --
+    # emptying it is destructive and filling it leaves files behind, which is
+    # exactly the mistake the three withdrawals above record.
+    (
+        "library-unknown-token-answers-a-picture",
+        "GetPictureFromToken handing back whatever the out-parameter held for "
+        "a token the library does not have",
+        MEDIA_LIBRARY,
+        "            guard available != 0 else {\n"
+        "                throw CNAError.nativeFailure(\n"
+        "                    operation: \"MediaLibrary.GetPictureFromToken\", result: 1,",
+        "            if false {\n"
+        "                throw CNAError.nativeFailure(\n"
+        "                    operation: \"MediaLibrary.GetPictureFromToken\", result: 1,",
+    ),
     # ---- Foundation 93: the media graph ------------------------------------
     (
         "media-collection-index-unchecked",

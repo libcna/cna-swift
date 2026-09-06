@@ -24,6 +24,17 @@ internal final class MediaCollectionStorage {
 
     enum Family: String {
         case song, artist, album, genre
+        case picture
+        case pictureAlbum = "picture_album"
+
+        /// The Swift type name a refusal names, which is not the route prefix:
+        /// `picture_album` is one word in C and two in Swift.
+        var typeName: String {
+            switch self {
+            case .pictureAlbum: return "PictureAlbumCollection"
+            default: return rawValue.capitalized + "Collection"
+            }
+        }
     }
 
     private let runtime: RuntimeState
@@ -49,6 +60,8 @@ internal final class MediaCollectionStorage {
         case .artist: result = functions.artistCollectionGetIsDisposed(handle, &value)
         case .album: result = functions.albumCollectionGetIsDisposed(handle, &value)
         case .genre: result = functions.genreCollectionGetIsDisposed(handle, &value)
+        case .picture: result = functions.pictureCollectionGetIsDisposed(handle, &value)
+        case .pictureAlbum: result = functions.pictureAlbumCollectionGetIsDisposed(handle, &value)
         }
         guard result == 0 else { return released }
         return value != 0
@@ -65,6 +78,8 @@ internal final class MediaCollectionStorage {
         case .artist: result = functions.artistCollectionGetCount(live, &value)
         case .album: result = functions.albumCollectionGetCount(live, &value)
         case .genre: result = functions.genreCollectionGetCount(live, &value)
+        case .picture: result = functions.pictureCollectionGetCount(live, &value)
+        case .pictureAlbum: result = functions.pictureAlbumCollectionGetCount(live, &value)
         }
         try functions.check(
             result, operation: "cna_\(family.rawValue)_collection_get_count")
@@ -91,6 +106,8 @@ internal final class MediaCollectionStorage {
         case .artist: result = functions.artistCollectionGetAt(live, index, &produced)
         case .album: result = functions.albumCollectionGetAt(live, index, &produced)
         case .genre: result = functions.genreCollectionGetAt(live, index, &produced)
+        case .picture: result = functions.pictureCollectionGetAt(live, index, &produced)
+        case .pictureAlbum: result = functions.pictureAlbumCollectionGetAt(live, index, &produced)
         }
         try functions.check(
             result, operation: "cna_\(family.rawValue)_collection_get_at")
@@ -120,6 +137,12 @@ internal final class MediaCollectionStorage {
         case .genre:
             disposeResult = functions.genreCollectionDispose(live)
             destroyResult = functions.genreCollectionDestroy(live)
+        case .picture:
+            disposeResult = functions.pictureCollectionDispose(live)
+            destroyResult = functions.pictureCollectionDestroy(live)
+        case .pictureAlbum:
+            disposeResult = functions.pictureAlbumCollectionDispose(live)
+            destroyResult = functions.pictureAlbumCollectionDestroy(live)
         }
         try functions.check(
             disposeResult, operation: "cna_\(family.rawValue)_collection_dispose")
@@ -130,7 +153,7 @@ internal final class MediaCollectionStorage {
     private func validated() throws -> UInt64 {
         guard !released, handle != 0 else {
             throw CNAObjectDisposedException(
-                objectName: "\(family.rawValue.capitalized)Collection")
+                objectName: family.typeName)
         }
         return handle
     }
