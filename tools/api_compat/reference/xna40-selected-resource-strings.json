@@ -35,6 +35,16 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "NoCompatibleDevices",
+      "value": "Could not find a Direct3D device that supports the XNA Framework {0} profile.\r\n\r\nVerify that a suitable graphics device is installed.\r\n\r\nMake sure the desktop is not locked, and that no other application is running in full screen mode.\r\n\r\nAvoid running under Remote Desktop or as a Windows service.\r\n\r\nCheck the display properties to make sure hardware acceleration is set to Full."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "NoCompatibleDevicesAfterRanking",
+      "value": "The process of ranking devices removed all compatible devices."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "NoGraphicsDeviceService",
       "value": "This property requires a graphics device service in the game service container."
     },
@@ -62,6 +72,11 @@
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "TargetElaspedCannotBeZero",
       "value": "The target elapsed time must be greater than zero.  Specify a non-zero positive value."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.Game.dll",
+      "key": "TitleCannotBeNull",
+      "value": "The title name cannot be null.  Use an empty string instead."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

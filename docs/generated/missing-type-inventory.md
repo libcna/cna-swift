@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=192
-TARGET_MEMBERS=2373
-TOTAL_DIAGNOSTICS=86
-COMPLETE_TYPES=187
-PARTIAL_TYPES=5
+TARGET_MEMBERS=2374
+TOTAL_DIAGNOSTICS=85
+COMPLETE_TYPES=188
+PARTIAL_TYPES=4
 MISSING_TYPES=65
 MISSING_TYPE=65
-MISSING_MEMBER=18
+MISSING_MEMBER=17
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -72,7 +72,7 @@ NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=31
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=76
+XNA_RESOURCE_STRING_PROJECTIONS=79
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
 PROJECTED_BCL_BASE_TYPES=15
@@ -88,8 +88,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=201
-PENDING_RETURN_NULLABILITY_PROJECTIONS=168
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=202
+PENDING_RETURN_NULLABILITY_PROJECTIONS=167
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=68
 ```
 
@@ -234,6 +234,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=68
 - `Microsoft.Xna.Framework.Graphics.VertexPositionTexture`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
 - `Microsoft.Xna.Framework.GraphicsDeviceInformation`
+- `Microsoft.Xna.Framework.GraphicsDeviceManager`
 - `Microsoft.Xna.Framework.IDrawable`
 - `Microsoft.Xna.Framework.IGameComponent`
 - `Microsoft.Xna.Framework.IGraphicsDeviceManager`
@@ -317,12 +318,6 @@ Expected members: 56; emitted members: 42.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceLost()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceReset()`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.DeviceResetting()`: mapped member is absent
-
-### `Microsoft.Xna.Framework.GraphicsDeviceManager`
-
-Expected members: 30; emitted members: 30.
-
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
 

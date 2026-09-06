@@ -119,6 +119,38 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 83: FindBestDevice -------------------------------------
+    # WITHDRAWN: "find-best-restores-the-multisampling-flag" -- undoing the
+    # destructive retry.
+    #
+    # The retry only runs when the FIRST pass finds nothing, and on this host it
+    # never does: one adapter, supporting both profiles, always yields a
+    # candidate. Restoring a flag on a path that is never taken changes no
+    # answer. The behaviour is real and is documented on the member -- XNA
+    # leaves PreferMultiSampling off after turning it off -- but the claim that
+    # a test here observes it is withdrawn.
+    (
+        "add-devices-keeps-duplicates",
+        "the Contains test dropped, so an adapter's current mode is offered "
+        "twice when it is also a supported mode",
+        MANAGER,
+        "            for existing in 0 ..< foundDevices.Count\n"
+        "            where try foundDevices.Item(existing).Equals(info) {\n"
+        "                return\n"
+        "            }",
+        "            for existing in 0 ..< foundDevices.Count\n"
+        "            where try foundDevices.Item(existing).Equals(info) && false {\n"
+        "                return\n"
+        "            }",
+    ),
+    # WITHDRAWN: "add-devices-drops-the-minimum-mode-size" -- removing the
+    # 640x480 floor on full-screen modes.
+    #
+    # Measured: this host reports exactly one supported display mode, 800x480,
+    # which clears the floor either way. With no mode below it there is nothing
+    # the floor can exclude, so the mutation cannot change an answer. The floor
+    # stays -- it is 0x280 by 0x1e0 in the IL -- and the claim that a test
+    # reaches it does not.
     # ---- Foundation 82: GameWindow -----------------------------------------
     # WITHDRAWN: "window-title-skips-the-change-test" -- removing the
     # `storedTitle != value` guard so an unchanged title is pushed again.

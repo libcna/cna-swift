@@ -258,8 +258,16 @@ extension Microsoft.Xna.Framework {
         }
 
         /// `Resources.TitleCannotBeNull`.
+        ///
+        /// Read out of the registered assembly's string table, not written from
+        /// memory: the first draft of this file invented "GameWindow title
+        /// cannot be null." and nothing caught it, because a message this
+        /// binding has not ADMITTED is a message the resource-string check does
+        /// not compare. Admitting it is what made the difference visible.
+        ///
+        /// Note the two spaces after the first sentence — they are Microsoft's.
         internal static let titleCannotBeNullMessage =
-            "GameWindow title cannot be null."
+            "The title name cannot be null.  Use an empty string instead."
 
         private static func withStringView(
             _ utf8: inout [UInt8], _ body: (CNASwift_StringView) -> UInt32

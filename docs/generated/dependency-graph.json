@@ -42,8 +42,7 @@
       ],
       "transitiveMissingReverseReach": 6,
       "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game",
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+        "Microsoft.Xna.Framework.Game"
       ]
     },
     {

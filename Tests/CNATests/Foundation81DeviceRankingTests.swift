@@ -155,3 +155,116 @@ private final class RankingProbeGame: Microsoft.Xna.Framework.Game {
         manager = try Microsoft.Xna.Framework.GraphicsDeviceManager(game: self)
     }
 }
+
+/// `GraphicsDeviceManager.FindBestDevice` — the last of the manager's five.
+final class Foundation83FindBestDeviceTests: XCTestCase {
+
+    /// Inside a callback the enumeration finds the host's one adapter and
+    /// returns the best candidate for it.
+    func testItFindsTheHostsAdapter() throws {
+        let game = try FindBestProbeGame()
+        try game.Run()
+        if let failure = game.failure { throw failure }
+        let best = try XCTUnwrap(game.best)
+        XCTAssertNotNil(best.Adapter, "the candidate names the adapter it is for")
+        XCTAssertEqual(best.GraphicsProfile, game.requestedProfile)
+        XCTAssertGreaterThan(best.PresentationParameters.BackBufferWidth, 0)
+    }
+
+    /// **The retry is destructive**, which is XNA's behaviour and not an
+    /// oversight: when multisampling has to be turned off to find anything,
+    /// `PreferMultiSampling` stays off afterwards.
+    ///
+    /// Asserted through the observable half — a successful find with the flag
+    /// set leaves it set, so the test pins that the retry did NOT run rather
+    /// than pretending to observe one that could not happen here.
+    func testAFindThatSucceedsFirstTimeLeavesTheFlagAlone() throws {
+        let game = try FindBestProbeGame(preferMultiSampling: true)
+        try game.Run()
+        if let failure = game.failure { throw failure }
+        XCTAssertEqual(game.flagAfter, true,
+                       "no retry was needed, so nothing was turned off")
+    }
+
+    /// **In full screen the current mode is offered twice, and the duplicate
+    /// test is what stops it.**
+    ///
+    /// This host reports one supported mode, 800x480, which is also the current
+    /// one — so `AddDevices` offers it once from `CurrentDisplayMode` and again
+    /// from the supported-mode loop. XNA adds a candidate only when the list
+    /// holds no equal one, which is what makes
+    /// `GraphicsDeviceInformation.Equals` load-bearing here rather than
+    /// decorative.
+    func testFullScreenOffersTheCurrentModeOnlyOnce() throws {
+        let game = try FindBestProbeGame(fullScreen: true)
+        try game.Run()
+        if let failure = game.failure { throw failure }
+        XCTAssertEqual(game.candidateCount, 1,
+                       "the current mode and the one supported mode are the same "
+                       + "candidate, and it is added once")
+    }
+
+    /// **The two refusals cannot be reached on this host**, and the message
+    /// is asserted directly rather than through a path that does not exist.
+    ///
+    /// `FindBestDevice` throws when the candidate list is empty. Emptying it
+    /// needs either an adapter supporting neither profile or an override of
+    /// `RankDevices` that discards — and this host reports one adapter that
+    /// supports both. Reaching the throw by subclassing the manager would test
+    /// the subclass, not the member.
+    ///
+    /// So what is pinned is Microsoft's own text and its one substitution,
+    /// which is the half a consumer actually sees.
+    func testTheRefusalMessagesAreMicrosoftsOwn() {
+        typealias Manager = Microsoft.Xna.Framework.GraphicsDeviceManager
+        let reach = Manager.noCompatibleDevicesMessage(.Reach)
+        XCTAssertTrue(reach.hasPrefix(
+            "Could not find a Direct3D device that supports the XNA Framework Reach profile."),
+            "the profile is substituted into {0}")
+        XCTAssertTrue(reach.contains("\r\n\r\nAvoid running under Remote Desktop"),
+                      "and the CRLF paragraphs are Microsoft's, not reflowed")
+        XCTAssertEqual(
+            Manager.noCompatibleDevicesAfterRankingMessage,
+            "The process of ranking devices removed all compatible devices.")
+    }
+}
+
+private final class FindBestProbeGame: Microsoft.Xna.Framework.Game {
+    let preferMultiSampling: Bool
+    let fullScreen: Bool
+    var manager: Microsoft.Xna.Framework.GraphicsDeviceManager?
+    var failure: Error?
+    var best: Microsoft.Xna.Framework.GraphicsDeviceInformation?
+    var flagAfter: Bool?
+    var candidateCount: Int32?
+    var requestedProfile = Microsoft.Xna.Framework.Graphics.GraphicsProfile.Reach
+
+    init(preferMultiSampling: Bool = false, fullScreen: Bool = false) throws {
+        self.preferMultiSampling = preferMultiSampling
+        self.fullScreen = fullScreen
+        try super.init()
+        manager = try Microsoft.Xna.Framework.GraphicsDeviceManager(game: self)
+    }
+
+    override func LoadContent() throws {
+        defer { try? Exit() }
+        do {
+            guard let manager else { return }
+            _ = try GraphicsDevice          // fills the adapter list
+            manager.PreferMultiSampling = preferMultiSampling
+            requestedProfile = manager.GraphicsProfile
+
+            if fullScreen {
+                manager.IsFullScreen = true
+                let found = CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>()
+                try manager.testOnlyAddDevices(true, found)
+                candidateCount = found.Count
+                return
+            }
+            best = try manager.FindBestDevice(true)
+            flagAfter = manager.PreferMultiSampling
+        } catch {
+            failure = error
+        }
+    }
+}

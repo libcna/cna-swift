@@ -205,7 +205,189 @@ extension Microsoft.Xna.Framework {
             try preparingDeviceSettingsSource.Raise(sender, args: args)
         }
 
-/// `protected virtual void RankDevices(List<GraphicsDeviceInformation>
+        /// `protected virtual GraphicsDeviceInformation FindBestDevice(bool
+        /// anySuitableDevice)`.
+        ///
+        /// Eight bytes forwarding to `FindBestPlatformDevice`, which is 132:
+        ///
+        /// ```text
+        /// found = new List<GraphicsDeviceInformation>()
+        /// AddDevices(anySuitableDevice, found)
+        /// if (found.Count == 0 && PreferMultiSampling) {
+        ///     PreferMultiSampling = false          // and it STAYS false
+        ///     AddDevices(anySuitableDevice, found)
+        /// }
+        /// if (found.Count == 0) throw NoSuitableGraphicsDeviceException(...)
+        /// RankDevices(found)
+        /// if (found.Count == 0) throw NoSuitableGraphicsDeviceException(...)
+        /// return found[0]
+        /// ```
+        ///
+        /// **The retry is destructive.** Turning multisampling off to find any
+        /// device at all leaves `PreferMultiSampling` false afterwards; XNA
+        /// never puts it back, and neither does this.
+        ///
+        /// **The emptiness test after `RankDevices` looks unreachable and is
+        /// not.** Ranking only sorts — but it is `virtual`, so an override can
+        /// empty the list, and the second test exists for that. Reproduced
+        /// rather than dropped as dead.
+        open func FindBestDevice(
+            _ anySuitableDevice: Bool
+        ) throws -> Microsoft.Xna.Framework.GraphicsDeviceInformation {
+            let found = CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>()
+            try addDevices(anySuitableDevice, found)
+            if found.Count == 0 && PreferMultiSampling {
+                PreferMultiSampling = false
+                try addDevices(anySuitableDevice, found)
+            }
+            if found.Count == 0 {
+                throw Microsoft.Xna.Framework.Graphics
+                    .NoSuitableGraphicsDeviceException(
+                        message: GraphicsDeviceManager.noCompatibleDevicesMessage(
+                            GraphicsProfile))
+            }
+            try RankDevices(found)
+            if found.Count == 0 {
+                throw Microsoft.Xna.Framework.Graphics
+                    .NoSuitableGraphicsDeviceException(
+                        message: GraphicsDeviceManager
+                            .noCompatibleDevicesAfterRankingMessage)
+            }
+            return try found.Item(0)
+        }
+
+        /// `AddDevices(bool anySuitableDevice, List<GraphicsDeviceInformation>)`.
+        ///
+        /// Walks every adapter, skips those that do not support the requested
+        /// profile, and offers each survivor's current display mode — plus, in
+        /// full screen, every supported mode at least **640x480** (`0x280` by
+        /// `0x1e0` in the IL).
+        ///
+        /// **`IsWindowOnAdapter` cannot be reproduced and is treated as true.**
+        /// XNA's is `ScreenFromAdapter(adapter) == ScreenFromHandle(handle)`,
+        /// two `System.Windows.Forms` calls with no counterpart here: CNA
+        /// publishes no screen-to-adapter mapping at all. On a host reporting
+        /// one adapter the window is necessarily on it, which is what makes the
+        /// substitution safe rather than merely convenient — and it is written
+        /// down because a multi-adapter host would need the real test and
+        /// `anySuitableDevice` would stop being the only thing that matters.
+        private func addDevices(
+            _ anySuitableDevice: Bool,
+            _ foundDevices: CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>
+        ) throws {
+            // XNA reads `game.Window.Handle`; the manager holds the game
+            // weakly, and a window exists only inside a callback.
+            let handle = game?.Window?.Handle ?? 0
+            guard let adapters = Microsoft.Xna.Framework.Graphics
+                    .GraphicsAdapter.Adapters else { return }
+            for index in 0 ..< adapters.Count {
+                let adapter = try adapters.Item(index)
+                guard adapter.IsProfileSupported(GraphicsProfile) else { continue }
+
+                let base = Microsoft.Xna.Framework.GraphicsDeviceInformation()
+                try base.SetAdapter(adapter)
+                base.GraphicsProfile = GraphicsProfile
+                base.PresentationParameters.DeviceWindowHandle = handle
+                base.PresentationParameters.MultiSampleCount = 0
+                base.PresentationParameters.IsFullScreen = IsFullScreen
+                base.PresentationParameters.PresentationInterval =
+                    SynchronizeWithVerticalRetrace ? .One : .Immediate
+
+                if let current = adapter.CurrentDisplayMode {
+                    try addDevice(adapter, current, base, foundDevices)
+                }
+                guard IsFullScreen, let modes = adapter.SupportedDisplayModes else {
+                    continue
+                }
+                let cursor = modes.GetEnumerator()
+                while let mode = try cursor.Next() {
+                    guard mode.Width >= 640, mode.Height >= 480 else { continue }
+                    try addDevice(adapter, mode, base, foundDevices)
+                }
+            }
+        }
+
+        /// The enumeration, reachable from the test suite.
+        ///
+        /// `AddDevices` is private in XNA and private here; `FindBestDevice`
+        /// is the only public way in, and it ranks and picks before a test can
+        /// see what was enumerated. This exposes the list itself to
+        /// `@testable`, which is how the duplicate test above is observed at
+        /// all.
+        internal func testOnlyAddDevices(
+            _ anySuitableDevice: Bool,
+            _ foundDevices: CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>
+        ) throws {
+            try addDevices(anySuitableDevice, foundDevices)
+        }
+
+        /// `AddDevices(GraphicsAdapter, DisplayMode, GraphicsDeviceInformation,
+        /// List<GraphicsDeviceInformation>)`, 228 bytes.
+        ///
+        /// Clones the base, sizes the back buffer, negotiates a format, writes
+        /// the three negotiated values back, and adds the candidate **only if
+        /// the list holds no equal one** — which is what makes
+        /// `GraphicsDeviceInformation.Equals` load-bearing rather than
+        /// decorative.
+        ///
+        /// The negotiation's own return is discarded, because XNA pops it:
+        /// whether the request was met exactly decides nothing, the three
+        /// chosen values do.
+        private func addDevice(
+            _ adapter: Microsoft.Xna.Framework.Graphics.GraphicsAdapter,
+            _ mode: Microsoft.Xna.Framework.Graphics.DisplayMode,
+            _ baseDeviceInfo: Microsoft.Xna.Framework.GraphicsDeviceInformation,
+            _ foundDevices: CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>
+        ) throws {
+            let info = baseDeviceInfo.Clone()
+            if IsFullScreen {
+                info.PresentationParameters.BackBufferWidth = mode.Width
+                info.PresentationParameters.BackBufferHeight = mode.Height
+            } else {
+                info.PresentationParameters.BackBufferWidth = PreferredBackBufferWidth
+                info.PresentationParameters.BackBufferHeight = PreferredBackBufferHeight
+            }
+
+            var format = mode.Format
+            var depth = PreferredDepthStencilFormat
+            var samples: Int32 = PreferMultiSampling ? 16 : 0
+            _ = try adapter.QueryBackBufferFormat(
+                info.GraphicsProfile, format: mode.Format,
+                depthFormat: PreferredDepthStencilFormat,
+                multiSampleCount: PreferMultiSampling ? 16 : 0,
+                selectedFormat: &format, selectedDepthFormat: &depth,
+                selectedMultiSampleCount: &samples)
+            info.PresentationParameters.BackBufferFormat = format
+            info.PresentationParameters.DepthStencilFormat = depth
+            info.PresentationParameters.MultiSampleCount = samples
+
+            for existing in 0 ..< foundDevices.Count
+            where try foundDevices.Item(existing).Equals(info) {
+                return
+            }
+            try foundDevices.Add(info)
+        }
+
+        /// `Resources.NoCompatibleDevices`, a one-argument format naming the
+        /// profile that found nothing.
+        internal static func noCompatibleDevicesMessage(
+            _ profile: Microsoft.Xna.Framework.Graphics.GraphicsProfile
+        ) -> String {
+            noCompatibleDevices.replacingOccurrences(of: "{0}", with: "\(profile)")
+        }
+
+        internal static let noCompatibleDevices =
+            "Could not find a Direct3D device that supports the XNA Framework {0} profile."
+            + "\r\n\r\nVerify that a suitable graphics device is installed."
+            + "\r\n\r\nMake sure the desktop is not locked, and that no other application is running in full screen mode."
+            + "\r\n\r\nAvoid running under Remote Desktop or as a Windows service."
+            + "\r\n\r\nCheck the display properties to make sure hardware acceleration is set to Full."
+
+        /// `Resources.NoCompatibleDevicesAfterRanking`.
+        internal static let noCompatibleDevicesAfterRankingMessage =
+            "The process of ranking devices removed all compatible devices."
+
+        /// `protected virtual void RankDevices(List<GraphicsDeviceInformation>
         /// foundDevices)`.
         ///
         /// Eight bytes forwarding to `RankDevicesPlatform`, which is thirteen:
