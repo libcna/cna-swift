@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 194,
-    "TARGET_MEMBERS": 2400,
-    "TOTAL_DIAGNOSTICS": 72,
-    "COMPLETE_TYPES": 190,
+    "TARGET_TYPES": 196,
+    "TARGET_MEMBERS": 2431,
+    "TOTAL_DIAGNOSTICS": 70,
+    "COMPLETE_TYPES": 192,
     "PARTIAL_TYPES": 4,
-    "MISSING_TYPES": 63,
-    "MISSING_TYPE": 63,
+    "MISSING_TYPES": 61,
+    "MISSING_TYPE": 61,
     "MISSING_MEMBER": 7,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -63,14 +63,14 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 92,
-    "PENDING_ACCESSOR_PROJECTIONS": 22,
+    "MEASURED_ACCESSOR_PROJECTIONS": 101,
+    "PENDING_ACCESSOR_PROJECTIONS": 13,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 26,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 27,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 20,
-    "XNA_SEALED_CLASS_PROJECTIONS": 34,
+    "XNA_SEALED_CLASS_PROJECTIONS": 35,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 205,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 164,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 70
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 208,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 161,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 71
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -104,6 +104,8 @@
     "Microsoft.Xna.Framework.Audio.MicrophoneState",
     "Microsoft.Xna.Framework.Audio.NoAudioHardwareException",
     "Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException",
+    "Microsoft.Xna.Framework.Audio.SoundEffect",
+    "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
     "Microsoft.Xna.Framework.Audio.SoundState",
     "Microsoft.Xna.Framework.BoundingBox",
     "Microsoft.Xna.Framework.BoundingFrustum",
@@ -301,8 +303,6 @@
     "Microsoft.Xna.Framework.Audio.Microphone",
     "Microsoft.Xna.Framework.Audio.RendererDetail",
     "Microsoft.Xna.Framework.Audio.SoundBank",
-    "Microsoft.Xna.Framework.Audio.SoundEffect",
-    "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
     "Microsoft.Xna.Framework.Audio.WaveBank",
     "Microsoft.Xna.Framework.Content.ContentReader",
     "Microsoft.Xna.Framework.Content.ContentTypeReader",
@@ -392,16 +392,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Audio.SoundBank",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Audio.SoundEffect",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -1116,6 +1106,132 @@
       "readerThrows": false,
       "writerSymbol": "Microsoft.Xna.Framework.Audio.AudioEmitter.SetDopplerScale(_:Float)",
       "writerName": "SetDopplerScale",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "Name",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.Name()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.SetName(_:String?)",
+      "writerName": "SetName",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "MasterVolume",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.MasterVolume()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.SetMasterVolume(_:Float)",
+      "writerName": "SetMasterVolume",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "SpeedOfSound",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.SpeedOfSound()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.SetSpeedOfSound(_:Float)",
+      "writerName": "SetSpeedOfSound",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "DopplerScale",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.DopplerScale()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.SetDopplerScale(_:Float)",
+      "writerName": "SetDopplerScale",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "sourceProperty": "DistanceScale",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.DistanceScale()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffect.SetDistanceScale(_:Float)",
+      "writerName": "SetDistanceScale",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "Volume",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.Volume()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.SetVolume(_:Float)",
+      "writerName": "SetVolume",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "Pitch",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.Pitch()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.SetPitch(_:Float)",
+      "writerName": "SetPitch",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "Pan",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.Pan()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.SetPan(_:Float)",
+      "writerName": "SetPan",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "sourceProperty": "IsLooped",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.IsLooped()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Audio.SoundEffectInstance.SetIsLooped(_:Bool)",
+      "writerName": "SetIsLooped",
       "writerThrows": true,
       "readerObserved": true,
       "writerObserved": true,
@@ -2418,96 +2534,6 @@
       "static": false
     },
     {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
-      "sourceProperty": "Name",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetName",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
-      "sourceProperty": "MasterVolume",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetMasterVolume",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
-      "sourceProperty": "SpeedOfSound",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetSpeedOfSound",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
-      "sourceProperty": "DopplerScale",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetDopplerScale",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
-      "sourceProperty": "DistanceScale",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetDistanceScale",
-      "writerThrows": true,
-      "indexed": false,
-      "static": true
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "sourceProperty": "Volume",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetVolume",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "sourceProperty": "Pitch",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetPitch",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "sourceProperty": "Pan",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetPan",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "sourceProperty": "IsLooped",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetIsLooped",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
       "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
       "sourceProperty": "EnabledGestures",
       "typeState": "missing",
@@ -2619,6 +2645,13 @@
     }
   ],
   "nonPublicConstructionProjections": [
+    {
+      "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "clrSealed": false,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
     {
       "type": "Microsoft.Xna.Framework.FrameworkDispatcher",
       "clrSealed": true,
@@ -4298,6 +4331,22 @@
       "derivableInReferenceButNotInSwift": false
     },
     {
+      "type": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
       "type": "Microsoft.Xna.Framework.BoundingFrustum",
       "clrSealed": false,
       "swiftFinal": false,
@@ -5091,42 +5140,42 @@
       "member": "FromStream",
       "kind": "method",
       "static": true,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Audio.SoundEffect",
       "swiftReturnType": "Microsoft.Xna.Framework.Audio.SoundEffect",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Audio.SoundEffect"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
       "member": "CreateInstance",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
       "swiftReturnType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Audio.SoundEffectInstance"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Audio.SoundEffect",
       "member": "Name",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.BoundingBox",
@@ -10374,29 +10423,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.SoundEffect",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 16,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Audio.SoundEffect",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 16,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 15,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 15,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.SoundState",

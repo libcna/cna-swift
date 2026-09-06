@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+import CNAShim
+
 extension Microsoft.Xna.Framework.Audio {
     // Pinned in Microsoft.Xna.Framework.dll as a public, non-sealed class
     // extending System.Object, with a public parameterless constructor, four
@@ -108,6 +110,20 @@ extension Microsoft.Xna.Framework.Audio {
                     + "than or equal to zero.")
             }
             dopplerScale = value
+        }
+
+        /// The mirrored `CNA_AudioEmitter`, which carries the emitter's own
+        /// `DopplerScale` beside the same four vectors the listener has.
+        internal func nativeDescriptor() -> CNASwift_AudioEmitter {
+            var native = CNASwift_AudioEmitter()
+            native.struct_size = UInt32(MemoryLayout<CNASwift_AudioEmitter>.size)
+            native.struct_version = 1
+            native.doppler_scale = DopplerScale
+            native.forward = CNASwift_Vector3(x: Forward.X, y: Forward.Y, z: Forward.Z)
+            native.position = CNASwift_Vector3(x: Position.X, y: Position.Y, z: Position.Z)
+            native.up = CNASwift_Vector3(x: Up.X, y: Up.Y, z: Up.Z)
+            native.velocity = CNASwift_Vector3(x: Velocity.X, y: Velocity.Y, z: Velocity.Z)
+            return native
         }
     }
 }

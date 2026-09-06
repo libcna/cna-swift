@@ -526,6 +526,45 @@ typedef struct CNASwift_SpriteScaledCommand {
     float layer_depth;
 } CNASwift_SpriteScaledCommand;
 
+typedef struct CNASwift_AudioEmitter {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    float doppler_scale;
+    CNASwift_Vector3 forward;
+    CNASwift_Vector3 position;
+    CNASwift_Vector3 up;
+    CNASwift_Vector3 velocity;
+} CNASwift_AudioEmitter;
+
+typedef struct CNASwift_AudioListener {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_Vector3 forward;
+    CNASwift_Vector3 position;
+    CNASwift_Vector3 up;
+    CNASwift_Vector3 velocity;
+} CNASwift_AudioListener;
+
+typedef struct CNASwift_SoundEffectCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t sample_rate;
+    uint32_t channels;
+    uint64_t reserved;
+} CNASwift_SoundEffectCreateInfo;
+
+typedef struct CNASwift_SoundEffectInstanceInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t state;
+    uint8_t is_looped;
+    uint8_t reserved0[3];
+    float volume;
+    float pitch;
+    float pan;
+    uint32_t reserved1;
+} CNASwift_SoundEffectInstanceInfo;
+
 typedef struct CNASwift_ContentManagerCreateInfo {
     uint32_t struct_size;
     uint32_t struct_version;

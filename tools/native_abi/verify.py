@@ -64,6 +64,8 @@ MIRRORED_STRUCTS = [
     # call was refused as an invalid configuration. Nothing in this gate
     # looked at the structure, so only a run caught it.
     "ContentManagerCreateInfo",
+    "SoundEffectCreateInfo", "SoundEffectInstanceInfo",
+    "AudioEmitter", "AudioListener",
     "VertexElement", "VertexBufferCreateInfo", "VertexBufferBinding",
     "IndexBufferCreateInfo", "IndexBufferTransfer",
     "TextureCubeCreateInfo", "TextureCubeInfo", "TextureCubeTransfer",
@@ -195,6 +197,10 @@ def canonical_type(value: str) -> str:
         # the same reason effects.h gives nine: the header naming which handle
         # a route wants, not a wider ABI.
         "CNA_OcclusionQueryHandle": "uint64_t",
+        # audio.h:13 and :21 -- the channel count and the playback state are
+        # both uint32_t enumerations the header names.
+        "CNA_AudioChannels": "uint32_t",
+        "CNA_SoundState": "uint32_t",
         # effects.h gives every effect object its own handle alias, and two
         # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,
         # and it is the header being precise about which handle a route wants

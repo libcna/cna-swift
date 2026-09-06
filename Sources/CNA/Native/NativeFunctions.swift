@@ -167,6 +167,41 @@ internal final class NativeFunctions {
     typealias GamepadSetVibrationRoute = @convention(c) (UInt64, UInt32, Float, Float, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias TextureGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_TextureInfo>?) -> UInt32
     typealias RenderTarget2dCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_RenderTarget2DCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundEffectCreatePcm16Route = @convention(c) (UInt64, UnsafePointer<CNASwift_SoundEffectCreateInfo>?, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundEffectCreatePcm16RangeExtRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SoundEffectCreateInfo>?, UnsafePointer<UInt8>?, UInt64, Int32, Int32, Int32, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundEffectCreateFromEncodedExtRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundEffectDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias SoundEffectGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SoundEffectGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundEffectCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundEffectSetNameRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias SoundEffectGetDurationTicksRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias SoundEffectPlayRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SoundEffectPlayWithSettingsRoute = @convention(c) (UInt64, Float, Float, Float, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SoundEffectCreateInstanceRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundEffectGetMasterVolumeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias SoundEffectSetMasterVolumeRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SoundEffectGetDistanceScaleRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias SoundEffectSetDistanceScaleRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SoundEffectGetDopplerScaleRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias SoundEffectSetDopplerScaleRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SoundEffectGetSpeedOfSoundRoute = @convention(c) (UInt64, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias SoundEffectSetSpeedOfSoundRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SoundEffectGetSampleSizeInBytesRoute = @convention(c) (Int64, Int32, UInt32, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias SoundEffectGetSampleDurationTicksRoute = @convention(c) (Int32, Int32, UInt32, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias SoundEffectInstanceGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_SoundEffectInstanceInfo>?) -> UInt32
+    typealias SoundEffectInstanceSetVolumeRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SoundEffectInstanceSetPitchRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SoundEffectInstanceSetPanRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias SoundEffectInstanceSetIsLoopedRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias SoundEffectInstancePlayRoute = @convention(c) (UInt64) -> UInt32
+    typealias SoundEffectInstancePauseRoute = @convention(c) (UInt64) -> UInt32
+    typealias SoundEffectInstanceResumeRoute = @convention(c) (UInt64) -> UInt32
+    typealias SoundEffectInstanceStopRoute = @convention(c) (UInt64, UInt8) -> UInt32
+    typealias SoundEffectInstanceGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SoundEffectInstanceDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias SoundEffectInstanceApply3dRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_AudioListener>?, UnsafePointer<CNASwift_AudioEmitter>?) -> UInt32
+    typealias SoundEffectInstanceApply3dMultiExtRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_AudioListener>?, UInt64, UnsafePointer<CNASwift_AudioEmitter>?) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -536,6 +571,41 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let soundEffectInstanceApply3D: SoundEffectInstanceApply3dRoute
+    let soundEffectInstanceApply3DMulti: SoundEffectInstanceApply3dMultiExtRoute
+    let soundEffectCreatePcm16: SoundEffectCreatePcm16Route
+    let soundEffectCreatePcm16Range: SoundEffectCreatePcm16RangeExtRoute
+    let soundEffectCreateFromEncoded: SoundEffectCreateFromEncodedExtRoute
+    let soundEffectDestroy: SoundEffectDestroyRoute
+    let soundEffectGetIsDisposed: SoundEffectGetIsDisposedRoute
+    let soundEffectGetNameSize: SoundEffectGetNameSizeRoute
+    let soundEffectCopyName: SoundEffectCopyNameRoute
+    let soundEffectSetName: SoundEffectSetNameRoute
+    let soundEffectGetDurationTicks: SoundEffectGetDurationTicksRoute
+    let soundEffectPlay: SoundEffectPlayRoute
+    let soundEffectPlayWithSettings: SoundEffectPlayWithSettingsRoute
+    let soundEffectCreateInstance: SoundEffectCreateInstanceRoute
+    let soundEffectGetMasterVolume: SoundEffectGetMasterVolumeRoute
+    let soundEffectSetMasterVolume: SoundEffectSetMasterVolumeRoute
+    let soundEffectGetDistanceScale: SoundEffectGetDistanceScaleRoute
+    let soundEffectSetDistanceScale: SoundEffectSetDistanceScaleRoute
+    let soundEffectGetDopplerScale: SoundEffectGetDopplerScaleRoute
+    let soundEffectSetDopplerScale: SoundEffectSetDopplerScaleRoute
+    let soundEffectGetSpeedOfSound: SoundEffectGetSpeedOfSoundRoute
+    let soundEffectSetSpeedOfSound: SoundEffectSetSpeedOfSoundRoute
+    let soundEffectGetSampleSizeInBytes: SoundEffectGetSampleSizeInBytesRoute
+    let soundEffectGetSampleDurationTicks: SoundEffectGetSampleDurationTicksRoute
+    let soundEffectInstanceGetInfo: SoundEffectInstanceGetInfoRoute
+    let soundEffectInstanceSetVolume: SoundEffectInstanceSetVolumeRoute
+    let soundEffectInstanceSetPitch: SoundEffectInstanceSetPitchRoute
+    let soundEffectInstanceSetPan: SoundEffectInstanceSetPanRoute
+    let soundEffectInstanceSetIsLooped: SoundEffectInstanceSetIsLoopedRoute
+    let soundEffectInstancePlay: SoundEffectInstancePlayRoute
+    let soundEffectInstancePause: SoundEffectInstancePauseRoute
+    let soundEffectInstanceResume: SoundEffectInstanceResumeRoute
+    let soundEffectInstanceStop: SoundEffectInstanceStopRoute
+    let soundEffectInstanceGetIsDisposed: SoundEffectInstanceGetIsDisposedRoute
+    let soundEffectInstanceDestroy: SoundEffectInstanceDestroyRoute
     let occlusionQueryDestroy: OcclusionQueryDestroyRoute
     let occlusionQueryBegin: OcclusionQueryBeginRoute
     let occlusionQueryEnd: OcclusionQueryEndRoute
@@ -924,6 +994,41 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        soundEffectInstanceApply3D = try library.resolve("cna_sound_effect_instance_apply_3d", as: SoundEffectInstanceApply3dRoute.self)
+        soundEffectInstanceApply3DMulti = try library.resolve("cna_sound_effect_instance_apply_3d_multi_ext", as: SoundEffectInstanceApply3dMultiExtRoute.self)
+        soundEffectCreatePcm16 = try library.resolve("cna_sound_effect_create_pcm16", as: SoundEffectCreatePcm16Route.self)
+        soundEffectCreatePcm16Range = try library.resolve("cna_sound_effect_create_pcm16_range_ext", as: SoundEffectCreatePcm16RangeExtRoute.self)
+        soundEffectCreateFromEncoded = try library.resolve("cna_sound_effect_create_from_encoded_ext", as: SoundEffectCreateFromEncodedExtRoute.self)
+        soundEffectDestroy = try library.resolve("cna_sound_effect_destroy", as: SoundEffectDestroyRoute.self)
+        soundEffectGetIsDisposed = try library.resolve("cna_sound_effect_get_is_disposed", as: SoundEffectGetIsDisposedRoute.self)
+        soundEffectGetNameSize = try library.resolve("cna_sound_effect_get_name_size", as: SoundEffectGetNameSizeRoute.self)
+        soundEffectCopyName = try library.resolve("cna_sound_effect_copy_name", as: SoundEffectCopyNameRoute.self)
+        soundEffectSetName = try library.resolve("cna_sound_effect_set_name", as: SoundEffectSetNameRoute.self)
+        soundEffectGetDurationTicks = try library.resolve("cna_sound_effect_get_duration_ticks", as: SoundEffectGetDurationTicksRoute.self)
+        soundEffectPlay = try library.resolve("cna_sound_effect_play", as: SoundEffectPlayRoute.self)
+        soundEffectPlayWithSettings = try library.resolve("cna_sound_effect_play_with_settings", as: SoundEffectPlayWithSettingsRoute.self)
+        soundEffectCreateInstance = try library.resolve("cna_sound_effect_create_instance", as: SoundEffectCreateInstanceRoute.self)
+        soundEffectGetMasterVolume = try library.resolve("cna_sound_effect_get_master_volume", as: SoundEffectGetMasterVolumeRoute.self)
+        soundEffectSetMasterVolume = try library.resolve("cna_sound_effect_set_master_volume", as: SoundEffectSetMasterVolumeRoute.self)
+        soundEffectGetDistanceScale = try library.resolve("cna_sound_effect_get_distance_scale", as: SoundEffectGetDistanceScaleRoute.self)
+        soundEffectSetDistanceScale = try library.resolve("cna_sound_effect_set_distance_scale", as: SoundEffectSetDistanceScaleRoute.self)
+        soundEffectGetDopplerScale = try library.resolve("cna_sound_effect_get_doppler_scale", as: SoundEffectGetDopplerScaleRoute.self)
+        soundEffectSetDopplerScale = try library.resolve("cna_sound_effect_set_doppler_scale", as: SoundEffectSetDopplerScaleRoute.self)
+        soundEffectGetSpeedOfSound = try library.resolve("cna_sound_effect_get_speed_of_sound", as: SoundEffectGetSpeedOfSoundRoute.self)
+        soundEffectSetSpeedOfSound = try library.resolve("cna_sound_effect_set_speed_of_sound", as: SoundEffectSetSpeedOfSoundRoute.self)
+        soundEffectGetSampleSizeInBytes = try library.resolve("cna_sound_effect_get_sample_size_in_bytes", as: SoundEffectGetSampleSizeInBytesRoute.self)
+        soundEffectGetSampleDurationTicks = try library.resolve("cna_sound_effect_get_sample_duration_ticks", as: SoundEffectGetSampleDurationTicksRoute.self)
+        soundEffectInstanceGetInfo = try library.resolve("cna_sound_effect_instance_get_info", as: SoundEffectInstanceGetInfoRoute.self)
+        soundEffectInstanceSetVolume = try library.resolve("cna_sound_effect_instance_set_volume", as: SoundEffectInstanceSetVolumeRoute.self)
+        soundEffectInstanceSetPitch = try library.resolve("cna_sound_effect_instance_set_pitch", as: SoundEffectInstanceSetPitchRoute.self)
+        soundEffectInstanceSetPan = try library.resolve("cna_sound_effect_instance_set_pan", as: SoundEffectInstanceSetPanRoute.self)
+        soundEffectInstanceSetIsLooped = try library.resolve("cna_sound_effect_instance_set_is_looped", as: SoundEffectInstanceSetIsLoopedRoute.self)
+        soundEffectInstancePlay = try library.resolve("cna_sound_effect_instance_play", as: SoundEffectInstancePlayRoute.self)
+        soundEffectInstancePause = try library.resolve("cna_sound_effect_instance_pause", as: SoundEffectInstancePauseRoute.self)
+        soundEffectInstanceResume = try library.resolve("cna_sound_effect_instance_resume", as: SoundEffectInstanceResumeRoute.self)
+        soundEffectInstanceStop = try library.resolve("cna_sound_effect_instance_stop", as: SoundEffectInstanceStopRoute.self)
+        soundEffectInstanceGetIsDisposed = try library.resolve("cna_sound_effect_instance_get_is_disposed", as: SoundEffectInstanceGetIsDisposedRoute.self)
+        soundEffectInstanceDestroy = try library.resolve("cna_sound_effect_instance_destroy", as: SoundEffectInstanceDestroyRoute.self)
         occlusionQueryDestroy = try library.resolve("cna_occlusion_query_destroy", as: OcclusionQueryDestroyRoute.self)
         occlusionQueryBegin = try library.resolve("cna_occlusion_query_begin", as: OcclusionQueryBeginRoute.self)
         occlusionQueryEnd = try library.resolve("cna_occlusion_query_end", as: OcclusionQueryEndRoute.self)

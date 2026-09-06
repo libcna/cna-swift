@@ -24,16 +24,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-875 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=72   COMPLETE_TYPES=190   PARTIAL_TYPES=4
-MISSING_TYPE=63  MISSING_MEMBER=7  OVERLOAD_MAPPING_MISMATCH=2
+886 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=70   COMPLETE_TYPES=192   PARTIAL_TYPES=4
+MISSING_TYPE=61  MISSING_MEMBER=7  OVERLOAD_MAPPING_MISMATCH=2
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=360  PROTOTYPE_TYPE_POSITIONS=1250  LAYOUTS=55  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=334 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=395  PROTOTYPE_TYPE_POSITIONS=1374  LAYOUTS=59  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=348 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2457  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+API_COMPAT_SELF_TESTS=2459  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
 ```
 
@@ -207,6 +207,46 @@ the road is long: this is a per-namespace campaign, not a handful of milestones.
 |---|---|---|
 | The five unwired content loaders | 0 types, 0 members | `ContentManager` landed in Foundation 87 with **one** loader bound, `load_texture2d`, because adopting what the other five produce needs machinery those types do not have yet. Each is unblocked by its own type's milestone, not by content work. |
 | `ContentManager.OpenStream` / `ReadAsset` | 0 types, 2 members | The two protected members Foundation 87 left absent. `OpenStream` returns a `Stream` over an asset this binding never opens itself, and `ReadAsset` takes `Action<IDisposable>`; both wait on decisions about `System.IO` and delegate projection. |
+
+### Foundation 89 — `SoundEffect` and `SoundEffectInstance`
+
+Two audio types, thirty-five routes, and **no asset**:
+`cna_sound_effect_create_pcm16` takes raw PCM16LE bytes, so the fixture is a
+tenth of a second of silence written by the test. That property is why this
+family came before `Model`, which is blocked on a compiled `.xnb`.
+
+The qualified HEADLESS renderer **does** have audio: sounds construct, play,
+loop, pan and report their state.
+
+**Almost all of the interesting work was the managed half.** Running
+`message_coverage.py` after the first green build returned **22 findings** --
+every argument and state rule XNA enforces and CNA does not:
+
+* four constructor refusals, because CNA takes the byte count it is given and
+  decodes what fits, so an odd-length buffer is a shorter sound rather than an
+  error, and a loop region past the end is accepted;
+* three stateful rules that all close at the first `Play` -- the loop flag is
+  fixed then, `Apply3D` is too late to make a sound 3D, and `Pan` cannot be set
+  on a 3D sound because the emitter's position decides where it is heard;
+* the disposal text, which XNA's audio types pass themselves rather than
+  taking the BCL's generic one.
+
+`InvalidBufferSize`, `InvalidPanCall` and the rest are read out of the pinned
+assemblies, never typed from memory.
+
+**One finding closed itself by accident, and that is worth knowing.**
+`CallFrameworkDispatcherUpdate` went green the moment its message constant
+existed -- `message_coverage.py` matches a message by its **text in the
+sources**, so a constant nobody references satisfies it. The constant was
+removed and the absence recorded as `unreachable` instead, with the real
+reason: a `SoundEffect` is built through `RuntimeRegistry.current()`, so one can
+exist only while a game does, and `Game.Tick` calls the dispatcher itself. When
+that gate goes green on a new message, check that something actually throws it.
+
+`Apply3D` needed the first two **mirrored structures** in the audio namespace:
+CNA takes the listener and emitter by value, not by handle, which is why those
+two managed types now have native descriptors and the ABI layout gate covers
+them.
 
 ### The status gate now re-runs the message-coverage report too
 

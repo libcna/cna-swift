@@ -83,22 +83,6 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Audio.AudioEmitter",
-        "Microsoft.Xna.Framework.Audio.AudioListener",
-        "Microsoft.Xna.Framework.Audio.SoundState"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
-        "Microsoft.Xna.Framework.Audio.SoundEffect"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 2,
-      "transitivePartialReverseReach": []
-    },
-    {
       "type": "Microsoft.Xna.Framework.Audio.Cue",
       "dependencies": [
         "Microsoft.Xna.Framework.Audio.AudioEmitter",
@@ -124,6 +108,18 @@
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 1,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Audio.AudioChannels",
+        "Microsoft.Xna.Framework.Audio.SoundEffectInstance"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
       "transitivePartialReverseReach": []
     },
     {

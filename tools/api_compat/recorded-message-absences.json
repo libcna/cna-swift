@@ -266,6 +266,13 @@
       "key": "DeviceCannotBeNullOnResourceCreate",
       "kind": "unreachable",
       "reason": "`graphicsDevice` is a non-Optional Swift class parameter, so the null-device branch cannot be reached through the projected constructor -- the same reason RenderTarget2D records for the same key."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "key": "CallFrameworkDispatcherUpdate",
+      "member": "Play",
+      "kind": "unreachable",
+      "reason": "XNA raises this for applications that use audio WITHOUT running a game loop, which this binding cannot express: a SoundEffect is built through RuntimeRegistry.current(), so one can exist only while a game does, and Game.Tick calls the dispatcher itself (see FrameworkDispatcher.Update's own documentation). The branch has no input. The message constant was written and then REMOVED, because an unused constant satisfies message_coverage.py by its text alone -- see the note in NEXT.md."
     }
   ]
 }

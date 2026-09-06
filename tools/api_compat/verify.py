@@ -604,7 +604,13 @@ def normalize_swift_type(text: str) -> str:
     # normalized here; only `InputStream` was until Foundation 60, and the
     # consequence was two live PARAMETER_MAPPING_MISMATCHes on SaveAsPng and
     # SaveAsJpeg that shipped in the Foundation 59 commit.
+    # The Optional spelling has to be qualified too. Only the bare names were
+    # matched until Foundation 89, so an `InputStream?` parameter compared
+    # unequal to `Foundation.InputStream?` and a correct projection looked
+    # wrong -- the same defect the paragraph above describes, one `?` over.
     if value in ("InputStream", "OutputStream"):
+        value = "Foundation." + value
+    elif value in ("InputStream?", "OutputStream?"):
         value = "Foundation." + value
     value = value.replace("()", "Void") if value == "()" else value
     return value
@@ -1828,6 +1834,8 @@ def normalizer_self_test() -> list[str]:
         ("(any CNAEqualityComparer<Key>)?", "CNAEqualityComparer<Key>?"),
         ("Swift.Int32", "Int32"),
         ("InputStream", "Foundation.InputStream"),
+        ("InputStream?", "Foundation.InputStream?"),
+        ("OutputStream?", "Foundation.OutputStream?"),
     ]
     for text, want in cases:
         got = normalize_swift_type(text)
@@ -5346,7 +5354,7 @@ def self_test() -> None:
 
     normalizer_failures = normalizer_self_test()
     failures.extend(normalizer_failures)
-    normalizer_self_tests = 10
+    normalizer_self_tests = 12
 
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))

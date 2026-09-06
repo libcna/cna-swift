@@ -1250,6 +1250,18 @@
       "member": "Load",
       "parameter": "assetName",
       "reason": "Load<T>'s first instruction after the disposal test is String.IsNullOrEmpty(assetName), and the null half of that test is a branch a caller can only reach by passing null. Declaring the parameter non-Optional would leave the ArgumentNullException unreachable from Swift, hiding half of a refusal the IL opens with -- the same reason TitleContainer.OpenStream's name is Optional."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundEffect",
+      "member": "FromStream",
+      "parameter": "stream",
+      "reason": "The same shape as TitleContainer.OpenStream: the method opens with a null test on the stream, and that branch is one a caller can only reach by passing null. A non-Optional parameter would make the refusal unreachable from Swift, leaving a factory that appears to accept anything."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
+      "member": "Apply3D",
+      "parameter": "listeners",
+      "reason": "The array overload opens with a null test on the array, and an empty array is NOT the same input -- it reaches CNA and means zero listeners. A non-Optional parameter would collapse the two, leaving the ArgumentNullException unreachable while an empty array quietly took its place. The single-listener overload takes a class and needs no such entry, because XNA's null check there is on a reference Swift already makes non-Optional."
     }
   ],
   "globalOperatorProjections": [

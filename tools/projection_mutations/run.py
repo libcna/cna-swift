@@ -38,6 +38,8 @@ MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
 CONTENT = ROOT / "Sources/CNA/Xna/Content/ContentManager.swift"
 OCCLUSION = ROOT / "Sources/CNA/Xna/Graphics/OcclusionQuery.swift"
+SOUND = ROOT / "Sources/CNA/Xna/Audio/SoundEffect.swift"
+SOUND_INSTANCE = ROOT / "Sources/CNA/Xna/Audio/SoundEffectInstance.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -121,6 +123,140 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 89: the sound effect pair ------------------------------
+    (
+        "sound-buffer-alignment-unchecked",
+        "the constructor accepting a buffer that is not a whole number of "
+        "PCM16 frames, which CNA decodes as a shorter sound instead",
+        SOUND,
+        "            guard length > 0, length % blockAlign == 0 else {",
+        "            if false {",
+    ),
+    (
+        "sound-loop-region-unchecked",
+        "a loop region past the end accepted, so the sound loops over samples "
+        "the caller never supplied",
+        SOUND,
+        "            guard loopStart >= 0, loopLength >= 0,\n"
+        "                  loopStart <= frames, loopStart <= frames - loopLength else {",
+        "            if false {",
+    ),
+    (
+        "sound-disposal-uses-the-bcl-message",
+        "the disposal refusal carrying the BCL's generic text instead of the "
+        "one XNA's audio types pass",
+        SOUND,
+        "                    message: Microsoft.Xna.Framework.Audio\n"
+        "                        .objectDisposedMessage)",
+        "                    message: nil)",
+    ),
+    (
+        "instance-loop-changes-after-play",
+        "SetIsLooped accepted once playback has started, so the flag changes "
+        "where nothing can act on it",
+        SOUND_INSTANCE,
+        "            guard !hasPlayed else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: SoundEffectInstance.invalidIsLoopedCallMessage)\n"
+        "            }",
+        "            if false {}",
+    ),
+    (
+        "instance-apply3d-after-play",
+        "Apply3D accepted after the first Play, when it is too late to make "
+        "the sound 3D at all",
+        SOUND_INSTANCE,
+        "            guard !hasPlayed else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: SoundEffectInstance.invalidApply3DCallMessage)\n"
+        "            }",
+        "            if false {}",
+    ),
+    (
+        "instance-pan-on-a-3d-sound",
+        "SetPan accepted on a sound placed in space, where the emitter's "
+        "position is what decides where it is heard",
+        SOUND_INSTANCE,
+        "            guard !is3D, !hasPlayed else {",
+        "            if false {",
+    ),
+    (
+        "sound-range-constructor-takes-the-canonical-route",
+        "the seven-argument constructor reaching the route that ignores offset, "
+        "count and the loop points, so a caller's range is silently the whole "
+        "buffer",
+        SOUND,
+        "                    if useRange {",
+        "                    if false {",
+    ),
+    (
+        "sound-name-writer-does-not-reach-the-runtime",
+        "SetName updating only the cached copy, so the name the runtime holds "
+        "and the name the getter answers disagree",
+        SOUND,
+        "                    runtime.functions.soundEffectSetName(live, view)",
+        "                    UInt32(0 * view.byte_length)",
+    ),
+    (
+        "sound-effect-never-joins-the-parent-registry",
+        "an effect that does not register with the runtime, so one the caller "
+        "forgot makes the game's teardown fail",
+        SOUND,
+        "            handle = created\n"
+        "            rt.register(self)",
+        "            handle = created",
+    ),
+    (
+        "sound-conversions-swap-their-arguments",
+        "GetSampleSizeInBytes passing the sample rate where the duration goes, "
+        "so every size it answers is for the wrong sound",
+        SOUND,
+        "                    SoundEffect.ticks(from: duration), sampleRate,",
+        "                    Int64(sampleRate), sampleRate,",
+    ),
+    (
+        "instance-volume-accepts-anything",
+        "SetVolume without its range check, which CNA passes through unclamped "
+        "-- so an illegal volume becomes a real one",
+        SOUND_INSTANCE,
+        "            guard value >= 0, value <= 1 else {\n"
+        "                throw CNAArgumentOutOfRangeException(paramName: \"value\")\n"
+        "            }\n"
+        "            let live = try validatedHandle(\"SoundEffectInstance.SetVolume\")",
+        "            let live = try validatedHandle(\"SoundEffectInstance.SetVolume\")",
+    ),
+    (
+        "instance-pitch-is-clamped-not-refused",
+        "SetPitch without its range check, so CNA clamps an illegal pitch to "
+        "the nearest legal one and the caller is never told",
+        SOUND_INSTANCE,
+        "            guard value >= -1, value <= 1 else {\n"
+        "                throw CNAArgumentOutOfRangeException(paramName: \"value\")\n"
+        "            }\n"
+        "            let live = try validatedHandle(\"SoundEffectInstance.SetPitch\")",
+        "            let live = try validatedHandle(\"SoundEffectInstance.SetPitch\")",
+    ),
+    (
+        "instance-stop-is-never-immediate",
+        "the parameterless Stop asking for a fade instead of an immediate stop",
+        SOUND_INSTANCE,
+        "        public func Stop() throws {\n"
+        "            try Stop(true)\n"
+        "        }",
+        "        public func Stop() throws {\n"
+        "            try Stop(false)\n"
+        "        }",
+    ),
+    (
+        "instance-apply3d-array-accepts-null",
+        "the array Apply3D letting a null array through, so a caller's mistake "
+        "reaches the ABI instead of being named",
+        SOUND_INSTANCE,
+        "            guard let listeners else {\n"
+        "                throw CNAArgumentNullException(paramName: \"listeners\")\n"
+        "            }",
+        "            let listeners = listeners ?? []",
+    ),
     # ---- Foundation 88: messages the coverage gate named --------------------
     (
         "content-root-moves-after-a-load",

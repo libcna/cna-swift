@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+import CNAShim
+
 extension Microsoft.Xna.Framework.Audio {
     // Pinned in Microsoft.Xna.Framework.dll as a public, non-sealed class
     // extending System.Object, with a public parameterless constructor and
@@ -54,6 +56,23 @@ extension Microsoft.Xna.Framework.Audio {
         public var Up: Microsoft.Xna.Framework.Vector3 {
             get { Microsoft.Xna.Framework.Audio.flipHandedness(up) }
             set { up = Microsoft.Xna.Framework.Audio.flipHandedness(newValue) }
+        }
+
+        /// The mirrored `CNA_AudioListener` this listener's four vectors make.
+        ///
+        /// Built on demand rather than stored: XNA's listener is four settable
+        /// vectors and nothing else, and `Apply3D` is the only place the native
+        /// shape is needed. The vectors read here are the PROPERTIES, so the
+        /// handedness flip those accessors apply is already in them.
+        internal func nativeDescriptor() -> CNASwift_AudioListener {
+            var native = CNASwift_AudioListener()
+            native.struct_size = UInt32(MemoryLayout<CNASwift_AudioListener>.size)
+            native.struct_version = 1
+            native.forward = CNASwift_Vector3(x: Forward.X, y: Forward.Y, z: Forward.Z)
+            native.position = CNASwift_Vector3(x: Position.X, y: Position.Y, z: Position.Z)
+            native.up = CNASwift_Vector3(x: Up.X, y: Up.Y, z: Up.Z)
+            native.velocity = CNASwift_Vector3(x: Velocity.X, y: Velocity.Y, z: Velocity.Z)
+            return native
         }
     }
 
