@@ -20,8 +20,24 @@ python3 tools/status_gate/verify.py \
   --cna-include /path/to/cnanext/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY" \
   --assembly-dir /path/to/xna/redistributable \
-  --il-cache ~/deps/xna-il-cache
+  --il-cache ~/deps/xna-il-cache \
+  --bcl-dir ~/deps/bcl-4.0-pinned \
+  --bcl-negative-control mscorlib.dll=/usr/lib/mono/4.5/mscorlib.dll \
+  --bcl-negative-control mscorlib.dll=/usr/lib/mono/4.0-api/mscorlib.dll \
+  --bcl-negative-control mscorlib.dll=/usr/lib/mono/2.0-api/mscorlib.dll \
+  --bcl-negative-control \
+    mscorlib.dll=~/.wine/drive_c/windows/Microsoft.NET/Framework64/v4.0.30319/mscorlib.dll
 ```
+
+`--bcl-dir` and the four controls are not optional decoration. Without them the
+gate reads `bcl-authority-audit.json` for five derived facts and never re-runs
+the audit, which is how `plan.md`'s sentinel-check count sat nine below what a
+live run answered — stale before Foundation 100 even started, and invisible to
+every gate. (Written without the `KEY=value` spelling on purpose: the gate
+cannot tell a quoted stale number from a live claim, and it is right not to
+try.) The controls have to be offered here because the committed report
+records one entry per control and the comparison is byte-for-byte; the report
+stores only their sha, so their paths live in this command.
 
 ```text
 931 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
@@ -33,7 +49,8 @@ PROJECTION_MUTATIONS=375 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=497
+BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=39  BCL_SENTINEL_CHECKS=585
 RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
 ```
 

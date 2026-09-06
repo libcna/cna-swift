@@ -282,6 +282,13 @@ def member_record(member: dict[str, Any]) -> dict[str, Any]:
             "setAccess": member.get("setAccess"),
             "getOverridable": bool(member.get("getOverridable")),
             "setOverridable": bool(member.get("setOverridable")),
+            # `overridable` cannot tell an abstract accessor from a virtual
+            # one, and PropertyDescriptor's contract is precisely that eight
+            # members are abstract -- a derived descriptor MUST supply them.
+            # The extractor already reads the flag; it was simply dropped
+            # here (Foundation 100).
+            "getAbstract": bool(member.get("getAbstract")),
+            "setAbstract": bool(member.get("setAbstract")),
             "parameters": [
                 {"name": item.get("name", ""), "type": item.get("type")}
                 for item in member.get("parameters", [])
@@ -398,6 +405,13 @@ NOT_SUPPORTED_EXCEPTION = "System.NotSupportedException"
 INVALID_OPERATION_EXCEPTION = "System.InvalidOperationException"
 OBJECT_DISPOSED_EXCEPTION = "System.ObjectDisposedException"
 KEY_NOT_FOUND_EXCEPTION = "System.Collections.Generic.KeyNotFoundException"
+TYPE_CONVERTER = "System.ComponentModel.TypeConverter"
+EXPANDABLE_CONVERTER = "System.ComponentModel.ExpandableObjectConverter"
+TYPE_DESCRIPTOR_CONTEXT = "System.ComponentModel.ITypeDescriptorContext"
+PROPERTY_DESCRIPTOR = "System.ComponentModel.PropertyDescriptor"
+PROPERTY_DESCRIPTOR_COLLECTION = "System.ComponentModel.PropertyDescriptorCollection"
+CULTURE_INFO = "System.Globalization.CultureInfo"
+NONGENERIC_IDICTIONARY = "System.Collections.IDictionary"
 
 
 # ----------------------------------------------------------------------------
@@ -1256,6 +1270,379 @@ def sentinel_checks(
         for member in members_of(IEQUALITY_COMPARER, "method", "GetHashCode"):
             require(member["returnType"] == "System.Int32",
                     "IEqualityComparer<T>.GetHashCode does not return Int32")
+
+    # ------------------------------------------------------------------
+    # System.ComponentModel.TypeConverter (Foundation 100).
+    #
+    # The transitive base of all thirteen XNA Design converters. Everything
+    # below is written from the documented .NET Framework 4.0 contract; where
+    # a claim turned out to be wrong the correction is noted AT the claim,
+    # because a sentinel silently relaxed to match the extraction is not a
+    # sentinel any more.
+    # ------------------------------------------------------------------
+    require(TYPE_CONVERTER in by_type,
+            "System.ComponentModel.TypeConverter was not extracted at all")
+    converter = by_type.get(TYPE_CONVERTER)
+    if converter is not None:
+        require(converter["kind"] == "class", "TypeConverter is not a class")
+        # NOT abstract. This is the claim most likely to be got wrong from
+        # memory -- `new TypeConverter()` is legal and returns a converter that
+        # refuses every conversion, and the thirteen XNA converters rely on
+        # that base behaviour for the pairs they do not override.
+        require(not converter["abstract"], "TypeConverter is abstract")
+        require(not converter["sealed"], "TypeConverter is sealed")
+        require(converter["baseType"] == "System.Object",
+                "TypeConverter does not derive directly from System.Object")
+        require(converter["genericArity"] == 0, "TypeConverter is generic")
+
+        # The four capability/conversion pairs. Each exists twice: a
+        # context-free convenience overload and the virtual one that takes the
+        # context first. Only the longer overload is virtual -- a projection
+        # that made the short one virtual would invite an override the CLR
+        # would never call.
+        for name, short_params, long_params, ret in (
+            ("CanConvertFrom", ["System.Type"],
+             [TYPE_DESCRIPTOR_CONTEXT, "System.Type"], "System.Boolean"),
+            ("CanConvertTo", ["System.Type"],
+             [TYPE_DESCRIPTOR_CONTEXT, "System.Type"], "System.Boolean"),
+            ("ConvertFrom", ["System.Object"],
+             [TYPE_DESCRIPTOR_CONTEXT, CULTURE_INFO, "System.Object"],
+             "System.Object"),
+            ("ConvertTo", ["System.Object", "System.Type"],
+             [TYPE_DESCRIPTOR_CONTEXT, CULTURE_INFO, "System.Object",
+              "System.Type"], "System.Object"),
+        ):
+            overloads = members_of(TYPE_CONVERTER, "method", name)
+            require(len(overloads) == 2,
+                    f"TypeConverter.{name} should have exactly 2 overloads, "
+                    f"found {len(overloads)}")
+            by_arity = {
+                tuple(item["type"] for item in member["parameters"]): member
+                for member in overloads
+            }
+            require(tuple(short_params) in by_arity,
+                    f"TypeConverter.{name} has no ({', '.join(short_params)}) "
+                    "overload")
+            require(tuple(long_params) in by_arity,
+                    f"TypeConverter.{name} has no context overload taking "
+                    f"({', '.join(long_params)})")
+            long_member = by_arity.get(tuple(long_params))
+            short_member = by_arity.get(tuple(short_params))
+            if long_member is not None:
+                # `overridable`, not merely `virtual`: `virtual final` is
+                # virtual and still cannot be overridden, and a converter that
+                # could not override this pair could not convert anything.
+                require(long_member["overridable"],
+                        f"TypeConverter.{name}'s context overload is not an "
+                        "override point")
+                require(long_member["returnType"] == ret,
+                        f"TypeConverter.{name} does not return {ret}")
+            if short_member is not None:
+                require(not short_member["overridable"],
+                        f"TypeConverter.{name}'s context-free overload is an "
+                        "override point; it is a forwarder and overriding it "
+                        "would be silently skipped by every internal caller")
+
+        # CreateInstance is why System.Collections.IDictionary is in the
+        # closure at all: the property bag GetProperties described comes back
+        # as a non-generic IDictionary.
+        create = members_of(TYPE_CONVERTER, "method", "CreateInstance")
+        require(len(create) == 2,
+                f"TypeConverter.CreateInstance should have 2 overloads, "
+                f"found {len(create)}")
+        require(any(
+            [item["type"] for item in member["parameters"]]
+            == [TYPE_DESCRIPTOR_CONTEXT, NONGENERIC_IDICTIONARY]
+            for member in create),
+            "TypeConverter.CreateInstance has no "
+            "(ITypeDescriptorContext, IDictionary) overload")
+
+        properties = members_of(TYPE_CONVERTER, "method", "GetProperties")
+        require(len(properties) == 3,
+                f"TypeConverter.GetProperties should have 3 overloads, "
+                f"found {len(properties)}")
+        for member in properties:
+            require(member["returnType"] == PROPERTY_DESCRIPTOR_COLLECTION,
+                    "TypeConverter.GetProperties does not return a "
+                    "PropertyDescriptorCollection")
+        widest = max(properties, key=lambda m: len(m["parameters"])) \
+            if properties else None
+        if widest is not None:
+            params = [item["type"] for item in widest["parameters"]]
+            require(len(params) == 3,
+                    "TypeConverter's widest GetProperties does not take 3 "
+                    "parameters")
+            require(params[:2] == [TYPE_DESCRIPTOR_CONTEXT, "System.Object"],
+                    "TypeConverter.GetProperties(context, value, attributes) "
+                    "does not start with (ITypeDescriptorContext, Object)")
+            require(len(params) == 3 and params[2].endswith("[]")
+                    and "Attribute" in params[2],
+                    "TypeConverter.GetProperties' third parameter is not an "
+                    "array of System.Attribute")
+
+    # ------------------------------------------------------------------
+    # System.ComponentModel.ExpandableObjectConverter.
+    #
+    # The DIRECT base of XNA's MathTypeConverter. It adds exactly two members
+    # over TypeConverter, and those two are what the math converters override.
+    # ------------------------------------------------------------------
+    require(EXPANDABLE_CONVERTER in by_type,
+            "System.ComponentModel.ExpandableObjectConverter was not "
+            "extracted at all")
+    expandable = by_type.get(EXPANDABLE_CONVERTER)
+    if expandable is not None:
+        require(expandable["baseType"] == TYPE_CONVERTER,
+                "ExpandableObjectConverter does not derive from TypeConverter")
+        require(not expandable["sealed"],
+                "ExpandableObjectConverter is sealed; MathTypeConverter "
+                "derives from it, so a sealed base would make XNA's own "
+                "hierarchy impossible")
+        require(not expandable["abstract"],
+                "ExpandableObjectConverter is abstract")
+        ctors = members_of(EXPANDABLE_CONVERTER, "constructor", ".ctor")
+        require(len(ctors) == 1 and not ctors[0]["parameters"],
+                "ExpandableObjectConverter does not declare exactly one "
+                "parameterless constructor")
+        for name in ("GetProperties", "GetPropertiesSupported"):
+            overrides = members_of(EXPANDABLE_CONVERTER, "method", name)
+            require(len(overrides) == 1,
+                    f"ExpandableObjectConverter.{name} should be declared "
+                    f"exactly once, found {len(overrides)}")
+            for member in overrides:
+                require(member["virtual"],
+                        f"ExpandableObjectConverter.{name} is not virtual")
+
+    # ------------------------------------------------------------------
+    # System.ComponentModel.ITypeDescriptorContext.
+    #
+    # In every converter signature and read by none of XNA's code. It extends
+    # the already-admitted System.IServiceProvider, which is the one place in
+    # this closure where two separately-justified families meet.
+    # ------------------------------------------------------------------
+    require(TYPE_DESCRIPTOR_CONTEXT in by_type,
+            "System.ComponentModel.ITypeDescriptorContext was not extracted "
+            "at all")
+    context = by_type.get(TYPE_DESCRIPTOR_CONTEXT)
+    if context is not None:
+        require(context["kind"] == "interface",
+                "ITypeDescriptorContext is not an interface")
+        require(ISERVICE_PROVIDER in context["directInterfaces"],
+                "ITypeDescriptorContext does not extend System.IServiceProvider")
+        require(len(context["members"]) == 5,
+                f"ITypeDescriptorContext should declare exactly 5 members, "
+                f"found {len(context['members'])}")
+        for name, clr_type in (("Instance", "System.Object"),
+                               ("PropertyDescriptor", PROPERTY_DESCRIPTOR)):
+            candidates = members_of(TYPE_DESCRIPTOR_CONTEXT, "property", name)
+            require(len(candidates) == 1,
+                    f"ITypeDescriptorContext.{name} is missing")
+            for member in candidates:
+                require(member["type"] == clr_type,
+                        f"ITypeDescriptorContext.{name} is not {clr_type}")
+                require(member["setAccess"] is None,
+                        f"ITypeDescriptorContext.{name} has a setter")
+        changing = members_of(TYPE_DESCRIPTOR_CONTEXT, "method",
+                              "OnComponentChanging")
+        require(len(changing) == 1,
+                "ITypeDescriptorContext.OnComponentChanging is missing")
+        for member in changing:
+            # Changing can be VETOED, Changed cannot. The asymmetric return is
+            # the whole difference between the two.
+            require(member["returnType"] == "System.Boolean",
+                    "OnComponentChanging does not return System.Boolean")
+        changed = members_of(TYPE_DESCRIPTOR_CONTEXT, "method",
+                             "OnComponentChanged")
+        require(len(changed) == 1,
+                "ITypeDescriptorContext.OnComponentChanged is missing")
+        for member in changed:
+            require(member["returnType"] == "System.Void",
+                    "OnComponentChanged does not return void")
+
+    # ------------------------------------------------------------------
+    # System.ComponentModel.PropertyDescriptor.
+    #
+    # Admitted as the element type of the collection GetProperties returns,
+    # NOT to be projected whole: it derives from MemberDescriptor, which is
+    # deliberately outside the closure. Asserting the base here records that
+    # the boundary is a choice and not an oversight.
+    # ------------------------------------------------------------------
+    require(PROPERTY_DESCRIPTOR in by_type,
+            "System.ComponentModel.PropertyDescriptor was not extracted at all")
+    descriptor = by_type.get(PROPERTY_DESCRIPTOR)
+    if descriptor is not None:
+        require(descriptor["kind"] == "class",
+                "PropertyDescriptor is not a class")
+        require(descriptor["abstract"],
+                "PropertyDescriptor is not abstract")
+        require(descriptor["baseType"] == "System.ComponentModel.MemberDescriptor",
+                "PropertyDescriptor does not derive from MemberDescriptor")
+        require(not descriptor["sealed"], "PropertyDescriptor is sealed")
+        # Every constructor is protected: the type is only ever reached
+        # through a derived descriptor.
+        ctors = members_of(PROPERTY_DESCRIPTOR, "constructor", ".ctor")
+        require(bool(ctors), "PropertyDescriptor declares no constructor")
+        require(all(member["access"] == "protected" for member in ctors),
+                "PropertyDescriptor declares a non-protected constructor")
+        # The eight members a concrete descriptor MUST supply.
+        for name, kind, ret in (
+            ("ComponentType", "property", "System.Type"),
+            ("IsReadOnly", "property", "System.Boolean"),
+            ("PropertyType", "property", "System.Type"),
+            ("CanResetValue", "method", "System.Boolean"),
+            ("GetValue", "method", "System.Object"),
+            ("ResetValue", "method", "System.Void"),
+            ("SetValue", "method", "System.Void"),
+            ("ShouldSerializeValue", "method", "System.Boolean"),
+        ):
+            candidates = members_of(PROPERTY_DESCRIPTOR, kind, name)
+            require(len(candidates) == 1,
+                    f"PropertyDescriptor.{name} should be declared exactly "
+                    f"once, found {len(candidates)}")
+            for member in candidates:
+                require(member["abstract"] if kind == "method"
+                        else member["getAbstract"],
+                        f"PropertyDescriptor.{name} is not abstract")
+                actual = member["returnType"] if kind == "method" \
+                    else member["type"]
+                require(actual == ret,
+                        f"PropertyDescriptor.{name} is not {ret}")
+        converter_property = members_of(PROPERTY_DESCRIPTOR, "property",
+                                        "Converter")
+        require(len(converter_property) == 1,
+                "PropertyDescriptor.Converter is missing")
+        for member in converter_property:
+            require(member["type"] == TYPE_CONVERTER,
+                    "PropertyDescriptor.Converter is not a TypeConverter")
+
+    # ------------------------------------------------------------------
+    # System.ComponentModel.PropertyDescriptorCollection.
+    # ------------------------------------------------------------------
+    require(PROPERTY_DESCRIPTOR_COLLECTION in by_type,
+            "System.ComponentModel.PropertyDescriptorCollection was not "
+            "extracted at all")
+    collection_pd = by_type.get(PROPERTY_DESCRIPTOR_COLLECTION)
+    if collection_pd is not None:
+        require(collection_pd["kind"] == "class",
+                "PropertyDescriptorCollection is not a class")
+        require(collection_pd["baseType"] == "System.Object",
+                "PropertyDescriptorCollection does not derive directly from "
+                "System.Object")
+        # It is BOTH a list and a dictionary -- indexable by position and by
+        # name. That is the second, independent reason IDictionary is in this
+        # closure, and it is why the type has two indexers.
+        for interface in ("System.Collections.IList",
+                          NONGENERIC_IDICTIONARY,
+                          "System.Collections.ICollection",
+                          "System.Collections.IEnumerable"):
+            require(interface in collection_pd["directInterfaces"],
+                    f"PropertyDescriptorCollection does not declare {interface}")
+        indexers = [
+            member for member in collection_pd["members"]
+            if member["kind"] == "property" and member["name"] == "Item"
+        ]
+        require(len(indexers) == 2,
+                f"PropertyDescriptorCollection should declare 2 indexers "
+                f"(by index and by name), found {len(indexers)}")
+        require({tuple(item["type"] for item in member["parameters"])
+                 for member in indexers}
+                == {("System.Int32",), ("System.String",)},
+                "PropertyDescriptorCollection's indexers are not one Int32 "
+                "and one String")
+        for member in indexers:
+            require(member["type"] == PROPERTY_DESCRIPTOR,
+                    "PropertyDescriptorCollection's indexer does not yield a "
+                    "PropertyDescriptor")
+        find = members_of(PROPERTY_DESCRIPTOR_COLLECTION, "method", "Find")
+        require(len(find) == 1, "PropertyDescriptorCollection.Find is missing")
+        for member in find:
+            require([item["type"] for item in member["parameters"]]
+                    == ["System.String", "System.Boolean"],
+                    "Find does not take (String, Boolean); the Boolean is the "
+                    "ignoreCase flag and dropping it would change lookups")
+            require(member["returnType"] == PROPERTY_DESCRIPTOR,
+                    "Find does not return a PropertyDescriptor")
+
+    # ------------------------------------------------------------------
+    # System.Globalization.CultureInfo (mscorlib).
+    #
+    # Foundation 74 recorded that this is NOT merely an opaque token passed
+    # through: the math converters format and parse through it.
+    # ------------------------------------------------------------------
+    require(CULTURE_INFO in by_type,
+            "System.Globalization.CultureInfo was not extracted at all")
+    culture = by_type.get(CULTURE_INFO)
+    if culture is not None:
+        require(culture["kind"] == "class", "CultureInfo is not a class")
+        require(not culture["sealed"], "CultureInfo is sealed")
+        for interface in ("System.ICloneable", "System.IFormatProvider"):
+            require(interface in culture["directInterfaces"],
+                    f"CultureInfo does not declare {interface}")
+        for name in ("InvariantCulture", "CurrentCulture", "CurrentUICulture"):
+            candidates = members_of(CULTURE_INFO, "property", name)
+            require(len(candidates) == 1, f"CultureInfo.{name} is missing")
+            for member in candidates:
+                require(member["static"], f"CultureInfo.{name} is not static")
+                require(member["type"] == CULTURE_INFO,
+                        f"CultureInfo.{name} is not a CultureInfo")
+                # In 4.0 the ambient culture is read-only from here; the
+                # public setter arrives in 4.6. A projection that offered a
+                # setter would be offering a later framework's contract.
+                require(member["setAccess"] is None,
+                        f"CultureInfo.{name} has a public setter; that is a "
+                        ".NET 4.6 addition, not 4.0")
+        number_format = members_of(CULTURE_INFO, "property", "NumberFormat")
+        require(len(number_format) == 1, "CultureInfo.NumberFormat is missing")
+        for member in number_format:
+            require(member["type"]
+                    == "System.Globalization.NumberFormatInfo",
+                    "CultureInfo.NumberFormat is not a NumberFormatInfo")
+            require(member["setAccess"] is not None,
+                    "CultureInfo.NumberFormat is read-only")
+        get_format = members_of(CULTURE_INFO, "method", "GetFormat")
+        require(len(get_format) == 1, "CultureInfo.GetFormat is missing")
+        for member in get_format:
+            require([item["type"] for item in member["parameters"]]
+                    == ["System.Type"],
+                    "GetFormat does not take exactly one System.Type")
+            require(member["returnType"] == "System.Object",
+                    "GetFormat does not return System.Object")
+
+    # ------------------------------------------------------------------
+    # System.Collections.IDictionary (mscorlib).
+    # ------------------------------------------------------------------
+    require(NONGENERIC_IDICTIONARY in by_type,
+            "System.Collections.IDictionary was not extracted at all")
+    idict = by_type.get(NONGENERIC_IDICTIONARY)
+    if idict is not None:
+        require(idict["kind"] == "interface",
+                "System.Collections.IDictionary is not an interface")
+        require(idict["genericArity"] == 0,
+                "System.Collections.IDictionary is generic; the generic one is "
+                "IDictionary`2 and is a different type")
+        require("System.Collections.ICollection" in idict["directInterfaces"],
+                "System.Collections.IDictionary does not extend ICollection")
+        require(len(idict["members"]) == 10,
+                f"System.Collections.IDictionary should declare exactly 10 "
+                f"members, found {len(idict['members'])}")
+        enumerator = members_of(NONGENERIC_IDICTIONARY, "method",
+                                "GetEnumerator")
+        require(len(enumerator) == 1,
+                "System.Collections.IDictionary.GetEnumerator is missing")
+        for member in enumerator:
+            # It hides IEnumerable's method with a NARROWER return. Extracting
+            # IEnumerator here would erase the entry-pair enumeration that is
+            # the only reason the interface is dictionary-shaped.
+            require(member["returnType"]
+                    == "System.Collections.IDictionaryEnumerator",
+                    "IDictionary.GetEnumerator does not return "
+                    "IDictionaryEnumerator")
+        for name in ("Keys", "Values"):
+            candidates = members_of(NONGENERIC_IDICTIONARY, "property", name)
+            require(len(candidates) == 1, f"IDictionary.{name} is missing")
+            for member in candidates:
+                require(member["type"] == "System.Collections.ICollection",
+                        f"IDictionary.{name} is not an ICollection")
+
     return checks, failures
 
 
@@ -1614,6 +2001,121 @@ def mutation_self_tests(
             item for item in record["directInterfaces"] if item != target]
         return True
 
+    def drop_named_interface(target: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            if target not in record["directInterfaces"]:
+                return False
+            record["directInterfaces"] = [
+                item for item in record["directInterfaces"] if item != target]
+            return True
+        return mutate
+
+    def drop_named_member(kind: str, name: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            before = len(record["members"])
+            record["members"] = [
+                item for item in record["members"]
+                if not (item["kind"] == kind and item["name"] == name)
+            ]
+            return len(record["members"]) != before
+        return mutate
+
+    def set_abstract(value: bool) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            if record.get("abstract") == value:
+                return False
+            record["abstract"] = value
+            return True
+        return mutate
+
+    def set_return(name: str, clr_type: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if (member["kind"] == "method" and member["name"] == name
+                        and member.get("returnType") != clr_type):
+                    member["returnType"] = clr_type
+                    return True
+            return False
+        return mutate
+
+    def make_concrete(name: str) -> Any:
+        """Turn an abstract member into a virtual one with a body.
+
+        This is the single most plausible wrong projection of
+        PropertyDescriptor: an abstract member that becomes virtual still
+        compiles at every call site and silently stops requiring a derived
+        descriptor to supply it.
+        """
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if member["name"] != name:
+                    continue
+                if member["kind"] == "method" and member.get("abstract"):
+                    member["abstract"] = False
+                    return True
+                if member["kind"] == "property" and member.get("getAbstract"):
+                    member["getAbstract"] = False
+                    return True
+            return False
+        return mutate
+
+    def widen_shortest_overload(name: str) -> Any:
+        """Make the context-free forwarder an override point."""
+        def mutate(record: dict[str, Any]) -> bool:
+            overloads = [
+                member for member in record["members"]
+                if member["kind"] == "method" and member["name"] == name
+            ]
+            if not overloads:
+                return False
+            shortest = min(overloads, key=lambda m: len(m["parameters"]))
+            if shortest.get("virtual"):
+                return False
+            shortest["virtual"] = True
+            shortest["overridable"] = True
+            return True
+        return mutate
+
+    def seal_overload(name: str) -> Any:
+        """Make a named method's WIDEST overload `virtual final`.
+
+        The sneakiest wrong projection: the member is still marked virtual, so
+        a reviewer scanning for the keyword sees nothing wrong, but no derived
+        converter can actually replace it.
+        """
+        def mutate(record: dict[str, Any]) -> bool:
+            overloads = [
+                member for member in record["members"]
+                if member["kind"] == "method" and member["name"] == name
+                and member.get("overridable")
+            ]
+            if not overloads:
+                return False
+            widest = max(overloads, key=lambda m: len(m["parameters"]))
+            widest["overridable"] = False
+            widest["final"] = True
+            return True
+        return mutate
+
+    def flip_static_of(name: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if member["name"] == name and "static" in member:
+                    member["static"] = not member["static"]
+                    return True
+            return False
+        return mutate
+
+    def add_setter_to(name: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if (member["kind"] == "property" and member["name"] == name
+                        and member.get("setAccess") is None):
+                    member["setAccess"] = "public"
+                    return True
+            return False
+        return mutate
+
     def add_interface(record: dict[str, Any]) -> bool:
         record["directInterfaces"] = sorted(
             record["directInterfaces"] + ["System.ICloneable"])
@@ -1882,6 +2384,78 @@ def mutation_self_tests(
          drop_member("constructor")),
         ("IsDefaultAttribute made non-overridable", ATTRIBUTE,
          seal_method("IsDefaultAttribute")),
+        # The ComponentModel closure (Foundation 100). Every one of these is a
+        # projection someone could defend in a review, and each is wrong.
+        ("TypeConverter made abstract", TYPE_CONVERTER, set_abstract(True)),
+        ("TypeConverter made sealed", TYPE_CONVERTER, flip_sealed),
+        ("TypeConverter rebased", TYPE_CONVERTER,
+         rebase_onto(EXPANDABLE_CONVERTER)),
+        ("ConvertFrom's context-free forwarder made an override point",
+         TYPE_CONVERTER, widen_shortest_overload("ConvertFrom")),
+        ("ConvertTo's context-free forwarder made an override point",
+         TYPE_CONVERTER, widen_shortest_overload("ConvertTo")),
+        ("CanConvertFrom's context overload left virtual but sealed",
+         TYPE_CONVERTER, seal_overload("CanConvertFrom")),
+        ("ConvertTo's context overload left virtual but sealed",
+         TYPE_CONVERTER, seal_overload("ConvertTo")),
+        ("a ConvertFrom overload dropped", TYPE_CONVERTER,
+         drop_named_member("method", "ConvertFrom")),
+        ("CreateInstance dropped, and with it the IDictionary bag",
+         TYPE_CONVERTER, drop_named_member("method", "CreateInstance")),
+        ("GetProperties made to return something other than a collection",
+         TYPE_CONVERTER, set_return("GetProperties", "System.Object")),
+        ("ExpandableObjectConverter sealed against MathTypeConverter",
+         EXPANDABLE_CONVERTER, flip_sealed),
+        ("ExpandableObjectConverter detached from TypeConverter",
+         EXPANDABLE_CONVERTER, rebase_onto("System.Object")),
+        ("ExpandableObjectConverter's GetProperties dropped",
+         EXPANDABLE_CONVERTER, drop_named_member("method", "GetProperties")),
+        ("ITypeDescriptorContext no longer a service provider",
+         TYPE_DESCRIPTOR_CONTEXT, drop_named_interface(ISERVICE_PROVIDER)),
+        ("ITypeDescriptorContext turned into a class",
+         TYPE_DESCRIPTOR_CONTEXT, change_kind),
+        ("OnComponentChanging robbed of its veto",
+         TYPE_DESCRIPTOR_CONTEXT, set_return("OnComponentChanging",
+                                             "System.Void")),
+        ("ITypeDescriptorContext.PropertyDescriptor given a setter",
+         TYPE_DESCRIPTOR_CONTEXT, add_setter_to("PropertyDescriptor")),
+        ("PropertyDescriptor made concrete", PROPERTY_DESCRIPTOR,
+         set_abstract(False)),
+        ("PropertyDescriptor flattened onto Object", PROPERTY_DESCRIPTOR,
+         rebase_onto("System.Object")),
+        ("PropertyDescriptor's protected constructor widened",
+         PROPERTY_DESCRIPTOR, change_visibility),
+        ("GetValue made virtual instead of abstract", PROPERTY_DESCRIPTOR,
+         make_concrete("GetValue")),
+        ("PropertyType made virtual instead of abstract", PROPERTY_DESCRIPTOR,
+         make_concrete("PropertyType")),
+        ("PropertyDescriptor.Converter retyped", PROPERTY_DESCRIPTOR,
+         change_property_type),
+        ("PropertyDescriptorCollection stripped of IDictionary",
+         PROPERTY_DESCRIPTOR_COLLECTION,
+         drop_named_interface(NONGENERIC_IDICTIONARY)),
+        ("PropertyDescriptorCollection's indexers dropped",
+         PROPERTY_DESCRIPTOR_COLLECTION, drop_named_member("property", "Item")),
+        ("Find robbed of its ignoreCase flag",
+         PROPERTY_DESCRIPTOR_COLLECTION, drop_named_member("method", "Find")),
+        ("CultureInfo made sealed", CULTURE_INFO, flip_sealed),
+        ("CultureInfo no longer a format provider", CULTURE_INFO,
+         drop_named_interface("System.IFormatProvider")),
+        ("CurrentCulture given the setter it only gains in 4.6", CULTURE_INFO,
+         add_setter_to("CurrentCulture")),
+        ("InvariantCulture made an instance property", CULTURE_INFO,
+         flip_static_of("InvariantCulture")),
+        ("NumberFormat dropped", CULTURE_INFO,
+         drop_named_member("property", "NumberFormat")),
+        ("IDictionary turned into a class", NONGENERIC_IDICTIONARY,
+         change_kind),
+        ("IDictionary detached from ICollection", NONGENERIC_IDICTIONARY,
+         drop_named_interface("System.Collections.ICollection")),
+        ("IDictionary.GetEnumerator narrowed back to IEnumerator",
+         NONGENERIC_IDICTIONARY,
+         set_return("GetEnumerator", "System.Collections.IEnumerator")),
+        ("IDictionary.Keys retyped", NONGENERIC_IDICTIONARY,
+         drop_named_member("property", "Keys")),
     ]
     for label, subject, mutate in sentinel_mutations:
         if subject not in by_name:
@@ -2120,7 +2694,12 @@ def verify_identity(
     il = disassemble(path, il_cache, digest)
 
     checks += 1
-    declared = re.search(r"^\.assembly\s+(?:extern\s+)?([\w.]+)\s*$", il, re.M)
+    # **The assembly's OWN declaration, not the first `.assembly` line.**
+    # `.assembly extern X` rows come first in every assembly that references
+    # another, so making `extern` optional and taking the first match reads a
+    # DEPENDENCY's name. It happened to be right for mscorlib, which references
+    # nothing, and wrong for System.dll -- which is how it was found.
+    declared = re.search(r"^\.assembly\s+(?!extern\b)([\w.]+)\s*$", il, re.M)
     assembly_name = declared.group(1) if declared else None
     if assembly_name != entry["assemblyName"]:
         failures.append(

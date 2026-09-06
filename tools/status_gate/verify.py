@@ -371,10 +371,18 @@ def regenerate_and_compare(
     library: Path | None,
     assembly_dir: Path | None = None,
     il_cache: Path | None = None,
-) -> tuple[list[str], int]:
+    bcl_dir: Path | None = None,
+    bcl_controls: list[str] | None = None,
+) -> tuple[list[str], int, int]:
     """A committed generated report must be what a live run writes now."""
     findings: list[str] = []
     compared = 0
+    # A regeneration that was never asked for is not a regeneration that
+    # passed. Counting the skips puts the difference between a full run and a
+    # partial one in the summary line people paste into documents, instead of
+    # letting the two look identical.
+    skipped = sum(1 for argument in (symbol_graph, cna_include, assembly_dir,
+                                     bcl_dir) if argument is None)
     with tempfile.TemporaryDirectory(prefix="cna-status-gate-") as raw:
         temporary = Path(raw)
 
@@ -469,7 +477,31 @@ def regenerate_and_compare(
             )
             compare(GENERATED / "message-coverage.json", coverage,
                     "tools/api_compat/message_coverage.py")
-    return findings, compared
+
+        # bcl-authority-audit.json is READ for five derived facts and, until
+        # Foundation 100, was never re-run either. Foundation 100 admitted
+        # System.dll and moved BCL_SENTINEL_CHECKS from 442 to 585 and
+        # BCL_MUTATION_SELF_TESTS from 462 to 497; the gate passed against the
+        # stale committed copy and said nothing. Same defect as the one above,
+        # one report over -- which is why it is fixed the same way rather than
+        # by remembering to regenerate.
+        if bcl_dir is not None:
+            audit = temporary / "bcl-authority-audit.json"
+            subprocess.run(
+                [sys.executable, "tools/api_compat/bcl_authority_audit.py",
+                 "--assembly", f"mscorlib.dll={bcl_dir / 'mscorlib.dll'}",
+                 "--assembly", f"System.dll={bcl_dir / 'System.dll'}",
+                 "--il-cache", str(bcl_dir),
+                 "--cross-check",
+                 *[argument
+                   for control in (bcl_controls or [])
+                   for argument in ("--negative-control", control)],
+                 "--output", str(audit)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(GENERATED / "bcl-authority-audit.json", audit,
+                    "tools/api_compat/bcl_authority_audit.py")
+    return findings, compared, skipped
 
 
 SELF_TEST_DOCUMENT = """# A document
@@ -650,6 +682,17 @@ def main() -> int:
                              "pinned XNA assemblies and require the committed "
                              "copy to match")
     parser.add_argument("--il-cache", type=Path)
+    parser.add_argument("--bcl-dir", type=Path,
+                        help="regenerate the BCL authority audit from the "
+                             "pinned mscorlib.dll and System.dll in this "
+                             "directory and require the committed copy to "
+                             "match")
+    parser.add_argument("--bcl-negative-control", action="append", default=[],
+                        metavar="NAME=PATH",
+                        help="a binary the audit must refuse; the committed "
+                             "report records one entry per control, so the "
+                             "same set must be offered here for the bytes to "
+                             "match")
     args = parser.parse_args()
 
     if args.self_test:
@@ -672,9 +715,10 @@ def main() -> int:
         findings += document_findings
         checked += document_checked
 
-    fresh_findings, compared = regenerate_and_compare(
+    fresh_findings, compared, skipped = regenerate_and_compare(
         ROOT, args.symbol_graph, args.cna_include, args.library,
-        args.assembly_dir, args.il_cache)
+        args.assembly_dir, args.il_cache, args.bcl_dir,
+        args.bcl_negative_control)
     findings += fresh_findings
 
     findings += planted_mutations(ROOT)
@@ -694,6 +738,7 @@ def main() -> int:
           f"STATUS_GATE_CLAIMS_CHECKED={checked} "
           f"STATUS_GATE_DISAGREEMENTS={len(nonzero)} "
           f"STATUS_GATE_REPORTS_COMPARED={compared} "
+          f"STATUS_GATE_REPORTS_SKIPPED={skipped} "
           f"STATUS_GATE_FINDINGS={len(findings)} "
           f"STATUS_GATE_STATUS={'PASS' if not findings else 'FAIL'}")
     return 0 if not findings else 1

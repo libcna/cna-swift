@@ -216,8 +216,8 @@ is selected, which would report a coverage loss as sixteen projection defects.
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
 (`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=73`). The BCL authority
-carries `BCL_SENTINEL_CHECKS=433`, `BCL_MUTATION_SELF_TESTS=462`,
-`BCL_CROSS_CHECKS=141` against a second disassembler, and four negative
+carries `BCL_SENTINEL_CHECKS=585`, `BCL_MUTATION_SELF_TESTS=497`,
+`BCL_CROSS_CHECKS=197` against a second disassembler, and four negative
 controls that are still refused. The four are not the same four binaries as in
 earlier sessions -- this machine's Mono packages were upgraded since, and none
 of the previously recorded control digests exists on disk any more, so the set
@@ -225,13 +225,24 @@ was rebuilt from what is here now. One of the four is the strongest control the
 gate has had: a **genuine Microsoft** `mscorlib.dll` from another .NET 4.0
 install, refused by 2 of 21 checks rather than by 12 to 16. A control that only
 just fails is worth more than three that fail obviously.
-`mscorlib` `5634668d…acc63` is the sole admitted BCL authority — 28 types and
-254 members across seven raised exception families and eleven support types.
-`System.dll` is available, its identity is established, and it is deliberately
-unadmitted: no family it declares is required by any implemented projection,
-and admitting it would register authority nothing consumes. What it would
-unlock is the thirteen `Microsoft.Xna.Framework.Design` converters, which are
-design-time IDE types unreachable from a running game.
+Two BCL assemblies are admitted, 39 types and 487 members between them.
+`mscorlib` `5634668d…acc63` supplies 34 types and 389 members across seven
+raised exception families and thirteen support types. `System.dll`
+`c3182e40…` was admitted at Foundation 100 for the five-type
+`System.ComponentModel` closure the thirteen `Microsoft.Xna.Framework.Design`
+converters are built from — `TypeConverter`, `ExpandableObjectConverter`,
+`ITypeDescriptorContext`, `PropertyDescriptor` and
+`PropertyDescriptorCollection`, 98 members — together with
+`Globalization.CultureInfo` and `Collections.IDictionary` from mscorlib, which
+those signatures reach for. The converters themselves are design-time IDE
+types unreachable from a running game; the admission is what makes projecting
+them possible, not a decision that they will be projected.
+
+The identity work found a defect worth recording: the audit read an assembly's
+own name with a regex that matched the FIRST `.assembly` line, which in any
+assembly that references another is `.assembly extern mscorlib`. It was right
+for `mscorlib` — which references nothing — and wrong for everything else. A
+negative lookahead fixed it. Admitting a second assembly is what exposed it.
 
 ## Platform and release policy
 

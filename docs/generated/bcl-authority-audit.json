@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "registrySha256": "ff76eba01a3eee693cc818cf24799785ad7ae8170bb064bceac3ba8af0105c94",
-  "manifestSha256": "9464163d37292ae9a950f07153104e58d2e606d9aa6de1d48b43a1ef1f5816be",
+  "registrySha256": "71ebb9e0c934c3572d29f937bd39bc22ac3cdcc8f7a3150394fa00460c14b5fe",
+  "manifestSha256": "40169fd7c231e8851e00c3ef13bcd9cc08dfec6bb28e3de3f9bfaccefc633fca",
   "BCL_AUTHORITY_STATUS": "PASS",
-  "BCL_AUTHORITY_ASSEMBLIES": 1,
-  "BCL_AUTHORITY_TYPES": 28,
-  "BCL_AUTHORITY_MEMBERS": 254,
-  "BCL_IDENTITY_CHECKS": 21,
-  "BCL_SENTINEL_CHECKS": 433,
-  "BCL_MANIFEST_CHECKS": 51,
-  "BCL_MUTATION_SELF_TESTS": 462,
-  "BCL_CROSS_CHECKS": 141,
-  "BCL_RESOURCE_CHECKS": 21,
+  "BCL_AUTHORITY_ASSEMBLIES": 2,
+  "BCL_AUTHORITY_TYPES": 39,
+  "BCL_AUTHORITY_MEMBERS": 487,
+  "BCL_IDENTITY_CHECKS": 37,
+  "BCL_SENTINEL_CHECKS": 585,
+  "BCL_MANIFEST_CHECKS": 74,
+  "BCL_MUTATION_SELF_TESTS": 497,
+  "BCL_CROSS_CHECKS": 197,
+  "BCL_RESOURCE_CHECKS": 33,
   "BCL_IL_LITERAL_CHECKS": 1,
   "BCL_STATIC_TABLE_CHECKS": 1,
   "BCL_NEGATIVE_CONTROLS": 4,
@@ -114,8 +114,19 @@
       "publicKeyTokenRecomputed": "b77a5c561934e089",
       "sha256": "5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
       "fileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
-      "selectedTypes": 28,
-      "selectedMembers": 254
+      "selectedTypes": 34,
+      "selectedMembers": 389
+    },
+    {
+      "assembly": "System.dll",
+      "assemblyName": "System",
+      "assemblyVersion": "4.0.0.0",
+      "publicKeyToken": "b77a5c561934e089",
+      "publicKeyTokenRecomputed": "b77a5c561934e089",
+      "sha256": "c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462",
+      "fileVersion": "4.0.30319.1 built by: RTMRel",
+      "selectedTypes": 5,
+      "selectedMembers": 98
     }
   ]
 }

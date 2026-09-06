@@ -4,6 +4,2087 @@
   "note": "The selected BCL shape this binding's support classes are derived from, reconstructed mechanically from the hash-registered Microsoft binaries named in bcl-authorities.json. It records CLR facts only -- no Swift spelling, no mapping rule and no machine-local path -- so it is a function of those binaries alone and regenerates byte-identically. No Microsoft binary is stored in the repository.",
   "types": [
     {
+      "assembly": "System.dll",
+      "type": "System.ComponentModel.ExpandableObjectConverter",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.ComponentModel.TypeConverter",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetProperties",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributes",
+              "type": "System.Attribute[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetPropertiesSupported",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "assembly": "System.dll",
+      "type": "System.ComponentModel.ITypeDescriptorContext",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [
+        "System.IServiceProvider"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "OnComponentChanged",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "OnComponentChanging",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Container",
+          "type": "System.ComponentModel.IContainer",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Instance",
+          "type": "System.Object",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "PropertyDescriptor",
+          "type": "System.ComponentModel.PropertyDescriptor",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "System.dll",
+      "type": "System.ComponentModel.PropertyDescriptor",
+      "kind": "class",
+      "sealed": false,
+      "abstract": true,
+      "baseType": "System.ComponentModel.MemberDescriptor",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "descr",
+              "type": "System.ComponentModel.MemberDescriptor",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attrs",
+              "type": "System.Attribute[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "descr",
+              "type": "System.ComponentModel.MemberDescriptor",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attrs",
+              "type": "System.Attribute[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "AddValueChanged",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "handler",
+              "type": "System.EventHandler",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CanResetValue",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CreateInstance",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "type",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Equals",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "obj",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FillAttributes",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "attributeList",
+              "type": "System.Collections.IList",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetChildProperties",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetChildProperties",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "filter",
+              "type": "System.Attribute[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetChildProperties",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "instance",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "filter",
+              "type": "System.Attribute[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetChildProperties",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "instance",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEditor",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "editorBaseType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetHashCode",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetInvocationTarget",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "type",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "instance",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetTypeFromName",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Type",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "typeName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetValue",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetValueChangedHandler",
+          "access": "protected-internal",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.EventHandler",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "OnValueChanged",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "e",
+              "type": "System.EventArgs",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveValueChanged",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "handler",
+              "type": "System.EventHandler",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ResetValue",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "SetValue",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ShouldSerializeValue",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "component",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "ComponentType",
+          "type": "System.Type",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Converter",
+          "type": "System.ComponentModel.TypeConverter",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IsLocalizable",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IsReadOnly",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "PropertyType",
+          "type": "System.Type",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "SerializationVisibility",
+          "type": "System.ComponentModel.DesignerSerializationVisibility",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "SupportsChangeEvents",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "System.dll",
+      "type": "System.ComponentModel.PropertyDescriptorCollection",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [
+        "System.Collections.ICollection",
+        "System.Collections.IDictionary",
+        "System.Collections.IEnumerable",
+        "System.Collections.IList"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "properties",
+              "type": "System.ComponentModel.PropertyDescriptor[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "readOnly",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "properties",
+              "type": "System.ComponentModel.PropertyDescriptor[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Add",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.ComponentModel.PropertyDescriptor",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Clear",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Contains",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.ComponentModel.PropertyDescriptor",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CopyTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "array",
+              "type": "System.Array",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Find",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptor",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "ignoreCase",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Collections.IEnumerator",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "IndexOf",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.ComponentModel.PropertyDescriptor",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Insert",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.ComponentModel.PropertyDescriptor",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "InternalSort",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "names",
+              "type": "System.String[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "InternalSort",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "sorter",
+              "type": "System.Collections.IComparer",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.ComponentModel.PropertyDescriptor",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "RemoveAt",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "comparer",
+              "type": "System.Collections.IComparer",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "names",
+              "type": "System.String[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "comparer",
+              "type": "System.Collections.IComparer",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Sort",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "names",
+              "type": "System.String[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Count",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "System.ComponentModel.PropertyDescriptor",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.Int32"
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "System.ComponentModel.PropertyDescriptor",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.String"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "assembly": "System.dll",
+      "type": "System.ComponentModel.TypeConverter",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "CanConvertFrom",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "sourceType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CanConvertFrom",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "sourceType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CanConvertTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "destinationType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CanConvertTo",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "destinationType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertFrom",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertFrom",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertFromInvariantString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "text",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertFromInvariantString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "text",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertFromString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "text",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertFromString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "text",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertFromString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "text",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertTo",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "destinationType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertTo",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "destinationType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertToInvariantString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertToInvariantString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertToString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertToString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ConvertToString",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CreateInstance",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "propertyValues",
+              "type": "System.Collections.IDictionary",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "CreateInstance",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "propertyValues",
+              "type": "System.Collections.IDictionary",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetConvertFromException",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Exception",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetConvertToException",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Exception",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "destinationType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCreateInstanceSupported",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetCreateInstanceSupported",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetProperties",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "attributes",
+              "type": "System.Attribute[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetProperties",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetProperties",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetPropertiesSupported",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetPropertiesSupported",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetStandardValues",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Collections.ICollection",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetStandardValues",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.ComponentModel.TypeConverter+StandardValuesCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetStandardValuesExclusive",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetStandardValuesExclusive",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetStandardValuesSupported",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetStandardValuesSupported",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsValid",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "context",
+              "type": "System.ComponentModel.ITypeDescriptorContext",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "IsValid",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "SortProperties",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.ComponentModel.PropertyDescriptorCollection",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "props",
+              "type": "System.ComponentModel.PropertyDescriptorCollection",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "names",
+              "type": "System.String[]",
+              "ref": false,
+              "out": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "assembly": "mscorlib.dll",
       "type": "System.ArgumentException",
       "kind": "class",
@@ -194,6 +2275,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -205,6 +2288,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -524,6 +2609,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -535,6 +2622,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -1520,6 +3609,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -1891,6 +3982,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -1902,6 +3995,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -1913,6 +4008,8 @@
           "setAccess": "public",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": [
             {
               "name": "",
@@ -1929,6 +4026,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -1940,6 +4039,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -1998,6 +4099,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -2089,6 +4192,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -2180,6 +4285,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -2308,6 +4415,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -2319,6 +4428,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -2442,6 +4553,8 @@
           "setAccess": "public",
           "getOverridable": true,
           "setOverridable": true,
+          "getAbstract": true,
+          "setAbstract": true,
           "parameters": [
             {
               "name": "",
@@ -2458,6 +4571,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -2469,6 +4584,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -2528,6 +4645,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -2685,6 +4804,8 @@
           "setAccess": "public",
           "getOverridable": true,
           "setOverridable": true,
+          "getAbstract": true,
+          "setAbstract": true,
           "parameters": [
             {
               "name": "",
@@ -2856,6 +4977,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -2867,6 +4990,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -3988,6 +6113,8 @@
           "setAccess": "public",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -3999,6 +6126,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4010,6 +6139,8 @@
           "setAccess": "public",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": [
             {
               "name": "",
@@ -4071,6 +6202,186 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Collections.IDictionary",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [
+        "System.Collections.ICollection",
+        "System.Collections.IEnumerable"
+      ],
+      "members": [
+        {
+          "kind": "method",
+          "name": "Add",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Clear",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Contains",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetEnumerator",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Collections.IDictionaryEnumerator",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Remove",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "IsFixedSize",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IsReadOnly",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Item",
+          "type": "System.Object",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": true,
+          "setOverridable": true,
+          "getAbstract": true,
+          "setAbstract": true,
+          "parameters": [
+            {
+              "name": "",
+              "type": "System.Object"
+            }
+          ]
+        },
+        {
+          "kind": "property",
+          "name": "Keys",
+          "type": "System.Collections.ICollection",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Values",
+          "type": "System.Collections.ICollection",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -4400,6 +6711,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4411,6 +6724,8 @@
           "setAccess": "public",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": [
             {
               "name": "",
@@ -4427,6 +6742,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -4559,6 +6876,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4570,6 +6889,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": [
             {
               "name": "",
@@ -4586,6 +6907,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -4768,6 +7091,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4779,6 +7104,8 @@
           "setAccess": "protected",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4790,6 +7117,8 @@
           "setAccess": "public",
           "getOverridable": true,
           "setOverridable": true,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4801,6 +7130,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4812,6 +7143,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4823,6 +7156,8 @@
           "setAccess": "public",
           "getOverridable": true,
           "setOverridable": true,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4834,6 +7169,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -4845,6 +7182,692 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Globalization.CultureInfo",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [
+        "System.ICloneable",
+        "System.IFormatProvider"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "culture",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "useUserOverride",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "culture",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "useUserOverride",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ClearCachedData",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Clone",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "CreateSpecificCulture",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Equals",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetConsoleFallbackUICulture",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "GetCultureInfo",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "culture",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCultureInfo",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "altName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCultureInfo",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCultureInfoByIetfLanguageTag",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetCultures",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "types",
+              "type": "System.Globalization.CultureTypes",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetFormat",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "formatType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetHashCode",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadOnly",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "ci",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ToString",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Calendar",
+          "type": "System.Globalization.Calendar",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "CompareInfo",
+          "type": "System.Globalization.CompareInfo",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "CultureTypes",
+          "type": "System.Globalization.CultureTypes",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "CurrentCulture",
+          "type": "System.Globalization.CultureInfo",
+          "static": true,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "CurrentUICulture",
+          "type": "System.Globalization.CultureInfo",
+          "static": true,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "DateTimeFormat",
+          "type": "System.Globalization.DateTimeFormatInfo",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": true,
+          "setOverridable": true,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "DisplayName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "EnglishName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IetfLanguageTag",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "InstalledUICulture",
+          "type": "System.Globalization.CultureInfo",
+          "static": true,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "InvariantCulture",
+          "type": "System.Globalization.CultureInfo",
+          "static": true,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IsNeutralCulture",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IsReadOnly",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "KeyboardLayoutId",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "LCID",
+          "type": "System.Int32",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Name",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "NativeName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "NumberFormat",
+          "type": "System.Globalization.NumberFormatInfo",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": true,
+          "setOverridable": true,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "OptionalCalendars",
+          "type": "System.Globalization.Calendar[]",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "Parent",
+          "type": "System.Globalization.CultureInfo",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "TextInfo",
+          "type": "System.Globalization.TextInfo",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "ThreeLetterISOLanguageName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "ThreeLetterWindowsLanguageName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "TwoLetterISOLanguageName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "UseUserOverride",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -5051,6 +8074,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -5062,6 +8087,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -5073,6 +8100,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -5744,6 +8773,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -5755,6 +8786,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -5903,6 +8936,8 @@
           "setAccess": null,
           "getOverridable": true,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]
@@ -7537,6 +10572,8 @@
           "setAccess": "public",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -7548,6 +10585,8 @@
           "setAccess": "public",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": [
             {
               "name": "",
@@ -7564,6 +10603,8 @@
           "setAccess": "public",
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         },
         {
@@ -7575,6 +10616,8 @@
           "setAccess": null,
           "getOverridable": false,
           "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
           "parameters": []
         }
       ]

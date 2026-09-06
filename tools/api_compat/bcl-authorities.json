@@ -182,6 +182,14 @@
         {
           "type": "System.IServiceProvider",
           "reason": "The declared parameter type of both ContentManager constructors and the declared type of its ServiceProvider property, and the interface GameServiceContainer implements. Without it the constructor can only be spelled over the one concrete implementation this binding has, which narrows XNA's contract: a consumer's own service provider could not be handed to a ContentManager at all. Projected as CNAServiceProvider, a one-member protocol -- the smallest family admitted here, and the whole of it is GetService(Type)."
+        },
+        {
+          "type": "System.Globalization.CultureInfo",
+          "reason": "The second parameter of ConvertFrom and ConvertTo on every converter. Foundation 74 corrected the claim that it is only ever opaque here: the math converters format and parse THROUGH it, so its number formatting is part of what they do."
+        },
+        {
+          "type": "System.Collections.IDictionary",
+          "reason": "The parameter of TypeConverter.CreateInstance, which MathTypeConverter overrides to build a value out of the property bag GetProperties described."
         }
       ],
       "selectedResourceStrings": [
@@ -368,15 +376,57 @@
           "reason": "ArgumentException.get_Message concatenates the base message, Environment.NewLine and the formatted Arg_ParamName_Name. The newline is therefore part of an observable Message, and in the admitted assembly it is not probed from the platform at all: System.Environment::get_NewLine's entire body is `ldstr \"\\r\\n\"; ret`. Reading it here is what lets the composed message be reproduced without asserting anything about the platform this binding runs on."
         }
       ]
-    }
-  ],
-  "availableButNotAdmitted": [
+    },
     {
       "assembly": "System.dll",
+      "assemblyName": "System",
       "assemblyVersion": "4.0.0.0",
+      "publicKey": "00000000000000000400000000000000",
       "publicKeyToken": "b77a5c561934e089",
       "sha256": "c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462",
-      "reason": "Present and identity-established on this machine, but no family it declares is required by any implemented projection. System.ComponentModel.TypeConverter and ExpandableObjectConverter remain an undecided public support-family question, so admitting the assembly now would register authority nothing consumes."
+      "fileSize": 3481928,
+      "moduleName": "System.dll",
+      "versionResource": {
+        "CompanyName": "Microsoft Corporation",
+        "ProductName": "Microsoft\u00ae .NET Framework",
+        "OriginalFilename": "System.dll",
+        "InternalName": "System.dll"
+      },
+      "strongNameKeyFile": "f:\\dd\\tools\\devdiv\\EcmaPublicKey.snk",
+      "requiredModuleImports": [],
+      "forbiddenProvenanceMarkers": [
+        "Mono.Runtime",
+        "Mono.RuntimeStructs",
+        "System.Private.CoreLib",
+        "MonoTODO"
+      ],
+      "registered": "Foundation 100",
+      "selectedFamilies": [
+        {
+          "type": "System.ComponentModel.TypeConverter",
+          "reason": "The transitive base of all thirteen XNA Design converters and the type whose eight virtual members they override. Its ConvertFrom/ConvertTo/CanConvertFrom/CanConvertTo pairs are the whole behaviour a converter has."
+        },
+        {
+          "type": "System.ComponentModel.ExpandableObjectConverter",
+          "reason": "The DIRECT base of MathTypeConverter, which is itself the direct base of the other twelve. It adds only GetProperties/GetPropertiesSupported over TypeConverter, and those two are exactly what the math converters override."
+        },
+        {
+          "type": "System.ComponentModel.ITypeDescriptorContext",
+          "reason": "The first parameter of nine of TypeConverter's members and of every override the thirteen declare. Always passed through, never read by XNA's code -- but it is in every signature, so it is in the closure."
+        },
+        {
+          "type": "System.ComponentModel.PropertyDescriptor",
+          "reason": "What PropertyDescriptorCollection holds, and what MathTypeConverter's GetProperties builds one of per field."
+        },
+        {
+          "type": "System.ComponentModel.PropertyDescriptorCollection",
+          "reason": "The declared return of GetProperties on ExpandableObjectConverter and on every math converter that overrides it."
+        }
+      ],
+      "selectedResourceStrings": [],
+      "selectedStaticTables": [],
+      "selectedIlLiterals": []
     }
-  ]
+  ],
+  "availableButNotAdmitted": []
 }
