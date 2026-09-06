@@ -35,6 +35,7 @@ GAME = ROOT / "Sources/CNA/Xna/Framework/Game.swift"
 DISPATCHER = ROOT / "Sources/CNA/Xna/Framework/FrameworkDispatcher.swift"
 TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
+ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
@@ -115,6 +116,31 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 77: GraphicsAdapter ------------------------------------
+    (
+        "adapter-list-refilled-every-borrow",
+        "the generation guard dropped, so every device facade re-enumerates "
+        "and the adapters a caller holds stop being the ones the list has",
+        ADAPTER,
+        "            guard populatedGeneration != runtime.generation else { return }",
+        "            if false { return }",
+    ),
+    # WITHDRAWN: "adapter-profile-support-answers-yes-by-default" -- flipping
+    # the missing-key default in IsProfileSupported.
+    #
+    # It survived because the branch cannot be reached: XNA's GraphicsProfile
+    # has exactly two members and the enumeration asks the route about both, so
+    # every key is present and the `??` never fires. The default is there for
+    # the shape of a dictionary lookup, not for a case any caller can produce.
+    # A mutation that cannot change an answer is withdrawn rather than scored.
+    (
+        "adapter-query-drops-the-multisample-result",
+        "the negotiated multi-sample count not written back through its inout "
+        "parameter",
+        ADAPTER,
+        "            selectedMultiSampleCount = selection.multi_sample_count",
+        "            _ = selection.multi_sample_count",
+    ),
     # ---- Foundation 76: SpriteBatch.Begin with an effect -------------------
     (
         "begin-effect-skips-the-pair-check",

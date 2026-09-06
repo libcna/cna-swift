@@ -127,6 +127,17 @@ internal final class NativeFunctions {
     typealias SpriteBatchSubmitManyRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_SpriteCommand>?, UInt64) -> UInt32
     typealias SpriteBatchEndRoute = @convention(c) (UInt64) -> UInt32
     typealias SpriteBatchDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias GraphicsAdapterGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsAdapterGetInfoRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_GraphicsAdapterInfo>?) -> UInt32
+    typealias GraphicsAdapterCopyDescriptionRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsAdapterCopyDeviceNameRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsAdapterGetCurrentDisplayModeRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CNASwift_DisplayMode>?) -> UInt32
+    typealias GraphicsAdapterGetDisplayModeCountRoute = @convention(c) (UInt64, UInt32, UInt8, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsAdapterCopyDisplayModesRoute = @convention(c) (UInt64, UInt32, UInt8, UInt32, UnsafeMutablePointer<CNASwift_DisplayMode>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GraphicsAdapterSetDevicePreferencesRoute = @convention(c) (UInt64, UInt32, UInt8, UInt8) -> UInt32
+    typealias GraphicsAdapterIsProfileSupportedRoute = @convention(c) (UInt64, UInt32, UInt32, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GraphicsAdapterQueryBackbufferFormatRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UInt32, Int32, UnsafeMutablePointer<CNASwift_GraphicsFormatSelection>?) -> UInt32
+    typealias GraphicsAdapterQueryRenderTargetFormatRoute = @convention(c) (UInt64, UInt32, UInt32, UInt32, UInt32, Int32, UnsafeMutablePointer<CNASwift_GraphicsFormatSelection>?) -> UInt32
     typealias MouseGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_MouseState>?) -> UInt32
     typealias MouseSetPositionRoute = @convention(c) (UInt64, Int32, Int32) -> UInt32
     typealias MouseSetWindowHandleRoute = @convention(c) (UInt64, UInt64) -> UInt32
@@ -453,6 +464,17 @@ internal final class NativeFunctions {
     let spriteBatchSubmit: SpriteBatchSubmitManyRoute
     let spriteBatchEnd: SpriteBatchEndRoute
     let spriteBatchDestroy: SpriteBatchDestroyRoute
+    let graphicsAdapterGetCount: GraphicsAdapterGetCountRoute
+    let graphicsAdapterGetInfo: GraphicsAdapterGetInfoRoute
+    let graphicsAdapterCopyDescription: GraphicsAdapterCopyDescriptionRoute
+    let graphicsAdapterCopyDeviceName: GraphicsAdapterCopyDeviceNameRoute
+    let graphicsAdapterGetCurrentDisplayMode: GraphicsAdapterGetCurrentDisplayModeRoute
+    let graphicsAdapterGetDisplayModeCount: GraphicsAdapterGetDisplayModeCountRoute
+    let graphicsAdapterCopyDisplayModes: GraphicsAdapterCopyDisplayModesRoute
+    let graphicsAdapterSetDevicePreferences: GraphicsAdapterSetDevicePreferencesRoute
+    let graphicsAdapterIsProfileSupported: GraphicsAdapterIsProfileSupportedRoute
+    let graphicsAdapterQueryBackbufferFormat: GraphicsAdapterQueryBackbufferFormatRoute
+    let graphicsAdapterQueryRenderTargetFormat: GraphicsAdapterQueryRenderTargetFormatRoute
     let mouseGetState: MouseGetStateRoute
     let mouseSetPosition: MouseSetPositionRoute
     let mouseSetWindowHandle: MouseSetWindowHandleRoute
@@ -799,6 +821,17 @@ internal final class NativeFunctions {
         spriteBatchSubmit = try library.resolve("cna_sprite_batch_submit_many", as: SpriteBatchSubmitManyRoute.self)
         spriteBatchEnd = try library.resolve("cna_sprite_batch_end", as: SpriteBatchEndRoute.self)
         spriteBatchDestroy = try library.resolve("cna_sprite_batch_destroy", as: SpriteBatchDestroyRoute.self)
+        graphicsAdapterGetCount = try library.resolve("cna_graphics_adapter_get_count", as: GraphicsAdapterGetCountRoute.self)
+        graphicsAdapterGetInfo = try library.resolve("cna_graphics_adapter_get_info", as: GraphicsAdapterGetInfoRoute.self)
+        graphicsAdapterCopyDescription = try library.resolve("cna_graphics_adapter_copy_description", as: GraphicsAdapterCopyDescriptionRoute.self)
+        graphicsAdapterCopyDeviceName = try library.resolve("cna_graphics_adapter_copy_device_name", as: GraphicsAdapterCopyDeviceNameRoute.self)
+        graphicsAdapterGetCurrentDisplayMode = try library.resolve("cna_graphics_adapter_get_current_display_mode", as: GraphicsAdapterGetCurrentDisplayModeRoute.self)
+        graphicsAdapterGetDisplayModeCount = try library.resolve("cna_graphics_adapter_get_display_mode_count", as: GraphicsAdapterGetDisplayModeCountRoute.self)
+        graphicsAdapterCopyDisplayModes = try library.resolve("cna_graphics_adapter_copy_display_modes", as: GraphicsAdapterCopyDisplayModesRoute.self)
+        graphicsAdapterSetDevicePreferences = try library.resolve("cna_graphics_adapter_set_device_preferences", as: GraphicsAdapterSetDevicePreferencesRoute.self)
+        graphicsAdapterIsProfileSupported = try library.resolve("cna_graphics_adapter_is_profile_supported", as: GraphicsAdapterIsProfileSupportedRoute.self)
+        graphicsAdapterQueryBackbufferFormat = try library.resolve("cna_graphics_adapter_query_backbuffer_format", as: GraphicsAdapterQueryBackbufferFormatRoute.self)
+        graphicsAdapterQueryRenderTargetFormat = try library.resolve("cna_graphics_adapter_query_render_target_format", as: GraphicsAdapterQueryRenderTargetFormatRoute.self)
         mouseGetState = try library.resolve("cna_mouse_get_state", as: MouseGetStateRoute.self)
         mouseSetPosition = try library.resolve("cna_mouse_set_position", as: MouseSetPositionRoute.self)
         mouseSetWindowHandle = try library.resolve("cna_mouse_set_window_handle", as: MouseSetWindowHandleRoute.self)

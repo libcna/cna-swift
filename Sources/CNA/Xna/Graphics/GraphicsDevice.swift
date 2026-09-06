@@ -22,6 +22,7 @@ extension Microsoft.Xna.Framework.Graphics {
         /// facade; they differ only in which route supplied the handle.
         internal convenience init(borrowedHandle: UInt64, runtime: RuntimeState) throws {
             try GraphicsDevice.cacheProfile(runtime, handle: borrowedHandle)
+            GraphicsAdapter.populateIfNeeded(runtime, device: borrowedHandle)
             self.init(handle: borrowedHandle, runtime: runtime)
         }
 
@@ -83,6 +84,10 @@ extension Microsoft.Xna.Framework.Graphics {
                 operation: "cna_game_get_graphics_device"
             )
             try cacheProfile(runtime, handle: handle)
+            // XNA enumerates adapters in GraphicsAdapter's class constructor.
+            // This is the first moment a device exists, which is the closest
+            // this binding can get to that.
+            GraphicsAdapter.populateIfNeeded(runtime, device: handle)
             return GraphicsDevice(handle: handle, runtime: runtime)
         }
 

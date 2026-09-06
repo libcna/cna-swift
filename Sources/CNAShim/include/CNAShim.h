@@ -526,6 +526,41 @@ typedef struct CNASwift_SpriteScaledCommand {
     float layer_depth;
 } CNASwift_SpriteScaledCommand;
 
+typedef struct CNASwift_DisplayMode {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t width;
+    int32_t height;
+    float aspect_ratio;
+    uint32_t format;
+} CNASwift_DisplayMode;
+
+typedef struct CNASwift_GraphicsAdapterInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint32_t adapter_index;
+    uint8_t is_default_adapter;
+    uint8_t is_wide_screen;
+    uint8_t use_null_device;
+    uint8_t use_reference_device;
+    int32_t vendor_id;
+    int32_t device_id;
+    int32_t revision;
+    int32_t subsystem_id;
+    uint64_t description_byte_length;
+    uint64_t device_name_byte_length;
+} CNASwift_GraphicsAdapterInfo;
+
+typedef struct CNASwift_GraphicsFormatSelection {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint8_t exact_match;
+    uint8_t reserved[3];
+    uint32_t format;
+    uint32_t depth_format;
+    int32_t multi_sample_count;
+} CNASwift_GraphicsFormatSelection;
+
 typedef struct CNASwift_MouseState {
     uint32_t struct_size;
     uint32_t struct_version;
