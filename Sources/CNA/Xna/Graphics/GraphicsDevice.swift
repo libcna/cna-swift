@@ -829,7 +829,51 @@ extension Microsoft.Xna.Framework.Graphics {
                 operation: "cna_graphics_device_present")
         }
 
-        /// `GraphicsDevice.Reset()`.
+/// `Present(Nullable<Rectangle> sourceRectangle, Nullable<Rectangle>
+        /// destinationRectangle, IntPtr overrideWindowHandle)`.
+        ///
+        /// XNA's 136 bytes turn the two optional rectangles into native `RECT`
+        /// pointers and hand them, with the window handle, to D3D's `Present`.
+        ///
+        /// **CNA's route takes none of the three.**
+        /// `cna_graphics_device_present` is `(CNA_Handle game)` and there is no
+        /// other presentation route — the whole family is
+        /// `get_presentation_parameters`, `set_presentation_parameters` and
+        /// this one.
+        ///
+        /// So this member **refuses rather than silently presenting the whole
+        /// surface**. A caller asking for a sub-rectangle, a stretched
+        /// destination or a different window is asking for something this
+        /// runtime cannot do, and quietly giving them a full-surface present
+        /// would be a wrong frame reported as a right one. XNA does not refuse
+        /// — this is a divergence, and it is the one that fails loudly.
+        ///
+        /// With all three at their defaults the request is exactly what the
+        /// no-argument overload performs, and it is forwarded.
+        public func Present(
+            _ sourceRectangle: Microsoft.Xna.Framework.Rectangle?,
+            destinationRectangle: Microsoft.Xna.Framework.Rectangle?,
+            overrideWindowHandle: Int
+        ) throws {
+            guard sourceRectangle == nil, destinationRectangle == nil,
+                  overrideWindowHandle == 0 else {
+                throw CNANotSupportedException(
+                    message: GraphicsDevice.presentArgumentsNotSupportedMessage)
+            }
+            try Present()
+        }
+
+        /// Not a Microsoft string: no XNA resource covers this, because XNA
+        /// never refuses here. Written to say exactly which argument cannot be
+        /// carried and why.
+        internal static let presentArgumentsNotSupportedMessage =
+            "This runtime presents the whole surface to the game's own window. "
+            + "cna_graphics_device_present takes no source rectangle, no "
+            + "destination rectangle and no window handle, so a Present naming "
+            + "any of them is refused rather than silently widened to the full "
+            + "surface."
+
+                /// `GraphicsDevice.Reset()`.
         ///
         /// Resets with the parameters the device already has.
         public func Reset() throws {

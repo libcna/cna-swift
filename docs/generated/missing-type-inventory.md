@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=192
-TARGET_MEMBERS=2383
-TOTAL_DIAGNOSTICS=76
+TARGET_MEMBERS=2384
+TOTAL_DIAGNOSTICS=74
 COMPLETE_TYPES=188
 PARTIAL_TYPES=4
 MISSING_TYPES=65
 MISSING_TYPE=65
-MISSING_MEMBER=8
+MISSING_MEMBER=7
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -26,7 +26,7 @@ PROPERTY_MAPPING_MISMATCH=0
 METHOD_SIGNATURE_MAPPING_MISMATCH=0
 PARAMETER_MAPPING_MISMATCH=0
 RETURN_MAPPING_MISMATCH=0
-OVERLOAD_MAPPING_MISMATCH=3
+OVERLOAD_MAPPING_MISMATCH=2
 GENERIC_MAPPING_MISMATCH=0
 ENUM_VALUE_MISMATCH=0
 FLAGS_MAPPING_MISMATCH=0
@@ -301,11 +301,9 @@ Expected members: 37; emitted members: 36.
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
-Expected members: 56; emitted members: 51.
+Expected members: 56; emitted members: 52.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice..ctor(adapter:Microsoft.Xna.Framework.Graphics.GraphicsAdapter,graphicsProfile:Microsoft.Xna.Framework.Graphics.GraphicsProfile,presentationParameters:Microsoft.Xna.Framework.Graphics.PresentationParameters)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present(_:Microsoft.Xna.Framework.Rectangle?,destinationRectangle:Microsoft.Xna.Framework.Rectangle?,overrideWindowHandle:Int)`: mapped member is absent
-- `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.Present(_:Microsoft.Xna.Framework.Rectangle?,destinationRectangle:Microsoft.Xna.Framework.Rectangle?,overrideWindowHandle:Int)`: required overload is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:Microsoft.Xna.Framework.Rectangle?,data:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T],startIndex:Int32,elementCount:Int32)`: mapped member is absent
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Graphics.GraphicsDevice.GetBackBufferData(_:[T])`: mapped member is absent

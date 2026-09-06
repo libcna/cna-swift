@@ -119,6 +119,16 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 85: Present's refused arguments ------------------------
+    (
+        "present-widens-a-sub-rectangle",
+        "the three-argument Present silently presenting the whole surface "
+        "where a caller asked for part of it",
+        DEVICE,
+        "            guard sourceRectangle == nil, destinationRectangle == nil,\n"
+        "                  overrideWindowHandle == 0 else {",
+        "            guard true else {",
+    ),
     # ---- Foundation 84: device disposal and its events ---------------------
     (
         "dispose-swallows-the-refusal",

@@ -27,6 +27,33 @@ final class Foundation84DeviceDisposalTests: XCTestCase {
                        "the runtime's own diagnosis reaches the caller")
     }
 
+    /// **The three-argument `Present` refuses rather than silently widening.**
+    ///
+    /// CNA's only presentation route takes a game handle and nothing else, so a
+    /// caller naming a sub-rectangle, a stretched destination or another window
+    /// is asking for something this runtime cannot do. Giving them a
+    /// full-surface present would be a wrong frame reported as a right one.
+    /// XNA does not refuse; this is the divergence that fails loudly.
+    func testPresentRefusesArgumentsItCannotCarry() throws {
+        let game = try DisposalProbeGame(exercisePresent: true)
+        try game.Run()
+        if let failure = game.failure { throw failure }
+
+        XCTAssertEqual(game.defaultsAccepted, true,
+                       "all three at their defaults is the plain Present")
+        for (what, error) in game.presentRefusals {
+            guard let refusal = error as? CNANotSupportedException else {
+                return XCTFail("\(what): expected CNANotSupportedException, got \(error)")
+            }
+            XCTAssertEqual(
+                refusal.Message,
+                Microsoft.Xna.Framework.Graphics.GraphicsDevice
+                    .presentArgumentsNotSupportedMessage)
+        }
+        XCTAssertEqual(game.presentRefusals.count, 3,
+                       "each of the three arguments is refused on its own")
+    }
+
     /// `IsDisposed` is infallible, so it answers from the facade's generation
     /// rather than from a route: a live facade is not disposed.
     func testALiveFacadeIsNotDisposed() throws {
@@ -62,15 +89,19 @@ final class Foundation84DeviceDisposalTests: XCTestCase {
 
 private final class DisposalProbeGame: Microsoft.Xna.Framework.Game {
     let addHandlers: Bool
+    let exercisePresent: Bool
     var manager: Microsoft.Xna.Framework.GraphicsDeviceManager?
     var failure: Error?
     var disposeFailure: Error?
     var wasDisposed: Bool?
     var handlersAdded = 0
     var payloadShapes: [String] = []
+    var defaultsAccepted: Bool?
+    var presentRefusals: [(String, Error)] = []
 
-    init(addHandlers: Bool = false) throws {
+    init(addHandlers: Bool = false, exercisePresent: Bool = false) throws {
         self.addHandlers = addHandlers
+        self.exercisePresent = exercisePresent
         try super.init()
         manager = try Microsoft.Xna.Framework.GraphicsDeviceManager(game: self)
     }
@@ -82,6 +113,23 @@ private final class DisposalProbeGame: Microsoft.Xna.Framework.Game {
             wasDisposed = device.IsDisposed
             do { try device.Dispose() } catch { disposeFailure = error }
 
+            if exercisePresent {
+                try device.Present(nil, destinationRectangle: nil,
+                                   overrideWindowHandle: 0)
+                defaultsAccepted = true
+                let rect = Microsoft.Xna.Framework.Rectangle(0, 0, 4, 4)
+                for (what, body) in [
+                    ("source", { try device.Present(rect, destinationRectangle: nil,
+                                                    overrideWindowHandle: 0) }),
+                    ("destination", { try device.Present(nil, destinationRectangle: rect,
+                                                         overrideWindowHandle: 0) }),
+                    ("window", { try device.Present(nil, destinationRectangle: nil,
+                                                    overrideWindowHandle: 1) }),
+                ] as [(String, () throws -> Void)] {
+                    do { try body() } catch { presentRefusals.append((what, error)) }
+                }
+                return
+            }
             guard addHandlers else { return }
             for event in [device.Disposing, device.DeviceLost,
                           device.DeviceReset, device.DeviceResetting] {
