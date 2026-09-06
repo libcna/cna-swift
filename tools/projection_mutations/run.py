@@ -37,6 +37,7 @@ TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
+RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
@@ -117,6 +118,51 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 81: the device ranking ---------------------------------
+    (
+        "ranking-prefers-the-lower-profile",
+        "the profile link ordering ascending, so Reach outranks HiDef",
+        RANKING,
+        "                return d1.GraphicsProfile.rawValue > d2.GraphicsProfile.rawValue ? -1 : 1",
+        "                return d1.GraphicsProfile.rawValue < d2.GraphicsProfile.rawValue ? -1 : 1",
+    ),
+    (
+        "ranking-full-screen-asks-the-candidate",
+        "the full-screen link comparing the two candidates instead of asking "
+        "the manager which it wants",
+        RANKING,
+        "                return graphics.IsFullScreen == p1.IsFullScreen ? -1 : 1",
+        "                return p1.IsFullScreen ? -1 : 1",
+    ),
+    (
+        "ranking-format-sorts-descending",
+        "the format rank ordering descending, which puts Int32.max first",
+        RANKING,
+        "            if r1 != r2 { return r1 < r2 ? -1 : 1 }",
+        "            if r1 != r2 { return r1 > r2 ? -1 : 1 }",
+    ),
+    (
+        "ranking-multisample-prefers-fewer",
+        "the multi-sample link preferring the lower count",
+        RANKING,
+        "                return p1.MultiSampleCount > p2.MultiSampleCount ? -1 : 1",
+        "                return p1.MultiSampleCount < p2.MultiSampleCount ? -1 : 1",
+    ),
+    (
+        "ranking-aspect-tolerance-dropped",
+        "the 0.2 tolerance removed, so nearly-identical shapes decide the "
+        "order instead of falling through to pixel count",
+        RANKING,
+        "            if abs(off1 - off2) > 0.2 { return off1 < off2 ? -1 : 1 }",
+        "            if off1 != off2 { return off1 < off2 ? -1 : 1 }",
+    ),
+    (
+        "bit-depth-table-widened",
+        "a format XNA ranks zero given a real bit depth",
+        RANKING,
+        "            case 1, 2, 3: return 16",
+        "            case 1, 2, 3, 4: return 16",
+    ),
     # ---- Foundation 80: the manager's reset rule and settings event --------
     (
         "can-reset-device-also-compares-the-back-buffer",

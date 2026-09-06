@@ -205,7 +205,46 @@ extension Microsoft.Xna.Framework {
             try preparingDeviceSettingsSource.Raise(sender, args: args)
         }
 
-        /// `protected virtual bool CanResetDevice(GraphicsDeviceInformation
+/// `protected virtual void RankDevices(List<GraphicsDeviceInformation>
+        /// foundDevices)`.
+        ///
+        /// Eight bytes forwarding to `RankDevicesPlatform`, which is thirteen:
+        /// `foundDevices.Sort(new GraphicsDeviceInformationComparer(this))`.
+        /// All of the behaviour is that comparer, and it is transcribed in
+        /// `GraphicsDeviceInformationComparer` rather than approximated —
+        /// which device a consumer ends up with is decided by this order and
+        /// nothing else.
+        ///
+        /// **Sorted in place through the list's own surface.** `List<T>.Sort`
+        /// is one of the thirty-six members `CNAList` does not project, and
+        /// growing that subset for one caller would be the wrong way round, so
+        /// the elements are read out, ordered, and written back. The observable
+        /// effect is identical: the caller's list is reordered, not replaced.
+        ///
+        /// Ties keep no guaranteed order, in both. `List<T>.Sort` is an
+        /// unstable introsort and Swift's `sort` is unstable too, so two
+        /// candidates the comparer calls equal may come back in either order —
+        /// which is XNA's contract rather than a gap here.
+        open func RankDevices(
+            _ foundDevices:
+                CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>
+        ) throws {
+            let count = foundDevices.Count
+            guard count > 1 else { return }
+            var items: [Microsoft.Xna.Framework.GraphicsDeviceInformation] = []
+            items.reserveCapacity(Int(count))
+            for index in 0 ..< count {
+                items.append(try foundDevices.Item(index))
+            }
+            let comparer = Microsoft.Xna.Framework
+                .GraphicsDeviceInformationComparer(self)
+            items.sort { comparer.Compare($0, $1) < 0 }
+            for (offset, item) in items.enumerated() {
+                try foundDevices.SetItem(Int32(offset), item)
+            }
+        }
+
+                /// `protected virtual bool CanResetDevice(GraphicsDeviceInformation
         /// newDeviceInfo)`.
         ///
         /// **Twenty-three bytes, and one comparison.** The whole rule is that

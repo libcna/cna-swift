@@ -9,13 +9,13 @@ REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
 TARGET_TYPES=191
-TARGET_MEMBERS=2352
-TOTAL_DIAGNOSTICS=89
+TARGET_MEMBERS=2353
+TOTAL_DIAGNOSTICS=88
 COMPLETE_TYPES=186
 PARTIAL_TYPES=5
 MISSING_TYPES=66
 MISSING_TYPE=66
-MISSING_MEMBER=20
+MISSING_MEMBER=19
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -320,10 +320,9 @@ Expected members: 56; emitted members: 42.
 
 ### `Microsoft.Xna.Framework.GraphicsDeviceManager`
 
-Expected members: 30; emitted members: 29.
+Expected members: 30; emitted members: 30.
 
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)`: mapped member is absent
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.GraphicsDeviceManager.RankDevices(_:CNAList<Microsoft.Xna.Framework.GraphicsDeviceInformation>)`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
 
