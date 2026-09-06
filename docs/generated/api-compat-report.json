@@ -11,13 +11,13 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 189,
-    "TARGET_MEMBERS": 2340,
-    "TOTAL_DIAGNOSTICS": 94,
-    "COMPLETE_TYPES": 184,
+    "TARGET_TYPES": 191,
+    "TARGET_MEMBERS": 2349,
+    "TOTAL_DIAGNOSTICS": 92,
+    "COMPLETE_TYPES": 186,
     "PARTIAL_TYPES": 5,
-    "MISSING_TYPES": 68,
-    "MISSING_TYPE": 68,
+    "MISSING_TYPES": 66,
+    "MISSING_TYPE": 66,
     "MISSING_MEMBER": 23,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
@@ -63,8 +63,8 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 89,
-    "PENDING_ACCESSOR_PROJECTIONS": 25,
+    "MEASURED_ACCESSOR_PROJECTIONS": 90,
+    "PENDING_ACCESSOR_PROJECTIONS": 24,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 25,
     "EVENT_PROJECTIONS": 49,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 194,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 175,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 64
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 198,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 171,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 65
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -233,6 +233,7 @@
     "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture",
     "Microsoft.Xna.Framework.Graphics.VertexPositionTexture",
     "Microsoft.Xna.Framework.Graphics.Viewport",
+    "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.IDrawable",
     "Microsoft.Xna.Framework.IGameComponent",
     "Microsoft.Xna.Framework.IGraphicsDeviceManager",
@@ -273,6 +274,7 @@
     "Microsoft.Xna.Framework.PlaneIntersectionType",
     "Microsoft.Xna.Framework.PlayerIndex",
     "Microsoft.Xna.Framework.Point",
+    "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
     "Microsoft.Xna.Framework.Quaternion",
     "Microsoft.Xna.Framework.Ray",
     "Microsoft.Xna.Framework.Rectangle",
@@ -333,7 +335,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection",
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Graphics.OcclusionQuery",
-    "Microsoft.Xna.Framework.GraphicsDeviceInformation",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
     "Microsoft.Xna.Framework.Media.Album",
     "Microsoft.Xna.Framework.Media.AlbumCollection",
@@ -354,7 +355,6 @@
     "Microsoft.Xna.Framework.Media.Song",
     "Microsoft.Xna.Framework.Media.SongCollection",
     "Microsoft.Xna.Framework.Media.VideoPlayer",
-    "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
     "Microsoft.Xna.Framework.Storage.StorageDevice"
   ],
@@ -675,11 +675,6 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
       "category": "MISSING_MEMBER",
       "subject": "Microsoft.Xna.Framework.GraphicsDeviceManager.FindBestDevice(_:Bool)",
       "detail": "mapped member is absent"
@@ -802,11 +797,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Media.VideoPlayer",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2422,6 +2412,20 @@
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
+      "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
+      "sourceProperty": "Adapter",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.GraphicsDeviceInformation.Adapter()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.GraphicsDeviceInformation.SetAdapter(_:Microsoft.Xna.Framework.Graphics.GraphicsAdapter?)",
+      "writerName": "SetAdapter",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "sourceProperty": "PreferredBackBufferWidth",
       "indexed": false,
@@ -2591,16 +2595,6 @@
       "typeState": "missing",
       "readerThrows": false,
       "writerName": "SetTitle",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
-      "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
-      "sourceProperty": "Adapter",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetAdapter",
       "writerThrows": true,
       "indexed": false,
       "static": false
@@ -4861,6 +4855,14 @@
       "derivableInReferenceButNotInSwift": false
     },
     {
+      "type": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
       "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
       "clrSealed": false,
       "swiftFinal": false,
@@ -4921,6 +4923,14 @@
       "clrSealed": false,
       "swiftFinal": false,
       "swiftAccess": "open",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "public",
       "referencePublicConstructors": 1,
       "derivableInReferenceButNotInSwift": false
     },
@@ -8560,42 +8570,42 @@
       "member": "Clone",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
       "swiftReturnType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.GraphicsDeviceInformation"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
       "member": "Adapter",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsAdapter?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
       "member": "PresentationParameters",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.PresentationParameters",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.PresentationParameters",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Graphics.PresentationParameters"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.GraphicsDeviceManager",
@@ -9764,14 +9774,14 @@
       "member": "GraphicsDeviceInformation",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
       "swiftReturnType": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.GraphicsDeviceInformation"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Quaternion",
@@ -11888,16 +11898,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 7,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 7,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.GraphicsDeviceManager",
@@ -12474,16 +12478,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Quaternion",

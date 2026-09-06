@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=189
-TARGET_MEMBERS=2340
-TOTAL_DIAGNOSTICS=94
-COMPLETE_TYPES=184
+TARGET_TYPES=191
+TARGET_MEMBERS=2349
+TOTAL_DIAGNOSTICS=92
+COMPLETE_TYPES=186
 PARTIAL_TYPES=5
-MISSING_TYPES=68
-MISSING_TYPE=68
+MISSING_TYPES=66
+MISSING_TYPE=66
 MISSING_MEMBER=23
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -60,8 +60,8 @@ THROWING_WRITER_METHOD_PROJECTIONS=114
 INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
 GETTER_ONLY_PROJECTIONS=561
 WRITE_ONLY_PROJECTIONS=0
-MEASURED_ACCESSOR_PROJECTIONS=89
-PENDING_ACCESSOR_PROJECTIONS=25
+MEASURED_ACCESSOR_PROJECTIONS=90
+PENDING_ACCESSOR_PROJECTIONS=24
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 NONPUBLIC_CONSTRUCTION_PROJECTIONS=25
 EVENT_PROJECTIONS=49
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=194
-PENDING_RETURN_NULLABILITY_PROJECTIONS=175
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=64
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=198
+PENDING_RETURN_NULLABILITY_PROJECTIONS=171
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=65
 ```
 
 ## Complete types
@@ -232,6 +232,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=64
 - `Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture`
 - `Microsoft.Xna.Framework.Graphics.VertexPositionTexture`
 - `Microsoft.Xna.Framework.Graphics.Viewport`
+- `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.IDrawable`
 - `Microsoft.Xna.Framework.IGameComponent`
 - `Microsoft.Xna.Framework.IGraphicsDeviceManager`
@@ -272,6 +273,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=64
 - `Microsoft.Xna.Framework.PlaneIntersectionType`
 - `Microsoft.Xna.Framework.PlayerIndex`
 - `Microsoft.Xna.Framework.Point`
+- `Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs`
 - `Microsoft.Xna.Framework.Quaternion`
 - `Microsoft.Xna.Framework.Ray`
 - `Microsoft.Xna.Framework.Rectangle`
@@ -379,7 +381,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
-- `Microsoft.Xna.Framework.GraphicsDeviceInformation`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`
 - `Microsoft.Xna.Framework.Media.Album`
 - `Microsoft.Xna.Framework.Media.AlbumCollection`
@@ -400,6 +401,5 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Media.Song`
 - `Microsoft.Xna.Framework.Media.SongCollection`
 - `Microsoft.Xna.Framework.Media.VideoPlayer`
-- `Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs`
 - `Microsoft.Xna.Framework.Storage.StorageContainer`
 - `Microsoft.Xna.Framework.Storage.StorageDevice`

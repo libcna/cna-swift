@@ -36,6 +36,7 @@ DISPATCHER = ROOT / "Sources/CNA/Xna/Framework/FrameworkDispatcher.swift"
 TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
+DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 CALLBACK_STATE = ROOT / "Sources/CNA/Runtime/CallbackState.swift"
 MANAGER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceManager.swift"
 DRAWABLE = ROOT / "Sources/CNA/Xna/Framework/DrawableGameComponent.swift"
@@ -116,6 +117,39 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 79: the two managed device carriers --------------------
+    (
+        "device-information-equals-compares-the-objects",
+        "Equals comparing the two PresentationParameters objects instead of "
+        "the ten properties XNA reads through them",
+        DEVICEINFO,
+        "            let mine = storedParameters\n            let theirs = other.storedParameters",
+        "            guard other.storedParameters === storedParameters else { return false }\n"
+        "            let mine = storedParameters\n            let theirs = other.storedParameters",
+    ),
+    (
+        "device-information-clone-shares-the-parameters",
+        "Clone copying the parameters by reference, so a change to the copy "
+        "reaches the original",
+        DEVICEINFO,
+        "            copy.storedParameters = storedParameters.Clone()",
+        "            copy.storedParameters = storedParameters",
+    ),
+    (
+        "device-information-hash-drops-a-property",
+        "one of the ten properties left out of the XOR",
+        DEVICEINFO,
+        "            hash ^= Int32(truncatingIfNeeded: p.BackBufferHeight.hashValue)",
+        "",
+    ),
+    (
+        "event-args-copy-the-information",
+        "the event payload handing back a copy, so a handler's change never "
+        "reaches the manager",
+        DEVICEINFO,
+        "            stored\n        }",
+        "            stored.Clone()\n        }",
+    ),
     # ---- Foundation 78: GraphicsDevice presentation ------------------------
     (
         "reset-caches-parameters-before-the-device-takes-them",

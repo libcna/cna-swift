@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 14,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 13,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Design.MathTypeConverter",
@@ -131,25 +131,6 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.GraphicsDeviceInformation",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.GraphicsAdapter",
-        "Microsoft.Xna.Framework.Graphics.GraphicsProfile",
-        "Microsoft.Xna.Framework.Graphics.PresentationParameters"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.PreparingDeviceSettingsEventArgs"
-      ],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ],
-      "transitiveMissingReverseReach": 1,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.GraphicsDeviceManager"
-      ]
-    },
-    {
       "type": "Microsoft.Xna.Framework.Media.MediaSource",
       "dependencies": [
         "Microsoft.Xna.Framework.Media.MediaSourceType"
@@ -161,6 +142,23 @@
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 1,
       "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GameWindow",
+      "dependencies": [
+        "Microsoft.Xna.Framework.DisplayOrientation",
+        "Microsoft.Xna.Framework.Rectangle"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [
+        "Microsoft.Xna.Framework.Game"
+      ],
+      "transitiveMissingReverseReach": 1,
+      "transitivePartialReverseReach": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.GraphicsDeviceManager"
+      ]
     }
   ]
 }
