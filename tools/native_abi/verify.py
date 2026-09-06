@@ -58,6 +58,12 @@ MIRRORED_STRUCTS = [
     "BlendState", "DepthStencilState", "RasterizerState", "SamplerState",
     "SpriteCommand",
     "PresentationParameters",
+    # Added after its absence let a mirrored structure ship one field short:
+    # CNA_ContentManagerCreateInfo ends in a reserved uint64 that is part of
+    # sizeof, so leaving it out made struct_size too small and every create
+    # call was refused as an invalid configuration. Nothing in this gate
+    # looked at the structure, so only a run caught it.
+    "ContentManagerCreateInfo",
     "VertexElement", "VertexBufferCreateInfo", "VertexBufferBinding",
     "IndexBufferCreateInfo", "IndexBufferTransfer",
     "TextureCubeCreateInfo", "TextureCubeInfo", "TextureCubeTransfer",

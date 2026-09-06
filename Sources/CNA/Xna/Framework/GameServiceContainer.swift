@@ -30,7 +30,7 @@ extension Microsoft.Xna.Framework {
     /// the language type. See `clrTypeLanguageProjection`.
     ///
     /// CLR non-sealed maps to Swift `open`.
-    open class GameServiceContainer {
+    open class GameServiceContainer: CNAServiceProvider {
         /// `Dictionary<Type, object> services`.
         ///
         /// The CLR uses the default comparer, whose behaviour for a runtime

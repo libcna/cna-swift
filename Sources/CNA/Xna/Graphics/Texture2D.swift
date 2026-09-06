@@ -490,6 +490,34 @@ extension Microsoft.Xna.Framework.Graphics {
                 nativeElementCount: UInt64(windowBytes / Int64(formatSize)))
         }
 
+        /// Adopts a texture the content manager loaded.
+        ///
+        /// The handle arrives already made, so the dimensions, level count and
+        /// format are read from it exactly as `fromStream` reads them from a
+        /// texture it just decoded -- the same two routes, the same Int32
+        /// range check.
+        internal static func adoptLoaded(
+            handle: UInt64, runtime: RuntimeState
+        ) throws -> Texture2D {
+            var info = CNASwift_Texture2DInfo()
+            info.struct_size = UInt32(MemoryLayout<CNASwift_Texture2DInfo>.size)
+            info.struct_version = 1
+            try runtime.functions.check(
+                runtime.functions.textureGetInfo(handle, &info),
+                operation: "cna_texture2d_get_info")
+            guard info.width <= UInt32(Int32.max), info.height <= UInt32(Int32.max) else {
+                throw CNAError.nativeFailure(
+                    operation: "Texture2D dimensions", result: 10,
+                    message: "dimensions exceed XNA Int32 range")
+            }
+            let common = try Texture.readCommonInfo(handle: handle, runtime: runtime)
+            return Texture2D(
+                handle: handle, runtime: runtime, device: nil,
+                typeName: "Texture2D", destroy: runtime.functions.textureDestroy,
+                width: Int32(info.width), height: Int32(info.height),
+                levelCount: common.levelCount, format: common.format)
+        }
+
         public static func FromStream(
             _ graphicsDevice: GraphicsDevice,
             stream: InputStream

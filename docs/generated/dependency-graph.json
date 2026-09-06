@@ -30,22 +30,6 @@
       "transitivePartialReverseReach": []
     },
     {
-      "type": "Microsoft.Xna.Framework.Content.ContentManager",
-      "dependencies": [],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Content.ContentReader",
-        "Microsoft.Xna.Framework.Content.ResourceContentManager"
-      ],
-      "directPartialReverseConsumers": [
-        "Microsoft.Xna.Framework.Game"
-      ],
-      "transitiveMissingReverseReach": 6,
-      "transitivePartialReverseReach": [
-        "Microsoft.Xna.Framework.Game"
-      ]
-    },
-    {
       "type": "Microsoft.Xna.Framework.Graphics.ModelMeshPart",
       "dependencies": [
         "Microsoft.Xna.Framework.Graphics.Effect",
@@ -146,6 +130,19 @@
       "type": "Microsoft.Xna.Framework.Audio.Microphone",
       "dependencies": [
         "Microsoft.Xna.Framework.Audio.MicrophoneState"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.GamerServices.GamerServicesComponent",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Game",
+        "Microsoft.Xna.Framework.GameComponent",
+        "Microsoft.Xna.Framework.GameTime"
       ],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [],

@@ -150,6 +150,12 @@ internal final class NativeFunctions {
     typealias GameWindowBeginScreenDeviceChangeRoute = @convention(c) (UInt64, UInt8) -> UInt32
     typealias GameWindowEndScreenDeviceChangeRoute = @convention(c) (UInt64, CNASwift_StringView, Int32, Int32) -> UInt32
     typealias GameSetWindowTitleRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias ContentManagerCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_ContentManagerCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ContentManagerDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ContentManagerUnloadRoute = @convention(c) (UInt64) -> UInt32
+    typealias ContentManagerGetRootDirectorySizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ContentManagerCopyRootDirectoryRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ContentManagerLoadTexture2dRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MouseGetStateRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_MouseState>?) -> UInt32
     typealias MouseSetPositionRoute = @convention(c) (UInt64, Int32, Int32) -> UInt32
     typealias MouseSetWindowHandleRoute = @convention(c) (UInt64, UInt64) -> UInt32
@@ -506,6 +512,12 @@ internal final class NativeFunctions {
     let gameWindowBeginScreenDeviceChange: GameWindowBeginScreenDeviceChangeRoute
     let gameWindowEndScreenDeviceChange: GameWindowEndScreenDeviceChangeRoute
     let gameSetWindowTitle: GameSetWindowTitleRoute
+    let contentManagerCreate: ContentManagerCreateRoute
+    let contentManagerDestroy: ContentManagerDestroyRoute
+    let contentManagerUnload: ContentManagerUnloadRoute
+    let contentManagerGetRootDirectorySize: ContentManagerGetRootDirectorySizeRoute
+    let contentManagerCopyRootDirectory: ContentManagerCopyRootDirectoryRoute
+    let contentManagerLoadTexture2d: ContentManagerLoadTexture2dRoute
     let mouseGetState: MouseGetStateRoute
     let mouseSetPosition: MouseSetPositionRoute
     let mouseSetWindowHandle: MouseSetWindowHandleRoute
@@ -882,6 +894,12 @@ internal final class NativeFunctions {
         gameWindowBeginScreenDeviceChange = try library.resolve("cna_game_window_begin_screen_device_change", as: GameWindowBeginScreenDeviceChangeRoute.self)
         gameWindowEndScreenDeviceChange = try library.resolve("cna_game_window_end_screen_device_change", as: GameWindowEndScreenDeviceChangeRoute.self)
         gameSetWindowTitle = try library.resolve("cna_game_set_window_title", as: GameSetWindowTitleRoute.self)
+        contentManagerCreate = try library.resolve("cna_content_manager_create", as: ContentManagerCreateRoute.self)
+        contentManagerDestroy = try library.resolve("cna_content_manager_destroy", as: ContentManagerDestroyRoute.self)
+        contentManagerUnload = try library.resolve("cna_content_manager_unload", as: ContentManagerUnloadRoute.self)
+        contentManagerGetRootDirectorySize = try library.resolve("cna_content_manager_get_root_directory_size", as: ContentManagerGetRootDirectorySizeRoute.self)
+        contentManagerCopyRootDirectory = try library.resolve("cna_content_manager_copy_root_directory", as: ContentManagerCopyRootDirectoryRoute.self)
+        contentManagerLoadTexture2d = try library.resolve("cna_content_manager_load_texture2d", as: ContentManagerLoadTexture2dRoute.self)
         mouseGetState = try library.resolve("cna_mouse_get_state", as: MouseGetStateRoute.self)
         mouseSetPosition = try library.resolve("cna_mouse_set_position", as: MouseSetPositionRoute.self)
         mouseSetWindowHandle = try library.resolve("cna_mouse_set_window_handle", as: MouseSetWindowHandleRoute.self)

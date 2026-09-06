@@ -22,16 +22,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-791 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=101   COMPLETE_TYPES=183   PARTIAL_TYPES=5
-MISSING_TYPE=69  MISSING_MEMBER=30  OVERLOAD_MAPPING_MISMATCH=2
+866 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=73   COMPLETE_TYPES=189   PARTIAL_TYPES=4
+MISSING_TYPE=64  MISSING_MEMBER=7  OVERLOAD_MAPPING_MISMATCH=2
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=318  PROTOTYPE_TYPE_POSITIONS=1090  LAYOUTS=54  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=292 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=354  PROTOTYPE_TYPE_POSITIONS=1235  LAYOUTS=55  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=325 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2443  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+API_COMPAT_SELF_TESTS=2457  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
 ```
 
@@ -203,7 +203,55 @@ the road is long: this is a per-namespace campaign, not a handful of milestones.
 
 | Next | Closes | Notes |
 |---|---|---|
-| `ContentManager` (+ `Game.Content`) | 2 types, 1 member | **The next milestone.** 33 routes. It inherits a specific question from Foundation 70: whether a compiled `.xnb`'s character table arrives sorted, which `SpriteFont`'s binary search requires and which `cna_sprite_font_create` does not guarantee. |
+| The five unwired content loaders | 0 types, 0 members | `ContentManager` landed in Foundation 87 with **one** loader bound, `load_texture2d`, because adopting what the other five produce needs machinery those types do not have yet. Each is unblocked by its own type's milestone, not by content work. |
+| `ContentManager.OpenStream` / `ReadAsset` | 0 types, 2 members | The two protected members Foundation 87 left absent. `OpenStream` returns a `Stream` over an asset this binding never opens itself, and `ReadAsset` takes `Action<IDisposable>`; both wait on decisions about `System.IO` and delegate projection. |
+
+### Foundation 87 — `ContentManager`, `Game.Content`, and one BCL family
+
+**The shape of the divergence.** XNA reads the asset's type out of the `.xnb`
+header and builds whatever it finds. CNA publishes one route per asset kind
+instead, so here the *type argument selects the route*. A type with no route is
+refused by name rather than reported as a missing file, because those are
+different facts and a caller can act on only one of them.
+
+Five of the six loaders are deliberately **not bound**: a route with no
+consuming member is not bound, and adopting a sprite font, an effect, a sound
+effect, a cube or a model needs adoption paths those types do not have. Only
+`Texture2D` could be received, so only its route is wired.
+
+**Three decisions that the fallibility table, not taste, settled.**
+`Game.Content`'s getter is `IL_NO_FAILURE_PATH` and its return is proven
+non-null, which leaves a non-Optional property that must **trap** when there is
+no runtime — the answer `GraphicsAdapter.DefaultAdapter` reached from the same
+two facts. `set_Content` is `IL_DIRECT_THROW`, so it is a throwing writer, and
+because a writer takes the property's own type the null it tests for cannot be
+spelled in Swift at all: the type system closes the hole the setter existed to
+guard. `ContentManager.RootDirectory` goes the other way — proven nullable, so
+Optional.
+
+**`System.IServiceProvider` was admitted as a BCL family**, the smallest one
+here: one method. Spelling `ContentManager`'s constructors over
+`GameServiceContainer` compiled, passed every test, and was still a narrowing —
+a consumer's own service provider could not be handed to a manager at all. The
+narrowing was invisible from inside the binding, which is why it was worth a
+protocol. Admitted through `bcl-authorities.json`, pinned from the real
+`mscorlib.dll`, and covered by nine new sentinel facts (433 → 442).
+
+### Two gates were blind, and a run caught what they missed
+
+`CNASwift_ContentManagerCreateInfo` shipped one field short: CNA's structure
+ends in a reserved `uint64` that is part of `sizeof`, so `struct_size` was eight
+bytes too small and **every** create call was refused as an invalid
+configuration. `tools/native_abi/verify.py` never looked at it —
+`MIRRORED_STRUCTS` did not name it. It does now (LAYOUTS 54 → 55), and removing
+the field again is a compile error in the generated static assertions.
+
+The second blindness cost an hour: SwiftPM did not recompile the CNA module
+when only the C header changed, so the corrected header sat on disk while the
+tests kept failing against a stale object. The fix that looked wrong was right.
+Anything that edits `Sources/CNAShim/include/` should touch a Swift file in
+`Sources/CNA/` too, or verify the value the *binding* sees rather than the one
+a test module computes from its own copy of the header.
 
 ### The mutation harness had no deadline, and one mutation hung a full run
 

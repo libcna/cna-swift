@@ -5203,6 +5203,39 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "type": "System.IServiceProvider",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "method",
+          "name": "GetService",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "serviceType",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.IndexOutOfRangeException",
       "kind": "class",
       "sealed": true,

@@ -526,6 +526,15 @@ typedef struct CNASwift_SpriteScaledCommand {
     float layer_depth;
 } CNASwift_SpriteScaledCommand;
 
+typedef struct CNASwift_ContentManagerCreateInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    CNASwift_StringView root_directory;
+    /* Reserved; CNA rejects the whole structure unless this is zero, and it
+       is part of sizeof, so omitting it also made struct_size too small. */
+    uint64_t reserved;
+} CNASwift_ContentManagerCreateInfo;
+
 typedef struct CNASwift_DisplayMode {
     uint32_t struct_size;
     uint32_t struct_version;

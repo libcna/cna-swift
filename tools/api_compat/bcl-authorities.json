@@ -17,7 +17,7 @@
         "CompanyName": "Microsoft Corporation",
         "FileDescription": "Microsoft Common Language Runtime Class Library",
         "FileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
-        "ProductName": "Microsoft® .NET Framework",
+        "ProductName": "Microsoft\u00ae .NET Framework",
         "ProductVersion": "4.0.30319.1",
         "OriginalFilename": "mscorlib.dll",
         "InternalName": "mscorlib.dll"
@@ -178,6 +178,10 @@
         {
           "type": "System.IO.FileNotFoundException",
           "reason": "The class TitleContainer.OpenStream raises when the asset is absent. Its IL catches FileNotFoundException, DirectoryNotFoundException and ArgumentException out of File.OpenRead and re-raises this one with FrameworkResources.OpenStreamNotFound formatted with the requested name, so it is the class a consumer meets for a missing title asset and is not substitutable by the CNA runtime channel. Only the (String message) constructor is on XNA's path; FileName is therefore null on every instance this binding produces, which is what that constructor leaves it. Projected as CNAFileNotFoundException."
+        },
+        {
+          "type": "System.IServiceProvider",
+          "reason": "The declared parameter type of both ContentManager constructors and the declared type of its ServiceProvider property, and the interface GameServiceContainer implements. Without it the constructor can only be spelled over the one concrete implementation this binding has, which narrows XNA's contract: a consumer's own service provider could not be handed to a ContentManager at all. Projected as CNAServiceProvider, a one-member protocol -- the smallest family admitted here, and the whole of it is GetService(Type)."
         }
       ],
       "selectedResourceStrings": [

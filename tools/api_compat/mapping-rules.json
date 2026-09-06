@@ -226,7 +226,8 @@
     "System.InvalidOperationException": "CNAInvalidOperationException",
     "System.Collections.Generic.KeyNotFoundException": "CNAKeyNotFoundException",
     "System.NullReferenceException": "CNANullReferenceException",
-    "System.IndexOutOfRangeException": "CNAIndexOutOfRangeException"
+    "System.IndexOutOfRangeException": "CNAIndexOutOfRangeException",
+    "System.IServiceProvider": "CNAServiceProvider"
   },
   "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
@@ -750,6 +751,23 @@
         "GetType",
         "ToString"
       ]
+    },
+    "CNAServiceProvider": {
+      "kind": "protocol",
+      "inheritance": "public",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.IServiceProvider",
+      "requiredMembers": [
+        "GetService"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "AddService",
+        "RemoveService"
+      ]
     }
   },
   "bclSupportMapping": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",
@@ -894,7 +912,7 @@
   "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "7b30963201a17e6cf6d4c31ef2c9f274691e577618e69ccf50c5ae274f54ac45",
+  "bclSelectedShapeSha256": "5c9f5f48670adc9e89d5435308a32f4116cbe331b2633be9258ccbbb7b0366ac",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class",
@@ -1226,6 +1244,12 @@
       "member": "SetTitle",
       "parameter": "title",
       "reason": "GameWindow declares BOTH a Title property whose setter is fallible and a protected SetTitle(String) hook. The accessor rule derives the writer's name as Set+Title, which is the hook's own name, so the two expected identities collide and Swift cannot overload them apart -- a String literal binds to the non-Optional one, which is how the collision was found. Declaring this parameter Optional makes the hook's identity and the derived writer's identity the SAME, so one member satisfies both: it performs set_Title's null check (the branch this Optional makes reachable), its change test, and the platform push the hook is for."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ContentManager",
+      "member": "Load",
+      "parameter": "assetName",
+      "reason": "Load<T>'s first instruction after the disposal test is String.IsNullOrEmpty(assetName), and the null half of that test is a branch a caller can only reach by passing null. Declaring the parameter non-Optional would leave the ArgumentNullException unreachable from Swift, hiding half of a refusal the IL opens with -- the same reason TitleContainer.OpenStream's name is Optional."
     }
   ],
   "globalOperatorProjections": [

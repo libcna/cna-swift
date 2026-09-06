@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 192,
-    "TARGET_MEMBERS": 2385,
+    "TARGET_TYPES": 193,
+    "TARGET_MEMBERS": 2394,
     "TOTAL_DIAGNOSTICS": 73,
-    "COMPLETE_TYPES": 188,
+    "COMPLETE_TYPES": 189,
     "PARTIAL_TYPES": 4,
-    "MISSING_TYPES": 65,
-    "MISSING_TYPE": 65,
-    "MISSING_MEMBER": 6,
+    "MISSING_TYPES": 64,
+    "MISSING_TYPE": 64,
+    "MISSING_MEMBER": 7,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -63,13 +63,13 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 91,
-    "PENDING_ACCESSOR_PROJECTIONS": 23,
+    "MEASURED_ACCESSOR_PROJECTIONS": 92,
+    "PENDING_ACCESSOR_PROJECTIONS": 22,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 26,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
-    "BCL_SUPPORT_TYPE_MEASUREMENTS": 19,
+    "BCL_SUPPORT_TYPE_MEASUREMENTS": 20,
     "XNA_SEALED_CLASS_PROJECTIONS": 34,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 202,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 167,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 68
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 205,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 164,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 70
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -124,6 +124,7 @@
     "Microsoft.Xna.Framework.DisplayOrientation",
     "Microsoft.Xna.Framework.DrawableGameComponent",
     "Microsoft.Xna.Framework.FrameworkDispatcher",
+    "Microsoft.Xna.Framework.Game",
     "Microsoft.Xna.Framework.GameComponent",
     "Microsoft.Xna.Framework.GameComponentCollection",
     "Microsoft.Xna.Framework.GameComponentCollectionEventArgs",
@@ -287,7 +288,7 @@
   ],
   "partialTypes": [
     "Microsoft.Xna.Framework.Content.ContentLoadException",
-    "Microsoft.Xna.Framework.Game",
+    "Microsoft.Xna.Framework.Content.ContentManager",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ],
@@ -302,7 +303,6 @@
     "Microsoft.Xna.Framework.Audio.SoundEffect",
     "Microsoft.Xna.Framework.Audio.SoundEffectInstance",
     "Microsoft.Xna.Framework.Audio.WaveBank",
-    "Microsoft.Xna.Framework.Content.ContentManager",
     "Microsoft.Xna.Framework.Content.ContentReader",
     "Microsoft.Xna.Framework.Content.ContentTypeReader",
     "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
@@ -420,9 +420,14 @@
       "detail": "required overload is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentManager",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Content.ContentManager.ReadAsset(_:String,recordDisposableObject:System.Action<System.IDisposable>)",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Content.ContentManager.OpenStream(_:String)",
+      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -513,11 +518,6 @@
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Design.Vector4Converter",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Game.Content()",
-      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -1127,6 +1127,20 @@
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
+      "ownerType": "Microsoft.Xna.Framework.Content.ContentManager",
+      "sourceProperty": "RootDirectory",
+      "indexed": false,
+      "readerSymbol": "Microsoft.Xna.Framework.Content.ContentManager.RootDirectory()",
+      "readerForm": "property",
+      "readerThrows": false,
+      "writerSymbol": "Microsoft.Xna.Framework.Content.ContentManager.SetRootDirectory(_:String?)",
+      "writerName": "SetRootDirectory",
+      "writerThrows": true,
+      "readerObserved": true,
+      "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
       "sourceProperty": "CollectionItemName",
       "indexed": false,
@@ -1186,14 +1200,14 @@
       "ownerType": "Microsoft.Xna.Framework.Game",
       "sourceProperty": "Content",
       "indexed": false,
-      "readerSymbol": null,
+      "readerSymbol": "Microsoft.Xna.Framework.Game.Content()",
       "readerForm": "property",
       "readerThrows": false,
-      "writerSymbol": null,
+      "writerSymbol": "Microsoft.Xna.Framework.Game.SetContent(_:Microsoft.Xna.Framework.Content.ContentManager)",
       "writerName": "SetContent",
       "writerThrows": true,
-      "readerObserved": false,
-      "writerObserved": false,
+      "readerObserved": true,
+      "writerObserved": true,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2499,16 +2513,6 @@
       "static": false
     },
     {
-      "ownerType": "Microsoft.Xna.Framework.Content.ContentManager",
-      "sourceProperty": "RootDirectory",
-      "typeState": "missing",
-      "readerThrows": false,
-      "writerName": "SetRootDirectory",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
-    {
       "ownerType": "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
       "sourceProperty": "EnabledGestures",
       "typeState": "missing",
@@ -3493,6 +3497,28 @@
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
     {
+      "supportType": "CNAServiceProvider",
+      "clrFamily": "System.IServiceProvider",
+      "kind": "protocol",
+      "inheritance": "public",
+      "genericParameters": [],
+      "base": null,
+      "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [],
+      "finalMembers": [],
+      "publicMembers": [
+        "GetService"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "AddService",
+        "RemoveService"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNAStringBuilder",
       "clrFamily": "System.Text.StringBuilder",
       "kind": "class",
@@ -4290,6 +4316,14 @@
       "swiftFinal": false,
       "swiftAccess": "open",
       "referencePublicConstructors": 3,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentManager",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 2,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -5180,7 +5214,7 @@
       "member": "OpenStream",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "System.IO.Stream",
       "swiftReturnType": "Foundation.InputStream",
       "optional": false,
@@ -5194,28 +5228,28 @@
       "member": "ServiceProvider",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "System.IServiceProvider",
-      "swiftReturnType": "System.IServiceProvider?",
+      "swiftReturnType": "CNAServiceProvider?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAServiceProvider?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentManager",
       "member": "RootDirectory",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentReader",
@@ -5978,7 +6012,7 @@
       "member": "LaunchParameters",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.LaunchParameters",
       "swiftReturnType": "Microsoft.Xna.Framework.LaunchParameters",
       "optional": false,
@@ -5992,7 +6026,7 @@
       "member": "Components",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.GameComponentCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.GameComponentCollection",
       "optional": false,
@@ -6006,7 +6040,7 @@
       "member": "Services",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.GameServiceContainer",
       "swiftReturnType": "Microsoft.Xna.Framework.GameServiceContainer",
       "optional": false,
@@ -6020,7 +6054,7 @@
       "member": "Window",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.GameWindow",
       "swiftReturnType": "Microsoft.Xna.Framework.GameWindow?",
       "optional": true,
@@ -6034,7 +6068,7 @@
       "member": "GraphicsDevice",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
       "swiftReturnType": "Microsoft.Xna.Framework.Graphics.GraphicsDevice?",
       "optional": true,
@@ -6048,14 +6082,14 @@
       "member": "Content",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Content.ContentManager",
       "swiftReturnType": "Microsoft.Xna.Framework.Content.ContentManager",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Content.ContentManager"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.GameComponent",
@@ -10436,14 +10470,19 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentManager",
-      "status": "MISSING",
+      "status": "PARTIAL",
       "expectedMembers": 10,
-      "targetMembers": 0,
+      "targetMembers": 8,
       "diagnostics": [
         {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentManager",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Content.ContentManager.ReadAsset(_:String,recordDisposableObject:System.Action<System.IDisposable>)",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Content.ContentManager.OpenStream(_:String)",
+          "detail": "mapped member is absent"
         }
       ]
     },
@@ -10781,16 +10820,10 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Game",
-      "status": "PARTIAL",
+      "status": "COMPLETE",
       "expectedMembers": 37,
-      "targetMembers": 36,
-      "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Game.Content()",
-          "detail": "mapped member is absent"
-        }
-      ]
+      "targetMembers": 37,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.GameComponent",

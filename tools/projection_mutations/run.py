@@ -36,6 +36,7 @@ DISPATCHER = ROOT / "Sources/CNA/Xna/Framework/FrameworkDispatcher.swift"
 TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
+CONTENT = ROOT / "Sources/CNA/Xna/Content/ContentManager.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -119,6 +120,82 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 87: the content manager --------------------------------
+    (
+        "content-tests-the-name-before-disposal",
+        "Load testing the asset name before the disposal it must report "
+        "first, so a disposed manager reports a null name instead",
+        CONTENT,
+        "            guard var assets = loadedAssets else {\n"
+        "                throw CNAObjectDisposedException(objectName: \"\\(type(of: self))\")\n"
+        "            }\n"
+        "            guard let assetName, !assetName.isEmpty else {",
+        "            guard let assetName, !assetName.isEmpty else {\n"
+        "                throw CNAArgumentNullException(paramName: \"assetName\")\n"
+        "            }\n"
+        "            guard var assets = loadedAssets else {",
+    ),
+    (
+        "content-accepts-the-empty-asset-name",
+        "Load refusing only a null name, so the empty one reaches the route "
+        "and is reported as a missing asset rather than a bad argument",
+        CONTENT,
+        "            guard let assetName, !assetName.isEmpty else {",
+        "            guard let assetName else {",
+    ),
+    (
+        "content-unload-disposes-the-manager",
+        "Unload nulling the cache the way Dispose does, so a manager that "
+        "should still be usable reports itself disposed",
+        CONTENT,
+        "            loadedAssets = [:]\n"
+        "        }",
+        "            loadedAssets = nil\n"
+        "        }",
+    ),
+    (
+        "content-dispose-leaves-the-manager-usable",
+        "Dispose releasing the handle without nulling the cache, so the "
+        "manager keeps answering Load with a destroyed handle",
+        CONTENT,
+        "            guard loadedAssets != nil else { return }\n"
+        "            loadedAssets = nil",
+        "            guard loadedAssets != nil else { return }",
+    ),
+    (
+        "content-never-joins-the-parent-registry",
+        "the manager not registering with the runtime, so a caller who never "
+        "disposes it leaves a live handle for the game teardown to trip over",
+        CONTENT,
+        "            rt.register(self)",
+        "            _ = rt",
+    ),
+    (
+        "content-declares-the-structure-one-field-short",
+        "the create call declaring the size the mirror had before its "
+        "reserved field was added, which CNA refuses outright",
+        CONTENT,
+        "                        UInt32(MemoryLayout<CNASwift_ContentManagerCreateInfo>.size)",
+        "                        UInt32(MemoryLayout<CNASwift_ContentManagerCreateInfo>.size - 8)",
+    ),
+    (
+        "content-refuses-the-kind-it-can-load",
+        "the type switch falling through for Texture2D as well, so the one "
+        "wired loader is reported as having no route",
+        CONTENT,
+        "            case is Microsoft.Xna.Framework.Graphics.Texture2D.Type:",
+        "            case is Microsoft.Xna.Framework.Graphics.SpriteFont.Type:",
+    ),
+    (
+        "game-content-rebuilt-on-every-read",
+        "Game.Content ignoring its cache, so each read builds another manager "
+        "and a caller's installed one is silently replaced",
+        GAME,
+        "            if let cachedContent, cachedContentGeneration == currentGeneration {\n"
+        "                return cachedContent\n"
+        "            }",
+        "            if false, let cachedContent { return cachedContent }",
+    ),
     # ---- Foundation 86: the device ownership rule --------------------------
     (
         "own-device-disposed-through-the-refusing-route",

@@ -387,6 +387,7 @@ KEY_VALUE_PAIR = "System.Collections.Generic.KeyValuePair`2"
 IEQUALITY_COMPARER = "System.Collections.Generic.IEqualityComparer`1"
 IDICTIONARY = "System.Collections.Generic.IDictionary`2"
 ATTRIBUTE = "System.Attribute"
+ISERVICE_PROVIDER = "System.IServiceProvider"
 EXCEPTION = "System.Exception"
 SYSTEM_EXCEPTION = "System.SystemException"
 EXTERNAL_EXCEPTION = "System.Runtime.InteropServices.ExternalException"
@@ -1168,6 +1169,38 @@ def sentinel_checks(
                         f"KeyValuePair<K,V>.{name} has a setter")
                 require(member["type"] == clr_type,
                         f"KeyValuePair<K,V>.{name} is not {clr_type}")
+
+    # ------------------------------------------------------------------
+    # System.IServiceProvider.
+    #
+    # The smallest admitted family: one method, and the reason it is admitted
+    # at all is that ContentManager's constructors declare it. Stating the
+    # arity here is the point -- a projection over the concrete
+    # GameServiceContainer would look identical to the extractor and would
+    # still be a narrowing of XNA's contract.
+    # ------------------------------------------------------------------
+    require(ISERVICE_PROVIDER in by_type,
+            "System.IServiceProvider was not extracted at all")
+    service_provider = by_type.get(ISERVICE_PROVIDER)
+    if service_provider is not None:
+        require(service_provider["kind"] == "interface",
+                "IServiceProvider is not an interface")
+        require(service_provider["genericArity"] == 0,
+                "IServiceProvider is generic")
+        require(not service_provider["directInterfaces"],
+                "IServiceProvider extends another interface")
+        require(len(service_provider["members"]) == 1,
+                "IServiceProvider declares more than GetService")
+        get_service = members_of(ISERVICE_PROVIDER, "method", "GetService")
+        require(len(get_service) == 1, "IServiceProvider.GetService is missing")
+        for member in get_service:
+            require(member["returnType"] == "System.Object",
+                    "GetService does not return System.Object")
+            require([item["type"] for item in member["parameters"]]
+                    == ["System.Type"],
+                    "GetService does not take exactly one System.Type")
+            require(member["abstract"],
+                    "GetService is not abstract; an interface method must be")
 
     # ------------------------------------------------------------------
     # System.Attribute.

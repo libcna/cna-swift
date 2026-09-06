@@ -274,8 +274,62 @@ extension Microsoft.Xna.Framework {
             (try? RuntimeRegistry.current())?.generation
         }
 
-                private var cachedWindow: Microsoft.Xna.Framework.GameWindow?
+        private var cachedWindow: Microsoft.Xna.Framework.GameWindow?
         private var cachedWindowGeneration: UInt64?
+        private var cachedContent: Microsoft.Xna.Framework.Content.ContentManager?
+        private var cachedContentGeneration: UInt64?
+
+        /// `Game.Content`.
+        ///
+        /// **Non-Optional, and it traps when there is no runtime.** The
+        /// return's nullability is proven non-null -- XNA builds the manager in
+        /// the constructor and the getter is a field read -- so Optional would
+        /// invent a state XNA has no way to produce. The getter is also
+        /// infallible, so it cannot report the missing runtime as an error.
+        /// That leaves a trap, which is the same answer `DefaultAdapter`
+        /// reached from the same two facts, and for the same reason: it is the
+        /// honest Swift analogue of an unhandled CLR exception.
+        ///
+        /// The divergence is *when* the manager is built. XNA builds it in the
+        /// constructor; here it needs a graphics device, which does not exist
+        /// until the runtime is up, so it is built on first read inside the
+        /// lifecycle instead.
+        public var Content: Microsoft.Xna.Framework.Content.ContentManager {
+            if let cachedContent, cachedContentGeneration == currentGeneration {
+                return cachedContent
+            }
+            guard let runtime = try? RuntimeRegistry.current(),
+                  let manager = try? Microsoft.Xna.Framework.Content.ContentManager(
+                      serviceProvider: Services)
+            else {
+                preconditionFailure(
+                    "Game.Content was read before the runtime existed, so no "
+                    + "ContentManager could be built. XNA builds one in the "
+                    + "Game constructor; this binding can only build one once a "
+                    + "graphics device is available, because cna_content_manager_create "
+                    + "takes one. Read it from inside a Game callback.")
+            }
+            cachedContent = manager
+            cachedContentGeneration = runtime.generation
+            return manager
+        }
+
+        /// `Game.set_Content`, whose IL throws `ArgumentNullException` directly
+        /// -- so it projects as a throwing writer method rather than a settable
+        /// property.
+        ///
+        /// **The refusal it exists for cannot happen here.** A writer takes the
+        /// property's own type, and `Content` is proven non-null, so the value
+        /// is non-Optional and Swift has no way to spell the null this setter
+        /// tests for. The `throws` is kept because the setter is fallible and
+        /// the projection is measured against that fact; what changed is that
+        /// the type system now refuses what XNA had to refuse at run time.
+        public func SetContent(
+            _ value: Microsoft.Xna.Framework.Content.ContentManager
+        ) throws {
+            cachedContent = value
+            cachedContentGeneration = currentGeneration
+        }
 
         public func Exit() throws {
             let handle = try validatedHandle("Game.Exit")

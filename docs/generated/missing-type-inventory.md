@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=192
-TARGET_MEMBERS=2385
+TARGET_TYPES=193
+TARGET_MEMBERS=2394
 TOTAL_DIAGNOSTICS=73
-COMPLETE_TYPES=188
+COMPLETE_TYPES=189
 PARTIAL_TYPES=4
-MISSING_TYPES=65
-MISSING_TYPE=65
-MISSING_MEMBER=6
+MISSING_TYPES=64
+MISSING_TYPE=64
+MISSING_MEMBER=7
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -60,13 +60,13 @@ THROWING_WRITER_METHOD_PROJECTIONS=114
 INFALLIBLE_WRITER_METHOD_PROJECTIONS=0
 GETTER_ONLY_PROJECTIONS=561
 WRITE_ONLY_PROJECTIONS=0
-MEASURED_ACCESSOR_PROJECTIONS=91
-PENDING_ACCESSOR_PROJECTIONS=23
+MEASURED_ACCESSOR_PROJECTIONS=92
+PENDING_ACCESSOR_PROJECTIONS=22
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
 NONPUBLIC_CONSTRUCTION_PROJECTIONS=26
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
-BCL_SUPPORT_TYPE_MEASUREMENTS=19
+BCL_SUPPORT_TYPE_MEASUREMENTS=20
 XNA_SEALED_CLASS_PROJECTIONS=34
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=31
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=202
-PENDING_RETURN_NULLABILITY_PROJECTIONS=167
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=68
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=205
+PENDING_RETURN_NULLABILITY_PROJECTIONS=164
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=70
 ```
 
 ## Complete types
@@ -123,6 +123,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=68
 - `Microsoft.Xna.Framework.DisplayOrientation`
 - `Microsoft.Xna.Framework.DrawableGameComponent`
 - `Microsoft.Xna.Framework.FrameworkDispatcher`
+- `Microsoft.Xna.Framework.Game`
 - `Microsoft.Xna.Framework.GameComponent`
 - `Microsoft.Xna.Framework.GameComponentCollection`
 - `Microsoft.Xna.Framework.GameComponentCollectionEventArgs`
@@ -293,11 +294,12 @@ Expected members: 4; emitted members: 3.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Content.ContentLoadException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Content.ContentLoadException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)`: required overload is absent
 
-### `Microsoft.Xna.Framework.Game`
+### `Microsoft.Xna.Framework.Content.ContentManager`
 
-Expected members: 37; emitted members: 36.
+Expected members: 10; emitted members: 8.
 
-- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Game.Content()`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Content.ContentManager.ReadAsset(_:String,recordDisposableObject:System.Action<System.IDisposable>)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Content.ContentManager.OpenStream(_:String)`: mapped member is absent
 
 ### `Microsoft.Xna.Framework.Graphics.GraphicsDevice`
 
@@ -326,7 +328,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Audio.SoundEffect`
 - `Microsoft.Xna.Framework.Audio.SoundEffectInstance`
 - `Microsoft.Xna.Framework.Audio.WaveBank`
-- `Microsoft.Xna.Framework.Content.ContentManager`
 - `Microsoft.Xna.Framework.Content.ContentReader`
 - `Microsoft.Xna.Framework.Content.ContentTypeReader`
 - `Microsoft.Xna.Framework.Content.ContentTypeReaderManager`

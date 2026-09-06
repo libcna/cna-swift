@@ -588,6 +588,17 @@ def normalize_swift_type(text: str) -> str:
     # opaque result type is a different type from the existential a CLR
     # interface-typed member requires, and must still be diagnosed.
     value = re.sub(r"\bany\s+", "", value)
+    # Removing `any` can leave the parentheses the source needed to write an
+    # optional existential: `(any P)?` becomes `(P)?`, which is the same type
+    # as `P?` and must compare equal to it. Only a parenthesised SINGLE name is
+    # unwrapped -- a tuple has a comma and a function type an arrow, and
+    # neither matches, so neither is touched. Found on ContentManager's
+    # ServiceProvider, the first optional existential in the binding.
+    while True:
+        collapsed = re.sub(r"\(([A-Za-z_][A-Za-z0-9_.]*(?:<[^()<>]*>)?)\)", r"\1", value)
+        if collapsed == value:
+            break
+        value = collapsed
     # The compiler emits Foundation's two stream classes unqualified, and the
     # mapping names them qualified. Both directions of `System.IO.Stream` are
     # normalized here; only `InputStream` was until Foundation 60, and the
@@ -1803,6 +1814,31 @@ def compare(expected: dict[str, TypeModel], actual: dict[str, TypeModel],
             if pointer_pattern.search(member.declaration):
                 result.append(diagnostic("PUBLIC_NATIVE_FFI_LEAK", member.display, member.declaration))
     return result
+
+
+def normalizer_self_test() -> list[str]:
+    """The spellings the compiler emits that mean the same type, and the ones
+    that do not. Each case is a spelling actually seen in a symbol graph."""
+    failures: list[str] = []
+    cases = [
+        ("any CNAServiceProvider", "CNAServiceProvider"),
+        ("(any CNAServiceProvider)?", "CNAServiceProvider?"),
+        ("(CNAServiceProvider)?", "CNAServiceProvider?"),
+        ("[(any CNAServiceProvider)]", "[CNAServiceProvider]"),
+        ("(any CNAEqualityComparer<Key>)?", "CNAEqualityComparer<Key>?"),
+        ("Swift.Int32", "Int32"),
+        ("InputStream", "Foundation.InputStream"),
+    ]
+    for text, want in cases:
+        got = normalize_swift_type(text)
+        if got != want:
+            failures.append(f"normalize_swift_type({text!r}) = {got!r}, want {want!r}")
+    # `some P` is a DIFFERENT type and must survive; a tuple and a function
+    # type must keep their parentheses.
+    for text in ("some CNAServiceProvider", "(Int32, Int32)", "() -> Void"):
+        if normalize_swift_type(text) != text.replace("Swift.", ""):
+            failures.append(f"normalize_swift_type({text!r}) changed a type it must not")
+    return failures
 
 
 def self_test() -> None:
@@ -5308,11 +5344,15 @@ def self_test() -> None:
         failures.append("the return-nullability rule text is not configured")
     nullability_self_tests += 1
 
+    normalizer_failures = normalizer_self_test()
+    failures.extend(normalizer_failures)
+    normalizer_self_tests = 10
+
     if failures:
         raise SystemExit("self-test failures:\n" + "\n".join(failures))
     print(
         "API_COMPAT_SELF_TESTS="
-        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + curve_baseline_self_tests + accessor_writer_self_tests + 2 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + list_self_tests + order_self_tests + nullability_self_tests + field_mutability_self_tests + stream_direction_self_tests}"
+        f"{len(mutations) + 17 + len(protocol_mutations) + len(curve_mutations) + curve_baseline_self_tests + accessor_writer_self_tests + 2 + len(gamepad_mutations) + len(display_mutations) + 1 + len(buffer_mutations) + 1 + len(fill_mutations) + 1 + len(surface_mutations) + 1 + len(depth_mutations) + 1 + len(mode_mutations) + 6 + len(usage_mutations) + 12 + batch_self_tests + intptr_self_tests + event_self_tests + list_self_tests + order_self_tests + nullability_self_tests + field_mutability_self_tests + stream_direction_self_tests + normalizer_self_tests}"
     )
     print("API_COMPAT_SELF_TEST_STATUS=PASS")
 
