@@ -206,6 +206,50 @@ the road is long: this is a per-namespace campaign, not a handful of milestones.
 | The five unwired content loaders | 0 types, 0 members | `ContentManager` landed in Foundation 87 with **one** loader bound, `load_texture2d`, because adopting what the other five produce needs machinery those types do not have yet. Each is unblocked by its own type's milestone, not by content work. |
 | `ContentManager.OpenStream` / `ReadAsset` | 0 types, 2 members | The two protected members Foundation 87 left absent. `OpenStream` returns a `Stream` over an asset this binding never opens itself, and `ReadAsset` takes `Action<IDisposable>`; both wait on decisions about `System.IO` and delegate projection. |
 
+### Next milestone — the `Model` family, and it is the largest one left
+
+Twelve of the sixty-four missing types are one family: `Model`, `ModelBone`,
+`ModelMesh`, `ModelMeshPart` and their four read-only collections with four
+nested enumerators. It is also the family that unblocks
+`cna_content_manager_load_model`, one of the five loaders Foundation 87 left
+unbound.
+
+**The design is already decided, from the tables rather than from taste.**
+Every `ModelBone` accessor is `IL_NO_FAILURE_PATH`, so the family takes the
+snapshot shape `GraphicsAdapter`, `GraphicsDevice` and `GameWindow` already
+use: read from CNA once, cache, and answer from fields. `ModelBone.Transform`
+is the one accessor with an infallible **setter** that crosses the boundary, so
+it is a deferred write -- store, and push at the next throwing member --
+exactly as the accessor rule requires. `ModelBone.Parent` is
+`PROVEN_NULLABLE_SUCCESS` on `IL_FIELD_LIFECYCLE` evidence (no constructor
+assigns `parent`), so it is Optional; the collections derive from
+`CNAReadOnlyCollection`, which is already projected.
+
+Start at the leaves -- `ModelBone` and `ModelBoneCollection` -- because
+everything above them holds one.
+
+`ResourceContentManager` is NOT the next step despite being a Content type with
+its own CNA route: its constructor takes `System.Resources.ResourceManager` and
+its one method returns `System.IO.Stream`, so it is blocked on two decisions
+this binding has not made.
+
+### A consumer's stale build plan cost an hour, and would cost anyone else one
+
+Building `cna-swift-template` against the new `ContentManager` failed with
+`'ContentManager' is not a member type of enum ...Content` and
+`cannot find type 'CNAServiceProvider'` -- while the same sources built cleanly
+in this repository. The cause was neither: SwiftPM had cached a **build plan**
+in the template's `.build/debug.yaml` that predated the two new files, so they
+were never handed to the compiler. `grep -c CNAServiceProvider .build/debug.yaml`
+answered `0`, which is the fastest way to see it. Touching `Package.swift` did
+not regenerate the plan; removing `.build/debug.yaml` and `.build/build.db` did,
+and it keeps every object file, so nothing is rebuilt that did not change.
+
+This is the second staleness trap in one milestone -- the other was SwiftPM not
+recompiling the CNA module when only a C header changed. **When a symbol that
+demonstrably exists is reported missing, check what the build plan contains
+before reading the source again.**
+
 ### Foundation 87 — `ContentManager`, `Game.Content`, and one BCL family
 
 **The shape of the divergence.** XNA reads the asset's type out of the `.xnb`
