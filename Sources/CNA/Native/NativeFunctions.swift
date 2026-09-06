@@ -167,6 +167,12 @@ internal final class NativeFunctions {
     typealias GamepadSetVibrationRoute = @convention(c) (UInt64, UInt32, Float, Float, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias TextureGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_TextureInfo>?) -> UInt32
     typealias RenderTarget2dCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_RenderTarget2DCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
+    typealias OcclusionQueryEndRoute = @convention(c) (UInt64) -> UInt32
+    typealias OcclusionQueryGetIsCompleteRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias OcclusionQueryGetPixelCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
     typealias RenderTargetGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_RenderTargetInfo>?) -> UInt32
     typealias RenderTargetDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceSetRenderTarget2dRoute = @convention(c) (UInt64, UInt64) -> UInt32
@@ -529,6 +535,12 @@ internal final class NativeFunctions {
     let gamePadSetVibration: GamepadSetVibrationRoute
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
+    let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let occlusionQueryDestroy: OcclusionQueryDestroyRoute
+    let occlusionQueryBegin: OcclusionQueryBeginRoute
+    let occlusionQueryEnd: OcclusionQueryEndRoute
+    let occlusionQueryGetIsComplete: OcclusionQueryGetIsCompleteRoute
+    let occlusionQueryGetPixelCount: OcclusionQueryGetPixelCountRoute
     let renderTargetGetInfo: RenderTargetGetInfoRoute
     let renderTargetDestroy: RenderTargetDestroyRoute
     let graphicsDeviceSetRenderTarget2D: GraphicsDeviceSetRenderTarget2dRoute
@@ -911,6 +923,12 @@ internal final class NativeFunctions {
         gamePadSetVibration = try library.resolve("cna_gamepad_set_vibration", as: GamepadSetVibrationRoute.self)
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
+        occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        occlusionQueryDestroy = try library.resolve("cna_occlusion_query_destroy", as: OcclusionQueryDestroyRoute.self)
+        occlusionQueryBegin = try library.resolve("cna_occlusion_query_begin", as: OcclusionQueryBeginRoute.self)
+        occlusionQueryEnd = try library.resolve("cna_occlusion_query_end", as: OcclusionQueryEndRoute.self)
+        occlusionQueryGetIsComplete = try library.resolve("cna_occlusion_query_get_is_complete", as: OcclusionQueryGetIsCompleteRoute.self)
+        occlusionQueryGetPixelCount = try library.resolve("cna_occlusion_query_get_pixel_count", as: OcclusionQueryGetPixelCountRoute.self)
         renderTargetGetInfo = try library.resolve("cna_render_target_get_info", as: RenderTargetGetInfoRoute.self)
         renderTargetDestroy = try library.resolve("cna_render_target_destroy", as: RenderTargetDestroyRoute.self)
         graphicsDeviceSetRenderTarget2D = try library.resolve("cna_graphics_device_set_render_target2d", as: GraphicsDeviceSetRenderTarget2dRoute.self)

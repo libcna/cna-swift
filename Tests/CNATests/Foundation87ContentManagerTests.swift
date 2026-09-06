@@ -67,6 +67,25 @@ final class Foundation87ContentManagerTests: XCTestCase {
                        "a refused assignment leaves the old root in place")
     }
 
+    /// The second half of the setter, which Foundation 87 first shipped
+    /// without: once anything has been loaded the root is frozen, because
+    /// every cached asset was resolved against it.
+    func testTheRootIsFrozenOnceAnythingHasBeenLoaded() throws {
+        let game = try ContentProbeGame(freezeRoot: true)
+        try game.Run()
+        if let failure = game.failure { throw failure }
+        let refusal = try XCTUnwrap(
+            game.frozenRootFailure as? CNAInvalidOperationException)
+        XCTAssertEqual(
+            refusal.Message,
+            "This property cannot be changed after content has been loaded "
+            + "into the ContentManager.")
+        XCTAssertEqual(game.rootAfterFreeze, "probe-content",
+                       "the refused change left the root where it was")
+        XCTAssertTrue(game.rootMovedWhileEmpty,
+                      "an empty manager still accepts a new root")
+    }
+
     /// Order matters: XNA tests disposal *before* it tests the name, so a
     /// disposed manager asked for a null asset reports disposal, not the null.
     func testDisposalIsTestedBeforeTheAssetName() throws {
@@ -188,6 +207,7 @@ private final class ContentProbeGame: Microsoft.Xna.Framework.Game {
     let loadUnwiredKind: Bool
     let loadMissingTexture: Bool
     let unloadThenUse: Bool
+    let freezeRoot: Bool
     let skipManager: Bool
     let useGameContent: Bool
     let installOwnContent: Bool
@@ -202,6 +222,9 @@ private final class ContentProbeGame: Microsoft.Xna.Framework.Game {
     var unwiredFailure: Error?
     var missingTextureFailure: Error?
     var usableAfterUnload = false
+    var frozenRootFailure: Error?
+    var rootAfterFreeze: String?
+    var rootMovedWhileEmpty = false
     var sameContentFacade = false
     var gameContentRoot: String?
     var capturedContent: Microsoft.Xna.Framework.Content.ContentManager?
@@ -212,13 +235,14 @@ private final class ContentProbeGame: Microsoft.Xna.Framework.Game {
          loadBadNames: Bool = false, loadUnwiredKind: Bool = false,
          loadMissingTexture: Bool = false, unloadThenUse: Bool = false,
          skipManager: Bool = false, useGameContent: Bool = false,
-         installOwnContent: Bool = false) throws {
+         installOwnContent: Bool = false, freezeRoot: Bool = false) throws {
         self.setNullRoot = setNullRoot
         self.disposeThenLoadNil = disposeThenLoadNil
         self.loadBadNames = loadBadNames
         self.loadUnwiredKind = loadUnwiredKind
         self.loadMissingTexture = loadMissingTexture
         self.unloadThenUse = unloadThenUse
+        self.freezeRoot = freezeRoot
         self.skipManager = skipManager
         self.useGameContent = useGameContent
         self.installOwnContent = installOwnContent
@@ -249,6 +273,18 @@ private final class ContentProbeGame: Microsoft.Xna.Framework.Game {
                 serviceProvider: Services, rootDirectory: "probe-content")
             rootDirectory = manager.RootDirectory
 
+            if freezeRoot {
+                // Empty cache: the root still moves.
+                try manager.SetRootDirectory("elsewhere")
+                rootMovedWhileEmpty = manager.RootDirectory == "elsewhere"
+                try manager.SetRootDirectory("probe-content")
+                manager.testOnlyRecordLoadedAsset("hero")
+                do { try manager.SetRootDirectory("elsewhere") }
+                catch { frozenRootFailure = error }
+                rootAfterFreeze = manager.RootDirectory
+                try manager.Dispose()
+                return
+            }
             if setNullRoot {
                 do { try manager.SetRootDirectory(nil) }
                 catch { nullRootFailure = error }

@@ -383,6 +383,42 @@ final class Foundation38RenderTargetTests: XCTestCase {
     /// The parent game's disposal releases the target with everything else,
     /// and disposing it again afterwards is still a no-op rather than a
     /// double free.
+    /// `GraphicsDevice.Present` refuses while a render target is bound.
+    ///
+    /// XNA raises `InvalidOperationException(CannotPresentActiveRenderTargets)`
+    /// and CNA makes no such check, so the refusal is the binding's own. It
+    /// matters: presenting here would show the backbuffer the caller was NOT
+    /// drawing into, which looks like a dropped frame rather than a mistake.
+    func testPresentRefusesWhileARenderTargetIsBound() throws {
+        try requireNative()
+        let game = try run { game, device in
+            let target = try G.RenderTarget2D(
+                graphicsDevice: device, width: 16, height: 16)
+            try device.SetRenderTarget(target)
+            do {
+                try device.Present()
+                game.observations["refused"] = "false"
+            } catch let error as CNAInvalidOperationException {
+                game.observations["refused"] = "true"
+                game.observations["message"] = error.Message ?? ""
+            }
+            // Unbound, the same call is accepted again: the refusal is about
+            // the binding, not about Present.
+            try device.SetRenderTarget(nil)
+            do {
+                try device.Present()
+                game.observations["afterUnbind"] = "accepted"
+            } catch {
+                game.observations["afterUnbind"] = "\(error)"
+            }
+        }
+        XCTAssertEqual(game.observations["refused"], "true")
+        XCTAssertEqual(game.observations["message"],
+                       "Cannot call Present when a render target is active.")
+        XCTAssertEqual(game.observations["afterUnbind"], "accepted",
+                       "unbinding restores what the refusal was protecting")
+    }
+
     func testParentGameDisposalReleasesTheTarget() throws {
         try requireNative()
         var escaped: G.RenderTarget2D?

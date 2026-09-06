@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=193
-TARGET_MEMBERS=2394
-TOTAL_DIAGNOSTICS=73
-COMPLETE_TYPES=189
+TARGET_TYPES=194
+TARGET_MEMBERS=2400
+TOTAL_DIAGNOSTICS=72
+COMPLETE_TYPES=190
 PARTIAL_TYPES=4
-MISSING_TYPES=64
-MISSING_TYPE=64
+MISSING_TYPES=63
+MISSING_TYPE=63
 MISSING_MEMBER=7
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -177,6 +177,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=70
 - `Microsoft.Xna.Framework.Graphics.IndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.IndexElementSize`
 - `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
+- `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgr565`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Bgra4444`
@@ -359,7 +360,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPart`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
-- `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
 - `Microsoft.Xna.Framework.Input.Touch.TouchPanel`
 - `Microsoft.Xna.Framework.Media.Album`
 - `Microsoft.Xna.Framework.Media.AlbumCollection`

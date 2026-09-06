@@ -191,6 +191,10 @@ def canonical_type(value: str) -> str:
         "CNA_IndexBufferHandle": "uint64_t",
         "CNA_VertexBufferEventRegistrationHandle": "uint64_t",
         "CNA_IndexBufferEventRegistrationHandle": "uint64_t",
+        # graphics_device.h:1280 gives the occlusion query its own alias for
+        # the same reason effects.h gives nine: the header naming which handle
+        # a route wants, not a wider ABI.
+        "CNA_OcclusionQueryHandle": "uint64_t",
         # effects.h gives every effect object its own handle alias, and two
         # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,
         # and it is the header being precise about which handle a route wants

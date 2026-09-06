@@ -96,8 +96,25 @@ extension Microsoft.Xna.Framework.Content {
             guard let value else {
                 throw CNAArgumentNullException(paramName: "value")
             }
+            // **The half Foundation 87 shipped without.** The accessor table
+            // records TWO exceptions for this setter, and only the null one was
+            // reproduced; `tools/api_compat/message_coverage.py` named the
+            // other by its resource key. Once anything has been loaded the root
+            // is frozen, because every cached asset was resolved against it and
+            // moving it would leave the cache describing paths that no longer
+            // exist.
+            if !(loadedAssets?.isEmpty ?? true) {
+                throw CNAInvalidOperationException(
+                    message: ContentManager.cannotChangeRootDirectoryMessage)
+            }
             storedRootDirectory = value
         }
+
+        /// `FrameworkResources.ContentManagerCannotChangeRootDirectory`, read
+        /// out of the registered `Microsoft.Xna.Framework.dll`.
+        internal static let cannotChangeRootDirectoryMessage =
+            "This property cannot be changed after content has been loaded "
+            + "into the ContentManager." 
 
         /// `ContentManager.Load<T>(String assetName)`.
         ///
@@ -254,6 +271,17 @@ extension Microsoft.Xna.Framework.Content {
         /// module computes from its own copy of the header.
         internal static let createInfoSize =
             MemoryLayout<CNASwift_ContentManagerCreateInfo>.size
+
+        /// The cache entry a successful `Load` would have made.
+        ///
+        /// The frozen-root rule needs a manager that has loaded something, and
+        /// this host has no `.xnb` to load -- so without a hook the rule is
+        /// unprovable and a mutation that removes it survives. Internal, and
+        /// named for what it is, exactly as `GraphicsDeviceManager`'s own test
+        /// hook is.
+        internal func testOnlyRecordLoadedAsset(_ key: String) {
+            loadedAssets?[key] = key
+        }
 
         internal var runtimeObjectIsDisposed: Bool { loadedAssets == nil }
         internal func disposeFromParent() throws { try Dispose() }

@@ -42,10 +42,23 @@ extension Microsoft.Xna.Framework {
             _ value: Microsoft.Xna.Framework.Graphics.GraphicsAdapter?
         ) throws {
             guard let value else {
-                throw CNAArgumentNullException(paramName: "value")
+                // The IL selects the (paramName, message) overload and names
+                // the way out, which is the useful half of the refusal: this
+                // property has no null state, and DefaultAdapter is what a
+                // caller who has no adapter of their own should pass.
+                throw CNAArgumentNullException(
+                    paramName: "value",
+                    message: GraphicsDeviceInformation.noNullUseDefaultAdapterMessage)
             }
             storedAdapter = value
         }
+
+        /// `FrameworkResources.NoNullUseDefaultAdapter`, read out of the
+        /// registered `Microsoft.Xna.Framework.Game.dll`. Two spaces after the
+        /// first sentence, as the resource has them.
+        internal static let noNullUseDefaultAdapterMessage =
+            "Adapter cannot be null.  Try using GraphicsAdapter.DefaultAdapter "
+            + "instead."
 
         public var GraphicsProfile: Microsoft.Xna.Framework.Graphics.GraphicsProfile {
             get { storedProfile }

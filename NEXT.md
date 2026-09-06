@@ -22,12 +22,12 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-866 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=73   COMPLETE_TYPES=189   PARTIAL_TYPES=4
-MISSING_TYPE=64  MISSING_MEMBER=7  OVERLOAD_MAPPING_MISMATCH=2
+875 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=72   COMPLETE_TYPES=190   PARTIAL_TYPES=4
+MISSING_TYPE=63  MISSING_MEMBER=7  OVERLOAD_MAPPING_MISMATCH=2
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=354  PROTOTYPE_TYPE_POSITIONS=1235  LAYOUTS=55  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=325 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=360  PROTOTYPE_TYPE_POSITIONS=1250  LAYOUTS=55  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=334 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -206,7 +206,92 @@ the road is long: this is a per-namespace campaign, not a handful of milestones.
 | The five unwired content loaders | 0 types, 0 members | `ContentManager` landed in Foundation 87 with **one** loader bound, `load_texture2d`, because adopting what the other five produce needs machinery those types do not have yet. Each is unblocked by its own type's milestone, not by content work. |
 | `ContentManager.OpenStream` / `ReadAsset` | 0 types, 2 members | The two protected members Foundation 87 left absent. `OpenStream` returns a `Stream` over an asset this binding never opens itself, and `ReadAsset` takes `Action<IDisposable>`; both wait on decisions about `System.IO` and delegate projection. |
 
-### Next milestone — the `Model` family, and it is the largest one left
+### Foundation 88 — `OcclusionQuery`, and a gate nobody had been running
+
+`tools/api_compat/message_coverage.py` reported **eleven findings** the first
+time it was run this session, against a recorded state of zero. Every one was a
+message an implemented member can raise that was neither reproduced nor
+recorded, and several belonged to milestones from earlier the same day. The
+gate is not in the default loop; running it is now part of finishing a
+milestone, not part of a handoff.
+
+Eight were reproduced and three recorded, and the interesting half is what
+happened to the ones that could not be:
+
+**`NullWindowHandleNotAllowed` was implemented and withdrawn.** The qualified
+HEADLESS renderer reports `DeviceWindowHandle = 0` for every device it makes --
+the consumer canary prints `window=handle=0` -- so XNA's check refused *every*
+device creation and reset on this binding's own qualified boundary. Three green
+suites failed on it, which is the measurement. Recorded as `deferred`, naming
+the work: make it conditional on a renderer that has a window.
+
+**`ProfileInvalidDevice` was implemented and withdrawn.** Reproducing it over
+`GraphicsAdapter.IsProfileSupported` refused a reset CNA accepts -- proof the
+two conditions are not the same one. Whether a profile can be served is CNA's
+decision. Recorded as `native-owned`.
+
+**`ContentManagerCannotChangeRootDirectory` was a real defect shipped in
+Foundation 87.** The accessor table records TWO exceptions for
+`set_RootDirectory` and only the null one was reproduced; once anything has
+been loaded the root is frozen. The rule needed an internal test hook to be
+provable at all, because this host has no `.xnb` to load -- without it the
+mutation that removes the rule survives.
+
+`OcclusionQuery` itself closes one missing type. The type is small and its two
+managed rules are the whole of it: a second `Begin` is refused until the
+previous result has been *looked at* (reading `IsComplete` rearms it), and
+`PixelCount` refuses a query that has not finished -- **measured: CNA answers a
+count for a query that was never begun, so both refusals are the binding's**.
+
+One decision is worth keeping. `IsComplete` is `IL_NO_FAILURE_PATH` over a
+route that can fail, and a failed read answers **true**, not false. The member
+exists to be spun on; answering false on a route that keeps failing hangs that
+loop forever with nothing to report, while answering true ends it and hands the
+question to `PixelCount`, which can raise. An infallible getter should not be
+the member that traps a caller -- it should defer to the one that can explain.
+The failure is kept in `lastStatusFailure` so the choice is provable rather than
+described.
+
+### The `Model` family is blocked on a fixture, and the reason was measured
+
+Two facts turned up before a line of it was written, both from
+`build-probe/f88a_bone_identity.c` and the 0.21.0 headers.
+
+**CNA bone handles carry no object identity.** Every accessor that answers a
+bone or a collection returns a *fresh* handle: two `get_at(c, 0)` calls answer
+different values, `get_parent` answers a different value each time, `find`
+answers a third, and none equals the handle the bone was created with. What CNA
+does expose is `cna_model_bone_collection_contains`, which answers true for
+**both** a created handle and a view handle -- so the identity exists inside the
+runtime and simply has no comparison in the ABI.
+
+The consequence for the projection is concrete: XNA's `Bones[0] === Bones[0]`
+and `bone.Parent === theParent` are reference identities, and they cannot be
+reproduced from handle values. They have to come from materialising each bone
+facade **once per model** and resolving `Parent` through
+`cna_model_bone_get_index` into that array -- which is what XNA's own object
+graph does. Every accessor in the family is `IL_NO_FAILURE_PATH`, so the
+snapshot shape was already indicated; this is the measurement that makes it the
+only correct shape rather than the convenient one. Note also that each of those
+per-call views is an **owned** handle: a facade that read `Parent` on every
+access would leak one per read.
+
+**Nothing on this host can produce a `Model`.**
+`cna_content_manager_load_model` loads a compiled `.xnb`, and this repository
+has none; the header says so plainly ("before it, every `CNA_ModelHandle` was
+built by hand from `cna_model_create_*`"). Building one by hand would bind
+`cna_model_create`, `cna_model_bone_create` and `cna_model_bone_add_child`,
+and **no projected member consumes any of them** -- XNA has no public `Model`
+or `ModelBone` constructor -- so the Foundation 67 rule forbids exactly that.
+The other door is `cna_cnb_compile_cnj` plus `cna_cnb_build_model_from_cnj`,
+which would let a test compile a tiny model at run time; that is a separate
+binding surface and its own decision, not a detour inside this milestone.
+
+So the family waits on **one** question: does this binding project the CNB/CNJ
+compiler, so that a model asset can be produced rather than shipped? Until that
+is answered, implementing `Model` would add four types no test could reach.
+
+### When the fixture question is answered — the `Model` family design
 
 Twelve of the sixty-four missing types are one family: `Model`, `ModelBone`,
 `ModelMesh`, `ModelMeshPart` and their four read-only collections with four

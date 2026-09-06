@@ -37,6 +37,7 @@ TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
 CONTENT = ROOT / "Sources/CNA/Xna/Content/ContentManager.swift"
+OCCLUSION = ROOT / "Sources/CNA/Xna/Graphics/OcclusionQuery.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -120,6 +121,108 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 88: messages the coverage gate named --------------------
+    (
+        "content-root-moves-after-a-load",
+        "SetRootDirectory accepting a change once assets are cached, leaving "
+        "every cached asset resolved against a path that no longer applies",
+        CONTENT,
+        "            if !(loadedAssets?.isEmpty ?? true) {",
+        "            if false {",
+    ),
+    (
+        "device-presents-over-a-bound-render-target",
+        "Present accepted while a render target is bound, so a caller presents "
+        "the backbuffer they were not drawing into",
+        DEVICE,
+        "            guard runtime.cachedRenderTargetBindings.isEmpty else {",
+        "            if false {",
+    ),
+    # ---- Foundation 88: the occlusion query --------------------------------
+    (
+        "occlusion-second-begin-accepted",
+        "Begin accepted while a result is still unread, so a caller silently "
+        "discards the query they were waiting on",
+        OCCLUSION,
+        "            guard !awaitingCompletionCheck else {",
+        "            if false {",
+    ),
+    (
+        "occlusion-check-does-not-rearm",
+        "reading IsComplete leaving the query armed, so every later Begin is "
+        "refused and the type can be used exactly once",
+        OCCLUSION,
+        "            awaitingCompletionCheck = false\n"
+        "            return value != 0",
+        "            return value != 0",
+    ),
+    (
+        "occlusion-status-failure-hangs-the-wait",
+        "a failed status read answering false, which is what turns a caller's "
+        "wait loop into a hang with nothing to report",
+        OCCLUSION,
+        "            } catch {\n"
+        "                lastStatusFailure = error\n"
+        "                return true\n"
+        "            }",
+        "            } catch {\n"
+        "                lastStatusFailure = error\n"
+        "                return false\n"
+        "            }",
+    ),
+    (
+        "occlusion-status-swallows-the-failure",
+        "a failed status read leaving no trace, so the divergence is described "
+        "in a comment and provable nowhere",
+        OCCLUSION,
+        "            } catch {\n"
+        "                lastStatusFailure = error\n"
+        "                return true",
+        "            } catch {\n"
+        "                lastStatusFailure = nil\n"
+        "                return true",
+    ),
+    (
+        "occlusion-never-joins-the-parent-registry",
+        "a query that does not register with the runtime, so an undisposed one "
+        "makes the game's own teardown fail",
+        OCCLUSION,
+        "            runtime.register(self)",
+        "            _ = runtime",
+    ),
+    # WITHDRAWN: "occlusion-pixel-count-cannot-fail" -- dropping the route's
+    # own result check. It cannot be falsified on this host and the reason is
+    # structural, not a missing test. Reaching that check requires a query whose
+    # handle is valid AND whose IsComplete is true AND whose count route then
+    # fails; the disposed path throws at validatedHandle first, and the
+    # incomplete path is caught by the managed guard below it. CNA answers
+    # success for every completed query this renderer can produce, so the third
+    # condition has no input. It is replaced by the mutation on the guard that
+    # IS reachable.
+    (
+        "occlusion-count-read-before-completion",
+        "PixelCount answering a count for a query that never finished, which "
+        "is the refusal XNA raises and CNA does not",
+        OCCLUSION,
+        "                guard IsComplete else {\n"
+        "                    throw CNAInvalidOperationException(\n"
+        "                        message: OcclusionQuery.dataNotAvailableMessage)\n"
+        "                }",
+        "                if false {\n"
+        "                    throw CNAInvalidOperationException(\n"
+        "                        message: OcclusionQuery.dataNotAvailableMessage)\n"
+        "                }",
+    ),
+    (
+        "occlusion-end-does-not-submit",
+        "End accepted without reaching the runtime, so a query is waited on "
+        "that was never submitted",
+        OCCLUSION,
+        "                nativeStorage.runtime.functions.occlusionQueryEnd(handle),\n"
+        "                operation: \"cna_occlusion_query_end\")",
+        "                nativeStorage.runtime.functions.occlusionQueryBegin(handle),\n"
+        "                operation: \"cna_occlusion_query_end\")",
+    ),
     # ---- Foundation 87: the content manager --------------------------------
     (
         "content-tests-the-name-before-disposal",

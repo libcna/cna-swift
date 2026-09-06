@@ -78,6 +78,26 @@ extension Microsoft.Xna.Framework.Graphics {
             self.init(handle: created, runtime: runtime, callerCreated: true)
         }
 
+        /// **Neither of XNA's two pre-driver refusals is enforced here, and
+        /// both reasons were measured rather than reasoned.**
+        ///
+        /// `NullWindowHandleNotAllowed`: the qualified HEADLESS renderer
+        /// reports `DeviceWindowHandle = 0` for every device it makes -- the
+        /// consumer canary prints `window=handle=0` -- so the check refused
+        /// every creation and reset on this binding's own qualified boundary.
+        ///
+        /// `ProfileInvalidDevice`: reproducing it over
+        /// `GraphicsAdapter.IsProfileSupported` refused a reset that CNA
+        /// accepts, which is proof the two conditions are not the same one.
+        /// Whether a profile can be served is CNA's decision, and
+        /// `cna_graphics_device_create` reports it on the runtime channel
+        /// naming the route -- which says what happened, where "Could not find
+        /// a graphics device that supports the XNA Framework {0} profile."
+        /// describes an enumeration this binding never performs.
+        ///
+        /// Both are recorded in `recorded-message-absences.json`, with the
+        /// evidence, rather than left as code that refuses the wrong things.
+
         /// Reads the device's own `GraphicsProfile` once and caches it.
         ///
         /// Every facade this runtime hands out is the same device, so this runs
@@ -877,10 +897,24 @@ extension Microsoft.Xna.Framework.Graphics {
         /// live inside.
         public func Present() throws {
             let handle = try validatedHandle("GraphicsDevice.Present")
+            // XNA refuses to present while a render target is bound, and the
+            // binding already knows which ones are: `GetRenderTargets` answers
+            // the same cached bindings. CNA makes no such check, so without
+            // this a caller would present the backbuffer they were not drawing
+            // into and see the frame they expected to have replaced.
+            guard runtime.cachedRenderTargetBindings.isEmpty else {
+                throw CNAInvalidOperationException(
+                    message: GraphicsDevice.cannotPresentActiveRenderTargetsMessage)
+            }
             try runtime.functions.check(
                 runtime.functions.graphicsDevicePresent(handle),
                 operation: "cna_graphics_device_present")
         }
+
+        /// `FrameworkResources.CannotPresentActiveRenderTargets`, read out of
+        /// the registered `Microsoft.Xna.Framework.dll`.
+        internal static let cannotPresentActiveRenderTargetsMessage =
+            "Cannot call Present when a render target is active." 
 
 /// `Present(Nullable<Rectangle> sourceRectangle, Nullable<Rectangle>
         /// destinationRectangle, IntPtr overrideWindowHandle)`.
