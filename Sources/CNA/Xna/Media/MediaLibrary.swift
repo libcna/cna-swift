@@ -12,17 +12,15 @@ extension Microsoft.Xna.Framework.Media {
     /// can obtain one. A song created from a file path has no library context
     /// at all -- CNA says so and `Song.Artist` reports it.
     ///
-    /// **Still partial, and by less.** `Playlists` reaches
-    /// `PlaylistCollection` and `MediaSource` is its own type; the constructor
-    /// that takes one, and the `SavePicture` overload that takes a `Stream`,
-    /// wait with them. The `Stream` overload is blocked differently from the
-    /// rest: `cna_media_library_save_picture_from_stream` wants a CNA stream
-    /// handle, and this binding has no way to make one from a
-    /// `Foundation.InputStream`.
+    /// **One member short.** The `SavePicture` overload that takes a `Stream`
+    /// is blocked differently from everything else that waited:
+    /// `cna_media_library_save_picture_from_stream` wants a CNA stream handle,
+    /// and this binding has no way to make one from a
+    /// `Foundation.InputStream`. Everything else the type declares is here.
     public final class MediaLibrary: RuntimeOwnedChild {
 
-        private let runtime: RuntimeState
-        private var handle: UInt64
+        private var runtime: RuntimeState!
+        private var handle: UInt64 = 0
         private var released = false
 
         /// `MediaLibrary()`, the parameterless constructor.
@@ -98,6 +96,57 @@ extension Microsoft.Xna.Framework.Media {
                     runtime.functions.mediaLibraryGetGenres(live, &produced),
                     operation: "cna_media_library_get_genres")
                 return GenreCollection(handle: produced, runtime: runtime)
+            }
+        }
+
+        /// `MediaLibrary(MediaSource mediaSource)`.
+        ///
+        /// The source carries its index in the runtime's enumeration, which is
+        /// what CNA's route takes -- there is no media-source object to pass.
+        public convenience init(mediaSource: MediaSource?) throws {
+            guard let mediaSource else {
+                throw CNAArgumentNullException(paramName: "mediaSource")
+            }
+            try self.init(sourceIndex: mediaSource.enumerationIndex)
+        }
+
+        private init(sourceIndex: UInt32) throws {
+            let rt = try RuntimeRegistry.current()
+            var created: UInt64 = 0
+            try rt.functions.check(
+                rt.functions.mediaLibraryCreateFromSource(
+                    rt.gameHandle, sourceIndex, &created),
+                operation: "cna_media_library_create_from_source")
+            runtime = rt
+            handle = created
+            rt.register(self)
+        }
+
+        /// `MediaLibrary.MediaSource`.
+        ///
+        /// **Nil, always, and that is CNA's shape rather than a gap.** The
+        /// runtime publishes a library's source only as a *name*, through
+        /// `cna_media_library_copy_media_source_name`, and a name is not a
+        /// `MediaSource`: the type carries an enumeration index this binding
+        /// would have to guess at. The return is proven nullable, so nil is a
+        /// state XNA itself produces, and inventing a source from a matching
+        /// name would be a different object that merely looked right.
+        public var MediaSource: Microsoft.Xna.Framework.Media.MediaSource? {
+            get throws {
+                _ = try validated()
+                return nil
+            }
+        }
+
+        /// `MediaLibrary.Playlists`.
+        public var Playlists: PlaylistCollection? {
+            get throws {
+                let live = try validated()
+                var produced: UInt64 = 0
+                try runtime.functions.check(
+                    runtime.functions.mediaLibraryGetPlaylists(live, &produced),
+                    operation: "cna_media_library_get_playlists")
+                return PlaylistCollection(handle: produced, runtime: runtime)
             }
         }
 

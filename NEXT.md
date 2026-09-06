@@ -24,16 +24,16 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-911 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=63   COMPLETE_TYPES=205   PARTIAL_TYPES=6
-MISSING_TYPE=46  MISSING_MEMBER=13  OVERLOAD_MAPPING_MISMATCH=4
+915 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=56   COMPLETE_TYPES=208   PARTIAL_TYPES=6
+MISSING_TYPE=43  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=521  PROTOTYPE_TYPE_POSITIONS=1781  LAYOUTS=59  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=362 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=541  PROTOTYPE_TYPE_POSITIONS=1847  LAYOUTS=59  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=365 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2463  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
+API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=462
 RESOURCE_STRINGS_REPRODUCED=73  ACCESSOR_SELF_TESTS=41
 ```
 
@@ -383,6 +383,37 @@ type will not repeat it.
 takes one, and the `SavePicture` overload taking a `Stream` is blocked
 differently -- `cna_media_library_save_picture_from_stream` wants a CNA stream
 handle, which this binding cannot make from a `Foundation.InputStream`.
+
+### Foundation 95 — `Playlist`, `MediaSource`, and `MediaLibrary` finished bar one
+
+Three types, and `MediaLibrary` is now one member short of complete: the
+`SavePicture` overload that takes a `Stream` needs a CNA stream handle this
+binding cannot make from a `Foundation.InputStream`.
+
+**`MediaSource` carries an index, not a handle.** CNA publishes no media-source
+object -- every route is `_at(game, index)` -- so a source *is* its position in
+the runtime's enumeration, and the name and type are read once when the list is
+built rather than on each access, because a later enumeration need not be the
+one an index came from. `System.Collections.Generic.IList<T>` maps to `CNAList`,
+its first and only use in the whole contract.
+
+**`MediaLibrary.MediaSource` is always nil, and that is CNA's shape rather than
+a gap.** The runtime publishes a library's source only as a *name*, and a name
+is not a `MediaSource` -- the type carries an enumeration index this binding
+would have to guess at. The return is proven nullable, so nil is a state XNA
+itself produces; inventing a source from a matching name would be a different
+object that merely looked right. The getter still refuses on a disposed
+library, because the CLR getter is fallible.
+
+**Measured, and it corrected the test rather than the code:** disposing a
+`MediaLibrary` does **not** cascade to the collections it handed out. They are
+separate runtime children, alive until the game tears down -- which is XNA's
+shape too, where a library's `Dispose` disposes the library and not the objects
+it published.
+
+Two mutations are withdrawn with their reasons: one needs a machine with two
+media sources, and this host publishes one, so index zero is the right answer
+and the mutant is indistinguishable.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 

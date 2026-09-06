@@ -47,6 +47,7 @@ MEDIA_COLLECTIONS = ROOT / "Sources/CNA/Xna/Media/MediaCollections.swift"
 MEDIA_ENTITIES = ROOT / "Sources/CNA/Xna/Media/MediaEntities.swift"
 MEDIA_LIBRARY = ROOT / "Sources/CNA/Xna/Media/MediaLibrary.swift"
 PICTURE = ROOT / "Sources/CNA/Xna/Media/PictureEntities.swift"
+MEDIA_SOURCE = ROOT / "Sources/CNA/Xna/Media/MediaSource.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -130,6 +131,36 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 95: playlists and media sources -------------------------
+    (
+        "media-source-list-stops-one-short",
+        "the source enumeration dropping its last entry, so a caller cannot "
+        "open the library that source names",
+        MEDIA_SOURCE,
+        "            for index in 0..<count {",
+        "            for index in 0..<max(0, count - 1) {",
+    ),
+    # WITHDRAWN: "media-source-index-always-zero" -- every source carrying
+    # index zero. This host publishes exactly one media source, so index zero
+    # IS the right answer for it and the mutant is indistinguishable. It needs
+    # a machine with two sources, which is not something a suite can arrange.
+    (
+        "library-playlists-come-from-the-wrong-route",
+        "MediaLibrary.Playlists answering the songs collection, so a caller "
+        "enumerating playlists walks songs",
+        MEDIA_LIBRARY,
+        "                    runtime.functions.mediaLibraryGetPlaylists(live, &produced),",
+        "                    runtime.functions.mediaLibraryGetSongs(live, &produced),",
+    ),
+    (
+        "library-own-source-never-refuses",
+        "MediaLibrary.MediaSource answering nil for a disposed library instead "
+        "of refusing, so a released library looks like one with no source",
+        MEDIA_LIBRARY,
+        "                _ = try validated()\n"
+        "                return nil",
+        "                return nil",
+    ),
     # ---- Foundation 94: the picture branch ---------------------------------
     # WITHDRAWN, all three together: "library-saved-pictures-come-from-the-wrong-route",
     # "picture-thumbnail-reads-the-full-image" and "picture-date-loses-its-epoch".

@@ -221,6 +221,9 @@ def canonical_type(value: str) -> str:
         "CNA_PictureAlbumHandle": "uint64_t",
         "CNA_PictureCollectionHandle": "uint64_t",
         "CNA_PictureAlbumCollectionHandle": "uint64_t",
+        "CNA_PlaylistHandle": "uint64_t",
+        "CNA_PlaylistCollectionHandle": "uint64_t",
+        "CNA_MediaSourceType": "uint32_t",
         # effects.h gives every effect object its own handle alias, and two
         # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,
         # and it is the header being precise about which handle a route wants

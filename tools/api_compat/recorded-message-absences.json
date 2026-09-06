@@ -273,6 +273,13 @@
       "member": "Play",
       "kind": "unreachable",
       "reason": "XNA raises this for applications that use audio WITHOUT running a game loop, which this binding cannot express: a SoundEffect is built through RuntimeRegistry.current(), so one can exist only while a game does, and Game.Tick calls the dispatcher itself (see FrameworkDispatcher.Update's own documentation). The branch has no input. The message constant was written and then REMOVED, because an unused constant satisfies message_coverage.py by its text alone -- see the note in NEXT.md."
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.MediaLibrary",
+      "key": "UnexpectedError",
+      "member": "ctor",
+      "kind": "native-owned",
+      "reason": "XNA's catch-all for a library it could not open: \"An unexpected error has occurred.\" Whether a media library opens is CNA's decision, and cna_media_library_create reports its refusal on the runtime error channel naming the route -- which tells a caller what actually failed, where XNA's text tells them only that something did."
     }
   ]
 }

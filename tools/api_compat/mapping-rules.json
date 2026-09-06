@@ -229,7 +229,8 @@
     "System.Collections.Generic.KeyNotFoundException": "CNAKeyNotFoundException",
     "System.NullReferenceException": "CNANullReferenceException",
     "System.IndexOutOfRangeException": "CNAIndexOutOfRangeException",
-    "System.IServiceProvider": "CNAServiceProvider"
+    "System.IServiceProvider": "CNAServiceProvider",
+    "System.Collections.Generic.IList`1": "CNAList"
   },
   "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
@@ -1333,6 +1334,18 @@
     },
     {
       "owner": "Microsoft.Xna.Framework.Media.PictureAlbum",
+      "member": "Equals",
+      "parameter": "other",
+      "reason": "`IEquatable<T>.Equals` is defined for null and answers false."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.MediaLibrary",
+      "member": ".ctor",
+      "parameter": "mediaSource",
+      "reason": "The constructor null-tests its source before it reaches the runtime, and that branch is one a caller can only take by passing null."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Playlist",
       "member": "Equals",
       "parameter": "other",
       "reason": "`IEquatable<T>.Equals` is defined for null and answers false."

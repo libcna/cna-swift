@@ -328,6 +328,26 @@ internal final class NativeFunctions {
     typealias MediaLibraryGetRootPictureAlbumRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias MediaLibrarySavePictureRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaLibraryGetPictureFromTokenRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PlaylistCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PlaylistCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PlaylistCollectionGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PlaylistCollectionDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias PlaylistCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias PlaylistGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PlaylistCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PlaylistGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PlaylistDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias PlaylistDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias PlaylistEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias PlaylistGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias PlaylistGetSongsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias PlaylistGetDurationRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias MediaLibraryGetPlaylistsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryCreateFromSourceRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaSourceGetAvailableCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias MediaSourceGetNameSizeAtRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaSourceCopyNameAtRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaSourceGetTypeAtRoute = @convention(c) (UInt64, UInt32, UnsafeMutablePointer<UInt32>?) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -697,6 +717,26 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let playlistCollectionGetAt: PlaylistCollectionGetAtRoute
+    let playlistCollectionGetCount: PlaylistCollectionGetCountRoute
+    let playlistCollectionGetIsDisposed: PlaylistCollectionGetIsDisposedRoute
+    let playlistCollectionDispose: PlaylistCollectionDisposeRoute
+    let playlistCollectionDestroy: PlaylistCollectionDestroyRoute
+    let playlistGetNameSize: PlaylistGetNameSizeRoute
+    let playlistCopyName: PlaylistCopyNameRoute
+    let playlistGetIsDisposed: PlaylistGetIsDisposedRoute
+    let playlistDispose: PlaylistDisposeRoute
+    let playlistDestroy: PlaylistDestroyRoute
+    let playlistEquals: PlaylistEqualsRoute
+    let playlistGetHashCode: PlaylistGetHashCodeRoute
+    let playlistGetSongs: PlaylistGetSongsRoute
+    let playlistGetDuration: PlaylistGetDurationRoute
+    let mediaLibraryGetPlaylists: MediaLibraryGetPlaylistsRoute
+    let mediaLibraryCreateFromSource: MediaLibraryCreateFromSourceRoute
+    let mediaSourceGetAvailableCount: MediaSourceGetAvailableCountRoute
+    let mediaSourceGetNameSizeAt: MediaSourceGetNameSizeAtRoute
+    let mediaSourceCopyNameAt: MediaSourceCopyNameAtRoute
+    let mediaSourceGetTypeAt: MediaSourceGetTypeAtRoute
     let pictureCollectionGetAt: PictureCollectionGetAtRoute
     let pictureCollectionGetCount: PictureCollectionGetCountRoute
     let pictureCollectionGetIsDisposed: PictureCollectionGetIsDisposedRoute
@@ -1246,6 +1286,26 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        playlistCollectionGetAt = try library.resolve("cna_playlist_collection_get_at", as: PlaylistCollectionGetAtRoute.self)
+        playlistCollectionGetCount = try library.resolve("cna_playlist_collection_get_count", as: PlaylistCollectionGetCountRoute.self)
+        playlistCollectionGetIsDisposed = try library.resolve("cna_playlist_collection_get_is_disposed", as: PlaylistCollectionGetIsDisposedRoute.self)
+        playlistCollectionDispose = try library.resolve("cna_playlist_collection_dispose", as: PlaylistCollectionDisposeRoute.self)
+        playlistCollectionDestroy = try library.resolve("cna_playlist_collection_destroy", as: PlaylistCollectionDestroyRoute.self)
+        playlistGetNameSize = try library.resolve("cna_playlist_get_name_size", as: PlaylistGetNameSizeRoute.self)
+        playlistCopyName = try library.resolve("cna_playlist_copy_name", as: PlaylistCopyNameRoute.self)
+        playlistGetIsDisposed = try library.resolve("cna_playlist_get_is_disposed", as: PlaylistGetIsDisposedRoute.self)
+        playlistDispose = try library.resolve("cna_playlist_dispose", as: PlaylistDisposeRoute.self)
+        playlistDestroy = try library.resolve("cna_playlist_destroy", as: PlaylistDestroyRoute.self)
+        playlistEquals = try library.resolve("cna_playlist_equals", as: PlaylistEqualsRoute.self)
+        playlistGetHashCode = try library.resolve("cna_playlist_get_hash_code", as: PlaylistGetHashCodeRoute.self)
+        playlistGetSongs = try library.resolve("cna_playlist_get_songs", as: PlaylistGetSongsRoute.self)
+        playlistGetDuration = try library.resolve("cna_playlist_get_duration", as: PlaylistGetDurationRoute.self)
+        mediaLibraryGetPlaylists = try library.resolve("cna_media_library_get_playlists", as: MediaLibraryGetPlaylistsRoute.self)
+        mediaLibraryCreateFromSource = try library.resolve("cna_media_library_create_from_source", as: MediaLibraryCreateFromSourceRoute.self)
+        mediaSourceGetAvailableCount = try library.resolve("cna_media_source_get_available_count", as: MediaSourceGetAvailableCountRoute.self)
+        mediaSourceGetNameSizeAt = try library.resolve("cna_media_source_get_name_size_at", as: MediaSourceGetNameSizeAtRoute.self)
+        mediaSourceCopyNameAt = try library.resolve("cna_media_source_copy_name_at", as: MediaSourceCopyNameAtRoute.self)
+        mediaSourceGetTypeAt = try library.resolve("cna_media_source_get_type_at", as: MediaSourceGetTypeAtRoute.self)
         pictureCollectionGetAt = try library.resolve("cna_picture_collection_get_at", as: PictureCollectionGetAtRoute.self)
         pictureCollectionGetCount = try library.resolve("cna_picture_collection_get_count", as: PictureCollectionGetCountRoute.self)
         pictureCollectionGetIsDisposed = try library.resolve("cna_picture_collection_get_is_disposed", as: PictureCollectionGetIsDisposedRoute.self)

@@ -26,6 +26,7 @@ internal final class MediaCollectionStorage {
         case song, artist, album, genre
         case picture
         case pictureAlbum = "picture_album"
+        case playlist
 
         /// The Swift type name a refusal names, which is not the route prefix:
         /// `picture_album` is one word in C and two in Swift.
@@ -62,6 +63,7 @@ internal final class MediaCollectionStorage {
         case .genre: result = functions.genreCollectionGetIsDisposed(handle, &value)
         case .picture: result = functions.pictureCollectionGetIsDisposed(handle, &value)
         case .pictureAlbum: result = functions.pictureAlbumCollectionGetIsDisposed(handle, &value)
+        case .playlist: result = functions.playlistCollectionGetIsDisposed(handle, &value)
         }
         guard result == 0 else { return released }
         return value != 0
@@ -80,6 +82,7 @@ internal final class MediaCollectionStorage {
         case .genre: result = functions.genreCollectionGetCount(live, &value)
         case .picture: result = functions.pictureCollectionGetCount(live, &value)
         case .pictureAlbum: result = functions.pictureAlbumCollectionGetCount(live, &value)
+        case .playlist: result = functions.playlistCollectionGetCount(live, &value)
         }
         try functions.check(
             result, operation: "cna_\(family.rawValue)_collection_get_count")
@@ -108,6 +111,7 @@ internal final class MediaCollectionStorage {
         case .genre: result = functions.genreCollectionGetAt(live, index, &produced)
         case .picture: result = functions.pictureCollectionGetAt(live, index, &produced)
         case .pictureAlbum: result = functions.pictureAlbumCollectionGetAt(live, index, &produced)
+        case .playlist: result = functions.playlistCollectionGetAt(live, index, &produced)
         }
         try functions.check(
             result, operation: "cna_\(family.rawValue)_collection_get_at")
@@ -143,6 +147,9 @@ internal final class MediaCollectionStorage {
         case .pictureAlbum:
             disposeResult = functions.pictureAlbumCollectionDispose(live)
             destroyResult = functions.pictureAlbumCollectionDestroy(live)
+        case .playlist:
+            disposeResult = functions.playlistCollectionDispose(live)
+            destroyResult = functions.playlistCollectionDestroy(live)
         }
         try functions.check(
             disposeResult, operation: "cna_\(family.rawValue)_collection_dispose")
