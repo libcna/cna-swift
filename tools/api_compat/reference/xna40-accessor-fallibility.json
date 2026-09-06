@@ -39,7 +39,7 @@
     "ACCESSOR_ABSENT": "the CLR property does not declare this accessor",
     "IL_ACCESSOR_NOT_FOUND": "the contract declares an accessor the IL does not; a hard error"
   },
-  "SELF_TESTS": 41,
+  "ACCESSOR_SELF_TESTS": 41,
   "SELF_TEST_STATUS": "PASS",
   "selfTestFailures": [],
   "PROPERTIES": 840,

@@ -88,7 +88,6 @@ FACT_REPORTS = [
     "native-stress-report.json",
     "package-qualification-report.json",
     "message-coverage.json",
-    "accessor-fallibility.json",
     # A RUN record, not a property of the tree, so it is not regenerated here:
     # the harness mutates the working tree and takes a lock, and this gate also
     # checks for mutations left standing. It cannot go stale unnoticed anyway
@@ -96,6 +95,13 @@ FACT_REPORTS = [
     # mutation added without re-running makes the two sources disagree and
     # derive_facts fails.
     "native-abi-mutations.json",
+]
+
+# Pinned references live under tools/, not docs/generated. Reading facts from
+# them directly avoids keeping a second copy of the same data in
+# docs/generated -- the mistake this list replaces.
+PINNED_REFERENCES = [
+    "tools/api_compat/reference/xna40-accessor-fallibility.json",
 ]
 
 # A category whose non-zero value would mean the projection DISAGREES with the
@@ -363,6 +369,15 @@ def derive_facts(root: Path = ROOT, with_self_tests: bool = True) -> dict[str, i
         for key, value in found.items():
             add(key, value, name)
 
+    for name in PINNED_REFERENCES:
+        path = root / name
+        if not path.exists():
+            raise Failure(f"{name} is absent")
+        found: dict[str, int] = {}
+        flatten(json.loads(path.read_text(encoding="utf-8")), found)
+        for key, value in found.items():
+            add(key, value, name)
+
     for key, value in mutation_harness_sizes(root).items():
         add(key, value, "mutation harness")
     for key, value in mutation_record_counts(root).items():
@@ -484,9 +499,15 @@ def regenerate_and_compare(
             if not fresh.exists():
                 findings.append(f"{command} wrote nothing")
             elif committed.read_bytes() != fresh.read_bytes():
+                # The real path, not an assumed docs/generated/ prefix: the
+                # pinned references live under tools/, and naming the wrong
+                # directory sends the reader to a file that is not there.
+                try:
+                    where = committed.relative_to(root)
+                except ValueError:
+                    where = committed
                 findings.append(
-                    f"docs/generated/{committed.name} is stale: {command} "
-                    f"produces different bytes"
+                    f"{where} is stale: {command} produces different bytes"
                 )
 
         if symbol_graph is not None:
@@ -611,7 +632,7 @@ def regenerate_and_compare(
             compare(GENERATED / "pinned-assembly-audit.json", pinned,
                     "tools/api_compat/pinned_assembly_audit.py")
 
-            accessors = temporary / "accessor-fallibility.json"
+            accessors = temporary / "xna40-accessor-fallibility.json"
             inventory = temporary / "accessor-fallibility-inventory.md"
             subprocess.run(
                 [sys.executable, "tools/api_compat/accessor_fallibility.py",
@@ -621,7 +642,8 @@ def regenerate_and_compare(
                  "--markdown", str(inventory)],
                 cwd=root, capture_output=True, text=True, check=False,
             )
-            compare(GENERATED / "accessor-fallibility.json", accessors,
+            compare(root / "tools/api_compat/reference"
+                    / "xna40-accessor-fallibility.json", accessors,
                     "tools/api_compat/accessor_fallibility.py")
             compare(GENERATED / "accessor-fallibility-inventory.md", inventory,
                     "tools/api_compat/accessor_fallibility.py --markdown")

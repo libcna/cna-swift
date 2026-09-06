@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "referenceSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d",
-  "accessorFallibilitySha256": "56521047e93271c6308b6aebcdd162be67fe938859da83358b6ba4d59d16de62",
+  "accessorFallibilitySha256": "417366927ba140d80e87a27312c05ecd04476afb0bee7d0f7ca2a5195a696463",
   "assemblies": [
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
