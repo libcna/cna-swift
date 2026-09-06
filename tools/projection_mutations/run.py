@@ -15,6 +15,7 @@ the tree is proven byte-identical afterwards.
 from __future__ import annotations
 
 import argparse
+import json
 import fcntl
 import os
 import re
@@ -3947,6 +3948,11 @@ def main() -> int:
         "--only", default=None,
         help="plant only the mutations whose name contains one of these "
              "comma-separated substrings")
+    parser.add_argument(
+        "--output", type=Path, default=None,
+        help="write a full pass's outcome as JSON, so the caught and survivor "
+             "counts reach the documents from a file rather than from a "
+             "terminal line someone retyped. Ignored for --only runs.")
     args = parser.parse_args()
 
     if args.audit_tree:
@@ -4108,6 +4114,19 @@ def main() -> int:
             survivors.append(f"{path} was not restored")
 
     scope = "" if args.only is None else f" SELECTED={args.only!r}"
+    if args.output is not None and args.only is None:
+        # Only a FULL pass may write the record: a --only run selects a subset
+        # and its counts would understate the harness. The status gate derives
+        # PROJECTION_MUTATIONS from this file's source too, so a record left
+        # behind by an older tree disagrees with it and fails the gate.
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps({
+            "PROJECTION_MUTATIONS": len(MUTATIONS),
+            "PROJECTION_MUTATIONS_LAST_FULL_RUN": len(selected),
+            "PROJECTION_MUTATIONS_CAUGHT": len(selected) - len(survivors),
+            "PROJECTION_MUTATION_SURVIVORS": len(survivors),
+            "survivors": survivors,
+        }, indent=2) + "\n", encoding="utf-8")
     # Qualified names, not a bare CAUGHT=. Both this harness and the native
     # ABI one printed `CAUGHT=`, the documents quoted both, and a status-gate
     # fact key can only mean one thing -- so the gate could derive neither and

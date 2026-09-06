@@ -14,6 +14,7 @@ tree is byte-identical to how it started.
 from __future__ import annotations
 
 import argparse
+import json
 import fcntl
 import os
 import subprocess
@@ -160,6 +161,11 @@ def main() -> int:
     parser.add_argument("--cna-include", required=True, type=Path)
     parser.add_argument("--library", required=True, type=Path)
     parser.add_argument("--cc", default="cc")
+    parser.add_argument("--output", type=Path,
+                        help="write the run's outcome as JSON. Until this "
+                             "existed the caught/survivor counts reached the "
+                             "documents by hand off a terminal line, which is "
+                             "the one path the status gate cannot police.")
     args = parser.parse_args()
     tree_lock = acquire_tree_lock("native_abi_mutations")
     if tree_lock is None:
@@ -199,9 +205,18 @@ def main() -> int:
 
     # See the note in tools/projection_mutations/run.py: a bare CAUGHT= meant
     # two different numbers across the documents, so neither was policed.
+    caught = len(MUTATIONS) - len(
+        [s for s in survivors if not s.endswith("restored")])
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps({
+            "NATIVE_ABI_MUTATIONS": len(MUTATIONS),
+            "NATIVE_ABI_MUTATIONS_CAUGHT": caught,
+            "NATIVE_ABI_MUTATION_SURVIVORS": len(survivors),
+            "survivors": survivors,
+        }, indent=2) + "\n", encoding="utf-8")
     print(f"NATIVE_ABI_MUTATIONS={len(MUTATIONS)} "
-          f"NATIVE_ABI_MUTATIONS_CAUGHT="
-          f"{len(MUTATIONS) - len([s for s in survivors if not s.endswith('restored')])} "
+          f"NATIVE_ABI_MUTATIONS_CAUGHT={caught} "
           f"NATIVE_ABI_MUTATION_SURVIVORS={len(survivors)}")
     for survivor in survivors:
         print(f"  SURVIVOR {survivor}")

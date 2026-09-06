@@ -73,14 +73,10 @@ UNPOLICED_CLAIMS = {
         "not a property of the tree. Only a full run can produce it and the "
         "harness writes no report, so nothing here can check it.",
     "PROJECTION_MUTATIONS_CAUGHT":
-        "the outcome of that same pass. Deriving it means running 137 "
-        "mutations, each a build and a test run; the fix is for the harness "
-        "to write a report, not for this gate to run it.",
-    "NATIVE_ABI_MUTATIONS_CAUGHT":
-        "the outcome of the native ABI pass, which needs a compiler and the "
-        "selected library. Same fix as above and much cheaper -- 14 C probes.",
-    "NATIVE_ABI_MUTATION_SURVIVORS":
-        "the same pass's survivor count.",
+        "the outcome of that same pass. The harness now accepts --output, so "
+        "the next full run makes this derivable the way the native ABI pass "
+        "already is; deriving it here would mean running 137 mutations, each "
+        "a build and a test run.",
 }
 
 FACT_REPORTS = [
@@ -93,6 +89,13 @@ FACT_REPORTS = [
     "package-qualification-report.json",
     "message-coverage.json",
     "accessor-fallibility.json",
+    # A RUN record, not a property of the tree, so it is not regenerated here:
+    # the harness mutates the working tree and takes a lock, and this gate also
+    # checks for mutations left standing. It cannot go stale unnoticed anyway
+    # -- NATIVE_ABI_MUTATIONS is derived from the harness source as well, so a
+    # mutation added without re-running makes the two sources disagree and
+    # derive_facts fails.
+    "native-abi-mutations.json",
 ]
 
 # A category whose non-zero value would mean the projection DISAGREES with the
