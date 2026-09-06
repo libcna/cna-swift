@@ -41,6 +41,7 @@ OCCLUSION = ROOT / "Sources/CNA/Xna/Graphics/OcclusionQuery.swift"
 SOUND = ROOT / "Sources/CNA/Xna/Audio/SoundEffect.swift"
 SOUND_INSTANCE = ROOT / "Sources/CNA/Xna/Audio/SoundEffectInstance.swift"
 DYNAMIC_SOUND = ROOT / "Sources/CNA/Xna/Audio/DynamicSoundEffectInstance.swift"
+RENDERER_DETAIL = ROOT / "Sources/CNA/Xna/Audio/RendererDetail.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -124,6 +125,34 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 91: the renderer detail --------------------------------
+    (
+        "renderer-detail-compares-the-label",
+        "equality including the friendly name, so the same renderer under two "
+        "labels reads as two renderers",
+        RENDERER_DETAIL,
+        "            lhs.rendererId == rhs.rendererId\n"
+        "        }",
+        "            lhs.rendererId == rhs.rendererId\n"
+        "                && lhs.friendlyName == rhs.friendlyName\n"
+        "        }",
+    ),
+    (
+        "renderer-detail-hashes-the-label",
+        "hashing the friendly name, so two equal details hash differently and "
+        "the hash contract breaks",
+        RENDERER_DETAIL,
+        "            Microsoft.Xna.Framework.Audio.RendererDetail.stringHash(rendererId)",
+        "            Microsoft.Xna.Framework.Audio.RendererDetail.stringHash(friendlyName)",
+    ),
+    (
+        "renderer-detail-renders-the-id",
+        "ToString answering the id, which is what a caller passes back rather "
+        "than what a person reads",
+        RENDERER_DETAIL,
+        "        public func ToString() -> String { friendlyName }",
+        "        public func ToString() -> String { rendererId }",
+    ),
     # ---- Foundation 90: the dynamic instance -------------------------------
     (
         "dynamic-queue-grows-without-limit",

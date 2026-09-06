@@ -24,12 +24,12 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-891 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=71   COMPLETE_TYPES=192   PARTIAL_TYPES=5
-MISSING_TYPE=60  MISSING_MEMBER=9  OVERLOAD_MAPPING_MISMATCH=2
+896 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=70   COMPLETE_TYPES=193   PARTIAL_TYPES=5
+MISSING_TYPE=59  MISSING_MEMBER=9  OVERLOAD_MAPPING_MISMATCH=2
 every category that would mean DISAGREEMENT with XNA: 0
 BOUND_FUNCTIONS=402  PROTOTYPE_TYPE_POSITIONS=1403  LAYOUTS=59  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=351 (last full run 137, CAUGHT=135)
+PROJECTION_MUTATIONS=354 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -243,6 +243,28 @@ invisible from Swift.
 suite passes seconds later, and both times an immediate re-run was green. It is
 recorded rather than explained. If it recurs, the thing to capture is the
 baseline run's own output rather than the verdict line.
+
+### Foundation 91 — `RendererDetail`, a type nothing can populate yet
+
+Entirely managed: two strings, value equality over them, a hash and a
+`ToString`. It is projected even though `AudioEngine.RendererDetails` -- the
+only thing that produces one -- is blocked on a `.xgs` file, because everything
+a consumer can *do* with one is managed, and the pinned contract declares it.
+
+Two details are worth keeping. **Equality is over the renderer id alone**: the
+friendly name is what a person reads, the id is what identifies the device, so
+the same renderer under two labels is one renderer. And `ToString` answers the
+friendly name itself rather than a braced field list, unlike every geometry
+type in this binding.
+
+The parameterless constructor is **internal**, and the reference metadata is
+why: C# gives every struct an implicit one, the contract declares none, and a
+public Swift `init()` was reported as `UNEXPECTED_MEMBER` by name -- which is
+the strict comparison working exactly as intended.
+
+The hash deliberately does not claim to be Microsoft's. `String.GetHashCode` is
+unspecified across CLR runtimes, so the test asserts that equal values hash
+equally -- the contract a hash actually has -- and never a particular number.
 
 ### The XACT family is blocked on a settings file, like `Model` on its `.xnb`
 

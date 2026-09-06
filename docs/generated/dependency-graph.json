@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 11,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 10,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Design.MathTypeConverter",
@@ -63,17 +63,6 @@
       "dependencies": [
         "Microsoft.Xna.Framework.Audio.AudioStopOptions"
       ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Audio.AudioEngine"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 3,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Audio.RendererDetail",
-      "dependencies": [],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [
         "Microsoft.Xna.Framework.Audio.AudioEngine"
@@ -142,6 +131,19 @@
         "Microsoft.Xna.Framework.Input.Touch.GestureType",
         "Microsoft.Xna.Framework.Input.Touch.TouchCollection",
         "Microsoft.Xna.Framework.Input.Touch.TouchPanelCapabilities"
+      ],
+      "dependencyComplete": true,
+      "directMissingReverseConsumers": [],
+      "directPartialReverseConsumers": [],
+      "transitiveMissingReverseReach": 0,
+      "transitivePartialReverseReach": []
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.VideoPlayer",
+      "dependencies": [
+        "Microsoft.Xna.Framework.Graphics.Texture2D",
+        "Microsoft.Xna.Framework.Media.MediaState",
+        "Microsoft.Xna.Framework.Media.Video"
       ],
       "dependencyComplete": true,
       "directMissingReverseConsumers": [],

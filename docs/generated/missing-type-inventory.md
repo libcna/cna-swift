@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=197
-TARGET_MEMBERS=2439
-TOTAL_DIAGNOSTICS=71
-COMPLETE_TYPES=192
+TARGET_TYPES=198
+TARGET_MEMBERS=2446
+TOTAL_DIAGNOSTICS=70
+COMPLETE_TYPES=193
 PARTIAL_TYPES=5
-MISSING_TYPES=60
-MISSING_TYPE=60
+MISSING_TYPES=59
+MISSING_TYPE=59
 MISSING_MEMBER=9
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -88,8 +88,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=66
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=208
-PENDING_RETURN_NULLABILITY_PROJECTIONS=161
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=211
+PENDING_RETURN_NULLABILITY_PROJECTIONS=158
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=71
 ```
 
@@ -103,6 +103,7 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=71
 - `Microsoft.Xna.Framework.Audio.MicrophoneState`
 - `Microsoft.Xna.Framework.Audio.NoAudioHardwareException`
 - `Microsoft.Xna.Framework.Audio.NoMicrophoneConnectedException`
+- `Microsoft.Xna.Framework.Audio.RendererDetail`
 - `Microsoft.Xna.Framework.Audio.SoundEffect`
 - `Microsoft.Xna.Framework.Audio.SoundEffectInstance`
 - `Microsoft.Xna.Framework.Audio.SoundState`
@@ -332,7 +333,6 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Audio.AudioEngine`
 - `Microsoft.Xna.Framework.Audio.Cue`
 - `Microsoft.Xna.Framework.Audio.Microphone`
-- `Microsoft.Xna.Framework.Audio.RendererDetail`
 - `Microsoft.Xna.Framework.Audio.SoundBank`
 - `Microsoft.Xna.Framework.Audio.WaveBank`
 - `Microsoft.Xna.Framework.Content.ContentReader`

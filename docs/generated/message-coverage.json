@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "profile": "messages reachable from implemented members",
   "summary": {
-    "MESSAGE_COVERAGE_TYPES": 197,
+    "MESSAGE_COVERAGE_TYPES": 198,
     "RESOLVED_TYPES": 185,
-    "UNRESOLVED_TYPES": 12,
+    "UNRESOLVED_TYPES": 13,
     "STRING_TABLES_READ": 2,
     "MEMBERS_READ": 1750,
     "MESSAGES_REPRODUCED": 295,
@@ -16,6 +16,7 @@
   "findings": [],
   "unresolved": [
     "Microsoft.Xna.Framework.Audio.AudioStopOptions",
+    "Microsoft.Xna.Framework.Audio.RendererDetail",
     "Microsoft.Xna.Framework.Graphics.PackedVector.IPackedVectorOfT",
     "Microsoft.Xna.Framework.Input.Touch.GestureSample",
     "Microsoft.Xna.Framework.Input.Touch.GestureType",
