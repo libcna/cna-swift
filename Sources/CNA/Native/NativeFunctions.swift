@@ -223,6 +223,71 @@ internal final class NativeFunctions {
     typealias SongGetIsProtectedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias SongGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
     typealias SongEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SongCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SongCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias SongCollectionGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SongCollectionDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias SongCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ArtistCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ArtistCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias ArtistCollectionGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias ArtistCollectionDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias ArtistCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias AlbumCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias AlbumCollectionGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AlbumCollectionDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias AlbumCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias GenreCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GenreCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias GenreCollectionGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GenreCollectionDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias GenreCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ArtistGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ArtistCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ArtistGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias ArtistDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias ArtistDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ArtistEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias ArtistGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias ArtistGetSongsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AlbumDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias AlbumDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias AlbumEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AlbumGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias AlbumGetSongsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GenreGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GenreCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GenreGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GenreDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias GenreDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias GenreEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias GenreGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias GenreGetSongsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ArtistGetAlbumsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias GenreGetAlbumsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumGetArtistRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AlbumGetGenreRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AlbumGetDurationRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias AlbumGetHasArtRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AlbumGetArtSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumCopyArtRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumGetThumbnailSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AlbumCopyThumbnailRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SongGetArtistRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SongGetAlbumRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SongGetGenreRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaLibraryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaLibraryDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias MediaLibraryGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MediaLibraryGetSongsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryGetArtistsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryGetAlbumsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MediaLibraryGetGenresRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -592,6 +657,71 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let mediaLibraryCreate: MediaLibraryCreateRoute
+    let mediaLibraryDispose: MediaLibraryDisposeRoute
+    let mediaLibraryDestroy: MediaLibraryDestroyRoute
+    let mediaLibraryGetIsDisposed: MediaLibraryGetIsDisposedRoute
+    let mediaLibraryGetSongs: MediaLibraryGetSongsRoute
+    let mediaLibraryGetArtists: MediaLibraryGetArtistsRoute
+    let mediaLibraryGetAlbums: MediaLibraryGetAlbumsRoute
+    let mediaLibraryGetGenres: MediaLibraryGetGenresRoute
+    let songGetArtist: SongGetArtistRoute
+    let songGetAlbum: SongGetAlbumRoute
+    let songGetGenre: SongGetGenreRoute
+    let songCollectionGetAt: SongCollectionGetAtRoute
+    let songCollectionGetCount: SongCollectionGetCountRoute
+    let songCollectionGetIsDisposed: SongCollectionGetIsDisposedRoute
+    let songCollectionDispose: SongCollectionDisposeRoute
+    let songCollectionDestroy: SongCollectionDestroyRoute
+    let artistCollectionGetAt: ArtistCollectionGetAtRoute
+    let artistCollectionGetCount: ArtistCollectionGetCountRoute
+    let artistCollectionGetIsDisposed: ArtistCollectionGetIsDisposedRoute
+    let artistCollectionDispose: ArtistCollectionDisposeRoute
+    let artistCollectionDestroy: ArtistCollectionDestroyRoute
+    let albumCollectionGetAt: AlbumCollectionGetAtRoute
+    let albumCollectionGetCount: AlbumCollectionGetCountRoute
+    let albumCollectionGetIsDisposed: AlbumCollectionGetIsDisposedRoute
+    let albumCollectionDispose: AlbumCollectionDisposeRoute
+    let albumCollectionDestroy: AlbumCollectionDestroyRoute
+    let genreCollectionGetAt: GenreCollectionGetAtRoute
+    let genreCollectionGetCount: GenreCollectionGetCountRoute
+    let genreCollectionGetIsDisposed: GenreCollectionGetIsDisposedRoute
+    let genreCollectionDispose: GenreCollectionDisposeRoute
+    let genreCollectionDestroy: GenreCollectionDestroyRoute
+    let artistGetNameSize: ArtistGetNameSizeRoute
+    let artistCopyName: ArtistCopyNameRoute
+    let artistGetIsDisposed: ArtistGetIsDisposedRoute
+    let artistDispose: ArtistDisposeRoute
+    let artistDestroy: ArtistDestroyRoute
+    let artistEquals: ArtistEqualsRoute
+    let artistGetHashCode: ArtistGetHashCodeRoute
+    let artistGetSongs: ArtistGetSongsRoute
+    let albumGetNameSize: AlbumGetNameSizeRoute
+    let albumCopyName: AlbumCopyNameRoute
+    let albumGetIsDisposed: AlbumGetIsDisposedRoute
+    let albumDispose: AlbumDisposeRoute
+    let albumDestroy: AlbumDestroyRoute
+    let albumEquals: AlbumEqualsRoute
+    let albumGetHashCode: AlbumGetHashCodeRoute
+    let albumGetSongs: AlbumGetSongsRoute
+    let genreGetNameSize: GenreGetNameSizeRoute
+    let genreCopyName: GenreCopyNameRoute
+    let genreGetIsDisposed: GenreGetIsDisposedRoute
+    let genreDispose: GenreDisposeRoute
+    let genreDestroy: GenreDestroyRoute
+    let genreEquals: GenreEqualsRoute
+    let genreGetHashCode: GenreGetHashCodeRoute
+    let genreGetSongs: GenreGetSongsRoute
+    let artistGetAlbums: ArtistGetAlbumsRoute
+    let genreGetAlbums: GenreGetAlbumsRoute
+    let albumGetArtist: AlbumGetArtistRoute
+    let albumGetGenre: AlbumGetGenreRoute
+    let albumGetDuration: AlbumGetDurationRoute
+    let albumGetHasArt: AlbumGetHasArtRoute
+    let albumGetArtSize: AlbumGetArtSizeRoute
+    let albumCopyArt: AlbumCopyArtRoute
+    let albumGetThumbnailSize: AlbumGetThumbnailSizeRoute
+    let albumCopyThumbnail: AlbumCopyThumbnailRoute
     let songCreateFromUri: SongCreateFromUriRoute
     let songDestroy: SongDestroyRoute
     let songDispose: SongDisposeRoute
@@ -1036,6 +1166,71 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        mediaLibraryCreate = try library.resolve("cna_media_library_create", as: MediaLibraryCreateRoute.self)
+        mediaLibraryDispose = try library.resolve("cna_media_library_dispose", as: MediaLibraryDisposeRoute.self)
+        mediaLibraryDestroy = try library.resolve("cna_media_library_destroy", as: MediaLibraryDestroyRoute.self)
+        mediaLibraryGetIsDisposed = try library.resolve("cna_media_library_get_is_disposed", as: MediaLibraryGetIsDisposedRoute.self)
+        mediaLibraryGetSongs = try library.resolve("cna_media_library_get_songs", as: MediaLibraryGetSongsRoute.self)
+        mediaLibraryGetArtists = try library.resolve("cna_media_library_get_artists", as: MediaLibraryGetArtistsRoute.self)
+        mediaLibraryGetAlbums = try library.resolve("cna_media_library_get_albums", as: MediaLibraryGetAlbumsRoute.self)
+        mediaLibraryGetGenres = try library.resolve("cna_media_library_get_genres", as: MediaLibraryGetGenresRoute.self)
+        songGetArtist = try library.resolve("cna_song_get_artist", as: SongGetArtistRoute.self)
+        songGetAlbum = try library.resolve("cna_song_get_album", as: SongGetAlbumRoute.self)
+        songGetGenre = try library.resolve("cna_song_get_genre", as: SongGetGenreRoute.self)
+        songCollectionGetAt = try library.resolve("cna_song_collection_get_at", as: SongCollectionGetAtRoute.self)
+        songCollectionGetCount = try library.resolve("cna_song_collection_get_count", as: SongCollectionGetCountRoute.self)
+        songCollectionGetIsDisposed = try library.resolve("cna_song_collection_get_is_disposed", as: SongCollectionGetIsDisposedRoute.self)
+        songCollectionDispose = try library.resolve("cna_song_collection_dispose", as: SongCollectionDisposeRoute.self)
+        songCollectionDestroy = try library.resolve("cna_song_collection_destroy", as: SongCollectionDestroyRoute.self)
+        artistCollectionGetAt = try library.resolve("cna_artist_collection_get_at", as: ArtistCollectionGetAtRoute.self)
+        artistCollectionGetCount = try library.resolve("cna_artist_collection_get_count", as: ArtistCollectionGetCountRoute.self)
+        artistCollectionGetIsDisposed = try library.resolve("cna_artist_collection_get_is_disposed", as: ArtistCollectionGetIsDisposedRoute.self)
+        artistCollectionDispose = try library.resolve("cna_artist_collection_dispose", as: ArtistCollectionDisposeRoute.self)
+        artistCollectionDestroy = try library.resolve("cna_artist_collection_destroy", as: ArtistCollectionDestroyRoute.self)
+        albumCollectionGetAt = try library.resolve("cna_album_collection_get_at", as: AlbumCollectionGetAtRoute.self)
+        albumCollectionGetCount = try library.resolve("cna_album_collection_get_count", as: AlbumCollectionGetCountRoute.self)
+        albumCollectionGetIsDisposed = try library.resolve("cna_album_collection_get_is_disposed", as: AlbumCollectionGetIsDisposedRoute.self)
+        albumCollectionDispose = try library.resolve("cna_album_collection_dispose", as: AlbumCollectionDisposeRoute.self)
+        albumCollectionDestroy = try library.resolve("cna_album_collection_destroy", as: AlbumCollectionDestroyRoute.self)
+        genreCollectionGetAt = try library.resolve("cna_genre_collection_get_at", as: GenreCollectionGetAtRoute.self)
+        genreCollectionGetCount = try library.resolve("cna_genre_collection_get_count", as: GenreCollectionGetCountRoute.self)
+        genreCollectionGetIsDisposed = try library.resolve("cna_genre_collection_get_is_disposed", as: GenreCollectionGetIsDisposedRoute.self)
+        genreCollectionDispose = try library.resolve("cna_genre_collection_dispose", as: GenreCollectionDisposeRoute.self)
+        genreCollectionDestroy = try library.resolve("cna_genre_collection_destroy", as: GenreCollectionDestroyRoute.self)
+        artistGetNameSize = try library.resolve("cna_artist_get_name_size", as: ArtistGetNameSizeRoute.self)
+        artistCopyName = try library.resolve("cna_artist_copy_name", as: ArtistCopyNameRoute.self)
+        artistGetIsDisposed = try library.resolve("cna_artist_get_is_disposed", as: ArtistGetIsDisposedRoute.self)
+        artistDispose = try library.resolve("cna_artist_dispose", as: ArtistDisposeRoute.self)
+        artistDestroy = try library.resolve("cna_artist_destroy", as: ArtistDestroyRoute.self)
+        artistEquals = try library.resolve("cna_artist_equals", as: ArtistEqualsRoute.self)
+        artistGetHashCode = try library.resolve("cna_artist_get_hash_code", as: ArtistGetHashCodeRoute.self)
+        artistGetSongs = try library.resolve("cna_artist_get_songs", as: ArtistGetSongsRoute.self)
+        albumGetNameSize = try library.resolve("cna_album_get_name_size", as: AlbumGetNameSizeRoute.self)
+        albumCopyName = try library.resolve("cna_album_copy_name", as: AlbumCopyNameRoute.self)
+        albumGetIsDisposed = try library.resolve("cna_album_get_is_disposed", as: AlbumGetIsDisposedRoute.self)
+        albumDispose = try library.resolve("cna_album_dispose", as: AlbumDisposeRoute.self)
+        albumDestroy = try library.resolve("cna_album_destroy", as: AlbumDestroyRoute.self)
+        albumEquals = try library.resolve("cna_album_equals", as: AlbumEqualsRoute.self)
+        albumGetHashCode = try library.resolve("cna_album_get_hash_code", as: AlbumGetHashCodeRoute.self)
+        albumGetSongs = try library.resolve("cna_album_get_songs", as: AlbumGetSongsRoute.self)
+        genreGetNameSize = try library.resolve("cna_genre_get_name_size", as: GenreGetNameSizeRoute.self)
+        genreCopyName = try library.resolve("cna_genre_copy_name", as: GenreCopyNameRoute.self)
+        genreGetIsDisposed = try library.resolve("cna_genre_get_is_disposed", as: GenreGetIsDisposedRoute.self)
+        genreDispose = try library.resolve("cna_genre_dispose", as: GenreDisposeRoute.self)
+        genreDestroy = try library.resolve("cna_genre_destroy", as: GenreDestroyRoute.self)
+        genreEquals = try library.resolve("cna_genre_equals", as: GenreEqualsRoute.self)
+        genreGetHashCode = try library.resolve("cna_genre_get_hash_code", as: GenreGetHashCodeRoute.self)
+        genreGetSongs = try library.resolve("cna_genre_get_songs", as: GenreGetSongsRoute.self)
+        artistGetAlbums = try library.resolve("cna_artist_get_albums", as: ArtistGetAlbumsRoute.self)
+        genreGetAlbums = try library.resolve("cna_genre_get_albums", as: GenreGetAlbumsRoute.self)
+        albumGetArtist = try library.resolve("cna_album_get_artist", as: AlbumGetArtistRoute.self)
+        albumGetGenre = try library.resolve("cna_album_get_genre", as: AlbumGetGenreRoute.self)
+        albumGetDuration = try library.resolve("cna_album_get_duration", as: AlbumGetDurationRoute.self)
+        albumGetHasArt = try library.resolve("cna_album_get_has_art", as: AlbumGetHasArtRoute.self)
+        albumGetArtSize = try library.resolve("cna_album_get_art_size", as: AlbumGetArtSizeRoute.self)
+        albumCopyArt = try library.resolve("cna_album_copy_art", as: AlbumCopyArtRoute.self)
+        albumGetThumbnailSize = try library.resolve("cna_album_get_thumbnail_size", as: AlbumGetThumbnailSizeRoute.self)
+        albumCopyThumbnail = try library.resolve("cna_album_copy_thumbnail", as: AlbumCopyThumbnailRoute.self)
         songCreateFromUri = try library.resolve("cna_song_create_from_uri", as: SongCreateFromUriRoute.self)
         songDestroy = try library.resolve("cna_song_destroy", as: SongDestroyRoute.self)
         songDispose = try library.resolve("cna_song_dispose", as: SongDisposeRoute.self)

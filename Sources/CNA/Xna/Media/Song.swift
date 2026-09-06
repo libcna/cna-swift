@@ -179,6 +179,79 @@ extension Microsoft.Xna.Framework.Media {
             }
         }
 
+        /// `Song.Artist`, `Song.Album` and `Song.Genre`.
+        ///
+        /// The three members that kept this type partial through Foundation 92:
+        /// each answers a type that carries collections back to songs, so the
+        /// whole cycle had to land at once.
+        ///
+        /// **A divergence, and it is the file factory's fault rather than
+        /// XNA's.** All three returns are `PROVEN_NONNULL_SUCCESS`, because in
+        /// XNA a song comes from a media library and always has a library
+        /// context. CNA says plainly that one created from a file path does
+        /// not -- `out_available` reports false, "an ordinary answer, not a
+        /// failure" -- and a non-Optional getter has nothing to return then.
+        /// So the absence is reported on the runtime channel, naming the route
+        /// and the reason, rather than fabricated as an empty artist.
+        ///
+        /// **Each call is written out rather than routed through a helper.**
+        /// Passing a `@convention(c)` function pointer as a Swift closure
+        /// argument produces a broken re-abstraction thunk in this toolchain --
+        /// it crashed SILGen outright in `SoundEffect`, and the collection
+        /// storage segfaulted on the same shape.
+        public var Artist: Artist {
+            get throws {
+                let live = try validatedHandle()
+                var produced: UInt64 = 0
+                var available: UInt8 = 0
+                try runtime.functions.check(
+                    runtime.functions.songGetArtist(live, &produced, &available),
+                    operation: "cna_song_get_artist")
+                try Song.requireLibraryContext(available, "Artist")
+                return Microsoft.Xna.Framework.Media.Artist(
+                    handle: produced, runtime: runtime, borrowed: true)
+            }
+        }
+
+        public var Album: Album {
+            get throws {
+                let live = try validatedHandle()
+                var produced: UInt64 = 0
+                var available: UInt8 = 0
+                try runtime.functions.check(
+                    runtime.functions.songGetAlbum(live, &produced, &available),
+                    operation: "cna_song_get_album")
+                try Song.requireLibraryContext(available, "Album")
+                return Microsoft.Xna.Framework.Media.Album(
+                    handle: produced, runtime: runtime, borrowed: true)
+            }
+        }
+
+        public var Genre: Genre {
+            get throws {
+                let live = try validatedHandle()
+                var produced: UInt64 = 0
+                var available: UInt8 = 0
+                try runtime.functions.check(
+                    runtime.functions.songGetGenre(live, &produced, &available),
+                    operation: "cna_song_get_genre")
+                try Song.requireLibraryContext(available, "Genre")
+                return Microsoft.Xna.Framework.Media.Genre(
+                    handle: produced, runtime: runtime, borrowed: true)
+            }
+        }
+
+        private static func requireLibraryContext(
+            _ available: UInt8, _ member: String
+        ) throws {
+            guard available == 0 else { return }
+            throw CNAError.nativeFailure(
+                operation: "Song.\(member)", result: 1,
+                message: "this song was created from a file path and has no "
+                    + "media-library context, so it has no \(member.lowercased()); "
+                    + "XNA reaches one only through a library")
+        }
+
         /// `Song.Dispose()`.
         ///
         /// **Two native routes, and the difference matters.** `cna_song_dispose`

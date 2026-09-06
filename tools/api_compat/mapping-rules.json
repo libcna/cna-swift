@@ -1287,6 +1287,24 @@
       "member": "Equals",
       "parameter": "other",
       "reason": "`IEquatable<T>.Equals` is DEFINED for null: XNA answers false rather than refusing, so the null case is a normal input with a normal answer. A non-Optional parameter would remove the only interesting half of the comparison -- the same reason CurveKey.Equals(other) is Optional."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Artist",
+      "member": "Equals",
+      "parameter": "other",
+      "reason": "`IEquatable<T>.Equals` is defined for null and answers false, so the null case is a normal input with a normal answer -- the same reason Song.Equals(other) is Optional."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Album",
+      "member": "Equals",
+      "parameter": "other",
+      "reason": "`IEquatable<T>.Equals` is defined for null and answers false, so the null case is a normal input with a normal answer -- the same reason Song.Equals(other) is Optional."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Media.Genre",
+      "member": "Equals",
+      "parameter": "other",
+      "reason": "`IEquatable<T>.Equals` is defined for null and answers false, so the null case is a normal input with a normal answer -- the same reason Song.Equals(other) is Optional."
     }
   ],
   "globalOperatorProjections": [

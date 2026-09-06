@@ -43,6 +43,9 @@ SOUND_INSTANCE = ROOT / "Sources/CNA/Xna/Audio/SoundEffectInstance.swift"
 DYNAMIC_SOUND = ROOT / "Sources/CNA/Xna/Audio/DynamicSoundEffectInstance.swift"
 RENDERER_DETAIL = ROOT / "Sources/CNA/Xna/Audio/RendererDetail.swift"
 SONG = ROOT / "Sources/CNA/Xna/Media/Song.swift"
+MEDIA_COLLECTIONS = ROOT / "Sources/CNA/Xna/Media/MediaCollections.swift"
+MEDIA_ENTITIES = ROOT / "Sources/CNA/Xna/Media/MediaEntities.swift"
+MEDIA_LIBRARY = ROOT / "Sources/CNA/Xna/Media/MediaLibrary.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -126,6 +129,57 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 93: the media graph ------------------------------------
+    (
+        "media-collection-index-unchecked",
+        "the indexer accepting an index the collection does not have, so CNA's "
+        "own failure reaches the caller instead of the exception XNA declares",
+        MEDIA_COLLECTIONS,
+        "        guard index >= 0, index < total else {\n"
+        "            throw CNAArgumentOutOfRangeException(paramName: \"index\")\n"
+        "        }",
+        "        if false {}",
+    ),
+    (
+        "media-collection-negative-index-allowed",
+        "the lower bound dropped, so a negative index is handed to the ABI",
+        MEDIA_COLLECTIONS,
+        "        guard index >= 0, index < total else {",
+        "        guard index < total else {",
+    ),
+    # WITHDRAWN: "media-collection-disposal-skips-the-mark" -- releasing a
+    # collection without CNA's own dispose. Measured rather than reasoned:
+    # disposal here IS shared, so a second facade over the same collection sees
+    # it -- and it still sees it with the dispose call removed, because
+    # `cna_..._collection_destroy` alone already makes the collection report
+    # disposed. The two halves are therefore not separable through anything
+    # this projection publishes. The binding keeps calling both, in CNA's own
+    # documented order, because the header says dispose is the canonical
+    # disposal and destroy only releases a handle.
+    # WITHDRAWN: "media-entity-borrowed-handle-destroyed" -- a borrowed entity
+    # destroying a handle the library owns. Unreachable on this host, and the
+    # reason is the machine rather than the code: a borrowed Artist, Album or
+    # Genre comes only from a song or album that HAS a library context, and this
+    # media store is empty -- Song.Artist on a file-created song reports no
+    # context at all. Reinstate it on a host with media, where the difference
+    # between disposing a borrowed handle and releasing an owned one is exactly
+    # what a caller would trip over.
+    (
+        "song-relation-ignores-availability",
+        "Song.Artist handing back whatever the out-parameter held when CNA "
+        "reported no library context, which is an untouched handle",
+        SONG,
+        "                try Song.requireLibraryContext(available, \"Artist\")",
+        "                _ = available",
+    ),
+    (
+        "library-collection-comes-from-the-wrong-route",
+        "MediaLibrary.Artists answering the songs collection, so a caller "
+        "enumerating artists walks songs instead",
+        MEDIA_LIBRARY,
+        "                    runtime.functions.mediaLibraryGetArtists(live, &produced),",
+        "                    runtime.functions.mediaLibraryGetSongs(live, &produced),",
+    ),
     # ---- Foundation 92: the song -------------------------------------------
     (
         "song-equality-compares-handles",

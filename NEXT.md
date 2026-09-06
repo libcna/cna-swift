@@ -24,12 +24,12 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-901 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=72   COMPLETE_TYPES=193   PARTIAL_TYPES=6
-MISSING_TYPE=58  MISSING_MEMBER=12  OVERLOAD_MAPPING_MISMATCH=2
+906 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=71   COMPLETE_TYPES=201   PARTIAL_TYPES=6
+MISSING_TYPE=50  MISSING_MEMBER=18  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=416  PROTOTYPE_TYPE_POSITIONS=1448  LAYOUTS=59  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=357 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=481  PROTOTYPE_TYPE_POSITIONS=1649  LAYOUTS=59  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=361 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -303,6 +303,53 @@ One mutation is **withdrawn with its reason in place**: dropping
 because the only reference that could see the disposal mark is the one being
 released in the same call. It becomes observable when `SongCollection` can hold
 a song the caller also disposes directly, and should be reinstated then.
+
+### Foundation 93 — the Media cycle, and three defects the gates caught
+
+Eight types: `Artist`, `Album`, `Genre`, the four collections, and the half of
+`MediaLibrary` that reaches them. They are one cycle -- every entity reaches
+songs and albums, every collection answers an entity -- so they landed together,
+and `Song` is complete at last.
+
+`MediaLibrary` is **partial on purpose**: its picture half reaches `Picture`,
+`PictureCollection` and `PictureAlbum`, `Playlists` reaches
+`PlaylistCollection`, and `MediaSource` is a fifth missing type. What is here is
+the half that makes the rest of the family reachable *and testable* -- without
+a library nothing on this host can obtain an artist at all.
+
+**Three defects, and two gates caught what a build could not.**
+
+The relation routes take **three** parameters, not two: `out_artist` and an
+`out_available` flag. Calling a three-parameter C function through a
+two-parameter Swift signature segfaulted at the first call, and the native ABI
+gate named all of them precisely once it was run. The lesson is the running
+order: the ABI gate belongs immediately after binding routes, not after writing
+the type.
+
+Then `Song.Artist` refused. That is correct: CNA says a song built from a file
+path has no library context, "an ordinary answer, not a failure", and all three
+returns are `PROVEN_NONNULL_SUCCESS` -- so the absence is reported on the
+runtime channel rather than fabricated as an empty artist.
+
+And the borrowed-handle rule: CNA hands out a **borrowed** entity when a song
+names one, so a facade that called destroy on it would release something it
+never took. The three entity types carry a `borrowed` flag for exactly that.
+
+**A design that had to be rewritten twice.** The collections share one
+implementation, and the first version passed the five routes as a struct of
+closures. That segfaulted -- passing a `@convention(c)` pointer as a Swift
+closure argument produces a broken re-abstraction thunk in this toolchain, the
+same shape that crashed SILGen in `SoundEffect`. The family is selected by an
+enum now and every route is called directly. **Do not put a C function pointer
+behind a Swift closure parameter in this project.**
+
+**Measured, and it corrects a guess from Foundation 92 in the other
+direction.** A collection's disposal is *shared*: two facades over the library's
+songs name one collection and releasing either is visible from the other -- the
+opposite of `Song`, where two equal songs are separate objects. What is not
+established is which native half does it; removing
+`cna_..._collection_dispose` leaves the observation unchanged, so `destroy`
+alone suffices, and the mutation on it is withdrawn with that reason.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 

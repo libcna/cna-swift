@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 199,
-    "TARGET_MEMBERS": 2462,
-    "TOTAL_DIAGNOSTICS": 72,
-    "COMPLETE_TYPES": 193,
+    "TARGET_TYPES": 207,
+    "TARGET_MEMBERS": 2530,
+    "TOTAL_DIAGNOSTICS": 71,
+    "COMPLETE_TYPES": 201,
     "PARTIAL_TYPES": 6,
-    "MISSING_TYPES": 58,
-    "MISSING_TYPE": 58,
-    "MISSING_MEMBER": 12,
+    "MISSING_TYPES": 50,
+    "MISSING_TYPE": 50,
+    "MISSING_MEMBER": 18,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -29,7 +29,7 @@
     "METHOD_SIGNATURE_MAPPING_MISMATCH": 0,
     "PARAMETER_MAPPING_MISMATCH": 0,
     "RETURN_MAPPING_MISMATCH": 0,
-    "OVERLOAD_MAPPING_MISMATCH": 2,
+    "OVERLOAD_MAPPING_MISMATCH": 3,
     "GENERIC_MAPPING_MISMATCH": 0,
     "ENUM_VALUE_MISMATCH": 0,
     "FLAGS_MAPPING_MISMATCH": 0,
@@ -66,11 +66,11 @@
     "MEASURED_ACCESSOR_PROJECTIONS": 102,
     "PENDING_ACCESSOR_PROJECTIONS": 12,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 28,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 35,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 20,
-    "XNA_SEALED_CLASS_PROJECTIONS": 37,
+    "XNA_SEALED_CLASS_PROJECTIONS": 45,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 66,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 214,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 155,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 73
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 244,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 125,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 85
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -272,8 +272,16 @@
     "Microsoft.Xna.Framework.LaunchParameters",
     "Microsoft.Xna.Framework.MathHelper",
     "Microsoft.Xna.Framework.Matrix",
+    "Microsoft.Xna.Framework.Media.Album",
+    "Microsoft.Xna.Framework.Media.AlbumCollection",
+    "Microsoft.Xna.Framework.Media.Artist",
+    "Microsoft.Xna.Framework.Media.ArtistCollection",
+    "Microsoft.Xna.Framework.Media.Genre",
+    "Microsoft.Xna.Framework.Media.GenreCollection",
     "Microsoft.Xna.Framework.Media.MediaSourceType",
     "Microsoft.Xna.Framework.Media.MediaState",
+    "Microsoft.Xna.Framework.Media.Song",
+    "Microsoft.Xna.Framework.Media.SongCollection",
     "Microsoft.Xna.Framework.Media.Video",
     "Microsoft.Xna.Framework.Media.VideoSoundtrackType",
     "Microsoft.Xna.Framework.Media.VisualizationData",
@@ -295,7 +303,7 @@
     "Microsoft.Xna.Framework.Content.ContentLoadException",
     "Microsoft.Xna.Framework.Content.ContentManager",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
-    "Microsoft.Xna.Framework.Media.Song",
+    "Microsoft.Xna.Framework.Media.MediaLibrary",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ],
   "missingTypes": [
@@ -337,13 +345,6 @@
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection",
     "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator",
     "Microsoft.Xna.Framework.Input.Touch.TouchPanel",
-    "Microsoft.Xna.Framework.Media.Album",
-    "Microsoft.Xna.Framework.Media.AlbumCollection",
-    "Microsoft.Xna.Framework.Media.Artist",
-    "Microsoft.Xna.Framework.Media.ArtistCollection",
-    "Microsoft.Xna.Framework.Media.Genre",
-    "Microsoft.Xna.Framework.Media.GenreCollection",
-    "Microsoft.Xna.Framework.Media.MediaLibrary",
     "Microsoft.Xna.Framework.Media.MediaPlayer",
     "Microsoft.Xna.Framework.Media.MediaQueue",
     "Microsoft.Xna.Framework.Media.MediaSource",
@@ -353,7 +354,6 @@
     "Microsoft.Xna.Framework.Media.PictureCollection",
     "Microsoft.Xna.Framework.Media.Playlist",
     "Microsoft.Xna.Framework.Media.PlaylistCollection",
-    "Microsoft.Xna.Framework.Media.SongCollection",
     "Microsoft.Xna.Framework.Media.VideoPlayer",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
     "Microsoft.Xna.Framework.Storage.StorageDevice"
@@ -595,39 +595,54 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.Album",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary..ctor(mediaSource:Microsoft.Xna.Framework.Media.MediaSource)",
+      "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.AlbumCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "OVERLOAD_MAPPING_MISMATCH",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary..ctor(mediaSource:Microsoft.Xna.Framework.Media.MediaSource)",
+      "detail": "required overload is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.Artist",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String,imageBuffer:[UInt8])",
+      "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.ArtistCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String,source:Foundation.InputStream)",
+      "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.Genre",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.GetPictureFromToken(_:String)",
+      "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.GenreCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.Pictures()",
+      "detail": "mapped member is absent"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.RootPictureAlbum()",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.SavedPictures()",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.MediaSource()",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.Playlists()",
+      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -672,26 +687,6 @@
     {
       "category": "MISSING_TYPE",
       "subject": "Microsoft.Xna.Framework.Media.PlaylistCollection",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Media.Song.Artist()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Media.Song.Album()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Media.Song.Genre()",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Media.SongCollection",
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
@@ -2835,7 +2830,56 @@
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
     },
     {
+      "type": "Microsoft.Xna.Framework.Media.Album",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.AlbumCollection",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.Artist",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.ArtistCollection",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.Genre",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.GenreCollection",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
       "type": "Microsoft.Xna.Framework.Media.Song",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.SongCollection",
       "clrSealed": true,
       "referencePublicConstructors": 0,
       "swiftPublicInitializers": 0,
@@ -4968,7 +5012,71 @@
       "derivableInReferenceButNotInSwift": false
     },
     {
+      "type": "Microsoft.Xna.Framework.Media.Album",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.AlbumCollection",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.Artist",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.ArtistCollection",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.Genre",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.GenreCollection",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.MediaLibrary",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
       "type": "Microsoft.Xna.Framework.Media.Song",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Media.SongCollection",
       "clrSealed": true,
       "swiftFinal": true,
       "swiftAccess": "public",
@@ -8831,301 +8939,301 @@
       "member": "GetAlbumArt",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.IO.Stream",
       "swiftReturnType": "Foundation.InputStream?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Foundation.InputStream?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Album",
       "member": "GetThumbnail",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.IO.Stream",
       "swiftReturnType": "Foundation.InputStream?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Foundation.InputStream?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Album",
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Album",
       "member": "Name",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Album",
       "member": "Artist",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Artist"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Album",
       "member": "Songs",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.SongCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.SongCollection",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.SongCollection"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Album",
       "member": "Genre",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Genre"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.AlbumCollection",
       "member": "GetEnumerator",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Collections.Generic.IEnumerator`1[Microsoft.Xna.Framework.Media.Album]",
       "swiftReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Album>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Album>"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.AlbumCollection",
       "member": "Item",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Album",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Album",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Album"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Artist",
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Artist",
       "member": "Name",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Artist",
       "member": "Songs",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.SongCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.SongCollection",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.SongCollection"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Artist",
       "member": "Albums",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.ArtistCollection",
       "member": "GetEnumerator",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Collections.Generic.IEnumerator`1[Microsoft.Xna.Framework.Media.Artist]",
       "swiftReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Artist>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Artist>"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.ArtistCollection",
       "member": "Item",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Artist"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Genre",
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Genre",
       "member": "Name",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Genre",
       "member": "Songs",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.SongCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.SongCollection",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.SongCollection"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Genre",
       "member": "Albums",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.GenreCollection",
       "member": "GetEnumerator",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Collections.Generic.IEnumerator`1[Microsoft.Xna.Framework.Media.Genre]",
       "swiftReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Genre>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Genre>"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.GenreCollection",
       "member": "Item",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Genre"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaLibrary",
       "member": "SavePicture",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Picture",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Picture",
       "optional": false,
@@ -9139,7 +9247,7 @@
       "member": "SavePicture",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Picture",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Picture",
       "optional": false,
@@ -9153,7 +9261,7 @@
       "member": "GetPictureFromToken",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Picture",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Picture",
       "optional": false,
@@ -9167,7 +9275,7 @@
       "member": "Pictures",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.PictureCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.PictureCollection?",
       "optional": true,
@@ -9181,7 +9289,7 @@
       "member": "RootPictureAlbum",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.PictureAlbum",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.PictureAlbum?",
       "optional": true,
@@ -9195,7 +9303,7 @@
       "member": "SavedPictures",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.PictureCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.PictureCollection?",
       "optional": true,
@@ -9209,7 +9317,7 @@
       "member": "MediaSource",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.MediaSource",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.MediaSource?",
       "optional": true,
@@ -9223,49 +9331,49 @@
       "member": "Songs",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.SongCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.SongCollection?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.SongCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaLibrary",
       "member": "Artists",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.ArtistCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.ArtistCollection?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.ArtistCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaLibrary",
       "member": "Albums",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.AlbumCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaLibrary",
       "member": "Playlists",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.PlaylistCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.PlaylistCollection?",
       "optional": true,
@@ -9279,14 +9387,14 @@
       "member": "Genres",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "partial",
       "clrReturnType": "Microsoft.Xna.Framework.Media.GenreCollection",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.GenreCollection?",
       "optional": true,
       "nullability": "PROVEN_NULLABLE_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.GenreCollection?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.MediaPlayer",
@@ -9643,7 +9751,7 @@
       "member": "FromUri",
       "kind": "method",
       "static": true,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Song",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Song",
       "optional": false,
@@ -9657,7 +9765,7 @@
       "member": "ToString",
       "kind": "method",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
@@ -9671,7 +9779,7 @@
       "member": "Name",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
@@ -9685,70 +9793,70 @@
       "member": "Artist",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Artist",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Artist"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Song",
       "member": "Album",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Album",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Album",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Album"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.Song",
       "member": "Genre",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Genre",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Genre"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.SongCollection",
       "member": "GetEnumerator",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Collections.Generic.IEnumerator`1[Microsoft.Xna.Framework.Media.Song]",
       "swiftReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Song>",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "CNAEnumerator<Microsoft.Xna.Framework.Media.Song>"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.SongCollection",
       "member": "Item",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Media.Song",
       "swiftReturnType": "Microsoft.Xna.Framework.Media.Song",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Media.Song"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Media.VideoPlayer",
@@ -12116,92 +12224,101 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Media.Album",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 16,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.Album",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 16,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.AlbumCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.AlbumCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.Artist",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 11,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.Artist",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 11,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.ArtistCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.ArtistCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.Genre",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 11,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.Genre",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 11,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.GenreCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.GenreCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.MediaLibrary",
-      "status": "MISSING",
+      "status": "PARTIAL",
       "expectedMembers": 16,
-      "targetMembers": 0,
+      "targetMembers": 7,
       "diagnostics": [
         {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary..ctor(mediaSource:Microsoft.Xna.Framework.Media.MediaSource)",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "OVERLOAD_MAPPING_MISMATCH",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary..ctor(mediaSource:Microsoft.Xna.Framework.Media.MediaSource)",
+          "detail": "required overload is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String,imageBuffer:[UInt8])",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String,source:Foundation.InputStream)",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.GetPictureFromToken(_:String)",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.Pictures()",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.RootPictureAlbum()",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.SavedPictures()",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.MediaSource()",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Media.MediaLibrary.Playlists()",
+          "detail": "mapped member is absent"
         }
       ]
     },
@@ -12338,39 +12455,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Media.Song",
-      "status": "PARTIAL",
+      "status": "COMPLETE",
       "expectedMembers": 19,
-      "targetMembers": 16,
-      "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Media.Song.Artist()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Media.Song.Album()",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Media.Song.Genre()",
-          "detail": "mapped member is absent"
-        }
-      ]
+      "targetMembers": 19,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.SongCollection",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 5,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Media.SongCollection",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 5,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Media.Video",
