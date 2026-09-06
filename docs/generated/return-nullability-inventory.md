@@ -15,14 +15,14 @@ facts imply under `tools/api_compat/mapping-rules.json`.
 | REFERENCE_RETURN_FIELDS | 22 |
 | REFERENCE_RETURN_STATIC | 36 |
 | REFERENCE_RETURN_INSTANCE | 333 |
-| PROVEN_NONNULL_RETURNS | 133 |
+| PROVEN_NONNULL_RETURNS | 134 |
 | PROVEN_NULLABLE_RETURNS | 113 |
-| UNKNOWN_REFERENCE_RETURNS | 123 |
+| UNKNOWN_REFERENCE_RETURNS | 122 |
 | NULLABLE_INFALLIBLE | 68 |
 | NULLABLE_FALLIBLE | 45 |
-| NONNULL_INFALLIBLE | 66 |
+| NONNULL_INFALLIBLE | 67 |
 | NONNULL_FALLIBLE | 67 |
-| UNKNOWN_INFALLIBLE | 83 |
+| UNKNOWN_INFALLIBLE | 82 |
 | UNKNOWN_FALLIBLE | 40 |
 | CLASSIFIED_MEMBERS | 2964 |
 | Self-tests | 118 PASS |
@@ -76,7 +76,7 @@ return at all.
 | `Microsoft.Xna.Framework.Audio.AudioEngine` | `RendererDetails` | propertyGetter | `System.Collections.ObjectModel.ReadOnlyCollection`1[Microsoft.Xna.Framework.Audio.RendererDetail]` | `CNAReadOnlyCollection<Microsoft.Xna.Framework.Audio.RendererDetail>? { get throws }` | yes | `IL_RETURN_VALUE_ANALYSIS`: IL_005f local |
 | `Microsoft.Xna.Framework.Audio.Microphone` | `Default` | propertyGetter | `Microsoft.Xna.Framework.Audio.Microphone` | `Microsoft.Xna.Framework.Audio.Microphone? { get throws }` | yes | `IL_RETURN_VALUE_ANALYSIS`: IL_000a call Microsoft.Xna.Framework.Audio.MicrophoneCollection::get_Default/0 |
 | `Microsoft.Xna.Framework.Audio.SoundEffect` | `Name` | propertyGetter | `System.String` | `String?` | no | `IL_FIELD_LIFECYCLE`: Microsoft.Xna.Framework.Audio.SoundEffect::.ctor leaves it null |
-| `Microsoft.Xna.Framework.Content.ContentManager` | `ServiceProvider` | propertyGetter | `System.IServiceProvider` | `System.IServiceProvider?` | no | `IL_FIELD_LIFECYCLE`: Microsoft.Xna.Framework.Content.ContentManager::.ctor leaves it null |
+| `Microsoft.Xna.Framework.Content.ContentManager` | `ServiceProvider` | propertyGetter | `System.IServiceProvider` | `CNAServiceProvider?` | no | `IL_FIELD_LIFECYCLE`: Microsoft.Xna.Framework.Content.ContentManager::.ctor leaves it null |
 | `Microsoft.Xna.Framework.Content.ContentManager` | `RootDirectory` | propertyGetter | `System.String` | `String?` | no | `IL_FIELD_LIFECYCLE`: no constructor of Microsoft.Xna.Framework.Content.ContentManager assigns rootDirectory |
 | `Microsoft.Xna.Framework.Content.ContentSerializerAttribute` | `ElementName` | propertyGetter | `System.String` | `String?` | no | `IL_FIELD_LIFECYCLE`: Microsoft.Xna.Framework.Content.ContentSerializerAttribute::Clone IL_000d; no constructor of Microsoft.Xna.Framework.Content.ContentSerializerAttribute assigns elementName |
 | `Microsoft.Xna.Framework.Design.MathTypeConverter` | `GetProperties` | method | `System.ComponentModel.PropertyDescriptorCollection` | `System.ComponentModel.PropertyDescriptorCollection?` | no | `IL_FIELD_LIFECYCLE`: no constructor of Microsoft.Xna.Framework.Design.MathTypeConverter assigns propertyDescriptions |
@@ -151,7 +151,7 @@ return at all.
 | `Microsoft.Xna.Framework.Graphics.SkinnedEffect` | `DirectionalLight1` | propertyGetter | `Microsoft.Xna.Framework.Graphics.DirectionalLight` | `Microsoft.Xna.Framework.Graphics.DirectionalLight?` | no | `IL_FIELD_LIFECYCLE`: no constructor of Microsoft.Xna.Framework.Graphics.SkinnedEffect assigns light1 |
 | `Microsoft.Xna.Framework.Graphics.SkinnedEffect` | `DirectionalLight2` | propertyGetter | `Microsoft.Xna.Framework.Graphics.DirectionalLight` | `Microsoft.Xna.Framework.Graphics.DirectionalLight?` | no | `IL_FIELD_LIFECYCLE`: no constructor of Microsoft.Xna.Framework.Graphics.SkinnedEffect assigns light2 |
 | `Microsoft.Xna.Framework.Graphics.SkinnedEffect` | `Texture` | propertyGetter | `Microsoft.Xna.Framework.Graphics.Texture2D` | `Microsoft.Xna.Framework.Graphics.Texture2D? { get throws }` | yes | `IL_RETURN_VALUE_ANALYSIS`: IL_000b call Microsoft.Xna.Framework.Graphics.EffectParameter::GetValueTexture2D/0 |
-| `Microsoft.Xna.Framework.Graphics.SpriteFont` | `Characters` | propertyGetter | `System.Collections.ObjectModel.ReadOnlyCollection`1[System.Char]` | `CNAReadOnlyCollection<System.Char>?` | no | `IL_FIELD_LIFECYCLE`: no constructor of Microsoft.Xna.Framework.Graphics.SpriteFont assigns characters |
+| `Microsoft.Xna.Framework.Graphics.SpriteFont` | `Characters` | propertyGetter | `System.Collections.ObjectModel.ReadOnlyCollection`1[System.Char]` | `CNAReadOnlyCollection<UInt16>?` | no | `IL_FIELD_LIFECYCLE`: no constructor of Microsoft.Xna.Framework.Graphics.SpriteFont assigns characters |
 | `Microsoft.Xna.Framework.Graphics.TextureCollection` | `Item` | propertyGetter | `Microsoft.Xna.Framework.Graphics.Texture` | `Microsoft.Xna.Framework.Graphics.Texture? { get throws }` | yes | `IL_RETURN_VALUE_ANALYSIS`: IL_0168 local |
 | `Microsoft.Xna.Framework.Graphics.VertexBuffer` | `VertexDeclaration` | propertyGetter | `Microsoft.Xna.Framework.Graphics.VertexDeclaration` | `Microsoft.Xna.Framework.Graphics.VertexDeclaration?` | no | `IL_FIELD_LIFECYCLE`: no constructor of Microsoft.Xna.Framework.Graphics.VertexBuffer assigns _vertexDeclaration |
 | `Microsoft.Xna.Framework.GraphicsDeviceInformation` | `Adapter` | propertyGetter | `Microsoft.Xna.Framework.Graphics.GraphicsAdapter` | `Microsoft.Xna.Framework.Graphics.GraphicsAdapter?` | no | `IL_FIELD_LIFECYCLE`: Microsoft.Xna.Framework.GraphicsDeviceInformation::Clone IL_001e |
@@ -204,7 +204,7 @@ return at all.
 | `Microsoft.Xna.Framework.Content.ContentReader` | `ContentManager` | propertyGetter | `Microsoft.Xna.Framework.Content.ContentManager` | `Microsoft.Xna.Framework.Content.ContentManager` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_0006 field Microsoft.Xna.Framework.Content.ContentReader::contentManager |
 | `Microsoft.Xna.Framework.Content.ContentReader` | `AssetName` | propertyGetter | `System.String` | `String` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_0006 field Microsoft.Xna.Framework.Content.ContentReader::assetName |
 | `Microsoft.Xna.Framework.Content.ContentTypeReader` | `Read` | method | `System.Object` | `Any? throws` | yes | `IL_ABSTRACT_DECLARATION` |
-| `Microsoft.Xna.Framework.Content.ContentTypeReader` | `TargetType` | propertyGetter | `System.Type` | `System.Type` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_0006 field Microsoft.Xna.Framework.Content.ContentTypeReader::targetType |
+| `Microsoft.Xna.Framework.Content.ContentTypeReader` | `TargetType` | propertyGetter | `System.Type` | `Any.Type` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_0006 field Microsoft.Xna.Framework.Content.ContentTypeReader::targetType |
 | `Microsoft.Xna.Framework.Content.ContentTypeReaderManager` | `GetTypeReader` | method | `Microsoft.Xna.Framework.Content.ContentTypeReader` | `Microsoft.Xna.Framework.Content.ContentTypeReader throws` | yes | `IL_RETURN_VALUE_ANALYSIS`: IL_000c call Microsoft.Xna.Framework.Content.ContentTypeReaderManager::GetTypeReader/2 |
 | `Microsoft.Xna.Framework.Content.ContentTypeReader`1` | `Read` | method | `System.Object` | `Any? throws` | yes | `IL_RETURN_VALUE_ANALYSIS` |
 | `Microsoft.Xna.Framework.CurveKeyCollection` | `Item` | propertyGetter | `Microsoft.Xna.Framework.CurveKey` | `Microsoft.Xna.Framework.CurveKey { get throws }` | yes | `IL_RETURN_VALUE_ANALYSIS`: IL_000c call System.Collections.Generic.List`1::get_Item/1 |
@@ -242,7 +242,6 @@ return at all.
 | `Microsoft.Xna.Framework.Graphics.GraphicsAdapter` | `Description` | propertyGetter | `System.String` | `String` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_0006 field Microsoft.Xna.Framework.Graphics.GraphicsAdapter::_description |
 | `Microsoft.Xna.Framework.Graphics.GraphicsAdapter` | `DefaultAdapter` | propertyGetter | `Microsoft.Xna.Framework.Graphics.GraphicsAdapter` | `Microsoft.Xna.Framework.Graphics.GraphicsAdapter` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_000b call System.Collections.ObjectModel.ReadOnlyCollection`1::get_Item/1 |
 | `Microsoft.Xna.Framework.Graphics.GraphicsResource` | `ToString` | method | `System.String` | `String` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_0037 call System.Object::ToString/0 |
-| `Microsoft.Xna.Framework.Graphics.IVertexType` | `VertexDeclaration` | propertyGetter | `Microsoft.Xna.Framework.Graphics.VertexDeclaration` | `Microsoft.Xna.Framework.Graphics.VertexDeclaration` | no | `IL_ABSTRACT_NO_REGISTERED_IMPLEMENTOR` |
 | `Microsoft.Xna.Framework.Graphics.ModelBone` | `Name` | propertyGetter | `System.String` | `String` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_0006 field Microsoft.Xna.Framework.Graphics.ModelBone::name |
 | `Microsoft.Xna.Framework.Graphics.ModelBoneCollection` | `Item` | propertyGetter | `Microsoft.Xna.Framework.Graphics.ModelBone` | `Microsoft.Xna.Framework.Graphics.ModelBone { get throws }` | yes | `IL_RETURN_VALUE_ANALYSIS`: IL_0012 local |
 | `Microsoft.Xna.Framework.Graphics.ModelBoneCollection+Enumerator` | `Current` | propertyGetter | `Microsoft.Xna.Framework.Graphics.ModelBone` | `Microsoft.Xna.Framework.Graphics.ModelBone` | no | `IL_RETURN_VALUE_ANALYSIS`: IL_000d literal |

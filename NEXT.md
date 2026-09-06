@@ -1519,6 +1519,36 @@ third time in this file that writing about the gate's own output in
 `KEY=value` form made the gate read it as a claim about the repository. Prose
 about counters, numerals in words.)
 
+The sweep found two more, and one of them was hiding outside
+`docs/generated/` altogether.
+
+`tools/api_compat/reference/xna40-reference-return-nullability.json` is the
+pinned record that decides Optional versus non-Optional for every projected
+reference return — the most consequential generated file in the repository,
+and it lives under `tools/`, which is how enumerating `docs/generated/` missed
+it. It recorded `IVertexType.VertexDeclaration` as
+`UNKNOWN_REFERENCE_NULLABILITY` on the evidence
+`IL_ABSTRACT_NO_REGISTERED_IMPLEMENTOR` — no registered implementor. A live run
+finds **four**: `VertexPositionColor`, `VertexPositionColorTexture`,
+`VertexPositionNormalTexture` and `VertexPositionTexture`, every one an
+*explicit* interface implementation. Those are private in CLR metadata, the
+tool learned to see them, and the pinned record was never refreshed.
+
+No Swift signature was wrong, and that is worth stating precisely rather than
+hoping: `UNKNOWN_REFERENCE_NULLABILITY` and `PROVEN_NONNULL_SUCCESS` both
+project non-Optional, and after regenerating,
+`OPTIONAL_RETURN_PROJECTIONS=151` and `NONOPTIONAL_RETURN_PROJECTIONS=218` are
+unchanged, as are the diagnostics. What moved is the *evidence class*: one
+member from unknown to proven. The file has a pinned digest in
+`mapping-rules.json` and `verify.py --self-test` refused the moment it
+changed — that guard worked exactly as designed. It just had nothing to say
+about a file nobody regenerated.
+
+And `docs/generated/bcl-authority-report.json` was an orphan: an older,
+one-assembly BCL audit that no tool writes and nothing reads, still sitting
+there claiming PASS over 31 types. Its sentinel count is the number `plan.md`
+had been quoting. Deleted, superseded by `bcl-authority-audit.json`.
+
 One more thing the summary line now says: `STATUS_GATE_REPORTS_SKIPPED`. A
 regeneration nobody asked for is not a regeneration that passed, and a gate
 run given no `--symbol-graph`, `--cna-include`, `--assembly-dir` or

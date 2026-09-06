@@ -576,6 +576,30 @@ def regenerate_and_compare(
             # strings while a live run said FAIL over 79. Six user-visible XNA
             # messages had been pinned and used in Sources/ without being
             # registered, so nothing checked that they came from the authority.
+            # return_nullability decides Optional vs non-Optional for every
+            # projected reference return, and its PINNED reference lives under
+            # tools/, not docs/generated -- which is how it escaped the sweep.
+            # It had IVertexType.VertexDeclaration recorded as UNKNOWN with
+            # evidence "no registered implementor" while a live run finds four,
+            # all explicit interface implementations. Both verdicts project
+            # non-Optional, so no signature was wrong; the evidence was.
+            nullability = temporary / "xna40-reference-return-nullability.json"
+            nullability_md = temporary / "return-nullability-inventory.md"
+            subprocess.run(
+                [sys.executable, "tools/api_compat/return_nullability.py",
+                 "--assembly-dir", str(assembly_dir),
+                 "--il-cache", str(il_cache),
+                 "--output", str(nullability),
+                 "--markdown", str(nullability_md)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            compare(root / "tools/api_compat/reference"
+                    / "xna40-reference-return-nullability.json", nullability,
+                    "tools/api_compat/return_nullability.py")
+            compare(GENERATED / "return-nullability-inventory.md",
+                    nullability_md,
+                    "tools/api_compat/return_nullability.py --markdown")
+
             pinned = temporary / "pinned-assembly-audit.json"
             subprocess.run(
                 [sys.executable, "tools/api_compat/pinned_assembly_audit.py",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "referenceSha256": "7207908eb7926cc90a156d0370c907add4dda465421cea1cbec51afba2f97fdc",
-  "accessorFallibilitySha256": "5923c95d3723936ad53dce7f45c7fff74d399791ea38e3e800a96565150cac6e",
+  "referenceSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d",
+  "accessorFallibilitySha256": "56521047e93271c6308b6aebcdd162be67fe938859da83358b6ba4d59d16de62",
   "assemblies": [
     {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
@@ -54,14 +54,14 @@
   "REFERENCE_RETURN_FIELDS": 22,
   "REFERENCE_RETURN_STATIC": 36,
   "REFERENCE_RETURN_INSTANCE": 333,
-  "PROVEN_NONNULL_RETURNS": 133,
+  "PROVEN_NONNULL_RETURNS": 134,
   "PROVEN_NULLABLE_RETURNS": 113,
-  "UNKNOWN_REFERENCE_RETURNS": 123,
+  "UNKNOWN_REFERENCE_RETURNS": 122,
   "NULLABLE_INFALLIBLE": 68,
   "NULLABLE_FALLIBLE": 45,
-  "NONNULL_INFALLIBLE": 66,
+  "NONNULL_INFALLIBLE": 67,
   "NONNULL_FALLIBLE": 67,
-  "UNKNOWN_INFALLIBLE": 83,
+  "UNKNOWN_INFALLIBLE": 82,
   "UNKNOWN_FALLIBLE": 40,
   "CLASSIFIED_MEMBERS": 2964,
   "coverage": {
@@ -6983,13 +6983,18 @@
       "parameters": [],
       "ilMethod": "get_VertexDeclaration",
       "nullability": {
-        "verdict": "UNKNOWN_REFERENCE_NULLABILITY",
-        "evidence": "IL_ABSTRACT_NO_REGISTERED_IMPLEMENTOR",
+        "verdict": "PROVEN_NONNULL_SUCCESS",
+        "evidence": "IL_ABSTRACT_DECLARATION",
         "normalNullPossible": false,
-        "normalNonNullPossible": false,
-        "outcomesExhaustive": false,
+        "normalNonNullPossible": true,
+        "outcomesExhaustive": true,
         "returnSites": [],
-        "implementors": [],
+        "implementors": [
+          "Microsoft.Xna.Framework.Graphics.VertexPositionColor::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0",
+          "Microsoft.Xna.Framework.Graphics.VertexPositionColorTexture::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0",
+          "Microsoft.Xna.Framework.Graphics.VertexPositionNormalTexture::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0",
+          "Microsoft.Xna.Framework.Graphics.VertexPositionTexture::Microsoft.Xna.Framework.Graphics.IVertexType.get_VertexDeclaration/0"
+        ],
         "fieldLifecycle": []
       },
       "fallibility": {
