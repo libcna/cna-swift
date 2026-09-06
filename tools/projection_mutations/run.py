@@ -40,6 +40,7 @@ CONTENT = ROOT / "Sources/CNA/Xna/Content/ContentManager.swift"
 OCCLUSION = ROOT / "Sources/CNA/Xna/Graphics/OcclusionQuery.swift"
 SOUND = ROOT / "Sources/CNA/Xna/Audio/SoundEffect.swift"
 SOUND_INSTANCE = ROOT / "Sources/CNA/Xna/Audio/SoundEffectInstance.swift"
+DYNAMIC_SOUND = ROOT / "Sources/CNA/Xna/Audio/DynamicSoundEffectInstance.swift"
 DEVICEINFO = ROOT / "Sources/CNA/Xna/Framework/GraphicsDeviceInformation.swift"
 RANKING = ROOT / "Sources/CNA/Xna/Graphics/GraphicsDeviceInformationComparer.swift"
 WINDOW = ROOT / "Sources/CNA/Xna/Framework/GameWindow.swift"
@@ -123,6 +124,46 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 90: the dynamic instance -------------------------------
+    (
+        "dynamic-queue-grows-without-limit",
+        "SubmitBuffer accepted past the pending-buffer limit, which this "
+        "runtime allows and XNA does not -- the queue then fails somewhere "
+        "else entirely",
+        DYNAMIC_SOUND,
+        "            guard try PendingBufferCount < DynamicSoundEffectInstance.pendingBufferLimit else {",
+        "            if false {",
+    ),
+    (
+        "dynamic-subscription-outlives-the-instance",
+        "disposal leaving the BufferNeeded registration alive, so a native "
+        "callback keeps addressing a box that has been released",
+        DYNAMIC_SOUND,
+        "            releaseSubscription()\n"
+        "            dynamicHandle = 0",
+        "            dynamicHandle = 0",
+    ),
+    # WITHDRAWN: "dynamic-submit-ignores-the-range" -- passing the whole buffer
+    # where the caller gave a range. It cannot be falsified through the
+    # projected surface, and the reason is structural rather than a missing
+    # test: nothing CNA publishes reports how many BYTES are queued.
+    # `cna_dynamic_sound_effect_instance_get_pending_buffer_count` counts
+    # buffers, and one submit is one buffer whether it carried two bytes or
+    # two hundred. The range reaches the ABI correctly -- the manifest and the
+    # native ABI gate both check the argument positions -- but its effect is
+    # invisible from Swift, so a mutation on it can only ever survive.
+    (
+        "dynamic-conversion-uses-a-fixed-rate",
+        "GetSampleSizeInBytes answering from a static conversion instead of "
+        "the instance's own sample rate and channel count",
+        DYNAMIC_SOUND,
+        "                    .dynamicSoundEffectInstanceGetSampleSizeInBytes(\n"
+        "                        live,\n"
+        "                        Microsoft.Xna.Framework.Audio.SoundEffect.ticks(from: duration),\n"
+        "                        &bytes),",
+        "                    .dynamicSoundEffectInstanceGetSampleSizeInBytes(\n"
+        "                        live, 0, &bytes),",
+    ),
     # ---- Foundation 89: the sound effect pair ------------------------------
     (
         "sound-buffer-alignment-unchecked",

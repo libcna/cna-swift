@@ -526,6 +526,8 @@ typedef struct CNASwift_SpriteScaledCommand {
     float layer_depth;
 } CNASwift_SpriteScaledCommand;
 
+typedef void (*CNASwift_AudioEventCallback)(void* context);
+
 typedef struct CNASwift_AudioEmitter {
     uint32_t struct_size;
     uint32_t struct_version;

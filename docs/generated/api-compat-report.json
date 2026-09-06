@@ -11,14 +11,14 @@
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 196,
-    "TARGET_MEMBERS": 2431,
-    "TOTAL_DIAGNOSTICS": 70,
+    "TARGET_TYPES": 197,
+    "TARGET_MEMBERS": 2439,
+    "TOTAL_DIAGNOSTICS": 71,
     "COMPLETE_TYPES": 192,
-    "PARTIAL_TYPES": 4,
-    "MISSING_TYPES": 61,
-    "MISSING_TYPE": 61,
-    "MISSING_MEMBER": 7,
+    "PARTIAL_TYPES": 5,
+    "MISSING_TYPES": 60,
+    "MISSING_TYPE": 60,
+    "MISSING_MEMBER": 9,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -63,14 +63,14 @@
     "INFALLIBLE_WRITER_METHOD_PROJECTIONS": 0,
     "GETTER_ONLY_PROJECTIONS": 561,
     "WRITE_ONLY_PROJECTIONS": 0,
-    "MEASURED_ACCESSOR_PROJECTIONS": 101,
-    "PENDING_ACCESSOR_PROJECTIONS": 13,
+    "MEASURED_ACCESSOR_PROJECTIONS": 102,
+    "PENDING_ACCESSOR_PROJECTIONS": 12,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
     "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 27,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
     "BCL_SUPPORT_TYPE_MEASUREMENTS": 20,
-    "XNA_SEALED_CLASS_PROJECTIONS": 35,
+    "XNA_SEALED_CLASS_PROJECTIONS": 36,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
     "BCL_RESOURCE_STRING_PROJECTIONS": 31,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
@@ -290,6 +290,7 @@
     "Microsoft.Xna.Framework.Vector4"
   ],
   "partialTypes": [
+    "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
     "Microsoft.Xna.Framework.Content.ContentLoadException",
     "Microsoft.Xna.Framework.Content.ContentManager",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
@@ -299,7 +300,6 @@
     "Microsoft.Xna.Framework.Audio.AudioCategory",
     "Microsoft.Xna.Framework.Audio.AudioEngine",
     "Microsoft.Xna.Framework.Audio.Cue",
-    "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
     "Microsoft.Xna.Framework.Audio.Microphone",
     "Microsoft.Xna.Framework.Audio.RendererDetail",
     "Microsoft.Xna.Framework.Audio.SoundBank",
@@ -375,9 +375,14 @@
       "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance.Play()",
+      "detail": "mapped member is absent"
+    },
+    {
+      "category": "MISSING_MEMBER",
+      "subject": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance.IsLooped()",
+      "detail": "mapped member is absent"
     },
     {
       "category": "MISSING_TYPE",
@@ -1109,6 +1114,20 @@
       "writerThrows": true,
       "readerObserved": true,
       "writerObserved": true,
+      "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
+    },
+    {
+      "ownerType": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+      "sourceProperty": "IsLooped",
+      "indexed": false,
+      "readerSymbol": null,
+      "readerForm": "property",
+      "readerThrows": true,
+      "writerSymbol": null,
+      "writerName": "SetIsLooped",
+      "writerThrows": true,
+      "readerObserved": false,
+      "writerObserved": false,
       "reason": "Swift has no throwing property setter and forbids `set` beside a throwing getter, so this CLR setter accessor projects to a named writer method measured as part of one property identity"
     },
     {
@@ -2513,16 +2532,6 @@
     }
   ],
   "pendingAccessorProjections": [
-    {
-      "ownerType": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
-      "sourceProperty": "IsLooped",
-      "typeState": "missing",
-      "readerThrows": true,
-      "writerName": "SetIsLooped",
-      "writerThrows": true,
-      "indexed": false,
-      "static": false
-    },
     {
       "ownerType": "Microsoft.Xna.Framework.Audio.Microphone",
       "sourceProperty": "BufferDuration",
@@ -4302,6 +4311,14 @@
       "type": "Microsoft.Xna.Framework.Audio.AudioListener",
       "clrSealed": false,
       "swiftFinal": false,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+      "clrSealed": true,
+      "swiftFinal": true,
       "swiftAccess": "public",
       "referencePublicConstructors": 1,
       "derivableInReferenceButNotInSwift": false
@@ -10343,14 +10360,19 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
-      "status": "MISSING",
+      "status": "PARTIAL",
       "expectedMembers": 10,
-      "targetMembers": 0,
+      "targetMembers": 8,
       "diagnostics": [
         {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance.Play()",
+          "detail": "mapped member is absent"
+        },
+        {
+          "category": "MISSING_MEMBER",
+          "subject": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance.IsLooped()",
+          "detail": "mapped member is absent"
         }
       ]
     },

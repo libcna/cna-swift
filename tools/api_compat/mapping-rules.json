@@ -1262,6 +1262,12 @@
       "member": "Apply3D",
       "parameter": "listeners",
       "reason": "The array overload opens with a null test on the array, and an empty array is NOT the same input -- it reaches CNA and means zero listeners. A non-Optional parameter would collapse the two, leaving the ArgumentNullException unreachable while an empty array quietly took its place. The single-listener overload takes a class and needs no such entry, because XNA's null check there is on a reference Swift already makes non-Optional."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+      "member": "SubmitBuffer",
+      "parameter": "buffer",
+      "reason": "Both overloads open with a null test on the buffer, and an EMPTY array is a different input that reaches the alignment check instead. A non-Optional parameter would collapse the two and leave the ArgumentNullException unreachable, which is the same reason SoundEffectInstance.Apply3D's listener array is Optional."
     }
   ],
   "globalOperatorProjections": [

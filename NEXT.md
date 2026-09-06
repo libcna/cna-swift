@@ -24,12 +24,12 @@ python3 tools/status_gate/verify.py \
 ```
 
 ```text
-886 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=70   COMPLETE_TYPES=192   PARTIAL_TYPES=4
-MISSING_TYPE=61  MISSING_MEMBER=7  OVERLOAD_MAPPING_MISMATCH=2
+891 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=71   COMPLETE_TYPES=192   PARTIAL_TYPES=5
+MISSING_TYPE=60  MISSING_MEMBER=9  OVERLOAD_MAPPING_MISMATCH=2
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=395  PROTOTYPE_TYPE_POSITIONS=1374  LAYOUTS=59  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=348 (last full run 137, CAUGHT=135)
+BOUND_FUNCTIONS=402  PROTOTYPE_TYPE_POSITIONS=1403  LAYOUTS=59  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=351 (last full run 137, CAUGHT=135)
 5 withdrawn with the reason written where they stood, 1 no-op replaced
 NATIVE_ABI_MUTATIONS=14 CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
@@ -207,6 +207,42 @@ the road is long: this is a per-namespace campaign, not a handful of milestones.
 |---|---|---|
 | The five unwired content loaders | 0 types, 0 members | `ContentManager` landed in Foundation 87 with **one** loader bound, `load_texture2d`, because adopting what the other five produce needs machinery those types do not have yet. Each is unblocked by its own type's milestone, not by content work. |
 | `ContentManager.OpenStream` / `ReadAsset` | 0 types, 2 members | The two protected members Foundation 87 left absent. `OpenStream` returns a `Stream` over an asset this binding never opens itself, and `ReadAsset` takes `Action<IDisposable>`; both wait on decisions about `System.IO` and delegate projection. |
+
+### Foundation 90 — `DynamicSoundEffectInstance`, and two members Swift cannot spell
+
+Built from a sample rate and a channel count, so it is reachable where the XACT
+family is not. Twelve routes, a native `BufferNeeded` subscription, and one
+measured refusal.
+
+**Measured: submitting 101 buffers to this runtime leaves 101 pending.** XNA
+refuses past 64 -- `OverTheInstancePacketLimit` names the number -- so the limit
+is enforced here. A queue that grows without bound fails later and somewhere
+else, which is a worse answer than being told the limit.
+
+**`Play` and `IsLooped` stay inherited, and that is a language limit stated
+rather than hidden.** XNA declares both on this type again with C#'s `new`, and
+the accessor table shows the redeclared `IsLooped` throws in **both** directions
+where the base's getter is `IL_NO_FAILURE_PATH`. Swift has neither member hiding
+nor a way to override an infallible property with a fallible one, so the
+subclass cannot express either. They are counted as MISSING_MEMBER -- which is
+what they are, an absence -- and the consequence a caller sees is one refusal
+fewer: reading `IsLooped` on a dynamic instance answers false where XNA would
+raise. `Play` loses nothing, because CNA dispatches on the handle and the
+inherited call reaches the dynamic instance's own behaviour.
+
+One mutation was **withdrawn** with the reason written where it stood.
+`dynamic-submit-ignores-the-range` cannot be falsified through the projected
+surface: nothing CNA publishes reports how many *bytes* are queued --
+`get_pending_buffer_count` counts buffers, and one submit is one buffer whether
+it carried two bytes or two hundred. The range does reach the ABI, and the
+manifest and native ABI gate check its argument positions; only its effect is
+invisible from Swift.
+
+**An observation without a diagnosis:** the mutation harness reported
+`PROJECTION_MUTATION_BASELINE=RED` twice in this session on a tree whose full
+suite passes seconds later, and both times an immediate re-run was green. It is
+recorded rather than explained. If it recurs, the thing to capture is the
+baseline run's own output rather than the verdict line.
 
 ### The XACT family is blocked on a settings file, like `Model` on its `.xnb`
 

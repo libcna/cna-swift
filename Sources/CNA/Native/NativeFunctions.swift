@@ -202,6 +202,13 @@ internal final class NativeFunctions {
     typealias SoundEffectInstanceDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias SoundEffectInstanceApply3dRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_AudioListener>?, UnsafePointer<CNASwift_AudioEmitter>?) -> UInt32
     typealias SoundEffectInstanceApply3dMultiExtRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_AudioListener>?, UInt64, UnsafePointer<CNASwift_AudioEmitter>?) -> UInt32
+    typealias DynamicSoundEffectInstanceCreateRoute = @convention(c) (UInt64, Int32, UInt32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias DynamicSoundEffectInstanceSubmitBufferRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64, Int32, Int32) -> UInt32
+    typealias DynamicSoundEffectInstanceGetPendingBufferCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias DynamicSoundEffectInstanceGetSampleDurationTicksRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias DynamicSoundEffectInstanceGetSampleSizeInBytesRoute = @convention(c) (UInt64, Int64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias DynamicSoundEffectInstanceSubscribeBufferNeededRoute = @convention(c) (UInt64, CNASwift_AudioEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioUnsubscribeExtRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias OcclusionQueryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias OcclusionQueryBeginRoute = @convention(c) (UInt64) -> UInt32
@@ -571,6 +578,13 @@ internal final class NativeFunctions {
     let textureCommonGetInfo: TextureGetInfoRoute
     let renderTarget2DCreate: RenderTarget2dCreateRoute
     let occlusionQueryCreate: OcclusionQueryCreateRoute
+    let dynamicSoundEffectInstanceCreate: DynamicSoundEffectInstanceCreateRoute
+    let dynamicSoundEffectInstanceSubmitBuffer: DynamicSoundEffectInstanceSubmitBufferRoute
+    let dynamicSoundEffectInstanceGetPendingBufferCount: DynamicSoundEffectInstanceGetPendingBufferCountRoute
+    let dynamicSoundEffectInstanceGetSampleDurationTicks: DynamicSoundEffectInstanceGetSampleDurationTicksRoute
+    let dynamicSoundEffectInstanceGetSampleSizeInBytes: DynamicSoundEffectInstanceGetSampleSizeInBytesRoute
+    let dynamicSoundEffectInstanceSubscribeBufferNeeded: DynamicSoundEffectInstanceSubscribeBufferNeededRoute
+    let audioUnsubscribe: AudioUnsubscribeExtRoute
     let soundEffectInstanceApply3D: SoundEffectInstanceApply3dRoute
     let soundEffectInstanceApply3DMulti: SoundEffectInstanceApply3dMultiExtRoute
     let soundEffectCreatePcm16: SoundEffectCreatePcm16Route
@@ -994,6 +1008,13 @@ internal final class NativeFunctions {
         textureCommonGetInfo = try library.resolve("cna_texture_get_info", as: TextureGetInfoRoute.self)
         renderTarget2DCreate = try library.resolve("cna_render_target2d_create", as: RenderTarget2dCreateRoute.self)
         occlusionQueryCreate = try library.resolve("cna_occlusion_query_create", as: OcclusionQueryCreateRoute.self)
+        dynamicSoundEffectInstanceCreate = try library.resolve("cna_dynamic_sound_effect_instance_create", as: DynamicSoundEffectInstanceCreateRoute.self)
+        dynamicSoundEffectInstanceSubmitBuffer = try library.resolve("cna_dynamic_sound_effect_instance_submit_buffer", as: DynamicSoundEffectInstanceSubmitBufferRoute.self)
+        dynamicSoundEffectInstanceGetPendingBufferCount = try library.resolve("cna_dynamic_sound_effect_instance_get_pending_buffer_count", as: DynamicSoundEffectInstanceGetPendingBufferCountRoute.self)
+        dynamicSoundEffectInstanceGetSampleDurationTicks = try library.resolve("cna_dynamic_sound_effect_instance_get_sample_duration_ticks", as: DynamicSoundEffectInstanceGetSampleDurationTicksRoute.self)
+        dynamicSoundEffectInstanceGetSampleSizeInBytes = try library.resolve("cna_dynamic_sound_effect_instance_get_sample_size_in_bytes", as: DynamicSoundEffectInstanceGetSampleSizeInBytesRoute.self)
+        dynamicSoundEffectInstanceSubscribeBufferNeeded = try library.resolve("cna_dynamic_sound_effect_instance_subscribe_buffer_needed", as: DynamicSoundEffectInstanceSubscribeBufferNeededRoute.self)
+        audioUnsubscribe = try library.resolve("cna_audio_unsubscribe_ext", as: AudioUnsubscribeExtRoute.self)
         soundEffectInstanceApply3D = try library.resolve("cna_sound_effect_instance_apply_3d", as: SoundEffectInstanceApply3dRoute.self)
         soundEffectInstanceApply3DMulti = try library.resolve("cna_sound_effect_instance_apply_3d_multi_ext", as: SoundEffectInstanceApply3dMultiExtRoute.self)
         soundEffectCreatePcm16 = try library.resolve("cna_sound_effect_create_pcm16", as: SoundEffectCreatePcm16Route.self)

@@ -77,6 +77,9 @@ MIRRORED_CALLBACKS = [
     "GameLifecycleCallback", "GameBeginDrawCallback",
     "RenderTargetContentLostCallback", "GameEventCallback",
     "VertexBufferContentLostCallback", "IndexBufferContentLostCallback",
+    # The audio event callback carries no data at all -- `void (*)(void*)` --
+    # and DynamicSoundEffectInstance.BufferNeeded is what consumes it.
+    "AudioEventCallback",
 ]
 
 # The scalar typedefs a mirrored declaration may name on either side. The
@@ -201,6 +204,8 @@ def canonical_type(value: str) -> str:
         # both uint32_t enumerations the header names.
         "CNA_AudioChannels": "uint32_t",
         "CNA_SoundState": "uint32_t",
+        # audio.h:608 -- one owned handle per audio event subscription.
+        "CNA_AudioEventRegistrationHandle": "uint64_t",
         # effects.h gives every effect object its own handle alias, and two
         # enumerations of its own. Nine aliases for one `CNA_Handle` is a lot,
         # and it is the header being precise about which handle a route wants
