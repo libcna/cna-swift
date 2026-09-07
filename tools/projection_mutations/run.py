@@ -774,7 +774,11 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
     (
         "content-never-joins-the-parent-registry",
         "the manager not registering with the runtime, so a caller who never "
-        "disposes it leaves a live handle for the game teardown to trip over",
+        "disposes one it still HOLDS leaves a live handle for the game "
+        "teardown to trip over. Half the story, and Foundation 101 paid for "
+        "the other half: the registry is weak, so it covers a manager that is "
+        "alive and undisposed and does nothing for one already deallocated. "
+        "That case is `dropped-content-manager-leaks-its-handle`",
         CONTENT,
         "            rt.register(self)",
         "            _ = rt",

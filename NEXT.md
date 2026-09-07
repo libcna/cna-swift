@@ -1473,8 +1473,24 @@ the record, so a mutation added without re-running makes the two disagree and
 to 15 and watching it say so.
 
 The four that remain are the projection harness's own run counts. Its
-`--output` exists; producing the record means a full 137-mutation pass, each a
+`--output` exists; producing the record means a full pass, each mutation a
 build and a test run, so it is left for a session that is running one anyway.
+
+**And a correction to how big that pass is.** The harness selects by `git diff`
+against `origin/develop`, which on this branch is not "what changed today" but
+everything the branch has done — **40 source files**, and therefore most of the
+376 mutations rather than the handful a day's work touches. A session planning
+one should size it from that, not from its own diff.
+
+It also has to be sized for **memory, not just time**. Running it at `--jobs 3`
+here put the machine into low-memory kill: this session lost every background
+task at once, the harness among them, mid-pass. Nothing was left planted —
+`--audit-tree` answered `PLANTED=0` immediately afterwards and both trees were
+clean, so the restore in its `finally` survives being killed — but that is
+luck's margin, not a design to lean on. Thirty gigabytes and no swap, shared
+with everyone else on the machine, means `--jobs 1` for a long pass and no
+second heavy job beside it. The nine mutations that actually touch
+`ContentManager` were re-run that way instead.
 
 The self-test that guarded this had asserted *"an underived key must not be
 policed"* — the defect encoded as a passing test. Worth remembering when a

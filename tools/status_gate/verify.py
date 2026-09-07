@@ -388,6 +388,13 @@ def derive_facts(root: Path = ROOT, with_self_tests: bool = True) -> dict[str, i
         add(key, value, "mutation harness")
     for key, value in mutation_record_counts(root).items():
         add(key, value, "mutation harness source")
+    # `PLANTED` is a property of the working tree and the audit already
+    # computes it; leaving it underived meant a document could claim a clean
+    # tree and nothing would check. It is derived rather than excused because
+    # the answer is one subprocess away -- and because a document saying
+    # PLANTED=0 while a mutation stands is the exact confusion this gate's own
+    # audit exists to prevent.
+    add("PLANTED", len(planted_mutations(root)), "working-tree mutation audit")
     if with_self_tests:
         for key, value in api_compat_self_tests(root).items():
             add(key, value, "verify.py --self-test")
