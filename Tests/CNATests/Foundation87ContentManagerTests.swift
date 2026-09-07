@@ -55,6 +55,30 @@ final class Foundation87ContentManagerTests: XCTestCase {
         XCTAssertEqual(game.rootDirectory, "probe-content")
     }
 
+    /// A manager the consumer never disposes must not keep the game alive.
+    ///
+    /// This is the defect the template's canary carried on every run: it
+    /// reads `Game.Content`, installs one of its own through `SetContent`, and
+    /// lets the first go -- after which `Game.Dispose` failed with
+    ///
+    ///     cna_game_destroy failed with result 3: All owned C child resources
+    ///     must be destroyed before the game.
+    ///
+    /// Every other owned type routes its handle through `NativeHandleStorage`,
+    /// whose `deinit` releases it. `ContentManager` did not, so it was the one
+    /// type that could outlive its Swift object. In .NET a dropped manager
+    /// does not stop a game being disposed, so this is the projection catching
+    /// up with XNA rather than departing from it.
+    func testADroppedManagerDoesNotBlockGameDisposal() throws {
+        let game = try ContentProbeGame(dropManager: true)
+        try game.Run()
+        if let failure = game.failure { throw failure }
+        XCTAssertNoThrow(
+            try game.Dispose(),
+            "a content manager dropped without Dispose must be released by "
+            + "deinit, or cna_game_destroy refuses the game around it")
+    }
+
     /// The two-argument constructor assigns through the property, so the null
     /// check belongs to construction as much as to assignment.
     func testSetRootDirectoryRefusesNull() throws {
@@ -211,6 +235,7 @@ private final class ContentProbeGame: Microsoft.Xna.Framework.Game {
     let skipManager: Bool
     let useGameContent: Bool
     let installOwnContent: Bool
+    let dropManager: Bool
 
     var failure: Error?
     var rootDirectory: String?
@@ -235,7 +260,9 @@ private final class ContentProbeGame: Microsoft.Xna.Framework.Game {
          loadBadNames: Bool = false, loadUnwiredKind: Bool = false,
          loadMissingTexture: Bool = false, unloadThenUse: Bool = false,
          skipManager: Bool = false, useGameContent: Bool = false,
-         installOwnContent: Bool = false, freezeRoot: Bool = false) throws {
+         installOwnContent: Bool = false, freezeRoot: Bool = false,
+         dropManager: Bool = false) throws {
+        self.dropManager = dropManager
         self.setNullRoot = setNullRoot
         self.disposeThenLoadNil = disposeThenLoadNil
         self.loadBadNames = loadBadNames
@@ -260,6 +287,17 @@ private final class ContentProbeGame: Microsoft.Xna.Framework.Game {
                 capturedContent = first
                 sameContentFacade = Content === first
                 gameContentRoot = first.RootDirectory
+                return
+            }
+            if dropManager {
+                // The consumer pattern the template's canary writes: build a
+                // manager, keep no reference, walk away. Nothing here disposes
+                // it, and the runtime's child registry holds only a WEAK
+                // reference -- so by the time `Game.Dispose` walks that
+                // registry the entry is nil and the handle would be destroyed
+                // by nobody. `cna_game_destroy` then refuses the whole game.
+                _ = try Microsoft.Xna.Framework.Content.ContentManager(
+                    serviceProvider: Services, rootDirectory: "dropped")
                 return
             }
             if installOwnContent {

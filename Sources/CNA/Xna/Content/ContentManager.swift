@@ -20,6 +20,14 @@ extension Microsoft.Xna.Framework.Content {
 
         private let runtime: RuntimeState
         private var handle: UInt64
+        /// The runtime generation this manager's handle belongs to.
+        ///
+        /// Only `deinit` reads it, and only to refuse destroying a handle that
+        /// a LATER runtime may have reissued. `NativeHandleStorage` keeps the
+        /// same field for the same reason; this type does not use that storage
+        /// (it has no `GraphicsResource` base and its `Dispose` is XNA's, not
+        /// the storage's), so it keeps its own.
+        private let generation: UInt64
         private let serviceProvider: (any CNAServiceProvider)?
         private var storedRootDirectory: String?
 
@@ -70,10 +78,16 @@ extension Microsoft.Xna.Framework.Content {
                 },
                 operation: "cna_content_manager_create")
             handle = created
+            generation = rt.generation
 
             // CNA requires a content manager to be destroyed BEFORE its parent
             // game, so the manager joins the runtime's child registry and is
-            // torn down by `Game.Dispose` if the caller never disposes it.
+            // torn down by `Game.Dispose` if the caller never disposes it --
+            // **as long as it is still alive then**. The registry holds WEAK
+            // references, so a manager the consumer drops early is gone from
+            // it before `Game.Dispose` runs and its handle would be destroyed
+            // by nobody. `deinit` is what closes that, and see the note there:
+            // this was not a hypothetical.
             rt.register(self)
         }
 
@@ -285,6 +299,39 @@ extension Microsoft.Xna.Framework.Content {
 
         internal var runtimeObjectIsDisposed: Bool { loadedAssets == nil }
         internal func disposeFromParent() throws { try Dispose() }
+
+        /// Releases a handle the consumer dropped without disposing.
+        ///
+        /// Every other owned type in this binding routes its handle through
+        /// `NativeHandleStorage`, whose `deinit` does exactly this. This type
+        /// did not, and was therefore the ONE owned type whose handle survived
+        /// its Swift object -- which `cna_game_destroy` then refuses to
+        /// destroy the game around:
+        ///
+        ///     All owned C child resources must be destroyed before the game.
+        ///
+        /// The template's canary hit it on every run and had been failing at
+        /// teardown, in exactly the pattern a consumer writes: read
+        /// `Game.Content`, install one of your own with `SetContent`, and let
+        /// the first one go. The registry's weak reference is nil by the time
+        /// `Game.Dispose` walks it.
+        ///
+        /// This is not XNA's finalizer -- the CLR `ContentManager` declares
+        /// none, and calls `GC.SuppressFinalize` over nothing. It is the
+        /// opposite of a divergence: in .NET a dropped manager does not stop
+        /// the game being disposed, and without this it does here.
+        ///
+        /// The guards are `NativeHandleStorage.deinit`'s, for its reasons: a
+        /// dead runtime has already released everything, a newer generation
+        /// may have reissued this handle number, and destroying from a foreign
+        /// thread is not allowed.
+        deinit {
+            guard handle != 0,
+                  runtime.isActive,
+                  runtime.generation == generation,
+                  runtime.owner.isCurrent else { return }
+            if runtime.functions.contentManagerDestroy(handle) == 0 { handle = 0 }
+        }
 
         private static func withStringView(
             _ utf8: inout [UInt8], _ body: (CNASwift_StringView) -> UInt32

@@ -617,6 +617,16 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            }",
         "            let listeners = listeners ?? []",
     ),
+    # ---- Foundation 101: the one owned type without a release --------------
+    (
+        "dropped-content-manager-leaks-its-handle",
+        "a ContentManager deallocated without Dispose leaving its native "
+        "handle alive, which makes cna_game_destroy refuse the whole game -- "
+        "the defect the template's canary failed on every run",
+        CONTENT,
+        "            if runtime.functions.contentManagerDestroy(handle) == 0 { handle = 0 }",
+        "            _ = handle",
+    ),
     # ---- Foundation 88: messages the coverage gate named --------------------
     (
         "content-root-moves-after-a-load",

@@ -95,6 +95,12 @@ FACT_REPORTS = [
     # mutation added without re-running makes the two sources disagree and
     # derive_facts fails.
     "native-abi-mutations.json",
+    # Also a RUN record, and for a stronger reason than the others: its host
+    # facts -- how many pictures the media library holds, whether a controller
+    # is attached -- are properties of the machine, so byte-comparing it across
+    # machines would fail for something that is not a defect. What is derived
+    # from it are the tool's own counters.
+    "consumer-canary-report.json",
 ]
 
 # Pinned references live under tools/, not docs/generated. Reading facts from

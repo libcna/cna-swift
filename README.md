@@ -572,13 +572,23 @@ python3 tools/api_compat/bcl_authority_audit.py \
 python3 tools/runtime_capabilities/render.py --check
 python3 tools/api_compat/profile_capabilities.py --check \
   --assembly-dir /path/to/xna/redistributable --il-cache ~/deps/xna-il-cache
+python3 tools/consumer_canary/verify.py --self-test
+python3 tools/consumer_canary/verify.py \
+  --template ../cna-swift-template \
+  --library "$CNA_NATIVE_LIBRARY" --frames 60 \
+  --output docs/generated/consumer-canary-report.json
 python3 tools/status_gate/verify.py --self-test
 python3 tools/status_gate/verify.py \
   --symbol-graph .build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json \
   --cna-include /path/to/cnanext/modules/c-api/include \
   --library "$CNA_NATIVE_LIBRARY" \
   --assembly-dir /path/to/xna/redistributable \
-  --il-cache ~/deps/xna-il-cache
+  --il-cache ~/deps/xna-il-cache \
+  --bcl-dir ~/deps/bcl-4.0-pinned \
+  --bcl-negative-control mscorlib.dll=/usr/lib/mono/4.5/mscorlib.dll \
+  --bcl-negative-control mscorlib.dll=/usr/lib/mono/4.0-api/mscorlib.dll \
+  --bcl-negative-control mscorlib.dll=/usr/lib/mono/2.0-api/mscorlib.dll \
+  --bcl-negative-control mscorlib.dll=/path/to/another/net4/mscorlib.dll
 python3 tools/gamepad_native/run.py \
   --library "$CNA_NATIVE_LIBRARY" \
   --output docs/generated/gamepad-native-report.json

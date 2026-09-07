@@ -40,12 +40,12 @@ records one entry per control and the comparison is byte-for-byte; the report
 stores only their sha, so their paths live in this command.
 
 ```text
-931 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+932 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
 TOTAL_DIAGNOSTICS=51   COMPLETE_TYPES=213   PARTIAL_TYPES=6
 MISSING_TYPE=38  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
 BOUND_FUNCTIONS=612  PROTOTYPE_TYPE_POSITIONS=2052  LAYOUTS=64  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=375  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
+PROJECTION_MUTATIONS=376  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
 PROJECTION_MUTATIONS_CAUGHT=135
 WITHDRAWN_IN_SOURCE=26 with the reason written where each stood
 REPLACED_NO_OPS_IN_SOURCE=2
@@ -1549,10 +1549,104 @@ one-assembly BCL audit that no tool writes and nothing reads, still sitting
 there claiming PASS over 31 types. Its sentinel count is the number `plan.md`
 had been quoting. Deleted, superseded by `bcl-authority-audit.json`.
 
+**What all this costs, measured rather than guessed:** a full status-gate run
+is now **410 seconds** of wall clock on this machine, regenerating twelve
+reports. The single dominant cost is `return_nullability.py`, which holds a
+core at 99 % for minutes because it abstractly interprets every method body in
+the registered assemblies. That is the price of the pinned nullability record
+no longer being able to age quietly, and it was a real defect, so the price is
+worth paying — but it should be known before a handoff rather than discovered
+during one. `--no-build` on the canary and the fact that a run needs no
+rebuild keep the rest cheap.
+
 One more thing the summary line now says: `STATUS_GATE_REPORTS_SKIPPED`. A
 regeneration nobody asked for is not a regeneration that passed, and a gate
 run given no `--symbol-graph`, `--cna-include`, `--assembly-dir` or
 `--bcl-dir` used to print a summary indistinguishable from a full one.
+
+## Foundation 101 — the consumer found what the suite could not
+
+The template's canary had been **failing on every run**, and both repositories
+documented it as passing. Running the committed binary printed the verdict line
+this file quotes, and then:
+
+```text
+CNA Swift canary failed: CNA operation cna_game_destroy failed with result 3:
+All owned C child resources must be destroyed before the game.
+```
+
+on stderr, with exit status 1. The template's README recorded the verdict line
+and not the failure under it.
+
+**The cause was in the binding and it was one line's worth of asymmetry.**
+Every owned type routes its native handle through `NativeHandleStorage`, whose
+`deinit` releases a handle whose Swift object went away without `Dispose`.
+`ContentManager` — added at Foundation 87, by me — did not: it kept a raw
+`handle` and released it only in `Dispose`. It was the ONE owned type that
+could outlive its wrapper.
+
+The registry does not save it. `RuntimeState.register` stores a **weak**
+reference, so a manager dropped early is already nil when `Game.Dispose` walks
+the list — and `ContentManager`'s own constructor carried the comment *"the
+manager joins the runtime's child registry and is torn down by `Game.Dispose`
+if the caller never disposes it"*, which measurement contradicts. Fixed at both
+ends: the code has a `deinit`, and the comment says what the registry does and
+does not do.
+
+The canary hits it because it does what a consumer does — read `Game.Content`,
+install its own manager with `SetContent`, let the first one go. Nineteen
+children were registered in a 30-frame run; by teardown ten had been
+deallocated and pruned, and one of the two content managers was among them with
+its handle still alive.
+
+**This is the projection catching up with XNA, not departing from it.** The CLR
+`ContentManager` declares no finalizer — it calls `GC.SuppressFinalize` over
+nothing — but in .NET a dropped manager does not stop a game being disposed.
+Without the `deinit` it did here, which is a divergence CNA reports as a hard
+failure.
+
+Recorded as a test and a mutation: `testADroppedManagerDoesNotBlockGameDisposal`
+fails with exactly CNA's message when the release is removed, and
+`dropped-content-manager-leaks-its-handle` is mutation 376.
+
+**What this says about the gates.** Every suite in this repository was green
+through all of it, because every test disposes what it creates. The consumer
+that does not is the template, and nothing ran it. A canary that is never
+launched is a canary in a sealed jar — the one check here that exercises the
+package the way a game would, and its result reached no gate.
+
+That gap is now closed. `tools/consumer_canary/verify.py` builds the template
+(or reuses its binary with `--no-build`), runs the canary headless, and reads
+the verdict line back:
+
+```bash
+python3 tools/consumer_canary/verify.py \
+  --template ../cna-swift-template \
+  --library "$CNA_NATIVE_LIBRARY" --frames 60 \
+  --output docs/generated/consumer-canary-report.json
+```
+
+Thirty-two checks, and the interesting work is in what it refuses to check.
+The verdict line mixes three kinds of field, and only two are assertable:
+
+* **invariants** of the qualified runtime — the viewport, the adapter count,
+  every `…Refused=true` — which must hold wherever the package qualifies;
+* **counts tied to the request**, where `draws` is exactly `requested` but
+  `updates` is only `>=` it;
+* **host facts** — the media library's contents, whether a controller is
+  attached — which are properties of this machine. Those are read back into
+  the report and asserted nowhere. A gate that fails on another machine for a
+  reason that is not a defect is a gate people learn to ignore.
+
+Its self-test covers the shape that hid this defect for so long: a clean
+verdict line with a failed exit status. That is one finding naming CNA's own
+message, not a bare "exit 1".
+
+The same run corrected one more claim. The canary's `updates` count is **not
+reproducible** — 600, 601 and 602 across three runs at `--frames 600` — because
+CNA catches a fixed time step up with extra `Update` calls that have no `Draw`.
+`draws` is always exactly `requested`. The template's README pinned one
+observation of that as though it were the value.
 
 ## Rules a next session must not quietly break
 
