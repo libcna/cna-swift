@@ -45,6 +45,7 @@ import ast
 import importlib.util
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -101,6 +102,11 @@ FACT_REPORTS = [
     # machines would fail for something that is not a defect. What is derived
     # from it are the tool's own counters.
     "consumer-canary-report.json",
+    # Read for its observation counts and never re-run: the committed copy said
+    # 2125 where a live run says 2322, so it had been trailing the suite by
+    # nearly two hundred observations. Regenerated below -- it costs a `swift
+    # test`, which is the price of a corpus claim that cannot drift.
+    "behavior-corpus-report.json",
 ]
 
 # Pinned references live under tools/, not docs/generated. Reading facts from
@@ -506,11 +512,18 @@ def regenerate_and_compare(
     with tempfile.TemporaryDirectory(prefix="cna-status-gate-") as raw:
         temporary = Path(raw)
 
+        # Why a regeneration produced nothing, not merely that it did. A
+        # finding that says "wrote nothing" sends the reader to run the command
+        # by hand to find out; the command already told us.
+        reasons: dict[str, str] = {}
+
         def compare(committed: Path, fresh: Path, command: str) -> None:
             nonlocal compared
             compared += 1
             if not fresh.exists():
-                findings.append(f"{command} wrote nothing")
+                detail = reasons.get(command, "").strip().splitlines()
+                why = f": {detail[-1]}" if detail else ""
+                findings.append(f"{command} wrote nothing{why}")
             elif committed.read_bytes() != fresh.read_bytes():
                 # The real path, not an assumed docs/generated/ prefix: the
                 # pinned references live under tools/, and naming the wrong
@@ -668,6 +681,25 @@ def regenerate_and_compare(
         # stale committed copy and said nothing. Same defect as the one above,
         # one report over -- which is why it is fixed the same way rather than
         # by remembering to regenerate.
+        # The behaviour corpus needs no pinned assembly, header or library --
+        # only a Swift toolchain, which is an INPUT like any other. Absent, it
+        # is skipped and counted, not a finding: a machine with no toolchain
+        # cannot build the package either, and a gate that fails for a missing
+        # input rather than a defect is one people learn to ignore. Present, it
+        # is regenerated and compared like the rest.
+        corpus = temporary / "behavior-corpus-report.json"
+        if shutil.which("swift-test") or shutil.which("swift"):
+            ran = subprocess.run(
+                [sys.executable, "tools/behavior/run.py",
+                 "--output", str(corpus)],
+                cwd=root, capture_output=True, text=True, check=False,
+            )
+            reasons["tools/behavior/run.py"] = ran.stderr or ran.stdout
+            compare(GENERATED / "behavior-corpus-report.json", corpus,
+                    "tools/behavior/run.py")
+        else:
+            skipped += 1
+
         if bcl_dir is not None:
             audit = temporary / "bcl-authority-audit.json"
             subprocess.run(

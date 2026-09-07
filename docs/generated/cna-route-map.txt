@@ -1,5 +1,15 @@
 4076 distinct cna_* symbols in the headers
 
+PROVENANCE, added Foundation 101. That count is CNA C ABI **0.22.0**, not the
+0.21.0 this binding is qualified against, which has 4074. Nothing generates
+this file and nothing compares it, so the drift was invisible: cnanext moved to
+0.22.0 on 2026-09-04 and this map was measured after that, while
+CNA_NATIVE_LIBRARY and the pinned headers stayed at 0.21.0 deliberately -- the
+pair the qualified library was qualified with.
+
+Read it as a map of routes that EXIST in a slightly newer ABI, not as a
+description of the qualified one. A route named here may not be in 0.21.0.
+
  140  Microsoft.Xna.Framework.Graphics.Effect
         cna_effect_, cna_effect_annotation_collection_add, cna_effect_annotation_collection_create, cna_effect_annotation_collection_destroy, cna_effect_annotation_collection_find, cna_effect_annotation_collection_get_at
  134  Microsoft.Xna.Framework.Graphics.Model

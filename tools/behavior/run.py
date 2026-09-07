@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -123,12 +124,31 @@ def count_assertions(source: str) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--swift-test", default="swift-test")
+    parser.add_argument("--swift-test", default=None,
+                        help="the swift-test executable. Defaults to whichever "
+                             "of `swift-test` or `swift test` is on PATH.")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
+    # `swift-test` is a SwiftPM executable that only exists on PATH once a
+    # toolchain is sourced, so defaulting to its bare name made this tool fail
+    # with FileNotFoundError anywhere else -- which is how the status gate,
+    # invoked without a sourced toolchain, silently regenerated nothing while
+    # the committed corpus trailed the suite by nearly two hundred
+    # observations. The `swift` driver reaches the same code and is what a
+    # plain toolchain install provides.
+    if args.swift_test is not None:
+        command = [args.swift_test]
+    elif shutil.which("swift-test"):
+        command = ["swift-test"]
+    elif shutil.which("swift"):
+        command = ["swift", "test"]
+    else:
+        print("BEHAVIOR_CORPUS=FAIL neither swift-test nor swift is on PATH")
+        return 1
+
     completed = subprocess.run(
-        [args.swift_test, "--filter", "PureValueTests"],
+        command + ["--filter", "PureValueTests"],
         cwd=ROOT,
         text=True,
         stdout=subprocess.PIPE,

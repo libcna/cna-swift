@@ -1575,6 +1575,42 @@ worth paying — but it should be known before a handoff rather than discovered
 during one. `--no-build` on the canary and the fact that a run needs no
 rebuild keep the rest cheap.
 
+### Finishing the sweep found two more
+
+Two of the seven artefacts nobody regenerates were checked earlier and both
+were wrong, so the remaining ones were worth the same look.
+`runtime-capabilities.md` and `xna40-profile-capabilities.json` answer
+`CURRENT` to their own `--check` and needed nothing. The other two did.
+
+**`behavior-corpus-report.json` was trailing the suite by nearly two hundred
+observations** — 2125 committed against 2322 live, and 292 BCL observations
+against 323. Whole test families were missing from its list. It is regenerated
+and byte-compared now, and the regeneration exposed a second-order version of
+the same defect: `tools/behavior/run.py` invoked the bare name `swift-test`,
+a SwiftPM executable that only exists on PATH once a toolchain is sourced, so
+inside the gate it raised `FileNotFoundError` and produced nothing. The gate
+said `wrote nothing` and no more, which sends a reader to run the command by
+hand to learn what it already knew — the finding now carries the reason. The
+tool falls back to the `swift` driver, and a machine with no toolchain at all
+counts the corpus as **skipped**, not as a finding: a missing input is not a
+defect, and a gate that fails for one is a gate people learn to ignore.
+
+**`cna-route-map.txt` was measured against the wrong ABI.** Its header claims
+4076 distinct `cna_*` symbols. The pinned 0.21.0 headers this binding is
+qualified against hold 4074; 0.22.0 holds exactly 4076. cnanext moved to
+0.22.0 on 2026-09-04 and the map was measured after that, while
+`CNA_NATIVE_LIBRARY` and the headers stayed at 0.21.0 deliberately. Nothing
+generates this file and nothing compares it, so the drift was invisible. There
+is no tool to regenerate it with, so the fix is provenance written into the
+file itself: read it as a map of routes that exist in a slightly newer ABI, and
+a route named there may not be in the qualified one.
+
+That is **five** artefacts in `docs/generated/` found stale in one session,
+plus one pinned reference under `tools/`, plus one orphan nothing wrote. The
+pattern is not a series of oversights. Anything generated and then only read
+will drift, and the only structural answer is to regenerate and compare it on
+every run — which is now true of fourteen of them.
+
 One more thing the summary line now says: `STATUS_GATE_REPORTS_SKIPPED`. A
 regeneration nobody asked for is not a regeneration that passed, and a gate
 run given no `--symbol-graph`, `--cna-include`, `--assembly-dir` or
