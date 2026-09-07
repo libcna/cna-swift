@@ -218,8 +218,8 @@ is selected, which would report a coverage loss as sixteen projection defects.
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
 (`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=79`). The BCL authority
-carries `BCL_SENTINEL_CHECKS=585`, `BCL_MUTATION_SELF_TESTS=497`,
-`BCL_CROSS_CHECKS=197` against a second disassembler, and four negative
+carries `BCL_SENTINEL_CHECKS=651`, `BCL_MUTATION_SELF_TESTS=514`,
+`BCL_CROSS_CHECKS=222` against a second disassembler, and four negative
 controls that are still refused. The four are not the same four binaries as in
 earlier sessions -- this machine's Mono packages were upgraded since, and none
 of the previously recorded control digests exists on disk any more, so the set

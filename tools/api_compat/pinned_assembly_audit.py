@@ -1380,6 +1380,14 @@ class Parser:
         owner["members"].append({
             "kind": "field",
             "name": name,
+            # Recorded, not merely used to decide. `access_of` gates whether the
+            # field is kept at all, and dropping the answer afterwards meant
+            # `bcl_authority_audit.visible_members` -- which filters fields by
+            # exactly this key -- saw None on every field and discarded all of
+            # them. Every enum admitted as a BCL family therefore extracted
+            # with no values at all, which is a vacuous admission of precisely
+            # the kind that audit exists to refuse (Foundation 102).
+            "access": access,
             "type": normalize_type(positional_generics(
                 " ".join(type_tokens),
                 tuple(owner.get("genericParameters") or ()), ())),

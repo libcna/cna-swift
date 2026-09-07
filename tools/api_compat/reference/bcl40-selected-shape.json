@@ -822,6 +822,15 @@
           ]
         },
         {
+          "kind": "field",
+          "name": "Empty",
+          "type": "System.ComponentModel.PropertyDescriptorCollection",
+          "access": "public",
+          "static": true,
+          "constant": false,
+          "value": null
+        },
+        {
           "kind": "method",
           "name": "Add",
           "access": "public",
@@ -2625,6 +2634,117 @@
           "getAbstract": false,
           "setAbstract": false,
           "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.AsyncCallback",
+      "kind": "class",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.MulticastDelegate",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "object",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "method",
+              "type": "System.IntPtr",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "BeginInvoke",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.IAsyncResult",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "ar",
+              "type": "System.IAsyncResult",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "callback",
+              "type": "System.AsyncCallback",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "object",
+              "type": "System.Object",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "EndInvoke",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "result",
+              "type": "System.IAsyncResult",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Invoke",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "ar",
+              "type": "System.IAsyncResult",
+              "ref": false,
+              "out": false
+            }
+          ]
         }
       ]
     },
@@ -7874,6 +7994,196 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "type": "System.IAsyncResult",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "property",
+          "name": "AsyncState",
+          "type": "System.Object",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "AsyncWaitHandle",
+          "type": "System.Threading.WaitHandle",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "CompletedSynchronously",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IsCompleted",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": true,
+          "setAbstract": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.IO.FileAccess",
+      "kind": "enum",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.Enum",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "field",
+          "name": "Read",
+          "type": "System.IO.FileAccess",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "1"
+        },
+        {
+          "kind": "field",
+          "name": "ReadWrite",
+          "type": "System.IO.FileAccess",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "3"
+        },
+        {
+          "kind": "field",
+          "name": "Write",
+          "type": "System.IO.FileAccess",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "2"
+        },
+        {
+          "kind": "field",
+          "name": "value__",
+          "type": "System.Int32",
+          "access": "public",
+          "static": false,
+          "constant": false,
+          "value": null
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.IO.FileMode",
+      "kind": "enum",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.Enum",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "field",
+          "name": "Append",
+          "type": "System.IO.FileMode",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "6"
+        },
+        {
+          "kind": "field",
+          "name": "Create",
+          "type": "System.IO.FileMode",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "2"
+        },
+        {
+          "kind": "field",
+          "name": "CreateNew",
+          "type": "System.IO.FileMode",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "1"
+        },
+        {
+          "kind": "field",
+          "name": "Open",
+          "type": "System.IO.FileMode",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "3"
+        },
+        {
+          "kind": "field",
+          "name": "OpenOrCreate",
+          "type": "System.IO.FileMode",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "4"
+        },
+        {
+          "kind": "field",
+          "name": "Truncate",
+          "type": "System.IO.FileMode",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "5"
+        },
+        {
+          "kind": "field",
+          "name": "value__",
+          "type": "System.Int32",
+          "access": "public",
+          "static": false,
+          "constant": false,
+          "value": null
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.IO.FileNotFoundException",
       "kind": "class",
       "sealed": false,
@@ -8103,6 +8413,82 @@
           "getAbstract": false,
           "setAbstract": false,
           "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.IO.FileShare",
+      "kind": "enum",
+      "sealed": true,
+      "abstract": false,
+      "baseType": "System.Enum",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "field",
+          "name": "Delete",
+          "type": "System.IO.FileShare",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "4"
+        },
+        {
+          "kind": "field",
+          "name": "Inheritable",
+          "type": "System.IO.FileShare",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "16"
+        },
+        {
+          "kind": "field",
+          "name": "None",
+          "type": "System.IO.FileShare",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "0"
+        },
+        {
+          "kind": "field",
+          "name": "Read",
+          "type": "System.IO.FileShare",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "1"
+        },
+        {
+          "kind": "field",
+          "name": "ReadWrite",
+          "type": "System.IO.FileShare",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "3"
+        },
+        {
+          "kind": "field",
+          "name": "Write",
+          "type": "System.IO.FileShare",
+          "access": "public",
+          "static": true,
+          "constant": true,
+          "value": "2"
+        },
+        {
+          "kind": "field",
+          "name": "value__",
+          "type": "System.Int32",
+          "access": "public",
+          "static": false,
+          "constant": false,
+          "value": null
         }
       ]
     },

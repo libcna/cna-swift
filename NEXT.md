@@ -51,8 +51,8 @@ WITHDRAWN_IN_SOURCE=26 with the reason written where each stood
 REPLACED_NO_OPS_IN_SOURCE=2
 NATIVE_ABI_MUTATIONS=14 NATIVE_ABI_MUTATIONS_CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=497
-BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=39  BCL_SENTINEL_CHECKS=585
+API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
+BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=44  BCL_SENTINEL_CHECKS=651
 RESOURCE_STRINGS_REPRODUCED=79  ACCESSOR_SELF_TESTS=41
 ```
 
@@ -67,7 +67,7 @@ of them turned out to be work with a known price, and only two are decisions:
 | start with | why |
 |---|---|
 | **`Model`, 12 types** | **no measured blocker.** 134 CNA routes, four of which create with no game, device or asset; every public signature in the family names only `Matrix`, `BoundingSphere`, `Effect`, `VertexBuffer`, `IndexBuffer` and itself, and no BCL type at all. The `.xnb` this file called its blocker is needed by `ContentManager.Load<Model>` and by nothing else |
-| **`Storage`, 2 types** | ~8 BCL members, and CNA's routes are synchronous so the Begin/End pair projects over a call that has already finished |
+| **`Storage`, 2 types** | ~7 BCL members **if `IAsyncResult.AsyncWaitHandle` is FORBIDDEN**, which it must be: it returns `System.Threading.WaitHandle`, 26 methods over a `MarshalByRefObject` base, and this projection has no synchronisation primitive to hand back. Admitting it instead costs 28 more members. CNA's routes are synchronous, so the Begin/End pair projects over a call already finished |
 | **`Content` readers, 5 types** | ~66 BCL members: `BinaryReader` as a real Swift base plus `ResourceManager`. `Encoding` is NOT needed |
 
 The two that really are decisions: **XACT** needs a `.xgs` and banks — confirmed
@@ -609,6 +609,22 @@ not at the bodies.**
   `IAsyncResult` (7), `AsyncCallback` (5), `PlayerIndex`, `EventHandler<T>`,
   `EventArgs`, `Stream` and the three file enums. Everything there except the
   first two is already projected or mapped.
+
+  **One correction to the count above, found on starting the work.**
+  `IAsyncResult` has four properties, not three, and the fourth is
+  `AsyncWaitHandle` returning `System.Threading.WaitHandle` — 26 methods and 2
+  properties over `MarshalByRefObject`. Costing the interface at its own member
+  count missed what one of those members names, which is the same mistake as
+  counting a family's bodies instead of its signatures, one level down.
+
+  It does not change the answer, because this repository already has the rule
+  for it: `Exception.StackTrace` and its neighbours are **FORBIDDEN rather than
+  absent**, since "a member that answered with an empty string, a nil or a
+  fabricated stack would be a lie". A `WaitHandle` this projection invented
+  would be exactly that lie — and with CNA's storage routes synchronous, the
+  operation a caller would wait on has already finished. So the member is
+  declared and refused, `WaitHandle` stays out of the closure, and the cost
+  stays where it was.
 
   And the Begin/End pair is not a design question, because the pinned metadata
   decides it: the projection declares what XNA declares or the gate reports a
@@ -1495,7 +1511,7 @@ shared base of all thirteen and is eight members.
 
 `System.dll` `c3182e40…` is admitted. The seven-type closure above is extracted,
 sentinelled and pinned: `BCL_AUTHORITY_ASSEMBLIES=2`, 39 types, 487 members,
-`BCL_SENTINEL_CHECKS=585`. Two side-effects were worth the milestone on their
+`BCL_SENTINEL_CHECKS=651`. Two side-effects were worth the milestone on their
 own — a real regex defect that only a second assembly could expose (the audit
 read an assembly's own name from the first `.assembly` line, which is
 `.assembly extern mscorlib` in anything that references another), and a gate
@@ -1565,6 +1581,37 @@ The admission is still worth keeping. It is what made the measurement
 authoritative rather than a recollection about a framework, it hardened the
 audit by 143 sentinel checks and 35 mutations, and it is a precondition for
 anything that ever does consume `System.dll`.
+
+### Foundation 102 — the Storage closure, and an audit that could not see a field
+
+Five families admitted to mscorlib: `IAsyncResult`, `AsyncCallback` and the
+three `System.IO` file enums. 44 types, 514 members,
+`BCL_SENTINEL_CHECKS=651`, seventeen new mutations and every one caught. All
+five sentinel sets were written from the documented 4.0 contract before reading
+the extraction, and the assembly agreed with all of them —
+`FileShare.Inheritable = 16` included.
+
+**The admission found a defect with a far wider blast radius than the
+milestone.** `Parser.add_field` computes a field's `access`, uses it to decide
+whether the field is kept, and then does not record it.
+`bcl_authority_audit.visible_members` filters fields by exactly that key, found
+`None` on every one of them, and **discarded every field of every admitted
+family**. Recording the value that was already computed moved the extraction
+from 495 members to **514**: nineteen fields had been invisible.
+
+For a class that costs a `String.Empty` here and there. For an **enum** it
+costs everything, because an enum's fields are all it has: `FileMode` could
+have been admitted, passed the audit, and proved precisely nothing about its
+own values. That is the vacuous admission this whole tool exists to refuse, and
+it was reachable through the front door.
+
+It could not have been caught by mutation either, and that is the part worth
+keeping. There was no mutation that renumbered an enum value — there could not
+be, because the extraction had no value to renumber. The gap was invisible from
+inside the harness and only appeared when a family whose entire contract *is*
+fields was admitted for the first time. `change_enum_value` and
+`drop_enum_value` exist now, and `FileShare.Delete` — the value a hand-written
+enum forgets — has a mutation of its own.
 
 ### And the same defect, found twice more by looking for it
 

@@ -405,6 +405,11 @@ NOT_SUPPORTED_EXCEPTION = "System.NotSupportedException"
 INVALID_OPERATION_EXCEPTION = "System.InvalidOperationException"
 OBJECT_DISPOSED_EXCEPTION = "System.ObjectDisposedException"
 KEY_NOT_FOUND_EXCEPTION = "System.Collections.Generic.KeyNotFoundException"
+ASYNC_RESULT = "System.IAsyncResult"
+ASYNC_CALLBACK = "System.AsyncCallback"
+FILE_MODE = "System.IO.FileMode"
+FILE_ACCESS = "System.IO.FileAccess"
+FILE_SHARE = "System.IO.FileShare"
 TYPE_CONVERTER = "System.ComponentModel.TypeConverter"
 EXPANDABLE_CONVERTER = "System.ComponentModel.ExpandableObjectConverter"
 TYPE_DESCRIPTOR_CONTEXT = "System.ComponentModel.ITypeDescriptorContext"
@@ -1643,6 +1648,105 @@ def sentinel_checks(
                 require(member["type"] == "System.Collections.ICollection",
                         f"IDictionary.{name} is not an ICollection")
 
+
+    # ------------------------------------------------------------------
+    # System.IAsyncResult and the Storage closure (Foundation 102).
+    #
+    # Written from the documented .NET Framework 4.0 contract before reading
+    # the extraction, as the ComponentModel closure was. The enums matter more
+    # than their size suggests: an enum has no behaviour to get wrong, only
+    # values, and a value that shifts changes which file operation a caller
+    # asked for without any signature changing shape.
+    # ------------------------------------------------------------------
+    require(ASYNC_RESULT in by_type,
+            "System.IAsyncResult was not extracted at all")
+    async_result = by_type.get(ASYNC_RESULT)
+    if async_result is not None:
+        require(async_result["kind"] == "interface",
+                "IAsyncResult is not an interface")
+        require(not async_result["directInterfaces"],
+                "IAsyncResult extends another interface")
+        require(len(async_result["members"]) == 4,
+                f"IAsyncResult should declare exactly 4 members, "
+                f"found {len(async_result['members'])}")
+        for name, clr_type in (
+            ("IsCompleted", "System.Boolean"),
+            ("CompletedSynchronously", "System.Boolean"),
+            ("AsyncState", "System.Object"),
+            # The one this projection must DECLARE and REFUSE: handing back a
+            # WaitHandle would mean inventing a synchronisation primitive, and
+            # CNA's storage routes have already finished by the time a caller
+            # could wait on one.
+            ("AsyncWaitHandle", "System.Threading.WaitHandle"),
+        ):
+            candidates = members_of(ASYNC_RESULT, "property", name)
+            require(len(candidates) == 1, f"IAsyncResult.{name} is missing")
+            for member in candidates:
+                require(member["type"] == clr_type,
+                        f"IAsyncResult.{name} is not {clr_type}")
+                require(member["setAccess"] is None,
+                        f"IAsyncResult.{name} has a setter")
+                require(member["getAbstract"],
+                        f"IAsyncResult.{name} is not abstract")
+
+    require(ASYNC_CALLBACK in by_type,
+            "System.AsyncCallback was not extracted at all")
+    callback = by_type.get(ASYNC_CALLBACK)
+    if callback is not None:
+        require(callback["kind"] == "class",
+                "AsyncCallback is not a class; a delegate is one in metadata")
+        require(callback["sealed"], "AsyncCallback is not sealed")
+        require(callback["baseType"] == "System.MulticastDelegate",
+                "AsyncCallback does not derive from MulticastDelegate")
+        invoke = members_of(ASYNC_CALLBACK, "method", "Invoke")
+        require(len(invoke) == 1, "AsyncCallback.Invoke is missing")
+        for member in invoke:
+            require(member["returnType"] == "System.Void",
+                    "AsyncCallback.Invoke does not return void")
+            require([item["type"] for item in member["parameters"]]
+                    == [ASYNC_RESULT],
+                    "AsyncCallback.Invoke does not take exactly one "
+                    "IAsyncResult")
+
+    # -- the three file enums ---------------------------------------------
+    def enum_values(type_name: str) -> dict[str, Any]:
+        record = by_type.get(type_name)
+        if record is None:
+            return {}
+        return {
+            item["name"]: item.get("value")
+            for item in record["members"]
+            if item["kind"] not in ("method", "constructor", "property", "event")
+            and item.get("constant")
+        }
+
+    for type_name, expected, flags in (
+        (FILE_MODE, {"CreateNew": 1, "Create": 2, "Open": 3, "OpenOrCreate": 4,
+                     "Truncate": 5, "Append": 6}, False),
+        (FILE_ACCESS, {"Read": 1, "Write": 2, "ReadWrite": 3}, True),
+        (FILE_SHARE, {"None": 0, "Read": 1, "Write": 2, "ReadWrite": 3,
+                      "Delete": 4, "Inheritable": 16}, True),
+    ):
+        require(type_name in by_type, f"{type_name} was not extracted at all")
+        record = by_type.get(type_name)
+        if record is None:
+            continue
+        require(record["baseType"] == "System.Enum",
+                f"{type_name} is not an enum")
+        found = enum_values(type_name)
+        for name, value in expected.items():
+            require(name in found, f"{type_name}.{name} is missing")
+            if name in found:
+                # The parser records a literal in its decimal SPELLING, so the
+                # comparison is between strings. Comparing to an int silently
+                # fails for every value and reports "is 3, not 3".
+                require(str(found[name]) == str(value),
+                        f"{type_name}.{name} is {found[name]!r}, not {value}")
+        require(set(found) == set(expected),
+                f"{type_name} declares {sorted(set(found) - set(expected))} "
+                f"beyond the contract and is missing "
+                f"{sorted(set(expected) - set(found))}")
+
     return checks, failures
 
 
@@ -2097,6 +2201,34 @@ def mutation_self_tests(
             return True
         return mutate
 
+    def change_enum_value(name: str) -> Any:
+        """Renumber one enum member.
+
+        The mutation the file-enum families exist for. An enum has no
+        behaviour to break, only values, and a renumbered one changes which
+        file operation a caller asked for while every signature keeps its
+        shape. Until Foundation 102 this could not even be attempted: field
+        records carried no `access`, so the audit dropped every field and an
+        enum extracted as a type with nothing in it.
+        """
+        def mutate(record: dict[str, Any]) -> bool:
+            for member in record["members"]:
+                if member.get("name") == name and member.get("constant"):
+                    member["value"] = str(int(member["value"]) + 1)
+                    return True
+            return False
+        return mutate
+
+    def drop_enum_value(name: str) -> Any:
+        def mutate(record: dict[str, Any]) -> bool:
+            before = len(record["members"])
+            record["members"] = [
+                item for item in record["members"]
+                if not (item.get("name") == name and item.get("constant"))
+            ]
+            return len(record["members"]) != before
+        return mutate
+
     def flip_static_of(name: str) -> Any:
         def mutate(record: dict[str, Any]) -> bool:
             for member in record["members"]:
@@ -2456,6 +2588,34 @@ def mutation_self_tests(
          set_return("GetEnumerator", "System.Collections.IEnumerator")),
         ("IDictionary.Keys retyped", NONGENERIC_IDICTIONARY,
          drop_named_member("property", "Keys")),
+        # The Storage closure (Foundation 102).
+        ("IAsyncResult turned into a class", ASYNC_RESULT, change_kind),
+        ("IAsyncResult given a fifth member", ASYNC_RESULT, add_member),
+        ("IAsyncResult.IsCompleted given a setter", ASYNC_RESULT,
+         add_setter_to("IsCompleted")),
+        ("AsyncWaitHandle dropped, hiding the member that must be refused",
+         ASYNC_RESULT, drop_named_member("property", "AsyncWaitHandle")),
+        ("AsyncWaitHandle retyped away from WaitHandle", ASYNC_RESULT,
+         change_property_type),
+        ("AsyncCallback unsealed", ASYNC_CALLBACK, flip_sealed),
+        ("AsyncCallback detached from MulticastDelegate", ASYNC_CALLBACK,
+         rebase_onto("System.Object")),
+        ("AsyncCallback.Invoke made to return a value", ASYNC_CALLBACK,
+         set_return("Invoke", "System.Object")),
+        ("FileMode.Append renumbered", FILE_MODE,
+         change_enum_value("Append")),
+        ("FileMode.Open renumbered", FILE_MODE, change_enum_value("Open")),
+        ("FileMode.Truncate dropped", FILE_MODE, drop_enum_value("Truncate")),
+        ("FileMode rebased off Enum", FILE_MODE, rebase_onto("System.Object")),
+        ("FileAccess.ReadWrite renumbered, breaking the flag arithmetic",
+         FILE_ACCESS, change_enum_value("ReadWrite")),
+        ("FileAccess.Write dropped", FILE_ACCESS, drop_enum_value("Write")),
+        ("FileShare.Inheritable renumbered", FILE_SHARE,
+         change_enum_value("Inheritable")),
+        ("FileShare.Delete dropped -- the value a hand-written enum forgets",
+         FILE_SHARE, drop_enum_value("Delete")),
+        ("FileShare.None renumbered away from zero", FILE_SHARE,
+         change_enum_value("None")),
     ]
     for label, subject, mutate in sentinel_mutations:
         if subject not in by_name:

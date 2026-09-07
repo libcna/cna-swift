@@ -190,6 +190,26 @@
         {
           "type": "System.Collections.IDictionary",
           "reason": "The parameter of TypeConverter.CreateInstance, which MathTypeConverter overrides to build a value out of the property bag GetProperties described."
+        },
+        {
+          "type": "System.IAsyncResult",
+          "reason": "The return of StorageDevice.BeginShowSelector and BeginOpenContainer and the parameter of both End methods -- seven of the two Storage types' signatures name it. Its AsyncWaitHandle property returns System.Threading.WaitHandle, which is deliberately NOT admitted: this projection has no synchronisation primitive to hand back and CNA's storage routes complete inline, so the member is declared and refused, the way Exception.StackTrace is."
+        },
+        {
+          "type": "System.AsyncCallback",
+          "reason": "The callback parameter of both Begin methods. A delegate, so what is admitted is its shape -- one object argument, void return -- rather than a type a consumer constructs."
+        },
+        {
+          "type": "System.IO.FileMode",
+          "reason": "The second parameter of StorageContainer.OpenFile's three overloads. An enum that declares no member of its own beyond its values, which is why this family costs nothing to admit and everything to get wrong: a value renumbered here changes which file operation a caller asked for."
+        },
+        {
+          "type": "System.IO.FileAccess",
+          "reason": "The third parameter of two OpenFile overloads. A [Flags] enum, and whether it is one is the fact worth pinning."
+        },
+        {
+          "type": "System.IO.FileShare",
+          "reason": "The fourth parameter of the widest OpenFile overload. Also [Flags], and it carries a value XNA's own callers rarely name -- Delete -- which is exactly the kind of member a hand-written enum drops."
         }
       ],
       "selectedResourceStrings": [
