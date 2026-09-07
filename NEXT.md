@@ -41,19 +41,19 @@ stores only their sha, so their paths live in this command.
 
 ```text
 943 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=55   COMPLETE_TYPES=213   PARTIAL_TYPES=8
-MISSING_TYPE=36  MISSING_MEMBER=16  OVERLOAD_MAPPING_MISMATCH=3
+TOTAL_DIAGNOSTICS=43   COMPLETE_TYPES=225   PARTIAL_TYPES=8
+MISSING_TYPE=24  MISSING_MEMBER=16  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=641  PROTOTYPE_TYPE_POSITIONS=2164  LAYOUTS=64  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=384  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
+BOUND_FUNCTIONS=705  PROTOTYPE_TYPE_POSITIONS=2386  LAYOUTS=67  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=394  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
 PROJECTION_MUTATIONS_CAUGHT=135
-WITHDRAWN_IN_SOURCE=26 with the reason written where each stood
+WITHDRAWN_IN_SOURCE=27 with the reason written where each stood
 REPLACED_NO_OPS_IN_SOURCE=2
 NATIVE_ABI_MUTATIONS=14 NATIVE_ABI_MUTATIONS_CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
 API_COMPAT_SELF_TESTS=2494  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
 BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=44  BCL_SENTINEL_CHECKS=651
-RESOURCE_STRINGS_REPRODUCED=79  ACCESSOR_SELF_TESTS=41
+RESOURCE_STRINGS_REPRODUCED=81  ACCESSOR_SELF_TESTS=41
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
@@ -1581,6 +1581,72 @@ The admission is still worth keeping. It is what made the measurement
 authoritative rather than a recollection about a framework, it hardened the
 audit by 143 sentinel checks and 35 mutations, and it is a precondition for
 anything that ever does consume `System.dll`.
+
+### Foundation 103 — the Model family, and a blocker that was not one
+
+**Twelve types.** `MISSING_TYPE` 36 → 24, `COMPLETE_TYPES` 213 → 225,
+`TOTAL_DIAGNOSTICS` 55 → 43, every disagreement category zero. 954 tests, 705
+bound routes, 67 mirrored layouts.
+
+**This file called the family asset-blocked for several Foundations and it was
+wrong.** `cna_model_create_default`, `cna_model_bone_create`,
+`cna_model_mesh_part_create_default` and the collection creates all answer
+`CNA_RESULT_SUCCESS` with no game, no device and no asset. The `.xnb` is what a
+CONSUMER needs to obtain a model; it is not what the twelve types need in order
+to be projected or exercised. The tests build their models out of parts.
+
+**And the same measurement found the family's real edge.** A model can be
+built, but only an EMPTY one: `cna_model_create` and
+`cna_model_bone_add_child` are what would fill it, and neither is bound,
+because XNA's `Model` has no public constructor and a bone's children are
+read-only — no consuming member, so the Foundation 67 rule forbids binding
+them. That is why `model-collection-enumerator-starts-at-zero` is WITHDRAWN
+with its reason where it stood: on an empty collection a cursor at -1 and a
+cursor at 0 both answer false to the first `MoveNext`, so the defect is real
+and unfalsifiable here. Reinstate it the day `ContentManager.Load<Model>` is
+wired.
+
+**`PENDING_BCL_BASE_TYPES` went 4 → 0 as a side effect.** The four pending
+bases were exactly `ReadOnlyCollection<T>` specialisations, and the four model
+collections are what needed them.
+
+**What the gates caught that I had wrong** — five classes, none found by
+review:
+
+* **Every getter on `ModelBone` is infallible.** I wrote all five `get throws`
+  because a native route can fail. A CLR getter with no failure path must not
+  become a Swift reader that can refuse, so a route failure now answers what an
+  absent value answers: an infallible getter has no third thing to say.
+* **`Transform` is a settable property, not a `SetTransform` method** — the
+  third accessor shape, stored and pushed with the failure kept in
+  `lastPushFailure`, which made my method an UNEXPECTED_MEMBER.
+* **The generic argument must be fully qualified.**
+  `CNAReadOnlyCollection<ModelBone>` is not
+  `CNAReadOnlyCollection<Microsoft.Xna.Framework.Graphics.ModelBone>`, four
+  times over.
+* **`TryGetValue` takes the CLR's `out` as `inout` and keeps the Bool.** I
+  folded both into an Optional and wrote a comment defending it. The mapping
+  says otherwise, and `CopyBoneTransformsTo` is the same shape: a method that
+  WRITES INTO the caller's storage is not the same method as one that returns a
+  value.
+* **`Enumerator.Current` is infallible on all four enumerators**, so reading
+  outside the enumeration traps rather than throws.
+
+**And one the rules caught rather than the code.**
+`CopyBoneTransformsTo` really does write into the caller's array — I was right
+about that and still wrong about the projection, because `arrayMutationMapping`
+sends a destination array to `inout` only when its NAME is on a list. XNA calls
+it `destinationBoneTransforms`, so both members had to be registered in
+`arrayMutationMembers`. The registry exists for exactly this, and the trio is a
+good argument for why: the third member reads a `sourceBoneTransforms` and
+stays a value snapshot, so deciding by name alone would have got two of three
+wrong.
+
+**A no-op mutation, replaced not scored.** `model-mesh-part-effect-not-pushed`
+first read `let result: UInt32 = 0` followed by `_ = call(...)` — which still
+made the call and discarded only its answer. The effect was pushed either way
+and no test could have caught it. The replacement sends a null handle instead.
+Discarding a call's RESULT is not the same as not calling it.
 
 ### Foundation 102 — Storage, projected
 

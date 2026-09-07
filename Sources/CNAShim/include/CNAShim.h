@@ -214,6 +214,18 @@ typedef struct CNASwift_Matrix {
     float m44;
 } CNASwift_Matrix;
 
+/* CNA_BoundingSphere. Mirrored for ModelMesh.BoundingSphere, which is the one
+ * place the model family hands back a shape rather than a scalar or a handle.
+ * The centre nests CNASwift_Vector3, exactly as the C struct nests
+ * CNA_Vector3 and as CNASwift_AudioEmitter already does four times over. A
+ * first draft here spelled the three floats out on the theory that the ABI
+ * gate could not pair a nested typedef; AudioEmitter is the standing proof
+ * that it can. */
+typedef struct CNASwift_BoundingSphere {
+    CNASwift_Vector3 center;
+    float radius;
+} CNASwift_BoundingSphere;
+
 typedef struct CNASwift_UserPrimitives {
     uint32_t struct_size;
     uint32_t struct_version;
@@ -393,6 +405,35 @@ typedef struct CNASwift_VertexElement {
     uint32_t usage;
     int32_t usage_index;
 } CNASwift_VertexElement;
+
+/* CNA_VertexBufferInfo and CNA_IndexBufferInfo. Mirrored at Foundation 103 so
+ * ModelMeshPart can adopt the buffers a model already owns: the model routes
+ * hand back a bare handle, and a VertexBuffer facade needs the count, the
+ * usage and the declaration stride that only these structures carry. */
+typedef struct CNASwift_VertexBufferInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t vertex_count;
+    uint32_t buffer_usage;
+    uint8_t dynamic;
+    uint8_t is_content_lost;
+    uint8_t has_renderer;
+    uint8_t reserved0;
+    int32_t vertex_stride;
+    uint64_t vertex_element_count;
+} CNASwift_VertexBufferInfo;
+
+typedef struct CNASwift_IndexBufferInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    int32_t index_count;
+    uint32_t index_element_size;
+    uint32_t buffer_usage;
+    uint8_t dynamic;
+    uint8_t is_content_lost;
+    uint8_t has_renderer;
+    uint8_t reserved;
+} CNASwift_IndexBufferInfo;
 
 typedef struct CNASwift_VertexBufferCreateInfo {
     uint32_t struct_size;

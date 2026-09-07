@@ -417,6 +417,16 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OpenStreamNotFound",
       "reason": "The same path's other half: the file is not there at all. Two messages, two causes, and the projection must not collapse them into one."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ModelHasNoEffect",
+      "reason": "Held in Microsoft.Xna.Framework.dll's FrameworkResources, not in the Graphics assembly whose IL names it: Graphics carries no embedded string table at all. Model.Draw and ModelMesh.Draw raise InvalidOperationException with this when a mesh part carries no effect. Reachable and tested: cna_model_mesh_create and cna_model_mesh_part_create are both bound, so a mesh with an effectless part can be built here."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ModelHasNoIEffectMatrices",
+      "reason": "Also in the Framework assembly's table. Model.Draw raises InvalidOperationException with this when a part's effect does not implement IEffectMatrices, which is what Draw needs in order to push the world, view and projection it was given."
     }
   ]
 }

@@ -8,13 +8,13 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=221
-TARGET_MEMBERS=2669
-TOTAL_DIAGNOSTICS=55
-COMPLETE_TYPES=213
+TARGET_TYPES=233
+TARGET_MEMBERS=2717
+TOTAL_DIAGNOSTICS=43
+COMPLETE_TYPES=225
 PARTIAL_TYPES=8
-MISSING_TYPES=36
-MISSING_TYPE=36
+MISSING_TYPES=24
+MISSING_TYPE=24
 MISSING_MEMBER=16
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
@@ -63,21 +63,21 @@ WRITE_ONLY_PROJECTIONS=0
 MEASURED_ACCESSOR_PROJECTIONS=113
 PENDING_ACCESSOR_PROJECTIONS=1
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=47
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=55
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
 BCL_SUPPORT_TYPE_MEASUREMENTS=24
-XNA_SEALED_CLASS_PROJECTIONS=57
+XNA_SEALED_CLASS_PROJECTIONS=65
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=31
 BCL_ABSTRACT_BASE_WIDENINGS=1
 BCL_STATIC_TABLE_PROJECTIONS=1
-XNA_RESOURCE_STRING_PROJECTIONS=79
+XNA_RESOURCE_STRING_PROJECTIONS=81
 MEASURED_SUPPORT_BASE_PROJECTIONS=23
 BCL_BASE_PROJECTIONS=19
-PROJECTED_BCL_BASE_TYPES=15
-PENDING_BCL_BASE_TYPES=4
-BCL_INHERITED_MEMBER_PROJECTIONS=77
+PROJECTED_BCL_BASE_TYPES=19
+PENDING_BCL_BASE_TYPES=0
+BCL_INHERITED_MEMBER_PROJECTIONS=105
 REFERENCE_RETURN_PROJECTIONS=369
 OPTIONAL_RETURN_PROJECTIONS=151
 NONOPTIONAL_RETURN_PROJECTIONS=218
@@ -88,9 +88,9 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=67
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=291
-PENDING_RETURN_NULLABILITY_PROJECTIONS=78
-OPTIONAL_RETURN_PROJECTIONS_OBSERVED=100
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=313
+PENDING_RETURN_NULLABILITY_PROJECTIONS=56
+OPTIONAL_RETURN_PROJECTIONS_OBSERVED=111
 ```
 
 ## Complete types
@@ -180,6 +180,18 @@ OPTIONAL_RETURN_PROJECTIONS_OBSERVED=100
 - `Microsoft.Xna.Framework.Graphics.IVertexType`
 - `Microsoft.Xna.Framework.Graphics.IndexBuffer`
 - `Microsoft.Xna.Framework.Graphics.IndexElementSize`
+- `Microsoft.Xna.Framework.Graphics.Model`
+- `Microsoft.Xna.Framework.Graphics.ModelBone`
+- `Microsoft.Xna.Framework.Graphics.ModelBoneCollection`
+- `Microsoft.Xna.Framework.Graphics.ModelBoneCollection.Enumerator`
+- `Microsoft.Xna.Framework.Graphics.ModelEffectCollection`
+- `Microsoft.Xna.Framework.Graphics.ModelEffectCollection.Enumerator`
+- `Microsoft.Xna.Framework.Graphics.ModelMesh`
+- `Microsoft.Xna.Framework.Graphics.ModelMeshCollection`
+- `Microsoft.Xna.Framework.Graphics.ModelMeshCollection.Enumerator`
+- `Microsoft.Xna.Framework.Graphics.ModelMeshPart`
+- `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
+- `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
 - `Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException`
 - `Microsoft.Xna.Framework.Graphics.OcclusionQuery`
 - `Microsoft.Xna.Framework.Graphics.PackedVector.Alpha8`
@@ -396,15 +408,3 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Design.Vector2Converter`
 - `Microsoft.Xna.Framework.Design.Vector3Converter`
 - `Microsoft.Xna.Framework.Design.Vector4Converter`
-- `Microsoft.Xna.Framework.Graphics.Model`
-- `Microsoft.Xna.Framework.Graphics.ModelBone`
-- `Microsoft.Xna.Framework.Graphics.ModelBoneCollection`
-- `Microsoft.Xna.Framework.Graphics.ModelBoneCollection.Enumerator`
-- `Microsoft.Xna.Framework.Graphics.ModelEffectCollection`
-- `Microsoft.Xna.Framework.Graphics.ModelEffectCollection.Enumerator`
-- `Microsoft.Xna.Framework.Graphics.ModelMesh`
-- `Microsoft.Xna.Framework.Graphics.ModelMeshCollection`
-- `Microsoft.Xna.Framework.Graphics.ModelMeshCollection.Enumerator`
-- `Microsoft.Xna.Framework.Graphics.ModelMeshPart`
-- `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
-- `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`

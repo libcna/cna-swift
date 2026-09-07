@@ -185,6 +185,16 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ModelHasNoEffect",
+      "value": "ModelMeshPart has a null Effect."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ModelHasNoIEffectMatrices",
+      "value": "This model contains a custom effect which does not implement the IEffectMatrices interface, so it cannot be drawn using Model.Draw. Instead, call ModelMesh.Draw after setting the appropriate effect parameters."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "MustBeValidIndex",
       "value": "This parameter must be a valid index within the array."
     },

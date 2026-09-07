@@ -5,7 +5,7 @@
     "rules": "tools/api_compat/mapping-rules.json"
   },
   "edgeRule": "A -> B when A's pinned public signature (base, direct interface, return, property/field type, or parameter type) mentions XNA type B",
-  "DEPENDENCY_COMPLETE_MISSING_TYPES": 6,
+  "DEPENDENCY_COMPLETE_MISSING_TYPES": 4,
   "ranked": [
     {
       "type": "Microsoft.Xna.Framework.Design.MathTypeConverter",
@@ -27,35 +27,6 @@
       ],
       "directPartialReverseConsumers": [],
       "transitiveMissingReverseReach": 12,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.ModelMeshPart",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.Effect",
-        "Microsoft.Xna.Framework.Graphics.IndexBuffer",
-        "Microsoft.Xna.Framework.Graphics.VertexBuffer"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection",
-        "Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 6,
-      "transitivePartialReverseReach": []
-    },
-    {
-      "type": "Microsoft.Xna.Framework.Graphics.ModelEffectCollection.Enumerator",
-      "dependencies": [
-        "Microsoft.Xna.Framework.Graphics.Effect"
-      ],
-      "dependencyComplete": true,
-      "directMissingReverseConsumers": [
-        "Microsoft.Xna.Framework.Graphics.ModelEffectCollection"
-      ],
-      "directPartialReverseConsumers": [],
-      "transitiveMissingReverseReach": 5,
       "transitivePartialReverseReach": []
     },
     {

@@ -42,6 +42,7 @@ KEYS = ROOT / "Sources/CNA/Xna/Input/Keyboard.swift"
 
 # The shim mirrors exactly these canonical structures, one for one.
 MIRRORED_STRUCTS = [
+    "BoundingSphere", "VertexBufferInfo", "IndexBufferInfo",
     "StringView", "Color", "Vector2", "Rectangle", "GameTime", "CallbackError",
     "GameCallbacks", "GameFrameHooks", "GameCreateInfo", "Viewport",
     "Texture2DInfo", "Texture2DCreateInfo", "Texture2DTransfer",
@@ -226,6 +227,20 @@ def canonical_type(value: str) -> str:
         "CNA_StorageDeviceHandle": "uint64_t",
         "CNA_StorageContainerHandle": "uint64_t",
         "CNA_StorageStreamHandle": "uint64_t",
+        "CNA_AnimationPlayerHandle": "uint64_t",
+        "CNA_ModelAnimationsEXTHandle": "uint64_t",
+        "CNA_ModelBoneCollectionHandle": "uint64_t",
+        "CNA_ModelBoneHandle": "uint64_t",
+        "CNA_ModelEffectCollectionHandle": "uint64_t",
+        "CNA_ModelHandle": "uint64_t",
+        "CNA_ModelMeshCollectionHandle": "uint64_t",
+        "CNA_ModelMeshHandle": "uint64_t",
+        "CNA_ModelMeshPartCollectionHandle": "uint64_t",
+        "CNA_ModelMeshPartHandle": "uint64_t",
+        "CNA_MorphTargetDataEXTHandle": "uint64_t",
+        "CNA_ObjectDictionaryHandle": "uint64_t",
+        "CNA_SkinnedModelEXTHandle": "uint64_t",
+        "CNA_SkinningDataHandle": "uint64_t",
         "CNA_PictureHandle": "uint64_t",
         "CNA_PictureAlbumHandle": "uint64_t",
         "CNA_PictureCollectionHandle": "uint64_t",

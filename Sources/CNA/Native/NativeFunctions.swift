@@ -282,6 +282,72 @@ internal final class NativeFunctions {
     typealias SongGetGenreRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias MediaLibraryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
 
+    // ---- Foundation 103: Model ----
+    typealias VertexBufferGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_VertexBufferInfo>?) -> UInt32
+    typealias VertexBufferCopyDeclarationElementsRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_VertexElement>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias IndexBufferGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_IndexBufferInfo>?) -> UInt32
+    typealias ModelBoneCreateDefaultRoute = @convention(c) (UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneCreateRoute = @convention(c) (Int32, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelBoneGetNameByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneGetIndexRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias ModelBoneGetTransformRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Matrix>?) -> UInt32
+    typealias ModelBoneSetTransformRoute = @convention(c) (UInt64, CNASwift_Matrix) -> UInt32
+    typealias ModelBoneGetParentRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneGetChildrenRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneCollectionCreateRoute = @convention(c) (UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelBoneCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneCollectionFindRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelBoneCollectionContainsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias ModelMeshPartCreateDefaultRoute = @convention(c) (UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshPartCreateRoute = @convention(c) (UInt64, UInt64, Int32, Int32, Int32, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshPartDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelMeshPartGetNumVerticesRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias ModelMeshPartGetPrimitiveCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias ModelMeshPartGetStartIndexRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias ModelMeshPartGetVertexOffsetRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias ModelMeshPartGetEffectRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshPartSetEffectRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias ModelMeshPartGetVertexBufferRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshPartGetIndexBufferRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshPartCollectionCreateRoute = @convention(c) (UnsafePointer<UInt64>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshPartCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelMeshPartCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshPartCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshCreateRoute = @convention(c) (UInt64, UnsafePointer<UInt64>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshCreateNamedRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafePointer<UInt64>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelMeshGetBoundingSphereRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_BoundingSphere>?) -> UInt32
+    typealias ModelMeshGetMeshPartsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshGetEffectsRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshGetNameByteCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshGetParentBoneRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshDrawRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelMeshCollectionCreateRoute = @convention(c) (UnsafePointer<UInt64>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelMeshCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshCollectionFindRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelMeshCollectionContainsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias ModelEffectCollectionDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelEffectCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelEffectCollectionGetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelEffectCollectionContainsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias ModelCreateDefaultRoute = @convention(c) (UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias ModelGetBonesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelGetMeshesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelGetRootRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelGetBoneTransformCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelCopyAbsoluteBoneTransformsRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Matrix>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelSetBoneTransformsRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_Matrix>?, UInt64) -> UInt32
+    typealias ModelCopyBoneTransformsRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_Matrix>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias ModelDrawRoute = @convention(c) (UInt64, CNASwift_Matrix, CNASwift_Matrix, CNASwift_Matrix) -> UInt32
+
     // ---- Foundation 102: Storage ----
     typealias StorageDeviceShowSelectorRoute = @convention(c) (CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias StorageDeviceShowSelectorForPlayerRoute = @convention(c) (UInt32, CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
@@ -952,6 +1018,70 @@ internal final class NativeFunctions {
     let mediaLibraryGetPictureFromToken: MediaLibraryGetPictureFromTokenRoute
     let mediaLibraryCreate: MediaLibraryCreateRoute
 
+    let modelBoneCreateDefault: ModelBoneCreateDefaultRoute
+    let modelBoneCreate: ModelBoneCreateRoute
+    let modelBoneDestroy: ModelBoneDestroyRoute
+    let modelBoneGetNameByteCount: ModelBoneGetNameByteCountRoute
+    let modelBoneCopyName: ModelBoneCopyNameRoute
+    let modelBoneGetIndex: ModelBoneGetIndexRoute
+    let modelBoneGetTransform: ModelBoneGetTransformRoute
+    let modelBoneSetTransform: ModelBoneSetTransformRoute
+    let modelBoneGetParent: ModelBoneGetParentRoute
+    let modelBoneGetChildren: ModelBoneGetChildrenRoute
+    let modelBoneCollectionCreate: ModelBoneCollectionCreateRoute
+    let modelBoneCollectionDestroy: ModelBoneCollectionDestroyRoute
+    let modelBoneCollectionGetCount: ModelBoneCollectionGetCountRoute
+    let modelBoneCollectionGetAt: ModelBoneCollectionGetAtRoute
+    let modelBoneCollectionFind: ModelBoneCollectionFindRoute
+    let modelBoneCollectionContains: ModelBoneCollectionContainsRoute
+    let modelMeshPartCreateDefault: ModelMeshPartCreateDefaultRoute
+    let modelMeshPartCreate: ModelMeshPartCreateRoute
+    let modelMeshPartDestroy: ModelMeshPartDestroyRoute
+    let modelMeshPartGetNumVertices: ModelMeshPartGetNumVerticesRoute
+    let modelMeshPartGetPrimitiveCount: ModelMeshPartGetPrimitiveCountRoute
+    let modelMeshPartGetStartIndex: ModelMeshPartGetStartIndexRoute
+    let modelMeshPartGetVertexOffset: ModelMeshPartGetVertexOffsetRoute
+    let modelMeshPartGetEffect: ModelMeshPartGetEffectRoute
+    let modelMeshPartSetEffect: ModelMeshPartSetEffectRoute
+    let modelMeshPartGetVertexBuffer: ModelMeshPartGetVertexBufferRoute
+    let modelMeshPartGetIndexBuffer: ModelMeshPartGetIndexBufferRoute
+    let modelMeshPartCollectionCreate: ModelMeshPartCollectionCreateRoute
+    let modelMeshPartCollectionDestroy: ModelMeshPartCollectionDestroyRoute
+    let modelMeshPartCollectionGetCount: ModelMeshPartCollectionGetCountRoute
+    let modelMeshPartCollectionGetAt: ModelMeshPartCollectionGetAtRoute
+    let modelMeshCreate: ModelMeshCreateRoute
+    let modelMeshCreateNamed: ModelMeshCreateNamedRoute
+    let modelMeshDestroy: ModelMeshDestroyRoute
+    let modelMeshGetBoundingSphere: ModelMeshGetBoundingSphereRoute
+    let modelMeshGetMeshParts: ModelMeshGetMeshPartsRoute
+    let modelMeshGetEffects: ModelMeshGetEffectsRoute
+    let modelMeshGetNameByteCount: ModelMeshGetNameByteCountRoute
+    let modelMeshCopyName: ModelMeshCopyNameRoute
+    let modelMeshGetParentBone: ModelMeshGetParentBoneRoute
+    let modelMeshDraw: ModelMeshDrawRoute
+    let modelMeshCollectionCreate: ModelMeshCollectionCreateRoute
+    let modelMeshCollectionDestroy: ModelMeshCollectionDestroyRoute
+    let modelMeshCollectionGetCount: ModelMeshCollectionGetCountRoute
+    let modelMeshCollectionGetAt: ModelMeshCollectionGetAtRoute
+    let modelMeshCollectionFind: ModelMeshCollectionFindRoute
+    let modelMeshCollectionContains: ModelMeshCollectionContainsRoute
+    let modelEffectCollectionDestroy: ModelEffectCollectionDestroyRoute
+    let modelEffectCollectionGetCount: ModelEffectCollectionGetCountRoute
+    let modelEffectCollectionGetAt: ModelEffectCollectionGetAtRoute
+    let modelEffectCollectionContains: ModelEffectCollectionContainsRoute
+    let vertexBufferGetInfo: VertexBufferGetInfoRoute
+    let vertexBufferCopyDeclarationElements: VertexBufferCopyDeclarationElementsRoute
+    let indexBufferGetInfo: IndexBufferGetInfoRoute
+    let modelCreateDefault: ModelCreateDefaultRoute
+    let modelDestroy: ModelDestroyRoute
+    let modelGetBones: ModelGetBonesRoute
+    let modelGetMeshes: ModelGetMeshesRoute
+    let modelGetRoot: ModelGetRootRoute
+    let modelGetBoneTransformCount: ModelGetBoneTransformCountRoute
+    let modelCopyAbsoluteBoneTransforms: ModelCopyAbsoluteBoneTransformsRoute
+    let modelSetBoneTransforms: ModelSetBoneTransformsRoute
+    let modelCopyBoneTransforms: ModelCopyBoneTransformsRoute
+    let modelDraw: ModelDrawRoute
     let storageDeviceShowSelector: StorageDeviceShowSelectorRoute
     let storageDeviceShowSelectorForPlayer: StorageDeviceShowSelectorForPlayerRoute
     let storageDeviceShowSelectorWithSpace: StorageDeviceShowSelectorWithSpaceRoute
@@ -1576,6 +1706,70 @@ internal final class NativeFunctions {
         playlistGetDuration = try library.resolve("cna_playlist_get_duration", as: PlaylistGetDurationRoute.self)
         mediaLibraryGetPlaylists = try library.resolve("cna_media_library_get_playlists", as: MediaLibraryGetPlaylistsRoute.self)
         mediaLibraryCreateFromSource = try library.resolve("cna_media_library_create_from_source", as: MediaLibraryCreateFromSourceRoute.self)
+        modelBoneCreateDefault = try library.resolve("cna_model_bone_create_default", as: ModelBoneCreateDefaultRoute.self)
+        modelBoneCreate = try library.resolve("cna_model_bone_create", as: ModelBoneCreateRoute.self)
+        modelBoneDestroy = try library.resolve("cna_model_bone_destroy", as: ModelBoneDestroyRoute.self)
+        modelBoneGetNameByteCount = try library.resolve("cna_model_bone_get_name_byte_count", as: ModelBoneGetNameByteCountRoute.self)
+        modelBoneCopyName = try library.resolve("cna_model_bone_copy_name", as: ModelBoneCopyNameRoute.self)
+        modelBoneGetIndex = try library.resolve("cna_model_bone_get_index", as: ModelBoneGetIndexRoute.self)
+        modelBoneGetTransform = try library.resolve("cna_model_bone_get_transform", as: ModelBoneGetTransformRoute.self)
+        modelBoneSetTransform = try library.resolve("cna_model_bone_set_transform", as: ModelBoneSetTransformRoute.self)
+        modelBoneGetParent = try library.resolve("cna_model_bone_get_parent", as: ModelBoneGetParentRoute.self)
+        modelBoneGetChildren = try library.resolve("cna_model_bone_get_children", as: ModelBoneGetChildrenRoute.self)
+        modelBoneCollectionCreate = try library.resolve("cna_model_bone_collection_create", as: ModelBoneCollectionCreateRoute.self)
+        modelBoneCollectionDestroy = try library.resolve("cna_model_bone_collection_destroy", as: ModelBoneCollectionDestroyRoute.self)
+        modelBoneCollectionGetCount = try library.resolve("cna_model_bone_collection_get_count", as: ModelBoneCollectionGetCountRoute.self)
+        modelBoneCollectionGetAt = try library.resolve("cna_model_bone_collection_get_at", as: ModelBoneCollectionGetAtRoute.self)
+        modelBoneCollectionFind = try library.resolve("cna_model_bone_collection_find", as: ModelBoneCollectionFindRoute.self)
+        modelBoneCollectionContains = try library.resolve("cna_model_bone_collection_contains", as: ModelBoneCollectionContainsRoute.self)
+        modelMeshPartCreateDefault = try library.resolve("cna_model_mesh_part_create_default", as: ModelMeshPartCreateDefaultRoute.self)
+        modelMeshPartCreate = try library.resolve("cna_model_mesh_part_create", as: ModelMeshPartCreateRoute.self)
+        modelMeshPartDestroy = try library.resolve("cna_model_mesh_part_destroy", as: ModelMeshPartDestroyRoute.self)
+        modelMeshPartGetNumVertices = try library.resolve("cna_model_mesh_part_get_num_vertices", as: ModelMeshPartGetNumVerticesRoute.self)
+        modelMeshPartGetPrimitiveCount = try library.resolve("cna_model_mesh_part_get_primitive_count", as: ModelMeshPartGetPrimitiveCountRoute.self)
+        modelMeshPartGetStartIndex = try library.resolve("cna_model_mesh_part_get_start_index", as: ModelMeshPartGetStartIndexRoute.self)
+        modelMeshPartGetVertexOffset = try library.resolve("cna_model_mesh_part_get_vertex_offset", as: ModelMeshPartGetVertexOffsetRoute.self)
+        modelMeshPartGetEffect = try library.resolve("cna_model_mesh_part_get_effect", as: ModelMeshPartGetEffectRoute.self)
+        modelMeshPartSetEffect = try library.resolve("cna_model_mesh_part_set_effect", as: ModelMeshPartSetEffectRoute.self)
+        modelMeshPartGetVertexBuffer = try library.resolve("cna_model_mesh_part_get_vertex_buffer", as: ModelMeshPartGetVertexBufferRoute.self)
+        modelMeshPartGetIndexBuffer = try library.resolve("cna_model_mesh_part_get_index_buffer", as: ModelMeshPartGetIndexBufferRoute.self)
+        modelMeshPartCollectionCreate = try library.resolve("cna_model_mesh_part_collection_create", as: ModelMeshPartCollectionCreateRoute.self)
+        modelMeshPartCollectionDestroy = try library.resolve("cna_model_mesh_part_collection_destroy", as: ModelMeshPartCollectionDestroyRoute.self)
+        modelMeshPartCollectionGetCount = try library.resolve("cna_model_mesh_part_collection_get_count", as: ModelMeshPartCollectionGetCountRoute.self)
+        modelMeshPartCollectionGetAt = try library.resolve("cna_model_mesh_part_collection_get_at", as: ModelMeshPartCollectionGetAtRoute.self)
+        modelMeshCreate = try library.resolve("cna_model_mesh_create", as: ModelMeshCreateRoute.self)
+        modelMeshCreateNamed = try library.resolve("cna_model_mesh_create_named", as: ModelMeshCreateNamedRoute.self)
+        modelMeshDestroy = try library.resolve("cna_model_mesh_destroy", as: ModelMeshDestroyRoute.self)
+        modelMeshGetBoundingSphere = try library.resolve("cna_model_mesh_get_bounding_sphere", as: ModelMeshGetBoundingSphereRoute.self)
+        modelMeshGetMeshParts = try library.resolve("cna_model_mesh_get_mesh_parts", as: ModelMeshGetMeshPartsRoute.self)
+        modelMeshGetEffects = try library.resolve("cna_model_mesh_get_effects", as: ModelMeshGetEffectsRoute.self)
+        modelMeshGetNameByteCount = try library.resolve("cna_model_mesh_get_name_byte_count", as: ModelMeshGetNameByteCountRoute.self)
+        modelMeshCopyName = try library.resolve("cna_model_mesh_copy_name", as: ModelMeshCopyNameRoute.self)
+        modelMeshGetParentBone = try library.resolve("cna_model_mesh_get_parent_bone", as: ModelMeshGetParentBoneRoute.self)
+        modelMeshDraw = try library.resolve("cna_model_mesh_draw", as: ModelMeshDrawRoute.self)
+        modelMeshCollectionCreate = try library.resolve("cna_model_mesh_collection_create", as: ModelMeshCollectionCreateRoute.self)
+        modelMeshCollectionDestroy = try library.resolve("cna_model_mesh_collection_destroy", as: ModelMeshCollectionDestroyRoute.self)
+        modelMeshCollectionGetCount = try library.resolve("cna_model_mesh_collection_get_count", as: ModelMeshCollectionGetCountRoute.self)
+        modelMeshCollectionGetAt = try library.resolve("cna_model_mesh_collection_get_at", as: ModelMeshCollectionGetAtRoute.self)
+        modelMeshCollectionFind = try library.resolve("cna_model_mesh_collection_find", as: ModelMeshCollectionFindRoute.self)
+        modelMeshCollectionContains = try library.resolve("cna_model_mesh_collection_contains", as: ModelMeshCollectionContainsRoute.self)
+        modelEffectCollectionDestroy = try library.resolve("cna_model_effect_collection_destroy", as: ModelEffectCollectionDestroyRoute.self)
+        modelEffectCollectionGetCount = try library.resolve("cna_model_effect_collection_get_count", as: ModelEffectCollectionGetCountRoute.self)
+        modelEffectCollectionGetAt = try library.resolve("cna_model_effect_collection_get_at", as: ModelEffectCollectionGetAtRoute.self)
+        modelEffectCollectionContains = try library.resolve("cna_model_effect_collection_contains", as: ModelEffectCollectionContainsRoute.self)
+        vertexBufferGetInfo = try library.resolve("cna_vertex_buffer_get_info", as: VertexBufferGetInfoRoute.self)
+        vertexBufferCopyDeclarationElements = try library.resolve("cna_vertex_buffer_copy_declaration_elements", as: VertexBufferCopyDeclarationElementsRoute.self)
+        indexBufferGetInfo = try library.resolve("cna_index_buffer_get_info", as: IndexBufferGetInfoRoute.self)
+        modelCreateDefault = try library.resolve("cna_model_create_default", as: ModelCreateDefaultRoute.self)
+        modelDestroy = try library.resolve("cna_model_destroy", as: ModelDestroyRoute.self)
+        modelGetBones = try library.resolve("cna_model_get_bones", as: ModelGetBonesRoute.self)
+        modelGetMeshes = try library.resolve("cna_model_get_meshes", as: ModelGetMeshesRoute.self)
+        modelGetRoot = try library.resolve("cna_model_get_root", as: ModelGetRootRoute.self)
+        modelGetBoneTransformCount = try library.resolve("cna_model_get_bone_transform_count", as: ModelGetBoneTransformCountRoute.self)
+        modelCopyAbsoluteBoneTransforms = try library.resolve("cna_model_copy_absolute_bone_transforms", as: ModelCopyAbsoluteBoneTransformsRoute.self)
+        modelSetBoneTransforms = try library.resolve("cna_model_set_bone_transforms", as: ModelSetBoneTransformsRoute.self)
+        modelCopyBoneTransforms = try library.resolve("cna_model_copy_bone_transforms", as: ModelCopyBoneTransformsRoute.self)
+        modelDraw = try library.resolve("cna_model_draw", as: ModelDrawRoute.self)
         storageDeviceShowSelector = try library.resolve("cna_storage_device_show_selector", as: StorageDeviceShowSelectorRoute.self)
         storageDeviceShowSelectorForPlayer = try library.resolve("cna_storage_device_show_selector_for_player", as: StorageDeviceShowSelectorForPlayerRoute.self)
         storageDeviceShowSelectorWithSpace = try library.resolve("cna_storage_device_show_selector_with_space", as: StorageDeviceShowSelectorWithSpaceRoute.self)

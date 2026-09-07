@@ -38,6 +38,12 @@ TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
 CONTENT = ROOT / "Sources/CNA/Xna/Content/ContentManager.swift"
+MODEL = ROOT / "Sources/CNA/Xna/Graphics/Model/Model.swift"
+MODEL_BONE = ROOT / "Sources/CNA/Xna/Graphics/Model/ModelBone.swift"
+MODEL_MESH = ROOT / "Sources/CNA/Xna/Graphics/Model/ModelMesh.swift"
+MODEL_PART = ROOT / "Sources/CNA/Xna/Graphics/Model/ModelMeshPart.swift"
+MODEL_BONES = ROOT / "Sources/CNA/Xna/Graphics/Model/ModelBoneCollection.swift"
+MODEL_SUPPORT = ROOT / "Sources/CNA/Xna/Graphics/Model/ModelSupport.swift"
 STORAGE_DEVICE = ROOT / "Sources/CNA/Xna/Storage/StorageDevice.swift"
 STORAGE_CONTAINER = ROOT / "Sources/CNA/Xna/Storage/StorageContainer.swift"
 STORAGE_ASYNC = ROOT / "Sources/CNA/Xna/Storage/StorageAsyncResult.swift"
@@ -619,6 +625,117 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                throw CNAArgumentNullException(paramName: \"listeners\")\n"
         "            }",
         "            let listeners = listeners ?? []",
+    ),
+    # ---- Foundation 103: Model ---------------------------------------------
+    (
+        "model-mesh-draw-skips-the-effect-check",
+        "ModelMesh.Draw forwarding to the runtime without walking its parts, "
+        "so a part with no effect reaches the draw call instead of the "
+        "InvalidOperationException XNA raises",
+        MODEL_MESH,
+        """            for index in 0..<parts.Count where
+                (try? parts.Items.Item(index))?.Effect == nil {""",
+        """            for index in 0..<parts.Count where
+                index < 0 {""",
+    ),
+    (
+        "model-mesh-no-effect-message-truncated",
+        "the null-effect refusal carrying a message that is not the "
+        "assembly's, which is how a caller loses the half of it that says what "
+        "to do instead",
+        MODEL_SUPPORT,
+        '    static let modelHasNoEffect = "ModelMeshPart has a null Effect."',
+        '    static let modelHasNoEffect = "ModelMeshPart has a null Effect"',
+    ),
+    (
+        "model-bone-transform-not-pushed",
+        "the bone storing the transform a caller set without sending it, so "
+        "the projection and the runtime disagree about where the bone is",
+        MODEL_BONE,
+        """                let result = runtime.functions.modelBoneSetTransform(
+                    nativeHandle, ModelSupport.native(newValue))""",
+        """                let result: UInt32 = 0
+                _ = ModelSupport.native(newValue)""",
+    ),
+    (
+        "model-bone-index-answers-zero",
+        "Index reporting zero for every bone, so a skeleton's bones all claim "
+        "the root's slot",
+        MODEL_BONE,
+        "            guard runtime.functions.modelBoneGetIndex(nativeHandle, &value) == 0 else {",
+        "            guard false, runtime.functions.modelBoneGetIndex(nativeHandle, &value) == 0 else {",
+    ),
+    (
+        "model-bone-parent-ignores-the-availability",
+        "Parent building a bone from the handle without testing out_has_parent, "
+        "so the root reports a parent that is not there",
+        MODEL_BONE,
+        """            guard runtime.functions.modelBoneGetParent(nativeHandle, &has, &produced) == 0,
+                  has != 0 else { return nil }""",
+        """            guard runtime.functions.modelBoneGetParent(nativeHandle, &has, &produced) == 0,
+                  has != 1 || true else { return nil }""",
+    ),
+    (
+        "model-copy-transforms-uses-its-own-capacity",
+        "CopyBoneTransformsTo telling the runtime how big its scratch buffer "
+        "is rather than how big the caller's array is, so a short array is "
+        "overrun instead of refused",
+        MODEL,
+        "                            UInt64(destination.count), &written)\n                        : runtime.functions.modelCopyBoneTransforms(",
+        "                            UInt64(native.count), &written)\n                        : runtime.functions.modelCopyBoneTransforms(",
+    ),
+    (
+        "model-tag-not-kept",
+        "Tag dropping what a caller set, so the one property the projection "
+        "holds on the Swift side stops holding it",
+        MODEL,
+        "            set { storedTag = newValue }",
+        "            set { _ = newValue }",
+    ),
+    (
+        "model-mesh-part-start-index-reads-the-offset",
+        "StartIndex answering from the vertex-offset route, two properties "
+        "that are both small integers and mean different things",
+        MODEL_PART,
+        """            self.runtime.functions.modelMeshPartGetStartIndex(
+                self.nativeHandle, $0) } }""",
+        """            self.runtime.functions.modelMeshPartGetVertexOffset(
+                self.nativeHandle, $0) } }""",
+    ),
+    (
+        "model-mesh-part-effect-not-pushed",
+        "the part accepting an Effect and sending a null handle instead of it, "
+        "so the mesh draws with whatever it had before. The FIRST version of "
+        "this mutation was a NO-OP replaced rather than scored: it changed "
+        "`let result = call(...)` into `let result: UInt32 = 0; _ = call(...)`, "
+        "which still made the call and only discarded its answer. The effect "
+        "was pushed either way and the mutation could not have been caught by "
+        "any test",
+        MODEL_PART,
+        """                    nativeHandle, (try? newValue?.validatedHandle(
+                        "cna_model_mesh_part_set_effect")) ?? 0)""",
+        """                    nativeHandle, 0)
+                _ = newValue""",
+    ),
+    # WITHDRAWN: "model-collection-enumerator-starts-at-zero" -- an enumerator
+    # that starts ON the first element instead of before it is a real defect
+    # and it cannot be falsified here, because no NON-EMPTY model collection
+    # can be built. `cna_model_create` and `cna_model_bone_add_child` are the
+    # two routes that would fill one, and neither is bound: XNA's Model has no
+    # public constructor and its bone children are read-only, so under the
+    # Foundation 67 rule they have no consuming member. Every collection this
+    # environment can make is empty, and on an empty one a cursor at -1 and a
+    # cursor at 0 both answer false to the first MoveNext.
+    #
+    # Reinstate it the day `ContentManager.Load<Model>` is wired and a loaded
+    # model brings real bones with it.
+    (
+        "model-collection-try-get-value-always-succeeds",
+        "TryGetValue answering true for a name it did not find, leaving the "
+        "caller's slot holding whatever it held before",
+        MODEL_BONES,
+        "            guard let found = lookup(boneName) else { return false }",
+        "            guard let found = lookup(boneName) else { return true }",
     ),
     # ---- Foundation 102: Storage ------------------------------------------
     (

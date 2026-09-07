@@ -189,7 +189,7 @@
     "Microsoft.Xna.Framework.GraphicsDeviceManager.EndDraw"
   ],
   "protocolWitnessMapping": "A public Swift conformance witness forced by a CLR explicit interface implementation is compiler-measured through sourceOrigin and excluded from the concrete type member count. GraphicsDeviceManager's three IGraphicsDeviceManager members are the first non-PackedVector entries: the pinned contract declares no CreateDevice, BeginDraw or EndDraw on the class, because XNA implements all three EXPLICITLY and they are therefore private on its own surface. Swift has no explicit conformance: a witness must be at least as visible as the protocol, so the three are public here. That is a language widening, recorded rather than hidden, and it is the same shape as the PackedVector witnesses above.",
-  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots. Where the parameter NAME cannot decide -- Texture2D.SetData and GetData both call their array `data`, and only GetData writes through it -- the member is listed in arrayMutationMembers instead.",
+  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots. Where the parameter NAME cannot decide -- Texture2D.SetData and GetData both call their array `data`, and only GetData writes through it -- the member is listed in arrayMutationMembers instead. Foundation 103 added Model's two CopyBoneTransforms*To members that way: XNA names the destination `destinationBoneTransforms`, which the name list does not cover, and the third member of the trio -- CopyBoneTransformsFrom -- READS a `sourceBoneTransforms` and stays a value snapshot, so the name alone could not have decided either.",
   "arrayMutationParameterNames": [
     "destinationArray",
     "corners"
@@ -1523,6 +1523,16 @@
       "owner": "Microsoft.Xna.Framework.Graphics.Texture3D",
       "member": "GetData",
       "parameter": "data"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.Model",
+      "member": "CopyBoneTransformsTo",
+      "parameter": "destinationBoneTransforms"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.Model",
+      "member": "CopyAbsoluteBoneTransformsTo",
+      "parameter": "destinationBoneTransforms"
     }
   ],
   "recombinedPropertyWriters": [
