@@ -120,7 +120,12 @@
     "System.IO.Stream": "Foundation.InputStream",
     "System.Uri": "Foundation.URL",
     "System.IntPtr": "Int",
-    "System.Type": "Any.Type"
+    "System.Type": "Any.Type",
+    "System.IAsyncResult": "CNAAsyncResult",
+    "System.AsyncCallback": "CNAAsyncCallback",
+    "System.IO.FileMode": "CNAFileMode",
+    "System.IO.FileAccess": "CNAFileAccess",
+    "System.IO.FileShare": "CNAFileShare"
   },
   "streamDirectionParameters": [
     {
@@ -231,7 +236,11 @@
     "System.NullReferenceException": "CNANullReferenceException",
     "System.IndexOutOfRangeException": "CNAIndexOutOfRangeException",
     "System.IServiceProvider": "CNAServiceProvider",
-    "System.Collections.Generic.IList`1": "CNAList"
+    "System.Collections.Generic.IList`1": "CNAList",
+    "System.IAsyncResult": "CNAAsyncResult",
+    "System.IO.FileMode": "CNAFileMode",
+    "System.IO.FileAccess": "CNAFileAccess",
+    "System.IO.FileShare": "CNAFileShare"
   },
   "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
@@ -772,6 +781,82 @@
         "AddService",
         "RemoveService"
       ]
+    },
+    "CNAAsyncResult": {
+      "kind": "protocol",
+      "inheritance": "public",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.IAsyncResult",
+      "requiredMembers": [
+        "IsCompleted",
+        "CompletedSynchronously",
+        "AsyncState"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "AsyncWaitHandle"
+      ]
+    },
+    "CNAFileMode": {
+      "kind": "enum",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.IO.FileMode",
+      "requiredMembers": [
+        "CreateNew",
+        "Create",
+        "Open",
+        "OpenOrCreate",
+        "Truncate",
+        "Append"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAFileAccess": {
+      "kind": "struct",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [
+        "OptionSet"
+      ],
+      "clrFamily": "System.IO.FileAccess",
+      "requiredMembers": [
+        "Read",
+        "Write",
+        "ReadWrite"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAFileShare": {
+      "kind": "struct",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [
+        "OptionSet"
+      ],
+      "clrFamily": "System.IO.FileShare",
+      "requiredMembers": [
+        "None",
+        "Read",
+        "Write",
+        "ReadWrite",
+        "Delete",
+        "Inheritable"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
     }
   },
   "bclSupportMapping": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",

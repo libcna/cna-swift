@@ -8,14 +8,14 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=219
-TARGET_MEMBERS=2645
-TOTAL_DIAGNOSTICS=51
+TARGET_TYPES=221
+TARGET_MEMBERS=2669
+TOTAL_DIAGNOSTICS=55
 COMPLETE_TYPES=213
-PARTIAL_TYPES=6
-MISSING_TYPES=38
-MISSING_TYPE=38
-MISSING_MEMBER=10
+PARTIAL_TYPES=8
+MISSING_TYPES=36
+MISSING_TYPE=36
+MISSING_MEMBER=16
 UNEXPECTED_TYPE=0
 UNEXPECTED_MEMBER=0
 TYPE_KIND_MISMATCH=0
@@ -63,11 +63,11 @@ WRITE_ONLY_PROJECTIONS=0
 MEASURED_ACCESSOR_PROJECTIONS=113
 PENDING_ACCESSOR_PROJECTIONS=1
 GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS=2
-NONPUBLIC_CONSTRUCTION_PROJECTIONS=45
+NONPUBLIC_CONSTRUCTION_PROJECTIONS=47
 EVENT_PROJECTIONS=49
 EVENT_SUPPORT_TYPE_MEASUREMENTS=4
-BCL_SUPPORT_TYPE_MEASUREMENTS=20
-XNA_SEALED_CLASS_PROJECTIONS=56
+BCL_SUPPORT_TYPE_MEASUREMENTS=24
+XNA_SEALED_CLASS_PROJECTIONS=57
 NONDERIVABLE_UNSEALED_CLASSES=0
 BCL_RESOURCE_STRING_PROJECTIONS=31
 BCL_ABSTRACT_BASE_WIDENINGS=1
@@ -88,8 +88,8 @@ NULLABLE_INFALLIBLE_RETURN_PROJECTIONS=68
 NULLABLE_FALLIBLE_RETURN_PROJECTIONS=45
 NONNULL_INFALLIBLE_RETURN_PROJECTIONS=67
 NONNULL_FALLIBLE_RETURN_PROJECTIONS=67
-MEASURED_RETURN_NULLABILITY_PROJECTIONS=278
-PENDING_RETURN_NULLABILITY_PROJECTIONS=91
+MEASURED_RETURN_NULLABILITY_PROJECTIONS=291
+PENDING_RETURN_NULLABILITY_PROJECTIONS=78
 OPTIONAL_RETURN_PROJECTIONS_OBSERVED=100
 ```
 
@@ -347,6 +347,22 @@ Expected members: 16; emitted members: 15.
 - `MISSING_MEMBER` — `Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String?,source:Foundation.InputStream)`: mapped member is absent
 - `OVERLOAD_MAPPING_MISMATCH` — `Microsoft.Xna.Framework.Media.MediaLibrary.SavePicture(_:String?,source:Foundation.InputStream)`: required overload is absent
 
+### `Microsoft.Xna.Framework.Storage.StorageContainer`
+
+Expected members: 18; emitted members: 13.
+
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Storage.StorageContainer.CreateFile(_:String)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Storage.StorageContainer.OpenFile(_:String,fileMode:CNAFileMode)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Storage.StorageContainer.OpenFile(_:String,fileMode:CNAFileMode,fileAccess:CNAFileAccess)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Storage.StorageContainer.OpenFile(_:String,fileMode:CNAFileMode,fileAccess:CNAFileAccess,fileShare:CNAFileShare)`: mapped member is absent
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Storage.StorageContainer.Disposing()`: mapped member is absent
+
+### `Microsoft.Xna.Framework.Storage.StorageDevice`
+
+Expected members: 12; emitted members: 11.
+
+- `MISSING_MEMBER` — `Microsoft.Xna.Framework.Storage.StorageDevice.DeviceChanged()`: mapped member is absent
+
 ### `Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException`
 
 Expected members: 4; emitted members: 3.
@@ -392,5 +408,3 @@ Expected members: 4; emitted members: 3.
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPart`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection`
 - `Microsoft.Xna.Framework.Graphics.ModelMeshPartCollection.Enumerator`
-- `Microsoft.Xna.Framework.Storage.StorageContainer`
-- `Microsoft.Xna.Framework.Storage.StorageDevice`

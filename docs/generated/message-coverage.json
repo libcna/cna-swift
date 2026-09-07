@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "profile": "messages reachable from implemented members",
   "summary": {
-    "MESSAGE_COVERAGE_TYPES": 219,
+    "MESSAGE_COVERAGE_TYPES": 221,
     "RESOLVED_TYPES": 204,
-    "UNRESOLVED_TYPES": 15,
+    "UNRESOLVED_TYPES": 17,
     "STRING_TABLES_READ": 2,
     "MEMBERS_READ": 1938,
     "MESSAGES_REPRODUCED": 402,
@@ -29,6 +29,8 @@
     "Microsoft.Xna.Framework.Media.Video",
     "Microsoft.Xna.Framework.Media.VideoPlayer",
     "Microsoft.Xna.Framework.Media.VideoSoundtrackType",
+    "Microsoft.Xna.Framework.Storage.StorageContainer",
+    "Microsoft.Xna.Framework.Storage.StorageDevice",
     "Microsoft.Xna.Framework.Storage.StorageDeviceNotConnectedException"
   ]
 }

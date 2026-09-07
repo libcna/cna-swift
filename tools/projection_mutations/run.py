@@ -38,6 +38,9 @@ TITLE = ROOT / "Sources/CNA/Xna/Framework/TitleContainer.swift"
 MOUSE = ROOT / "Sources/CNA/Xna/Input/Mouse.swift"
 ADAPTER = ROOT / "Sources/CNA/Xna/Graphics/GraphicsAdapter.swift"
 CONTENT = ROOT / "Sources/CNA/Xna/Content/ContentManager.swift"
+STORAGE_DEVICE = ROOT / "Sources/CNA/Xna/Storage/StorageDevice.swift"
+STORAGE_CONTAINER = ROOT / "Sources/CNA/Xna/Storage/StorageContainer.swift"
+STORAGE_ASYNC = ROOT / "Sources/CNA/Xna/Storage/StorageAsyncResult.swift"
 OCCLUSION = ROOT / "Sources/CNA/Xna/Graphics/OcclusionQuery.swift"
 SOUND = ROOT / "Sources/CNA/Xna/Audio/SoundEffect.swift"
 SOUND_INSTANCE = ROOT / "Sources/CNA/Xna/Audio/SoundEffectInstance.swift"
@@ -616,6 +619,80 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                throw CNAArgumentNullException(paramName: \"listeners\")\n"
         "            }",
         "            let listeners = listeners ?? []",
+    ),
+    # ---- Foundation 102: Storage ------------------------------------------
+    (
+        "storage-result-reports-it-is-still-running",
+        "an IAsyncResult from a route that has already finished reporting "
+        "IsCompleted false, so a caller polls for a completion that happened "
+        "before Begin returned",
+        STORAGE_ASYNC,
+        "    var IsCompleted: Bool { true }",
+        "    var IsCompleted: Bool { false }",
+    ),
+    (
+        "storage-result-claims-asynchrony-it-does-not-have",
+        "CompletedSynchronously answering false, which tells a caller the work "
+        "happened on another thread when CNA ran it on this one",
+        STORAGE_ASYNC,
+        "    var CompletedSynchronously: Bool { true }",
+        "    var CompletedSynchronously: Bool { false }",
+    ),
+    (
+        "storage-begin-never-calls-its-callback",
+        "Begin returning without invoking the callback it was given, so a "
+        "caller that only reacts through the callback never learns the work is "
+        "done",
+        STORAGE_DEVICE,
+        "            callback(result)",
+        "            _ = callback",
+    ),
+    (
+        "storage-end-accepts-a-result-from-the-other-begin",
+        "EndShowSelector reading a container handle as a device, which the "
+        "kind tag exists to refuse",
+        STORAGE_DEVICE,
+        """            guard let produced = result as? StorageAsyncResult,
+                  produced.kind == .device else {""",
+        """            guard let produced = result as? StorageAsyncResult,
+                  produced.kind != .container || true else {""",
+    ),
+    (
+        "storage-free-space-answers-the-total",
+        "FreeSpace reading the total-space route, so a nearly full device "
+        "reports itself empty",
+        STORAGE_DEVICE,
+        """                    functions.storageDeviceGetFreeSpace(live, &value),
+                    operation: "cna_storage_device_get_free_space")""",
+        """                    functions.storageDeviceGetTotalSpace(live, &value),
+                    operation: "cna_storage_device_get_free_space")""",
+    ),
+    (
+        "storage-container-dispose-does-not-mark-itself",
+        "Dispose releasing the native container without setting the flag, so "
+        "IsDisposed keeps answering false and every later call is made against "
+        "a disposed handle",
+        STORAGE_CONTAINER,
+        "            disposed = true",
+        "            _ = disposed",
+    ),
+    (
+        "storage-container-search-pattern-ignored",
+        "GetFileNames(pattern) counting with the caller's pattern and copying "
+        "with a wildcard, so the names come back from a different set than the "
+        "count measured",
+        STORAGE_CONTAINER,
+        "        private func names(_ pattern: String, directories: Bool) throws -> [String] {\n            let live = try validated()\n            var utf8 = Array(pattern.utf8)",
+        "        private func names(_ pattern: String, directories: Bool) throws -> [String] {\n            let live = try validated()\n            var utf8 = Array(\"*\".utf8)",
+    ),
+    (
+        "storage-container-handle-not-released",
+        "a container dropped without Dispose leaving its native handle alive -- "
+        "the defect Foundation 101 found in ContentManager, planted in the type "
+        "written straight after it",
+        STORAGE_CONTAINER,
+        "            _ = functions.storageContainerDestroy(handle)",
+        "            _ = handle",
     ),
     # ---- Foundation 101: the one owned type without a release --------------
     (

@@ -577,6 +577,12 @@ typedef struct CNASwift_VisualizationData {
 
 typedef void (*CNASwift_AudioEventCallback)(void* context);
 
+/* CNA_StorageCompletionCallback. The same `void (*)(void*)` shape as the audio
+ * one, and mirrored separately rather than reused: the ABI gate pairs a shim
+ * typedef with a C prototype by NAME, so sharing one would leave the storage
+ * routes' callback parameter unchecked. */
+typedef void (*CNASwift_StorageCompletionCallback)(void* context);
+
 typedef struct CNASwift_AudioEmitter {
     uint32_t struct_size;
     uint32_t struct_version;

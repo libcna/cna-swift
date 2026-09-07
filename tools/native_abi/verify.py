@@ -82,6 +82,10 @@ MIRRORED_CALLBACKS = [
     # The audio event callback carries no data at all -- `void (*)(void*)` --
     # and DynamicSoundEffectInstance.BufferNeeded is what consumes it.
     "AudioEventCallback", "MediaPlayerEventCallback",
+    # Same `void (*)(void*)` shape as the audio one and mirrored anyway: this
+    # table pairs by name, so a shared typedef would leave the storage routes'
+    # callback parameter unpaired and unchecked.
+    "StorageCompletionCallback",
 ]
 
 # The scalar typedefs a mirrored declaration may name on either side. The
@@ -219,6 +223,9 @@ def canonical_type(value: str) -> str:
         "CNA_AlbumCollectionHandle": "uint64_t",
         "CNA_GenreCollectionHandle": "uint64_t",
         "CNA_MediaLibraryHandle": "uint64_t",
+        "CNA_StorageDeviceHandle": "uint64_t",
+        "CNA_StorageContainerHandle": "uint64_t",
+        "CNA_StorageStreamHandle": "uint64_t",
         "CNA_PictureHandle": "uint64_t",
         "CNA_PictureAlbumHandle": "uint64_t",
         "CNA_PictureCollectionHandle": "uint64_t",

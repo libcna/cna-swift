@@ -582,6 +582,16 @@ FOUNDATION_UNQUALIFIED_TYPES = frozenset({
     "InputStream", "OutputStream", "URL", "Date",
 })
 
+# A CLR delegate projects as a Swift closure typealias, and a Swift typealias
+# is TRANSPARENT in the Symbol Graph: `CNAAsyncCallback` arrives here already
+# expanded to its function type. Folding it back is what lets the mapping name
+# the delegate rather than its expansion -- the same shape of fix as the
+# Foundation set above, where the graph drops a module qualifier the mapping
+# keeps (Foundation 102).
+DELEGATE_ALIASES = {
+    "CNAAsyncResult -> Void": "CNAAsyncCallback",
+}
+
 
 def normalize_swift_type(text: str) -> str:
     value = re.sub(r"\s+", " ", text.strip())
@@ -622,6 +632,10 @@ def normalize_swift_type(text: str) -> str:
     # a reported mismatch. A set is what stops the fourth.
     if value.rstrip("?") in FOUNDATION_UNQUALIFIED_TYPES:
         value = "Foundation." + value
+    optional = value.endswith("?")
+    folded = DELEGATE_ALIASES.get(value.rstrip("?"))
+    if folded is not None:
+        value = folded + ("?" if optional else "")
     value = value.replace("()", "Void") if value == "()" else value
     return value
 

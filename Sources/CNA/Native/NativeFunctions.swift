@@ -281,6 +281,37 @@ internal final class NativeFunctions {
     typealias SongGetAlbumRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias SongGetGenreRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias MediaLibraryCreateRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+
+    // ---- Foundation 102: Storage ----
+    typealias StorageDeviceShowSelectorRoute = @convention(c) (CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageDeviceShowSelectorForPlayerRoute = @convention(c) (UInt32, CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageDeviceShowSelectorWithSpaceRoute = @convention(c) (Int32, Int32, CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageDeviceShowSelectorForPlayerWithSpaceRoute = @convention(c) (UInt32, Int32, Int32, CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageDeviceGetFreeSpaceRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias StorageDeviceGetIsConnectedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias StorageDeviceGetTotalSpaceRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias StorageDeviceDeleteContainerRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias StorageDeviceSubscribeDeviceChangedRoute = @convention(c) (CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageDeviceUnsubscribeDeviceChangedRoute = @convention(c) (UInt64) -> UInt32
+    typealias StorageDeviceDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias StorageContainerOpenRoute = @convention(c) (UInt64, CNASwift_StringView, CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerGetDisplayNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerCopyDisplayNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias StorageContainerGetStorageDeviceRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerDisposeRoute = @convention(c) (UInt64) -> UInt32
+    typealias StorageContainerSubscribeDisposingRoute = @convention(c) (UInt64, CNASwift_StorageCompletionCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerUnsubscribeDisposingRoute = @convention(c) (UInt64) -> UInt32
+    typealias StorageContainerCreateDirectoryRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias StorageContainerDirectoryExistsRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias StorageContainerDeleteDirectoryRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias StorageContainerFileExistsRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias StorageContainerDeleteFileRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias StorageContainerGetDirectoryNameCountRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerCopyDirectoryNameRoute = @convention(c) (UInt64, CNASwift_StringView, UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerGetFileNameCountRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerCopyFileNameRoute = @convention(c) (UInt64, CNASwift_StringView, UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias MediaLibraryDisposeRoute = @convention(c) (UInt64) -> UInt32
     typealias MediaLibraryDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias MediaLibraryGetIsDisposedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
@@ -920,6 +951,36 @@ internal final class NativeFunctions {
     let mediaLibrarySavePicture: MediaLibrarySavePictureRoute
     let mediaLibraryGetPictureFromToken: MediaLibraryGetPictureFromTokenRoute
     let mediaLibraryCreate: MediaLibraryCreateRoute
+
+    let storageDeviceShowSelector: StorageDeviceShowSelectorRoute
+    let storageDeviceShowSelectorForPlayer: StorageDeviceShowSelectorForPlayerRoute
+    let storageDeviceShowSelectorWithSpace: StorageDeviceShowSelectorWithSpaceRoute
+    let storageDeviceShowSelectorForPlayerWithSpace: StorageDeviceShowSelectorForPlayerWithSpaceRoute
+    let storageDeviceGetFreeSpace: StorageDeviceGetFreeSpaceRoute
+    let storageDeviceGetIsConnected: StorageDeviceGetIsConnectedRoute
+    let storageDeviceGetTotalSpace: StorageDeviceGetTotalSpaceRoute
+    let storageDeviceDeleteContainer: StorageDeviceDeleteContainerRoute
+    let storageDeviceSubscribeDeviceChanged: StorageDeviceSubscribeDeviceChangedRoute
+    let storageDeviceUnsubscribeDeviceChanged: StorageDeviceUnsubscribeDeviceChangedRoute
+    let storageDeviceDestroy: StorageDeviceDestroyRoute
+    let storageContainerOpen: StorageContainerOpenRoute
+    let storageContainerGetDisplayNameSize: StorageContainerGetDisplayNameSizeRoute
+    let storageContainerCopyDisplayName: StorageContainerCopyDisplayNameRoute
+    let storageContainerGetIsDisposed: StorageContainerGetIsDisposedRoute
+    let storageContainerGetStorageDevice: StorageContainerGetStorageDeviceRoute
+    let storageContainerDispose: StorageContainerDisposeRoute
+    let storageContainerSubscribeDisposing: StorageContainerSubscribeDisposingRoute
+    let storageContainerUnsubscribeDisposing: StorageContainerUnsubscribeDisposingRoute
+    let storageContainerCreateDirectory: StorageContainerCreateDirectoryRoute
+    let storageContainerDirectoryExists: StorageContainerDirectoryExistsRoute
+    let storageContainerDeleteDirectory: StorageContainerDeleteDirectoryRoute
+    let storageContainerFileExists: StorageContainerFileExistsRoute
+    let storageContainerDeleteFile: StorageContainerDeleteFileRoute
+    let storageContainerGetDirectoryNameCount: StorageContainerGetDirectoryNameCountRoute
+    let storageContainerCopyDirectoryName: StorageContainerCopyDirectoryNameRoute
+    let storageContainerGetFileNameCount: StorageContainerGetFileNameCountRoute
+    let storageContainerCopyFileName: StorageContainerCopyFileNameRoute
+    let storageContainerDestroy: StorageContainerDestroyRoute
     let mediaLibraryDispose: MediaLibraryDisposeRoute
     let mediaLibraryDestroy: MediaLibraryDestroyRoute
     let mediaLibraryGetIsDisposed: MediaLibraryGetIsDisposedRoute
@@ -1515,6 +1576,35 @@ internal final class NativeFunctions {
         playlistGetDuration = try library.resolve("cna_playlist_get_duration", as: PlaylistGetDurationRoute.self)
         mediaLibraryGetPlaylists = try library.resolve("cna_media_library_get_playlists", as: MediaLibraryGetPlaylistsRoute.self)
         mediaLibraryCreateFromSource = try library.resolve("cna_media_library_create_from_source", as: MediaLibraryCreateFromSourceRoute.self)
+        storageDeviceShowSelector = try library.resolve("cna_storage_device_show_selector", as: StorageDeviceShowSelectorRoute.self)
+        storageDeviceShowSelectorForPlayer = try library.resolve("cna_storage_device_show_selector_for_player", as: StorageDeviceShowSelectorForPlayerRoute.self)
+        storageDeviceShowSelectorWithSpace = try library.resolve("cna_storage_device_show_selector_with_space", as: StorageDeviceShowSelectorWithSpaceRoute.self)
+        storageDeviceShowSelectorForPlayerWithSpace = try library.resolve("cna_storage_device_show_selector_for_player_with_space", as: StorageDeviceShowSelectorForPlayerWithSpaceRoute.self)
+        storageDeviceGetFreeSpace = try library.resolve("cna_storage_device_get_free_space", as: StorageDeviceGetFreeSpaceRoute.self)
+        storageDeviceGetIsConnected = try library.resolve("cna_storage_device_get_is_connected", as: StorageDeviceGetIsConnectedRoute.self)
+        storageDeviceGetTotalSpace = try library.resolve("cna_storage_device_get_total_space", as: StorageDeviceGetTotalSpaceRoute.self)
+        storageDeviceDeleteContainer = try library.resolve("cna_storage_device_delete_container", as: StorageDeviceDeleteContainerRoute.self)
+        storageDeviceSubscribeDeviceChanged = try library.resolve("cna_storage_device_subscribe_device_changed", as: StorageDeviceSubscribeDeviceChangedRoute.self)
+        storageDeviceUnsubscribeDeviceChanged = try library.resolve("cna_storage_device_unsubscribe_device_changed", as: StorageDeviceUnsubscribeDeviceChangedRoute.self)
+        storageDeviceDestroy = try library.resolve("cna_storage_device_destroy", as: StorageDeviceDestroyRoute.self)
+        storageContainerOpen = try library.resolve("cna_storage_container_open", as: StorageContainerOpenRoute.self)
+        storageContainerGetDisplayNameSize = try library.resolve("cna_storage_container_get_display_name_size", as: StorageContainerGetDisplayNameSizeRoute.self)
+        storageContainerCopyDisplayName = try library.resolve("cna_storage_container_copy_display_name", as: StorageContainerCopyDisplayNameRoute.self)
+        storageContainerGetIsDisposed = try library.resolve("cna_storage_container_get_is_disposed", as: StorageContainerGetIsDisposedRoute.self)
+        storageContainerGetStorageDevice = try library.resolve("cna_storage_container_get_storage_device", as: StorageContainerGetStorageDeviceRoute.self)
+        storageContainerDispose = try library.resolve("cna_storage_container_dispose", as: StorageContainerDisposeRoute.self)
+        storageContainerSubscribeDisposing = try library.resolve("cna_storage_container_subscribe_disposing", as: StorageContainerSubscribeDisposingRoute.self)
+        storageContainerUnsubscribeDisposing = try library.resolve("cna_storage_container_unsubscribe_disposing", as: StorageContainerUnsubscribeDisposingRoute.self)
+        storageContainerCreateDirectory = try library.resolve("cna_storage_container_create_directory", as: StorageContainerCreateDirectoryRoute.self)
+        storageContainerDirectoryExists = try library.resolve("cna_storage_container_directory_exists", as: StorageContainerDirectoryExistsRoute.self)
+        storageContainerDeleteDirectory = try library.resolve("cna_storage_container_delete_directory", as: StorageContainerDeleteDirectoryRoute.self)
+        storageContainerFileExists = try library.resolve("cna_storage_container_file_exists", as: StorageContainerFileExistsRoute.self)
+        storageContainerDeleteFile = try library.resolve("cna_storage_container_delete_file", as: StorageContainerDeleteFileRoute.self)
+        storageContainerGetDirectoryNameCount = try library.resolve("cna_storage_container_get_directory_name_count", as: StorageContainerGetDirectoryNameCountRoute.self)
+        storageContainerCopyDirectoryName = try library.resolve("cna_storage_container_copy_directory_name", as: StorageContainerCopyDirectoryNameRoute.self)
+        storageContainerGetFileNameCount = try library.resolve("cna_storage_container_get_file_name_count", as: StorageContainerGetFileNameCountRoute.self)
+        storageContainerCopyFileName = try library.resolve("cna_storage_container_copy_file_name", as: StorageContainerCopyFileNameRoute.self)
+        storageContainerDestroy = try library.resolve("cna_storage_container_destroy", as: StorageContainerDestroyRoute.self)
         mediaSourceGetAvailableCount = try library.resolve("cna_media_source_get_available_count", as: MediaSourceGetAvailableCountRoute.self)
         mediaSourceGetNameSizeAt = try library.resolve("cna_media_source_get_name_size_at", as: MediaSourceGetNameSizeAtRoute.self)
         mediaSourceCopyNameAt = try library.resolve("cna_media_source_copy_name_at", as: MediaSourceCopyNameAtRoute.self)

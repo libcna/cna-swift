@@ -40,18 +40,18 @@ records one entry per control and the comparison is byte-for-byte; the report
 stores only their sha, so their paths live in this command.
 
 ```text
-932 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=51   COMPLETE_TYPES=213   PARTIAL_TYPES=6
-MISSING_TYPE=38  MISSING_MEMBER=10  OVERLOAD_MAPPING_MISMATCH=3
+943 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
+TOTAL_DIAGNOSTICS=55   COMPLETE_TYPES=213   PARTIAL_TYPES=8
+MISSING_TYPE=36  MISSING_MEMBER=16  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=612  PROTOTYPE_TYPE_POSITIONS=2052  LAYOUTS=64  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=376  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
+BOUND_FUNCTIONS=641  PROTOTYPE_TYPE_POSITIONS=2164  LAYOUTS=64  ABI_MISMATCHES=0
+PROJECTION_MUTATIONS=384  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
 PROJECTION_MUTATIONS_CAUGHT=135
 WITHDRAWN_IN_SOURCE=26 with the reason written where each stood
 REPLACED_NO_OPS_IN_SOURCE=2
 NATIVE_ABI_MUTATIONS=14 NATIVE_ABI_MUTATIONS_CAUGHT=14
 MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2464  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
+API_COMPAT_SELF_TESTS=2494  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
 BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=44  BCL_SENTINEL_CHECKS=651
 RESOURCE_STRINGS_REPRODUCED=79  ACCESSOR_SELF_TESTS=41
 ```
@@ -1581,6 +1581,70 @@ The admission is still worth keeping. It is what made the measurement
 authoritative rather than a recollection about a framework, it hardened the
 audit by 143 sentinel checks and 35 mutations, and it is a precondition for
 anything that ever does consume `System.dll`.
+
+### Foundation 102 — Storage, projected
+
+**Two types, and the first ones that do not live in a game's runtime.**
+`MISSING_TYPE` 38 → 36, `PARTIAL_TYPES` 6 → 8, every disagreement category
+still zero. 943 tests, 641 bound routes, `ABI_MISMATCHES=0`, eight new
+mutations and all eight caught.
+
+`cna_storage_device_show_selector` takes no game handle, and XNA's own
+`StorageDevice` is usable without a `Game`. Every other owned type here reaches
+its routes through `RuntimeRegistry.current()`, which refuses outside a
+callback, so requiring one would have been this binding narrowing a contract
+the ABI does not narrow. `StorageDevice` reaches `NativeFunctions.load()`
+instead — cached, and needing nothing.
+
+The price is lifetime. With no `RuntimeState` there is no child registry to
+fall back on, so both types release their own handle in `deinit`. That is
+written down rather than assumed because Foundation 101 had just found the
+consequence of not doing it, and `storage-container-handle-not-released` is
+that defect planted deliberately in the type written straight afterwards.
+
+**The Begin/End pair projects over work that has already finished.**
+`show_selector`'s header says its completion callback fires "before this call
+returns", so `Begin` does the work, invokes the callback and hands back an
+`IAsyncResult` reporting `IsCompleted` and `CompletedSynchronously`. That is
+not a shortcut: `CompletedSynchronously` is in the CLR contract precisely so an
+operation that finished on the calling thread can say so. A thread that
+pretended to work would report a concurrency this runtime has not got.
+
+**Four members are missing and the Swift side is why.** `CreateFile` and the
+three `OpenFile` overloads return `System.IO.Stream`, mapped here to
+`Foundation.InputStream` — a READ stream. CNA has the whole thing: eleven
+`cna_storage_stream_*` routes, measured writing and reading a file in
+`build-probe/f102_storage.c`. Returning an `InputStream` would satisfy the
+signature gate, because a signature gate compares spellings, and would hand a
+caller an object that cannot write to a file XNA says is writable. They wait on
+a decision about `System.IO.Stream`'s mapping, which `TitleContainer.OpenStream`
+also depends on.
+
+**What the gates caught that I had got wrong**, all four found by a tool
+reading the pinned metadata rather than by review:
+
+* fifteen `PARAMETER_MAPPING_MISMATCH`es, every one an optional I had added so
+  a null could be refused. The contract has those parameters non-nullable —
+  and distinguishes finely, since `state: Any?` IS optional. In Swift the type
+  system does that refusing, so the guards were dead code;
+* five more from a Swift **typealias being transparent in the Symbol Graph**:
+  `CNAAsyncCallback` arrives already expanded to `CNAAsyncResult -> Void`. The
+  normalizer folds it back now, the same shape of fix as the Foundation types
+  whose module qualifier the graph drops;
+* two `PROPERTY_MAPPING_MISMATCH`es that were exact opposites.
+  `StorageContainer.StorageDevice` returns a reference this type already holds,
+  so I wrote it non-throwing — but the CLR getter is fallible, and reading it
+  on a disposed container raises. `StorageDevice.IsConnected` calls a route
+  that can fail, so I wrote `get throws` — but the CLR getter has no failure
+  path, and a Swift reader that threw would offer a refusal XNA cannot produce.
+  Neither was guessed; both were read out of the IL and named.
+
+**One mutation survived and it was the useful one.**
+`storage-free-space-answers-the-total` lived because the test asserted
+`free <= total`, which a `FreeSpace` reading the total-space route satisfies
+exactly. Strengthened to a strict `<`. That leans on the host having something
+on its volume — a genuinely empty one would fail here, loudly, which is the
+right direction for an assertion that has stopped telling two routes apart.
 
 ### Foundation 102 — the Storage closure, and an audit that could not see a field
 
