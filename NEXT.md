@@ -59,6 +59,25 @@ RESOURCE_STRINGS_REPRODUCED=79  ACCESSOR_SELF_TESTS=41
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
 with the pinned metadata.
 
+## Where to start, after Foundation 101 re-costed everything
+
+This file used to say the remaining 38 types sat behind five decisions. Three
+of them turned out to be work with a known price, and only two are decisions:
+
+| start with | why |
+|---|---|
+| **`Model`, 12 types** | **no measured blocker.** 134 CNA routes, four of which create with no game, device or asset; every public signature in the family names only `Matrix`, `BoundingSphere`, `Effect`, `VertexBuffer`, `IndexBuffer` and itself, and no BCL type at all. The `.xnb` this file called its blocker is needed by `ContentManager.Load<Model>` and by nothing else |
+| **`Storage`, 2 types** | ~8 BCL members, and CNA's routes are synchronous so the Begin/End pair projects over a call that has already finished |
+| **`Content` readers, 5 types** | ~66 BCL members: `BinaryReader` as a real Swift base plus `ResourceManager`. `Encoding` is NOT needed |
+
+The two that really are decisions: **XACT** needs a `.xgs` and banks — confirmed
+by probe, `cna_audio_engine_create` takes a settings path — and **`Design`**
+needs someone to trade away *nothing implemented disagrees with the pinned
+metadata*, which is not a milestone's call to make.
+
+All five are measured in "Everything left is behind five decisions" below. Read
+that before planning, and read the five facts here before planning anything.
+
 ## Five facts that bound everything below
 
 Measured, not assumed. A plan that ignores one of these will produce work that
@@ -545,19 +564,19 @@ all eight is caught by a host with no touch device reporting phantom touches.
 structure, after `CNA_VISUALIZATION_DATA_SIZE` -- the parser that learned about
 those in Foundation 96 needed no further change.
 
-### Everything left is behind four decisions, and here they are
+### Everything left is behind five decisions, and here they are
 
 With Media, Input and GamerServices complete, the remaining **38 types and 10
-members** are not a queue of work but four questions. Nothing is left that can
+members** are not a queue of work but five questions. Nothing is left that can
 simply be written.
 
 | what | types | what it needs | costed? |
 |---|---:|---|---|
-| `Design` converters | 13 | **`System.dll`'s ComponentModel closure** admitted to the same non-vacuous standard `mscorlib` met: 7 types, ~151 members, and System.dll's first-time admission | yes, in this file |
-| `Model` family | 12 | a way to **produce** a `.xnb`, or shipped fixtures -- `cna_content_manager_load_model` reads one and this repository has none | partly |
+| `Design` converters | 13 | **a decision this file cannot make.** The `System.dll` closure is admitted (Foundation 100) and it was not the blocker: `MathTypeConverter` advertises exactly one conversion target of its own, `ComponentModel.Design.Serialization.InstanceDescriptor`, which the base type also accepts as its only source. That is a reflected `ConstructorInfo` plus an argument list, for a design-time source emitter. Either project a reflection surface Swift cannot supply faithfully, or answer `false` where XNA answers `true` — the project's first DISAGREEMENT | yes, and the answer is no |
+| `Model` family | 12 | **nothing measured.** 134 CNA routes, four of which create with no game, device or asset; every public signature in the family names only `Matrix`, `BoundingSphere`, `Effect`, `VertexBuffer`, `IndexBuffer` and itself; no BCL type appears in any of them. The `.xnb` is needed by `ContentManager.Load<Model>` and nothing else | yes, Foundation 101 |
 | XACT family | 6 | a `.xgs` settings file and `.xsb`/`.xwb` banks, same question one asset kind over | no |
-| `Content` readers | 5 | **`System.IO.BinaryReader`** (`ContentReader` derives from it) and `System.Resources.ResourceManager` | no |
-| `Storage` | 2 | `System.IAsyncResult`, `System.AsyncCallback`, and the three `System.IO` file enums | no |
+| `Content` readers | 5 | `System.IO.BinaryReader` as a real Swift base (27 methods + 1 property, subsettable) and `System.Resources.ResourceManager` (23 + 15). **~66 BCL members** | yes, Foundation 101 |
+| `Storage` | 2 | `System.IAsyncResult` (4 + 4), a delegate, and three empty enums. **~8 BCL members** — the smallest closure left | yes, Foundation 101 |
 
 The ten missing members are the same four questions in miniature, plus three
 that are **measured impossibilities** rather than decisions:
@@ -567,11 +586,127 @@ a stream handle this binding cannot make), and
 `DynamicSoundEffectInstance.Play`/`IsLooped` (C#'s `new`, which Swift has no
 word for).
 
-**The order that costs least.** `Design` is the only one already costed, needs
-no CNA route at all, and unblocks the largest single group; the content question
-unblocks eighteen types across two families but is a design decision about what
-this repository ships. Everything else waits on a BCL admission whose size has
-not been measured.
+**The order that costs least, revised at Foundation 100.** `Design` used to
+head this list: already costed, no CNA route needed, the largest single group.
+That reasoning survived the admission and died on the first branch of
+`CanConvertTo`. It is now the **most** blocked of the five, and the only one
+whose blocker is not effort but a trade — thirteen design-time IDE types
+against the sentence *nothing implemented disagrees with the pinned metadata*.
+That is not a milestone's decision to make.
+
+The content question unblocks the most at once: eighteen types across two
+families, and it is a decision about what this repository ships rather than a
+measurement anyone still needs to take.
+
+**`Content` readers and `Storage` are no longer uncosted.** Measured at
+Foundation 101, both are *smaller* than the ComponentModel closure that turned
+out unprojectable, and the measurement that made them small is the same one
+that saved the Design milestone from a wasted week: **look at the signatures,
+not at the bodies.**
+
+* **`Storage`'s whole surface has been walked and it needs no async runtime.**
+  Across both types the only things a public signature names are
+  `IAsyncResult` (7), `AsyncCallback` (5), `PlayerIndex`, `EventHandler<T>`,
+  `EventArgs`, `Stream` and the three file enums. Everything there except the
+  first two is already projected or mapped.
+
+  And the Begin/End pair is not a design question, because the pinned metadata
+  decides it: the projection declares what XNA declares or the gate reports a
+  mismatch, so Swift concurrency is not on the table however much nicer it
+  would read. What makes that cheap rather than painful is that **CNA's
+  storage routes are synchronous** — `cna_storage_device_show_selector`, with
+  no begin, no end and no callback, plus `subscribe_device_changed` for the
+  event. So `BeginShowSelector` projects over a call that has already finished:
+  an `IAsyncResult` reporting `IsCompleted` and `CompletedSynchronously`, and
+  a callback invoked at once. That is the CLR's own contract for an operation
+  that completes inline, and it is what this host actually does — which is the
+  thing to report, rather than pretending at an asynchrony the runtime has not
+  got.
+
+* **It is also the cheapest thing left in this table.** Its two types declare
+  33 methods and 6 properties, and the only BCL its public signatures need is
+  `System.IAsyncResult` (4 methods, 4 properties), a delegate, and three enums
+  that declare nothing. `System.IO.Stream` is already mapped to
+  `Foundation.InputStream`. `DirectoryInfo` and `Path` appear **nine times
+  each — and never once in a signature.** They are how `StorageContainer`
+  builds paths internally, so they need no projection at all, exactly as the
+  reflection inside `Design`'s private descriptors would not have. Counting
+  body references, as the first pass here did, made this family look like it
+  dragged in `FileSystemInfo` and `MarshalByRefObject`. It does not.
+* **`Content` readers cost about 66 BCL members.** `ContentReader`'s public
+  signatures mention nothing from the BCL at all — but it *derives* from
+  `System.IO.BinaryReader`, and this project's rule is that a BCL base with a
+  registered projection becomes a REAL Swift superclass, so those 28 members
+  are required by inheritance rather than by any signature. `ResourceManager`
+  (38) is needed because `ResourceContentManager` names it. **`System.Text.Encoding`
+  is not needed**: it appears in no signature of the five, and a BCL base is
+  projected as a measured subset, the way `CNAList` is sixteen of `List<T>`'s
+  fifty-two. Assuming otherwise would have added 104 members to the estimate.
+
+So the order by BCL cost is now `Storage` (~8), `Content` readers (~66), then
+the two asset questions, with `Design` last and blocked on a trade rather than
+on work. That is close to the reverse of what this section said before
+Foundation 100.
+
+**And the two asset questions are not the same question.** Both were recorded
+here as "needs an asset", and a probe says only one of them is.
+
+* **XACT is asset-blocked, confirmed.** `cna_audio_engine_create` takes
+  `(game, CNA_StringView settings_file, out_engine)` and
+  `cna_sound_bank_create` takes `(engine, CNA_StringView filename, out_bank)`.
+  A first reading here claimed both took no path at all — that was a truncated
+  `grep -A` splicing two declarations together, and building the probe is what
+  refused to compile and exposed it. The recorded blocker stands exactly as
+  written.
+* **Model is not, or not in the way recorded.** `build-probe/f101_model.c`
+  measures `cna_model_create_default` and `cna_model_bone_create_default`
+  answering `CNA_RESULT_SUCCESS` with **no game, no graphics device and no
+  asset**. CNA publishes 134 `cna_model_*` routes including
+  `cna_model_create`, `cna_model_mesh_create`, `cna_model_mesh_part_create`
+  and a create for each of the three collections. XNA's `Model` has no public
+  constructor, so the projection offers none either — but it does not need
+  one: the binding already has the pattern for adopting a natively created
+  handle into a facade whose CLR type cannot be constructed, which is
+  `Texture2D.adoptLoaded(handle:runtime:)` from Foundation 87.
+
+  So "a way to **produce** a `.xnb`" is what `ContentManager.Load<Model>`
+  needs. It is not what projecting and exercising the twelve types needs. That
+  is the same shape as the Media finding two sections down, which this file
+  already states plainly: **the family looked asset-blocked because its
+  neighbours are.**
+
+  That last question is now answered too. Four routes succeed with **nothing**
+  — `cna_model_create_default`, `cna_model_bone_create_default`,
+  `cna_model_mesh_part_create_default` and `cna_model_bone_collection_create`,
+  all `CNA_RESULT_SUCCESS` in `build-probe/f101_model.c`. The two that need
+  more need only what this binding already has:
+
+  ```text
+  cna_model_mesh_create(graphics_device, parts, count, out_mesh)
+  cna_model_mesh_part_create(vertex_buffer, index_buffer, ...)
+  ```
+
+  A `GraphicsDevice`, a `VertexBuffer` and an `IndexBuffer` are all projected
+  and all exercised by the existing suites. So the family can be built
+  end-to-end out of parts this repository can already make, and the content
+  pipeline is needed for `ContentManager.Load<Model>` and for nothing else.
+
+  **And the surface has now been walked.** Every public signature across the
+  family mentions exactly six things outside itself:
+
+  ```text
+  Matrix  BoundingSphere  Effect  VertexBuffer  IndexBuffer
+  ```
+
+  All projected. **No BCL type appears in any signature of the family at all** —
+  no reflection, no stream, no `InstanceDescriptor`, nothing async. The twelve
+  are eight types plus four nested `Enumerator`s, and nested enumerators are a
+  settled pattern here (`ENUMERATOR_SUPPORT_PROJECTIONS=13`).
+
+  So the reason recorded against Model for several Foundations does not survive
+  a probe, and the surface walk that caught `Design` out finds nothing here.
+  Whoever picks it up starts from `cna_model_create`, not from a content build.
+  It is the largest group left with no measured blocker.
 
 ### Media is NOT asset-blocked — it is a deep type graph, and one mapping
 
@@ -1475,6 +1610,54 @@ to 15 and watching it say so.
 The four that remain are the projection harness's own run counts. Its
 `--output` exists; producing the record means a full pass, each mutation a
 build and a test run, so it is left for a session that is running one anyway.
+
+**Foundation 101 ran every one of them, in two passes.** The first took 326 at
+`--jobs 1`, every one CAUGHT with no survivors, and then died on
+`timeout 21600` — a six-hour cap set against a need that measured out longer.
+The remaining 53 were run separately and all 53 were caught. Together:
+
+```text
+326 + 53 = 376 unique, overlap 3, SURVIVORS 0
+```
+
+**Every mutation in the harness is caught.** The overlap of 3 is worth keeping
+as a warning: the complement was computed by scanning the first log for
+`^CAUGHT` and `^SURVIVED`, which silently misses `CAUGHT+HUNG`, so three
+mutations were re-run needlessly. A status prefix that is a superset of another
+status is exactly the kind of thing a regex reads wrong.
+What is not complete is the machine-readable record, because the harness writes
+`--output` only for a full pass and deliberately skips it for `--only`, so a
+subset can never publish itself as a whole. That rule is right and it is why
+these four claims stay unpoliced.
+
+So the remaining cost is one uninterrupted pass, and the thing to get right is
+the cap — **which is not 376 × 66 s.** That average holds for a mutation the
+suite rejects quickly, and the catch-up run showed why it cannot be
+extrapolated: the 53 that the timeout cut off are hang-dense, and a hang costs
+the full `TEST_TIMEOUT_SECONDS = 600`. The harness's own docstring names one of
+them, `from-type-size-test-reads-the-wrong-size`, as failing 28 assertions
+before hanging at test 346 of 809 — caught, and expensive. In the 326 that ran,
+3 hung; in the first two of the catch-up, both did.
+
+Measured over both runs rather than extrapolated from either: 326 mutations in
+six hours at 66 s each with 3 hangs, then the hang-dense remainder at about
+160 s each with the same 3. **Budget a full pass at eight to nine hours** and
+set the cap above it, not at it.
+
+An earlier line here said "ten hours or more". That came from the catch-up
+run's first two mutations, which both hung, and two is not a rate — the same
+error as the six-hour cap it was written to correct, in the other direction.
+Read `CAUGHT+HUNG` as what it is: the verdict was obtained, the clock was
+spent. Reporting it separately from `HUNG` is the design that keeps a caught
+mutation from looking unmeasured.
+
+Two things survived being killed, both worth knowing: the harness restored the
+tree cleanly under SIGTERM here and under a low-memory kill earlier the same
+day, `--audit-tree` answering `PLANTED=0` immediately afterwards both times.
+The note below says that is luck's margin and not a design to lean on. Two
+demonstrations later it looks more like a design that works — but the audit is
+still what proves it, and it should still be run before believing any tree that
+a killed harness left behind.
 
 **And a correction to how big that pass is.** The harness selects by `git diff`
 against `origin/develop`, which on this branch is not "what changed today" but
