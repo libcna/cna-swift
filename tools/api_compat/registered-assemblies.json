@@ -420,6 +420,86 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnb",
+      "reason": "ContentReader wraps an IOException while reading the body with this asset-naming format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbMagic",
+      "reason": "ContentReader rejects a stream whose first three bytes are not XNB with this exact message."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbPlatform",
+      "reason": "The Windows reader accepts platform label w and reports this for any other compiled target."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbSize",
+      "reason": "The seekable XNB prologue check reports a declared body longer than the source as truncated."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbTypeVersion",
+      "reason": "ContentTypeReaderManager compares each manifest version with the constructed reader's TypeVersion and reports a disagreement with this format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbVersion",
+      "reason": "ContentReader rejects a non-XNA-4 XNB version with this format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbWrongType",
+      "reason": "ContentReader's erased generic bridge and ContentManager's cache-hit check both report the actual and requested type through this format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderDuplicate",
+      "reason": "The manifest manager refuses two reader identities that claim the same target type through this four-slot format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderInvalid",
+      "reason": "Failure to construct a manifest-named ContentTypeReader is wrapped with this format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderNotFound",
+      "reason": "An unknown manifest reader name is reported through this format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderNotRegistered",
+      "reason": "ContentTypeReaderManager.GetTypeReader reports an unknown target type through this format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ReaderConstructedNewInstance",
+      "reason": "InvokeReader refuses a reader that replaces a non-null existing reference rather than filling it."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "DecompressionError",
+      "reason": "The selected managed path explicitly classifies unsupported compressed XNB input with XNA's decompression failure text."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenResourceNotFound",
+      "reason": "ResourceContentManager.OpenStream reports a null ResourceManager result with this asset-naming format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenResourceNotBinary",
+      "reason": "ResourceContentManager.OpenStream requires the selected resource to be Byte[] and reports every other value with this format."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ContentManagerCannotChangeRootDirectory",
+      "reason": "ContentManager's RootDirectory setter refuses to move an already-populated cache with this exact message."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ModelHasNoEffect",
       "reason": "Held in Microsoft.Xna.Framework.dll's FrameworkResources, not in the Graphics assembly whose IL names it: Graphics carries no embedded string table at all. Model.Draw and ModelMesh.Draw raise InvalidOperationException with this when a mesh part carries no effect. Reachable and tested: cna_model_mesh_create and cna_model_mesh_part_create are both bound, so a mesh with an effectless part can be built here."
     },

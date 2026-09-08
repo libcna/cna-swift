@@ -4,13 +4,11 @@ import CNAShim
 
 /// `Microsoft.Xna.Framework.Content.ContentManager`.
 ///
-/// **The divergence this milestone must state plainly:** XNA reads the asset's
-/// type out of the `.xnb` header and builds whatever it finds. CNA publishes
-/// one route per asset kind instead, so here the type argument *selects the
-/// route*. `Texture2D` is the only kind wired; the other five routes exist in
-/// the ABI and are deliberately not bound, because adopting what they produce
-/// needs machinery those types do not yet have, and a route with no consuming
-/// member is not bound.
+/// XNA's managed reader now handles custom registered readers. Projected
+/// built-in assets retain CNA's one-route-per-kind backend: `Texture2D` is the
+/// only admitted loader, while the other five published routes remain
+/// deliberately unbound until their result ownership/adoption contracts are
+/// implemented.
 final class Foundation87ContentManagerTests: XCTestCase {
 
     private typealias Manager = Microsoft.Xna.Framework.Content.ContentManager
@@ -32,7 +30,7 @@ final class Foundation87ContentManagerTests: XCTestCase {
         let message = Manager.noLoaderMessage("Effect")
         XCTAssertTrue(message.contains("Effect"), "the refused type is named")
         XCTAssertTrue(message.contains(".xnb"),
-                      "the reason is the missing header read, and it is stated")
+                      "the managed-reader boundary is stated")
     }
 
     /// The mirrored structure must be byte-for-byte the ABI's. CNA refuses

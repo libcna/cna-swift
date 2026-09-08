@@ -107,6 +107,12 @@ ALPHATEST = ROOT / "Sources/CNA/Xna/Graphics/AlphaTestEffect.swift"
 DUALTEXTURE = ROOT / "Sources/CNA/Xna/Graphics/DualTextureEffect.swift"
 ENVMAP = ROOT / "Sources/CNA/Xna/Graphics/EnvironmentMapEffect.swift"
 SKINNED = ROOT / "Sources/CNA/Xna/Graphics/SkinnedEffect.swift"
+BINARY_READER = ROOT / "Sources/CNA/CNABinaryReader.swift"
+RESOURCE_MANAGER = ROOT / "Sources/CNA/CNAResourceManager.swift"
+CONTENT_READER = ROOT / "Sources/CNA/Xna/Content/ContentReader.swift"
+TYPE_READER = ROOT / "Sources/CNA/Xna/Content/ContentTypeReader.swift"
+TYPE_READER_MANAGER = ROOT / "Sources/CNA/Xna/Content/ContentTypeReaderManager.swift"
+RESOURCE_CONTENT_MANAGER = ROOT / "Sources/CNA/Xna/Content/ResourceContentManager.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -146,6 +152,102 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 104: the managed ContentReader family -------------------
+    (
+        "binary-reader-endian-swap",
+        "UInt16 decoding uses big endian, reversing every two-byte primitive",
+        BINARY_READER,
+        "        return UInt16(buffer[0]) | (UInt16(buffer[1]) << 8)",
+        "        return UInt16(buffer[1]) | (UInt16(buffer[0]) << 8)",
+    ),
+    (
+        "binary-reader-string-length-off-by-one",
+        "ReadString consumes one byte beyond its seven-bit encoded payload",
+        BINARY_READER,
+        "        let length = try Read7BitEncodedInt()\n"
+        "        guard length >= 0 else {",
+        "        let length = try Read7BitEncodedInt() + 1\n"
+        "        guard length >= 0 else {",
+    ),
+    (
+        "content-reader-index-zero-based",
+        "ReadObject treats XNA's one-based reader marker as a zero-based index",
+        CONTENT_READER,
+        "            let index = encodedIndex - 1\n"
+        "            guard index >= 0, Int(index) < typeReaders.count else {\n"
+        "                throw contentLoadException(Self.badXnb)\n"
+        "            }\n"
+        "            return try invokeReader(\n"
+        "                typeReaders[Int(index)], existingInstance: existingInstance)",
+        "            let index = encodedIndex\n"
+        "            guard index >= 0, Int(index) < typeReaders.count else {\n"
+        "                throw contentLoadException(Self.badXnb)\n"
+        "            }\n"
+        "            return try invokeReader(\n"
+        "                typeReaders[Int(index)], existingInstance: existingInstance)",
+    ),
+    (
+        "content-reader-skips-shared-resource",
+        "the shared-resource pass reads no objects, leaving every fixup unresolved",
+        CONTENT_READER,
+        "            for _ in 0..<count {\n"
+        "                resources.append(try readObjectErased())\n"
+        "            }",
+        "            for _ in 0..<0 {\n"
+        "                resources.append(try readObjectErased())\n"
+        "            }",
+    ),
+    (
+        "content-reader-external-reference-not-normalized",
+        "external references bypass XNA path cleaning and miss the shared cache key",
+        CONTENT_READER,
+        "            let combined = directory.isEmpty ? reference : directory + \"\\\\\" + reference\n"
+        "            let clean = Microsoft.Xna.Framework.TitleContainer.GetCleanPath(combined)",
+        "            let combined = reference\n"
+        "            let clean = combined",
+    ),
+    (
+        "generic-reader-target-type-wrong",
+        "ContentTypeReader<T> advertises Any instead of its stable T identity",
+        TYPE_READER,
+        "            super.init(targetType: T.self)",
+        "            super.init(targetType: Any.self)",
+    ),
+    (
+        "reader-creator-registry-wrong-name",
+        "manifest lookup folds a case-sensitive reader name before invoking its creator",
+        TYPE_READER_MANAGER,
+        "                        guard let creator = creators[name] else {",
+        "                        guard let creator = creators[name.lowercased()] else {",
+    ),
+    (
+        "content-manager-readasset-bypasses-cache",
+        "Load calls ReadAsset again even when the normalized asset is already cached",
+        CONTENT,
+        "            if let cached = assets[key] {",
+        "            if false, let cached = assets[key] {",
+    ),
+    (
+        "content-manager-openstream-ignores-root",
+        "OpenStream resolves every XNB outside the configured RootDirectory",
+        CONTENT,
+        "            let root = storedRootDirectory ?? \"\"",
+        "            let root = \"\"",
+    ),
+    (
+        "resource-content-manager-bypasses-resource-manager",
+        "ResourceContentManager never dispatches the selected key to ResourceManager",
+        RESOURCE_CONTENT_MANAGER,
+        "try resourceManager.GetObject(assetName)",
+        "Optional<Any>.none",
+    ),
+    (
+        "resource-manager-wrong-key-lookup",
+        "ResourceManager tests a fixed wrong key instead of the requested key",
+        RESOURCE_MANAGER,
+        "        if resourceFactories[name] != nil {",
+        "        if resourceFactories[\"wrong-key\"] != nil {",
+    ),
     # ---- Foundation 99: the touch panel --------------------------------------
     (
         "touch-state-reads-past-the-count",
@@ -951,10 +1053,16 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "Unload nulling the cache the way Dispose does, so a manager that "
         "should still be usable reports itself disposed",
         CONTENT,
-        "            loadedAssets = [:]\n"
-        "        }",
-        "            loadedAssets = nil\n"
-        "        }",
+        "            defer {\n"
+        "                loadedAssets = [:]\n"
+        "                disposableAssets = []\n"
+        "                openedStreamLengths.removeAll(keepingCapacity: false)\n"
+        "            }",
+        "            defer {\n"
+        "                loadedAssets = nil\n"
+        "                disposableAssets = []\n"
+        "                openedStreamLengths.removeAll(keepingCapacity: false)\n"
+        "            }",
     ),
     (
         "content-dispose-leaves-the-manager-usable",
@@ -962,8 +1070,11 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "manager keeps answering Load with a destroyed handle",
         CONTENT,
         "            guard loadedAssets != nil else { return }\n"
+        "            if disposing { try Unload() }\n"
         "            loadedAssets = nil",
-        "            guard loadedAssets != nil else { return }",
+        "            guard loadedAssets != nil else { return }\n"
+        "            if disposing { try Unload() }\n"
+        "            loadedAssets = [:]",
     ),
     (
         "content-never-joins-the-parent-registry",
@@ -982,8 +1093,10 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "the create call declaring the size the mirror had before its "
         "reserved field was added, which CNA refuses outright",
         CONTENT,
-        "                        UInt32(MemoryLayout<CNASwift_ContentManagerCreateInfo>.size)",
-        "                        UInt32(MemoryLayout<CNASwift_ContentManagerCreateInfo>.size - 8)",
+        "                        info.struct_size = UInt32(\n"
+        "                            MemoryLayout<CNASwift_ContentManagerCreateInfo>.size)",
+        "                        info.struct_size = UInt32(\n"
+        "                            MemoryLayout<CNASwift_ContentManagerCreateInfo>.size - 8)",
     ),
     (
         "content-refuses-the-kind-it-can-load",

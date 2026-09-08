@@ -25,6 +25,15 @@ internal enum RuntimeRegistry {
         guard let callbackRuntime else { throw CNAError.callbackOutsideGameLifecycle }
         return callbackRuntime
     }
+
+    /// ContentManager is a managed XNA type and may be constructed outside a
+    /// game callback. Native typed-loader acceleration is attached only when a
+    /// callback runtime is actually present.
+    static func currentIfAvailable() -> RuntimeState? {
+        lock.lock()
+        defer { lock.unlock() }
+        return callbackRuntime
+    }
 }
 
 internal final class RuntimeState {

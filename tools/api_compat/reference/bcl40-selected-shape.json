@@ -7310,6 +7310,104 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "type": "System.FormatException",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.SystemException",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "innerException",
+              "type": "System.Exception",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
       "type": "System.Globalization.CultureInfo",
       "kind": "class",
       "sealed": false,
@@ -8054,6 +8152,595 @@
           "getAbstract": true,
           "setAbstract": false,
           "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.IDisposable",
+      "kind": "interface",
+      "sealed": false,
+      "abstract": true,
+      "baseType": null,
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "method",
+          "name": "Dispose",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": true,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.IO.BinaryReader",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [
+        "System.IDisposable"
+      ],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "input",
+              "type": "System.IO.Stream",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "encoding",
+              "type": "System.Text.Encoding",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "input",
+              "type": "System.IO.Stream",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Close",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Dispose",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": true,
+          "overridable": false,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Dispose",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "disposing",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "FillBuffer",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "numBytes",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "PeekChar",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Read",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "Read",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "buffer",
+              "type": "System.Byte[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Read",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "buffer",
+              "type": "System.Char[]",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "index",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "Read7BitEncodedInt",
+          "access": "protected-internal",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadBoolean",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Boolean",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadByte",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Byte",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadBytes",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Byte[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ReadChar",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Char",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadChars",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Char[]",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "count",
+              "type": "System.Int32",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ReadDecimal",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Decimal",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadDouble",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Double",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadInt16",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int16",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadInt32",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadInt64",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Int64",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadSByte",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.SByte",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadSingle",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Single",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadString",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadUInt16",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.UInt16",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadUInt32",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.UInt32",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "method",
+          "name": "ReadUInt64",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.UInt64",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "BaseStream",
+          "type": "System.IO.Stream",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.IO.EndOfStreamException",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.IO.IOException",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "info",
+              "type": "System.Runtime.Serialization.SerializationInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "context",
+              "type": "System.Runtime.Serialization.StreamingContext",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "innerException",
+              "type": "System.Exception",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "message",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
         }
       ]
     },
@@ -9171,6 +9858,514 @@
           "getAccess": "public",
           "setAccess": null,
           "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "type": "System.Resources.ResourceManager",
+      "kind": "class",
+      "sealed": false,
+      "abstract": false,
+      "baseType": "System.Object",
+      "genericArity": 0,
+      "genericParameters": [],
+      "directInterfaces": [],
+      "members": [
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "protected",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "baseName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "assembly",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "usingResourceSet",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "baseName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "assembly",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "constructor",
+          "name": ".ctor",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": null,
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "resourceSource",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "field",
+          "name": "BaseNameField",
+          "type": "System.String",
+          "access": "protected",
+          "static": false,
+          "constant": false,
+          "value": null
+        },
+        {
+          "kind": "field",
+          "name": "HeaderVersionNumber",
+          "type": "System.Int32",
+          "access": "public",
+          "static": true,
+          "constant": false,
+          "value": null
+        },
+        {
+          "kind": "field",
+          "name": "MagicNumber",
+          "type": "System.Int32",
+          "access": "public",
+          "static": true,
+          "constant": false,
+          "value": null
+        },
+        {
+          "kind": "field",
+          "name": "MainAssembly",
+          "type": "System.Reflection.Assembly",
+          "access": "protected",
+          "static": false,
+          "constant": false,
+          "value": null
+        },
+        {
+          "kind": "field",
+          "name": "ResourceSets",
+          "type": "System.Collections.Hashtable",
+          "access": "protected",
+          "static": false,
+          "constant": false,
+          "value": null
+        },
+        {
+          "kind": "method",
+          "name": "CreateFileBasedResourceManager",
+          "access": "public",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Resources.ResourceManager",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "baseName",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "resourceDir",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "usingResourceSet",
+              "type": "System.Type",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetNeutralResourcesLanguage",
+          "access": "protected",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Globalization.CultureInfo",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "a",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetObject",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetObject",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Object",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetResourceFileName",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetResourceSet",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Resources.ResourceSet",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "createIfNotExists",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "tryParents",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetSatelliteContractVersion",
+          "access": "protected",
+          "static": true,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.Version",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "a",
+              "type": "System.Reflection.Assembly",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetStream",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.IO.UnmanagedMemoryStream",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetStream",
+          "access": "public",
+          "static": false,
+          "virtual": false,
+          "abstract": false,
+          "final": false,
+          "overridable": false,
+          "returnType": "System.IO.UnmanagedMemoryStream",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetString",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "GetString",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.String",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "name",
+              "type": "System.String",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "InternalGetResourceSet",
+          "access": "protected",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Resources.ResourceSet",
+          "genericParameters": [],
+          "parameters": [
+            {
+              "name": "culture",
+              "type": "System.Globalization.CultureInfo",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "createIfNotExists",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            },
+            {
+              "name": "tryParents",
+              "type": "System.Boolean",
+              "ref": false,
+              "out": false
+            }
+          ]
+        },
+        {
+          "kind": "method",
+          "name": "ReleaseAllResources",
+          "access": "public",
+          "static": false,
+          "virtual": true,
+          "abstract": false,
+          "final": false,
+          "overridable": true,
+          "returnType": "System.Void",
+          "genericParameters": [],
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "BaseName",
+          "type": "System.String",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "FallbackLocation",
+          "type": "System.Resources.UltimateResourceFallbackLocation",
+          "static": false,
+          "getAccess": "protected",
+          "setAccess": "protected",
+          "getOverridable": false,
+          "setOverridable": false,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "IgnoreCase",
+          "type": "System.Boolean",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": "public",
+          "getOverridable": true,
+          "setOverridable": true,
+          "getAbstract": false,
+          "setAbstract": false,
+          "parameters": []
+        },
+        {
+          "kind": "property",
+          "name": "ResourceSetType",
+          "type": "System.Type",
+          "static": false,
+          "getAccess": "public",
+          "setAccess": null,
+          "getOverridable": true,
           "setOverridable": false,
           "getAbstract": false,
           "setAbstract": false,
@@ -11027,8 +12222,18 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "Arg_EndOfStreamException",
+      "value": "Attempted to read past the end of the stream."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "Arg_ExternalException",
       "value": "External component has thrown an exception."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "Arg_FormatException",
+      "value": "One of the identified items was in an invalid format."
     },
     {
       "assembly": "mscorlib.dll",
@@ -11074,6 +12279,11 @@
       "assembly": "mscorlib.dll",
       "key": "ArgumentNull_Generic",
       "value": "Value cannot be null."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ArgumentOutOfRange_BinaryReaderFillBuffer",
+      "value": "The number of bytes requested does not fit into BinaryReader's internal buffer."
     },
     {
       "assembly": "mscorlib.dll",
@@ -11147,8 +12357,28 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "Argument_InvalidOffLen",
+      "value": "Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "Argument_StreamNotReadable",
+      "value": "Stream was not readable."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "Exception_WasThrown",
       "value": "Exception of type '{0}' was thrown."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "Format_Bad7BitInt32",
+      "value": "Too many bytes in what should have been a 7 bit encoded Int32."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "IO.EOF_ReadBeyondEOF",
+      "value": "Unable to read beyond the end of the stream."
     },
     {
       "assembly": "mscorlib.dll",
@@ -11157,13 +12387,28 @@
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "IO.IO_InvalidStringLen_Len",
+      "value": "BinaryReader encountered an invalid string length of {0} characters."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "InvalidOperation_EnumFailedVersion",
       "value": "Collection was modified; enumeration operation may not execute."
     },
     {
       "assembly": "mscorlib.dll",
+      "key": "InvalidOperation_ResourceNotString_Type",
+      "value": "Resource was of type '{0}' instead of String - call GetObject instead."
+    },
+    {
+      "assembly": "mscorlib.dll",
       "key": "NotSupported_ReadOnlyCollection",
       "value": "Collection is read-only."
+    },
+    {
+      "assembly": "mscorlib.dll",
+      "key": "ObjectDisposed_FileClosed",
+      "value": "Cannot access a closed file."
     },
     {
       "assembly": "mscorlib.dll",

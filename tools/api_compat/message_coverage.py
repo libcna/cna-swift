@@ -101,6 +101,44 @@ def method_name(head: str) -> str | None:
     return None
 
 
+def argument_count(text: str) -> int:
+    """Count top-level IL signature arguments without splitting generic types."""
+    value = text.strip()
+    if not value:
+        return 0
+    depths = {"(": 0, "[": 0, "<": 0}
+    closing = {")": "(", "]": "[", ">": "<"}
+    count = 1
+    for character in value:
+        if character in depths:
+            depths[character] += 1
+        elif character in closing:
+            opening = closing[character]
+            depths[opening] = max(0, depths[opening] - 1)
+        elif character == "," and not any(depths.values()):
+            count += 1
+    return count
+
+
+def method_arity(head: str) -> int | None:
+    """Return the arity of the declaration parameter list in `head`."""
+    cut = head.find("cil managed")
+    signature = head[:cut if cut > 0 else len(head)]
+    close = signature.rfind(")")
+    if close < 0:
+        return None
+    depth = 0
+    for index in range(close, -1, -1):
+        character = signature[index]
+        if character == ")":
+            depth += 1
+        elif character == "(":
+            depth -= 1
+            if depth == 0:
+                return argument_count(signature[index + 1:close])
+    return None
+
+
 def class_body(texts: dict[str, str], full: str) -> str | None:
     for text in texts.values():
         for opening in (f"beforefieldinit {full}\n", f"ansi {full}\n",
@@ -113,20 +151,52 @@ def class_body(texts: dict[str, str], full: str) -> str | None:
     return None
 
 
-def methods_of(body: str) -> dict[str, list[str]]:
-    """Every method body in a class, keyed by declared name."""
-    out: dict[str, list[str]] = {}
+def methods_of(body: str) -> dict[tuple[str, int], list[str]]:
+    """Every method body in a class, keyed by declared name and arity.
+
+    A name-only key merged private overloads into public members. In
+    ContentTypeReaderManager that made public `GetTypeReader(Type)` appear to
+    reach the unrelated manifest-only reflective-reader failure.
+    """
+    out: dict[tuple[str, int], list[str]] = {}
     for match in METHOD_HEAD.finditer(body):
         head = " ".join(match.group(0).split())
         name = method_name(head)
-        if not name:
+        arity = method_arity(head)
+        if not name or arity is None:
             continue
         end = body.find("} // end of method", match.end())
-        out.setdefault(name, []).append(body[match.end():end])
+        out.setdefault((name, arity), []).append(body[match.end():end])
     return out
 
 
-def reachable_keys(methods: dict[str, list[str]], start: str) -> set[str]:
+def called_methods(segment: str) -> set[tuple[str, int]]:
+    result: set[tuple[str, int]] = set()
+    pattern = re.compile(r"::(\.?[A-Za-z_][A-Za-z0-9_]*)(?:<[^<>(]*>)?\(")
+    for match in pattern.finditer(segment):
+        opening = match.end() - 1
+        depth = 0
+        close = None
+        for index in range(opening, len(segment)):
+            character = segment[index]
+            if character == "(":
+                depth += 1
+            elif character == ")":
+                depth -= 1
+                if depth == 0:
+                    close = index
+                    break
+        if close is None:
+            continue
+        name = match.group(1).lstrip(".")
+        result.add((name, argument_count(segment[opening + 1:close])))
+    return result
+
+
+def reachable_keys(
+    methods: dict[tuple[str, int], list[str]],
+    start: tuple[str, int] | str,
+) -> set[str]:
     """Resource keys raised by `start` or by what it calls within its class.
 
     A call site spells a GENERIC method as `Type::CopyData<!!0>(`, with the
@@ -137,18 +207,20 @@ def reachable_keys(methods: dict[str, list[str]], start: str) -> set[str]:
     `VertexBuffer` and `IndexBuffer` -- which is where texture and buffer
     transfer validation lives. The instantiation is now skipped over.
     """
-    seen: set[str] = set()
+    seen: set[tuple[str, int]] = set()
     keys: set[str] = set()
-    frontier = [(start, 0)]
+    starts = ([key for key in methods if key[0] == start]
+              if isinstance(start, str) else [start])
+    frontier = [(key, 0) for key in starts]
     while frontier:
-        name, depth = frontier.pop()
-        if name in seen or depth > MAX_CALL_DEPTH:
+        method, depth = frontier.pop()
+        if method in seen or depth > MAX_CALL_DEPTH:
             continue
-        seen.add(name)
-        for segment in methods.get(name, []):
+        seen.add(method)
+        for segment in methods.get(method, []):
             keys.update(re.findall(r"Resources::get_(\w+)", segment))
             if depth < MAX_CALL_DEPTH:
-                for callee in re.findall(r"::(\w+)(?:<[^<>(]*>)?\(", segment):
+                for callee in called_methods(segment):
                     if callee in methods and callee not in seen:
                         frontier.append((callee, depth + 1))
     return keys
@@ -166,21 +238,24 @@ def analyse(report, contract, absences, table, texts, literals, tables_read):
 
     contract_types = (contract["types"] if isinstance(contract.get("types"), list)
                       else list(contract["types"].values()))
-    contract_members: dict[str, set[str]] = {}
+    contract_members: dict[str, set[tuple[str, int]]] = {}
     for entry in contract_types:
         name = entry.get("name") or entry.get("fullName")
-        names: set[str] = set()
+        names: set[tuple[str, int]] = set()
         for member in entry.get("members", []):
             kind = member.get("kind")
             member_name = member.get("name", "")
+            arity = len(member.get("parameters", []))
             if kind == "property":
-                names.update({f"get_{member_name}", f"set_{member_name}"})
+                names.add((f"get_{member_name}", arity))
+                if member.get("set"):
+                    names.add((f"set_{member_name}", arity + 1))
             elif kind == "event":
-                names.update({f"add_{member_name}", f"remove_{member_name}"})
+                names.update({(f"add_{member_name}", 1), (f"remove_{member_name}", 1)})
             elif kind == "constructor" or member_name == ".ctor":
-                names.add("ctor")
+                names.add(("ctor", arity))
             else:
-                names.add(member_name)
+                names.add((member_name, arity))
         contract_members[name] = names
 
     missing_members: dict[str, set[str]] = {}
@@ -209,14 +284,15 @@ def analyse(report, contract, absences, table, texts, literals, tables_read):
         methods = methods_of(body)
         gone = missing_members.get(full, set())
         declared = contract_members.get(full, set())
-        for name in methods:
+        for method in methods:
+            name, _arity = method
             base = name[4:] if name.startswith(("get_", "set_")) else name
-            if name not in declared:
+            if method not in declared:
                 continue
             if name in gone or base in gone:
                 continue
             members_read += 1
-            for key in sorted(reachable_keys(methods, name)):
+            for key in sorted(reachable_keys(methods, method)):
                 value = table.get(key)
                 if value is None:
                     continue
@@ -495,7 +571,7 @@ def self_test() -> int:
   } // end of method Type::InternalDraw
 """
     methods = methods_of(body)
-    if set(methods) != {"Draw", "InternalDraw"}:
+    if set(methods) != {("Draw", 0), ("InternalDraw", 0)}:
         failures.append(f"methods_of found {sorted(methods)}")
     if reachable_keys(methods, "Draw") != {"BeginMustBeCalledBeforeDraw"}:
         failures.append("a key raised by a private callee is not reachable from "
@@ -534,13 +610,41 @@ def self_test() -> int:
     IL_0000:  call string Resources::get_NullNotAllowed()
   } // end of method T::CopyData
 """)
-    if set(generic) != {"SetData", "CopyData"}:
+    if set(generic) != {("SetData", 1), ("CopyData", 3)}:
         failures.append(f"methods_of found {sorted(generic)} for generic methods")
     if reachable_keys(generic, "SetData") != {"NullNotAllowed"}:
         failures.append("a key raised by a GENERIC callee is not reachable from "
                         "the public member that calls it")
 
-    print(f"MESSAGE_COVERAGE_SELF_TESTS={len(cases) + 6} "
+    overloaded = methods_of("""
+  .method public hidebysig instance object GetTypeReader(class Type targetType) cil managed
+  {
+    IL_0000:  call object T::GetTypeReader(class Type, class Reader)
+  } // end of method T::GetTypeReader
+  .method assembly hidebysig static object GetTypeReader(class Type targetType,
+                                                          class Reader reader) cil managed
+  {
+    IL_0000:  call string Resources::get_TypeReaderNotRegistered()
+  } // end of method T::GetTypeReader
+  .method private hidebysig static object GetTypeReader(string name,
+                                                         class Reader reader,
+                                                         class List readers) cil managed
+  {
+    IL_0000:  call bool T::InstantiateTypeReader(string, class Reader)
+  } // end of method T::GetTypeReader
+  .method private hidebysig static bool InstantiateTypeReader(string name,
+                                                               class Reader reader) cil managed
+  {
+    IL_0000:  call string Resources::get_ReflectiveReaderTypeNotFound()
+  } // end of method T::InstantiateTypeReader
+""")
+    if reachable_keys(overloaded, ("GetTypeReader", 1)) != {
+        "TypeReaderNotRegistered"
+    }:
+        failures.append("same-named private overload leaked a resource key into "
+                        "the selected public overload")
+
+    print(f"MESSAGE_COVERAGE_SELF_TESTS={len(cases) + 7} "
           f"MESSAGE_COVERAGE_SELF_TEST_STATUS={'PASS' if not failures else 'FAIL'}")
     for failure in failures:
         print(f"  {failure}")

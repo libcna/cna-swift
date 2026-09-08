@@ -82,6 +82,12 @@
       "reason": "Raised from XNA's ChangeDevice while it enumerates adapters, ranks device configurations and creates a Direct3D device. CNA owns device creation here and is not Direct3D; `cna_graphics_device_manager_apply_changes` reports its own failure, and inventing a Direct3D diagnosis for it would put a message in front of a user that describes something that did not happen."
     },
     {
+      "type": "Microsoft.Xna.Framework.Media.MediaSource",
+      "key": "WmpMediaSource",
+      "kind": "native-owned",
+      "reason": "XNA's internal parameterless MediaSource constructor uses this resource as the display name of its one hard-coded Windows Media Player source; it is not an exception message. The projected GetAvailableMediaSources asks CNA for the actual platform media-source names, so substituting the Windows-only label would describe a source the runtime did not enumerate."
+    },
+    {
       "type": "Microsoft.Xna.Framework.Input.GamePad",
       "key": "InvalidController",
       "kind": "deferred",

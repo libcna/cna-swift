@@ -5,20 +5,20 @@
     "path": "tools/api_compat/reference/xna40-windows-runtime-contract.json",
     "sha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d"
   },
-  "symbolGraph": ".build/x86_64-pc-linux-gnu/symbolgraph/CNA.symbols.json",
+  "symbolGraph": ".build/x86_64-unknown-linux-gnu/symbolgraph/CNA.symbols.json",
   "summary": {
     "REFERENCE_TYPES": 257,
     "REFERENCE_MEMBERS": 2964,
     "EXPECTED_SWIFT_TYPES": 257,
     "EXPECTED_SWIFT_MEMBERS": 2887,
-    "TARGET_TYPES": 233,
-    "TARGET_MEMBERS": 2717,
-    "TOTAL_DIAGNOSTICS": 43,
-    "COMPLETE_TYPES": 225,
-    "PARTIAL_TYPES": 8,
-    "MISSING_TYPES": 24,
-    "MISSING_TYPE": 24,
-    "MISSING_MEMBER": 16,
+    "TARGET_TYPES": 238,
+    "TARGET_MEMBERS": 2751,
+    "TOTAL_DIAGNOSTICS": 36,
+    "COMPLETE_TYPES": 231,
+    "PARTIAL_TYPES": 7,
+    "MISSING_TYPES": 19,
+    "MISSING_TYPE": 19,
+    "MISSING_MEMBER": 14,
     "UNEXPECTED_TYPE": 0,
     "UNEXPECTED_MEMBER": 0,
     "TYPE_KIND_MISMATCH": 0,
@@ -66,21 +66,21 @@
     "MEASURED_ACCESSOR_PROJECTIONS": 113,
     "PENDING_ACCESSOR_PROJECTIONS": 1,
     "GLOBAL_OPTIONAL_OPERATOR_PROJECTIONS": 2,
-    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 55,
+    "NONPUBLIC_CONSTRUCTION_PROJECTIONS": 57,
     "EVENT_PROJECTIONS": 49,
     "EVENT_SUPPORT_TYPE_MEASUREMENTS": 4,
-    "BCL_SUPPORT_TYPE_MEASUREMENTS": 24,
-    "XNA_SEALED_CLASS_PROJECTIONS": 65,
+    "BCL_SUPPORT_TYPE_MEASUREMENTS": 29,
+    "XNA_SEALED_CLASS_PROJECTIONS": 67,
     "NONDERIVABLE_UNSEALED_CLASSES": 0,
-    "BCL_RESOURCE_STRING_PROJECTIONS": 31,
+    "BCL_RESOURCE_STRING_PROJECTIONS": 40,
     "BCL_ABSTRACT_BASE_WIDENINGS": 1,
     "BCL_STATIC_TABLE_PROJECTIONS": 1,
-    "XNA_RESOURCE_STRING_PROJECTIONS": 81,
-    "MEASURED_SUPPORT_BASE_PROJECTIONS": 23,
-    "BCL_BASE_PROJECTIONS": 19,
-    "PROJECTED_BCL_BASE_TYPES": 19,
+    "XNA_RESOURCE_STRING_PROJECTIONS": 97,
+    "MEASURED_SUPPORT_BASE_PROJECTIONS": 24,
+    "BCL_BASE_PROJECTIONS": 20,
+    "PROJECTED_BCL_BASE_TYPES": 20,
     "PENDING_BCL_BASE_TYPES": 0,
-    "BCL_INHERITED_MEMBER_PROJECTIONS": 105,
+    "BCL_INHERITED_MEMBER_PROJECTIONS": 127,
     "REFERENCE_RETURN_PROJECTIONS": 369,
     "OPTIONAL_RETURN_PROJECTIONS": 151,
     "NONOPTIONAL_RETURN_PROJECTIONS": 218,
@@ -91,9 +91,9 @@
     "NULLABLE_FALLIBLE_RETURN_PROJECTIONS": 45,
     "NONNULL_INFALLIBLE_RETURN_PROJECTIONS": 67,
     "NONNULL_FALLIBLE_RETURN_PROJECTIONS": 67,
-    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 313,
-    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 56,
-    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 111
+    "MEASURED_RETURN_NULLABILITY_PROJECTIONS": 321,
+    "PENDING_RETURN_NULLABILITY_PROJECTIONS": 48,
+    "OPTIONAL_RETURN_PROJECTIONS_OBSERVED": 113
   },
   "completeTypes": [
     "Microsoft.Xna.Framework.Audio.AudioChannels",
@@ -113,11 +113,17 @@
     "Microsoft.Xna.Framework.BoundingSphere",
     "Microsoft.Xna.Framework.Color",
     "Microsoft.Xna.Framework.ContainmentType",
+    "Microsoft.Xna.Framework.Content.ContentManager",
+    "Microsoft.Xna.Framework.Content.ContentReader",
     "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
     "Microsoft.Xna.Framework.Content.ContentSerializerCollectionItemNameAttribute",
     "Microsoft.Xna.Framework.Content.ContentSerializerIgnoreAttribute",
     "Microsoft.Xna.Framework.Content.ContentSerializerRuntimeTypeAttribute",
     "Microsoft.Xna.Framework.Content.ContentSerializerTypeVersionAttribute",
+    "Microsoft.Xna.Framework.Content.ContentTypeReader",
+    "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
+    "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
+    "Microsoft.Xna.Framework.Content.ResourceContentManager",
     "Microsoft.Xna.Framework.Curve",
     "Microsoft.Xna.Framework.CurveContinuity",
     "Microsoft.Xna.Framework.CurveKey",
@@ -325,7 +331,6 @@
   "partialTypes": [
     "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
     "Microsoft.Xna.Framework.Content.ContentLoadException",
-    "Microsoft.Xna.Framework.Content.ContentManager",
     "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
     "Microsoft.Xna.Framework.Media.MediaLibrary",
     "Microsoft.Xna.Framework.Storage.StorageContainer",
@@ -339,11 +344,6 @@
     "Microsoft.Xna.Framework.Audio.Microphone",
     "Microsoft.Xna.Framework.Audio.SoundBank",
     "Microsoft.Xna.Framework.Audio.WaveBank",
-    "Microsoft.Xna.Framework.Content.ContentReader",
-    "Microsoft.Xna.Framework.Content.ContentTypeReader",
-    "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
-    "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
-    "Microsoft.Xna.Framework.Content.ResourceContentManager",
     "Microsoft.Xna.Framework.Design.BoundingBoxConverter",
     "Microsoft.Xna.Framework.Design.BoundingSphereConverter",
     "Microsoft.Xna.Framework.Design.ColorConverter",
@@ -408,41 +408,6 @@
       "category": "OVERLOAD_MAPPING_MISMATCH",
       "subject": "Microsoft.Xna.Framework.Content.ContentLoadException..ctor(info:System.Runtime.Serialization.SerializationInfo,context:System.Runtime.Serialization.StreamingContext)",
       "detail": "required overload is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Content.ContentManager.ReadAsset(_:String,recordDisposableObject:System.Action<System.IDisposable>)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_MEMBER",
-      "subject": "Microsoft.Xna.Framework.Content.ContentManager.OpenStream(_:String)",
-      "detail": "mapped member is absent"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentReader",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentTypeReader",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-    },
-    {
-      "category": "MISSING_TYPE",
-      "subject": "Microsoft.Xna.Framework.Content.ResourceContentManager",
-      "detail": "mapped XNA type is absent from the Swift Symbol Graph"
     },
     {
       "category": "MISSING_TYPE",
@@ -2566,6 +2531,20 @@
       "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
     },
     {
+      "type": "Microsoft.Xna.Framework.Content.ContentReader",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
+      "clrSealed": true,
+      "referencePublicConstructors": 0,
+      "swiftPublicInitializers": 0,
+      "reason": "A public CLR class whose declared constructors are all non-public is not externally derivable, so it maps to a Swift public class that is neither open nor final unless the CLR type is sealed; any Swift initializer it needs stays internal implementation infrastructure and must not appear as a public init in the Symbol Graph"
+    },
+    {
       "type": "Microsoft.Xna.Framework.FrameworkDispatcher",
       "clrSealed": true,
       "referencePublicConstructors": 0,
@@ -3180,6 +3159,75 @@
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
     {
+      "supportType": "CNABinaryReader",
+      "clrFamily": "System.IO.BinaryReader",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": null,
+      "conformances": [
+        "CNADisposable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "CNADisposable"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor",
+        "BaseStream",
+        "Close",
+        "Dispose",
+        "FillBuffer",
+        "PeekChar",
+        "Read",
+        "Read7BitEncodedInt",
+        "ReadBoolean",
+        "ReadByte",
+        "ReadBytes",
+        "ReadChar",
+        "ReadChars",
+        "ReadDouble",
+        "ReadInt16",
+        "ReadInt32",
+        "ReadInt64",
+        "ReadSByte",
+        "ReadSingle",
+        "ReadString",
+        "ReadUInt16",
+        "ReadUInt32",
+        "ReadUInt64"
+      ],
+      "openHooks": [
+        "BaseStream",
+        "Close",
+        "Dispose",
+        "FillBuffer",
+        "PeekChar",
+        "Read",
+        "ReadBoolean",
+        "ReadByte",
+        "ReadBytes",
+        "ReadChar",
+        "ReadChars",
+        "ReadDouble",
+        "ReadInt16",
+        "ReadInt32",
+        "ReadInt64",
+        "ReadSByte",
+        "ReadSingle",
+        "ReadString",
+        "ReadUInt16",
+        "ReadUInt32",
+        "ReadUInt64"
+      ],
+      "forbiddenMembersAbsent": [
+        "ReadDecimal"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNACollection",
       "clrFamily": "System.Collections.ObjectModel.Collection`1",
       "kind": "class",
@@ -3280,6 +3328,57 @@
         "Capacity",
         "TrimExcess",
         "EnsureCapacity"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNADisposable",
+      "clrFamily": "System.IDisposable",
+      "kind": "protocol",
+      "inheritance": "public",
+      "genericParameters": [],
+      "base": null,
+      "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [],
+      "finalMembers": [],
+      "publicMembers": [
+        "Dispose"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAEndOfStreamException",
+      "clrFamily": "System.IO.EndOfStreamException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNAIOException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
       ],
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
@@ -3474,6 +3573,38 @@
       ],
       "openHooks": [],
       "forbiddenMembersAbsent": [],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
+      "supportType": "CNAFormatException",
+      "clrFamily": "System.FormatException",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Error",
+        "Sendable"
+      ],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [
+        "Swift.Error"
+      ],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor"
+      ],
+      "openHooks": [],
+      "forbiddenMembersAbsent": [
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ],
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
     {
@@ -3746,6 +3877,43 @@
       "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
     },
     {
+      "supportType": "CNAResourceManager",
+      "clrFamily": "System.Resources.ResourceManager",
+      "kind": "class",
+      "inheritance": "open",
+      "genericParameters": [],
+      "base": null,
+      "conformances": [],
+      "clrAbstract": false,
+      "swiftConstructionWidened": false,
+      "requiredConformances": [],
+      "finalMembers": [],
+      "publicMembers": [
+        ".ctor",
+        "BaseName",
+        "GetObject",
+        "GetString",
+        "IgnoreCase",
+        "ReleaseAllResources",
+        "ResourceSetType"
+      ],
+      "openHooks": [
+        "BaseName",
+        "IgnoreCase",
+        "ResourceSetType",
+        "ReleaseAllResources",
+        "GetString",
+        "GetObject"
+      ],
+      "forbiddenMembersAbsent": [
+        "CreateFileBasedResourceManager",
+        "GetResourceFileName",
+        "GetResourceSet",
+        "GetStream"
+      ],
+      "reason": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK."
+    },
+    {
       "supportType": "CNAServiceProvider",
       "clrFamily": "System.IServiceProvider",
       "kind": "protocol",
@@ -4012,10 +4180,64 @@
       "reason": "ExceptionResource 28, raised by every Collection<T> mutator for a read-only backing list."
     },
     {
+      "resourceKey": "Arg_EndOfStreamException",
+      "pinnedValue": "Attempted to read past the end of the stream.",
+      "reproducedInSwiftSource": true,
+      "reason": "EndOfStreamException's parameterless constructor substitutes it before setting COR_E_ENDOFSTREAM."
+    },
+    {
+      "resourceKey": "Arg_FormatException",
+      "pinnedValue": "One of the identified items was in an invalid format.",
+      "reproducedInSwiftSource": true,
+      "reason": "FormatException's parameterless constructor substitutes it before setting COR_E_FORMAT."
+    },
+    {
       "resourceKey": "Arg_IOException",
       "pinnedValue": "I/O error occurred.",
       "reproducedInSwiftSource": true,
       "reason": "IOException's parameterless constructor substitutes it before setting COR_E_IO, so CNAIOException() must answer it rather than Exception's Exception_WasThrown default."
+    },
+    {
+      "resourceKey": "Argument_InvalidOffLen",
+      "pinnedValue": "Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.",
+      "reproducedInSwiftSource": true,
+      "reason": "BinaryReader's array overloads raise it for an invalid index/count range."
+    },
+    {
+      "resourceKey": "Argument_StreamNotReadable",
+      "pinnedValue": "Stream was not readable.",
+      "reproducedInSwiftSource": true,
+      "reason": "BinaryReader construction raises it when the stream cannot be read."
+    },
+    {
+      "resourceKey": "ArgumentOutOfRange_BinaryReaderFillBuffer",
+      "pinnedValue": "The number of bytes requested does not fit into BinaryReader's internal buffer.",
+      "reproducedInSwiftSource": true,
+      "reason": "BinaryReader.FillBuffer refuses a request larger than its internal buffer."
+    },
+    {
+      "resourceKey": "Format_Bad7BitInt32",
+      "pinnedValue": "Too many bytes in what should have been a 7 bit encoded Int32.",
+      "reproducedInSwiftSource": true,
+      "reason": "BinaryReader.Read7BitEncodedInt raises it after five continuation bytes."
+    },
+    {
+      "resourceKey": "IO.EOF_ReadBeyondEOF",
+      "pinnedValue": "Unable to read beyond the end of the stream.",
+      "reproducedInSwiftSource": true,
+      "reason": "BinaryReader fixed-width reads raise it on a short stream."
+    },
+    {
+      "resourceKey": "IO.IO_InvalidStringLen_Len",
+      "pinnedValue": "BinaryReader encountered an invalid string length of {0} characters.",
+      "reproducedInSwiftSource": true,
+      "reason": "BinaryReader.ReadString formats it for a negative decoded length."
+    },
+    {
+      "resourceKey": "ObjectDisposed_FileClosed",
+      "pinnedValue": "Cannot access a closed file.",
+      "reproducedInSwiftSource": true,
+      "reason": "BinaryReader raises it when a read follows Close."
     },
     {
       "resourceKey": "IO.FileNotFound",
@@ -4133,6 +4355,48 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BadXnb",
+      "pinnedValue": "Error loading \"{0}\".",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BadXnbMagic",
+      "pinnedValue": "Error loading \"{0}\". This is not a compiled content file.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BadXnbPlatform",
+      "pinnedValue": "Error loading \"{0}\". This file was compiled for the wrong target platform.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BadXnbSize",
+      "pinnedValue": "Error loading \"{0}\". File has been truncated.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BadXnbTypeVersion",
+      "pinnedValue": "Error loading \"{0}\". File contains the wrong version of type {1}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BadXnbVersion",
+      "pinnedValue": "Error loading \"{0}\". This file was compiled using the wrong version of the XNA Framework.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "BadXnbWrongType",
+      "pinnedValue": "Error loading \"{0}\". File contains {1} but trying to load as {2}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "BeginMustBeCalledBeforeDraw",
       "pinnedValue": "Begin must be called successfully before a Draw can be called.",
       "reproducedInSwiftSource": true
@@ -4183,6 +4447,18 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "CharacterNotInFont",
       "pinnedValue": "The character '{0}' (0x{1:x4}) is not available in this SpriteFont. If applicable, adjust the font's start and end CharacterRegions to include this character.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ContentManagerCannotChangeRootDirectory",
+      "pinnedValue": "This property cannot be changed after content has been loaded into the ContentManager.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "DecompressionError",
+      "pinnedValue": "Error decompressing content data.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4343,6 +4619,18 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "OpenResourceNotBinary",
+      "pinnedValue": "Error loading \"{0}\". Not a binary resource.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "OpenResourceNotFound",
+      "pinnedValue": "Error loading \"{0}\". Resource not found.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "OpenStreamError",
       "pinnedValue": "Error loading \"{0}\". Cannot open file.",
       "reproducedInSwiftSource": true
@@ -4427,6 +4715,12 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "ReaderConstructedNewInstance",
+      "pinnedValue": "ContentTypeReader {0} returned a new object instance from its Read method. This should have loaded data into the existingInstance parameter.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "RenderTargetsMustMatch",
       "pinnedValue": "All active render targets must be the same size with the same multisample type and bit depth.",
       "reproducedInSwiftSource": true
@@ -4465,6 +4759,30 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "resourceKey": "SkinnedEffectWeightsPerVertex",
       "pinnedValue": "SkinnedEffect.WeightsPerVertex must be 1, 2, or 4.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "TypeReaderDuplicate",
+      "pinnedValue": "Error loading \"{0}\". ContentTypeReader {1} conflicts with existing handler {2} for type {3}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "TypeReaderInvalid",
+      "pinnedValue": "Error loading \"{0}\". Cannot instantiate ContentTypeReader {1}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "TypeReaderNotFound",
+      "pinnedValue": "Error loading \"{0}\". Cannot find ContentTypeReader {1}.",
+      "reproducedInSwiftSource": true
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "resourceKey": "TypeReaderNotRegistered",
+      "pinnedValue": "Error loading \"{0}\". Cannot find ContentTypeReader for {1}.",
       "reproducedInSwiftSource": true
     },
     {
@@ -4607,8 +4925,16 @@
       "type": "Microsoft.Xna.Framework.Content.ContentManager",
       "clrSealed": false,
       "swiftFinal": false,
-      "swiftAccess": "public",
+      "swiftAccess": "open",
       "referencePublicConstructors": 2,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentReader",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
       "derivableInReferenceButNotInSwift": false
     },
     {
@@ -4648,6 +4974,38 @@
       "clrSealed": true,
       "swiftFinal": true,
       "swiftAccess": "public",
+      "referencePublicConstructors": 1,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentTypeReader",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
+      "clrSealed": true,
+      "swiftFinal": true,
+      "swiftAccess": "public",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
+      "referencePublicConstructors": 0,
+      "derivableInReferenceButNotInSwift": false
+    },
+    {
+      "type": "Microsoft.Xna.Framework.Content.ResourceContentManager",
+      "clrSealed": false,
+      "swiftFinal": false,
+      "swiftAccess": "open",
       "referencePublicConstructors": 1,
       "derivableInReferenceButNotInSwift": false
     },
@@ -5755,21 +6113,21 @@
       "member": "OpenStream",
       "kind": "method",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "System.IO.Stream",
       "swiftReturnType": "Foundation.InputStream",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Foundation.InputStream"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentManager",
       "member": "ServiceProvider",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "System.IServiceProvider",
       "swiftReturnType": "CNAServiceProvider?",
       "optional": true,
@@ -5783,7 +6141,7 @@
       "member": "RootDirectory",
       "kind": "property",
       "static": false,
-      "typeState": "partial",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String?",
       "optional": true,
@@ -5797,28 +6155,28 @@
       "member": "ContentManager",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Content.ContentManager",
       "swiftReturnType": "Microsoft.Xna.Framework.Content.ContentManager",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Content.ContentManager"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentReader",
       "member": "AssetName",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.String",
       "swiftReturnType": "String",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "String"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
@@ -5895,70 +6253,70 @@
       "member": "Read",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Object",
       "swiftReturnType": "Any?",
       "optional": true,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Any?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentTypeReader",
       "member": "TargetType",
       "kind": "property",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Type",
       "swiftReturnType": "Any.Type",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": false,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Any.Type"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
       "member": "GetTypeReader",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "Microsoft.Xna.Framework.Content.ContentTypeReader",
       "swiftReturnType": "Microsoft.Xna.Framework.Content.ContentTypeReader",
       "optional": false,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Microsoft.Xna.Framework.Content.ContentTypeReader"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
       "member": "Read",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.Object",
       "swiftReturnType": "Any?",
       "optional": true,
       "nullability": "UNKNOWN_REFERENCE_NULLABILITY",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Any?"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Content.ResourceContentManager",
       "member": "OpenStream",
       "kind": "method",
       "static": false,
-      "typeState": "missing",
+      "typeState": "complete",
       "clrReturnType": "System.IO.Stream",
       "swiftReturnType": "Foundation.InputStream",
       "optional": false,
       "nullability": "PROVEN_NONNULL_SUCCESS",
       "fallible": true,
-      "observed": false,
-      "observedReturnType": null
+      "observed": true,
+      "observedReturnType": "Foundation.InputStream"
     },
     {
       "ownerType": "Microsoft.Xna.Framework.Curve",
@@ -10997,34 +11355,17 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentManager",
-      "status": "PARTIAL",
+      "status": "COMPLETE",
       "expectedMembers": 10,
-      "targetMembers": 8,
-      "diagnostics": [
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Content.ContentManager.ReadAsset(_:String,recordDisposableObject:System.Action<System.IDisposable>)",
-          "detail": "mapped member is absent"
-        },
-        {
-          "category": "MISSING_MEMBER",
-          "subject": "Microsoft.Xna.Framework.Content.ContentManager.OpenStream(_:String)",
-          "detail": "mapped member is absent"
-        }
-      ]
+      "targetMembers": 10,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentReader",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 20,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentReader",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 20,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentSerializerAttribute",
@@ -11063,55 +11404,31 @@
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentTypeReader",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 6,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentTypeReader",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 6,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 1,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentTypeReaderManager",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 1,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 3,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 3,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Content.ResourceContentManager",
-      "status": "MISSING",
+      "status": "COMPLETE",
       "expectedMembers": 2,
-      "targetMembers": 0,
-      "diagnostics": [
-        {
-          "category": "MISSING_TYPE",
-          "subject": "Microsoft.Xna.Framework.Content.ResourceContentManager",
-          "detail": "mapped XNA type is absent from the Swift Symbol Graph"
-        }
-      ]
+      "targetMembers": 2,
+      "diagnostics": []
     },
     {
       "type": "Microsoft.Xna.Framework.Curve",

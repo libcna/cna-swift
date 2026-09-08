@@ -85,6 +85,41 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnb",
+      "value": "Error loading \"{0}\"."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbMagic",
+      "value": "Error loading \"{0}\". This is not a compiled content file."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbPlatform",
+      "value": "Error loading \"{0}\". This file was compiled for the wrong target platform."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbSize",
+      "value": "Error loading \"{0}\". File has been truncated."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbTypeVersion",
+      "value": "Error loading \"{0}\". File contains the wrong version of type {1}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbVersion",
+      "value": "Error loading \"{0}\". This file was compiled using the wrong version of the XNA Framework."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "BadXnbWrongType",
+      "value": "Error loading \"{0}\". File contains {1} but trying to load as {2}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "BeginMustBeCalledBeforeDraw",
       "value": "Begin must be called successfully before a Draw can be called."
     },
@@ -127,6 +162,16 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "CharacterNotInFont",
       "value": "The character '{0}' (0x{1:x4}) is not available in this SpriteFont. If applicable, adjust the font's start and end CharacterRegions to include this character."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ContentManagerCannotChangeRootDirectory",
+      "value": "This property cannot be changed after content has been loaded into the ContentManager."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "DecompressionError",
+      "value": "Error decompressing content data."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -260,6 +305,16 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenResourceNotBinary",
+      "value": "Error loading \"{0}\". Not a binary resource."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "OpenResourceNotFound",
+      "value": "Error loading \"{0}\". Resource not found."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "OpenStreamError",
       "value": "Error loading \"{0}\". Cannot open file."
     },
@@ -330,6 +385,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ReaderConstructedNewInstance",
+      "value": "ContentTypeReader {0} returned a new object instance from its Read method. This should have loaded data into the existingInstance parameter."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "RenderTargetsMustMatch",
       "value": "All active render targets must be the same size with the same multisample type and bit depth."
     },
@@ -362,6 +422,26 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "SkinnedEffectWeightsPerVertex",
       "value": "SkinnedEffect.WeightsPerVertex must be 1, 2, or 4."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderDuplicate",
+      "value": "Error loading \"{0}\". ContentTypeReader {1} conflicts with existing handler {2} for type {3}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderInvalid",
+      "value": "Error loading \"{0}\". Cannot instantiate ContentTypeReader {1}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderNotFound",
+      "value": "Error loading \"{0}\". Cannot find ContentTypeReader {1}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "TypeReaderNotRegistered",
+      "value": "Error loading \"{0}\". Cannot find ContentTypeReader for {1}."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

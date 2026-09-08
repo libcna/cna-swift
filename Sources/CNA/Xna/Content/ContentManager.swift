@@ -16,9 +16,9 @@ extension Microsoft.Xna.Framework.Content {
     /// `"a/../b"` and one named `"b"` are the same cache entry. Foundation 73
     /// built that routine from the same IL, and this calls it rather than
     /// reimplementing the agreement.
-    public class ContentManager: RuntimeOwnedChild {
+    open class ContentManager: RuntimeOwnedChild, CNADisposable {
 
-        private let runtime: RuntimeState
+        private let runtime: RuntimeState?
         private var handle: UInt64
         /// The runtime generation this manager's handle belongs to.
         ///
@@ -36,6 +36,18 @@ extension Microsoft.Xna.Framework.Content {
         /// `ObjectDisposedException` when it is gone. Optional for the same
         /// reason.
         private var loadedAssets: [String: Any]?
+        private var disposableAssets: [any CNADisposable]?
+        private var openedStreamLengths: [ObjectIdentifier: StreamLengthRecord] = [:]
+
+        private final class StreamLengthRecord {
+            weak var stream: InputStream?
+            let length: Int32
+
+            init(stream: InputStream, length: Int32) {
+                self.stream = stream
+                self.length = length
+            }
+        }
 
         /// `ContentManager(IServiceProvider serviceProvider)`.
         public convenience init(
@@ -53,42 +65,40 @@ extension Microsoft.Xna.Framework.Content {
             serviceProvider: any CNAServiceProvider,
             rootDirectory: String
         ) throws {
-            let rt = try RuntimeRegistry.current()
+            let rt = RuntimeRegistry.currentIfAvailable()
             self.runtime = rt
             self.serviceProvider = serviceProvider
             self.storedRootDirectory = rootDirectory
             self.loadedAssets = [:]
+            self.disposableAssets = []
+            self.handle = 0
+            self.generation = rt?.generation ?? 0
 
-            var device: UInt64 = 0
-            try rt.functions.check(
-                rt.functions.gameGetGraphicsDevice(rt.gameHandle, &device),
-                operation: "cna_game_get_graphics_device")
+            if let rt {
+                var device: UInt64 = 0
+                try rt.functions.check(
+                    rt.functions.gameGetGraphicsDevice(rt.gameHandle, &device),
+                    operation: "cna_game_get_graphics_device")
 
-            var utf8 = Array(rootDirectory.utf8)
-            var created: UInt64 = 0
-            try rt.functions.check(
-                ContentManager.withStringView(&utf8) { view in
-                    var info = CNASwift_ContentManagerCreateInfo()
-                    info.struct_size =
-                        UInt32(MemoryLayout<CNASwift_ContentManagerCreateInfo>.size)
-                    info.struct_version = 1
-                    info.root_directory = view
-                    return rt.functions.contentManagerCreate(
-                        device, &info, &created)
-                },
-                operation: "cna_content_manager_create")
-            handle = created
-            generation = rt.generation
+                var utf8 = Array(rootDirectory.utf8)
+                var created: UInt64 = 0
+                try rt.functions.check(
+                    ContentManager.withStringView(&utf8) { view in
+                        var info = CNASwift_ContentManagerCreateInfo()
+                        info.struct_size = UInt32(
+                            MemoryLayout<CNASwift_ContentManagerCreateInfo>.size)
+                        info.struct_version = 1
+                        info.root_directory = view
+                        return rt.functions.contentManagerCreate(
+                            device, &info, &created)
+                    },
+                    operation: "cna_content_manager_create")
+                handle = created
 
-            // CNA requires a content manager to be destroyed BEFORE its parent
-            // game, so the manager joins the runtime's child registry and is
-            // torn down by `Game.Dispose` if the caller never disposes it --
-            // **as long as it is still alive then**. The registry holds WEAK
-            // references, so a manager the consumer drops early is gone from
-            // it before `Game.Dispose` runs and its handle would be destroyed
-            // by nobody. `deinit` is what closes that, and see the note there:
-            // this was not a hypothetical.
-            rt.register(self)
+                // CNA requires native managers to be destroyed before their
+                // game. A managed-only manager has no runtime child to join.
+                rt.register(self)
+            }
         }
 
         /// `ContentManager.ServiceProvider`.
@@ -158,7 +168,8 @@ extension Microsoft.Xna.Framework.Content {
             guard let assetName, !assetName.isEmpty else {
                 throw CNAArgumentNullException(paramName: "assetName")
             }
-            let key = Microsoft.Xna.Framework.TitleContainer.GetCleanPath(assetName)
+            let cleanName = Microsoft.Xna.Framework.TitleContainer.GetCleanPath(assetName)
+            let key = cleanName.lowercased()
 
             // One cast site, reached by both paths. A freshly loaded asset
             // always matches, because `readAsset` picks its route from `T`;
@@ -168,7 +179,9 @@ extension Microsoft.Xna.Framework.Content {
             if let cached = assets[key] {
                 asset = cached
             } else {
-                asset = try readAsset(key, as: T.self)
+                let loaded: T = try ReadAsset(
+                    cleanName, recordDisposableObject: nil)
+                asset = loaded
                 assets[key] = asset
                 loadedAssets = assets
             }
@@ -181,14 +194,15 @@ extension Microsoft.Xna.Framework.Content {
             return typed
         }
 
-        /// The typed half of `ReadAsset<T>`.
+        /// The native acceleration half of `ReadAsset<T>`.
         ///
         /// XNA reads an `.xnb` header and picks a type reader from it. CNA
         /// publishes **one route per asset kind** instead —
         /// `load_texture2d`, `load_texture_cube`, `load_sprite_font`,
         /// `load_effect`, `load_sound_effect`, `load_model` — so the type
-        /// argument selects the route rather than validating a header this
-        /// binding never sees.
+        /// argument selects the route. The managed reader path below now sees
+        /// and validates XNB itself for every type without an admitted native
+        /// loader.
         ///
         /// **Only `Texture2D` is wired here.** CNA publishes five more
         /// loaders -- cube, sprite font, effect, sound effect, model -- and
@@ -197,10 +211,15 @@ extension Microsoft.Xna.Framework.Content {
         /// consuming member is not bound, so they wait for the milestones that
         /// can receive them.
         ///
-        /// A type with no loader is refused by name. That is narrower than
-        /// XNA, which loads whatever the `.xnb` declares, and the refusal says
-        /// so rather than reporting the asset as missing.
-        private func readAsset<T>(_ key: String, as: T.Type) throws -> Any {
+        /// A type selected for native acceleration but unavailable without a
+        /// callback runtime is refused by name. Other types proceed through
+        /// the real managed XNB path.
+        private func readNativeAsset<T>(_ key: String, as: T.Type) throws -> Any {
+            guard let runtime, handle != 0 else {
+                throw Microsoft.Xna.Framework.Content.ContentLoadException(
+                    message: ContentManager.noLoaderMessage(
+                        String(describing: T.self)))
+            }
             var utf8 = Array(key.utf8)
             var produced: UInt64 = 0
             let functions = runtime.functions
@@ -229,16 +248,148 @@ extension Microsoft.Xna.Framework.Content {
             }
         }
 
+        /// `ContentManager.ReadAsset<T>` widened from protected for Swift.
+        /// Custom readers always use the managed XNB stream. Existing CNA
+        /// typed loaders remain the backend for built-in asset types, so one
+        /// cache entry never crosses two incompatible loading systems.
+        open func ReadAsset<T>(
+            _ assetName: String,
+            recordDisposableObject: ((any CNADisposable) throws -> Void)?
+        ) throws -> T {
+            guard loadedAssets != nil else {
+                throw CNAObjectDisposedException(objectName: "\(type(of: self))")
+            }
+            guard !assetName.isEmpty else {
+                throw CNAArgumentNullException(paramName: "assetName")
+            }
+
+            if Self.isNativeBuiltIn(T.self) {
+                let value = try readNativeAsset(assetName, as: T.self)
+                guard let typed = value as? T else {
+                    throw ContentLoadException(message: Self.badXnbWrongTypeMessage(
+                        assetName, String(describing: type(of: value)),
+                        String(describing: T.self)))
+                }
+                return typed
+            }
+
+            let stream = try OpenStream(assetName)
+            let availableLength = TakeOpenedStreamLength(stream)
+            let reader: ContentReader
+            do {
+                reader = try ContentReader.Create(
+                    self, input: stream, assetName: assetName,
+                    recordDisposableObject: recordDisposableObject,
+                    availableLength: availableLength)
+            } catch {
+                stream.close()
+                throw error
+            }
+            defer { try? reader.Close() }
+            guard let result: T = try reader.readAsset() else {
+                throw ContentLoadException(message: Self.badXnbWrongTypeMessage(
+                    assetName, "null", String(describing: T.self)))
+            }
+            return result
+        }
+
+        /// `ContentManager.OpenStream`, widened from protected for Swift.
+        open func OpenStream(_ assetName: String) throws -> InputStream {
+            let root = storedRootDirectory ?? ""
+            let combined = root.isEmpty
+                ? assetName + ".xnb"
+                : root + "/" + assetName + ".xnb"
+            let clean = Microsoft.Xna.Framework.TitleContainer.GetCleanPath(combined)
+
+            do {
+                // The pinned runtime is the Windows XNA build. FileStream and
+                // TitleContainer both reject these filename characters before
+                // any missing-file decision; Linux accepts several of them,
+                // so reproduce the authority's failure ordering explicitly.
+                if Self.hasInvalidWindowsAssetPathCharacter(assetName) {
+                    throw CNAArgumentException(
+                        message: Microsoft.Xna.Framework.TitleContainer
+                            .invalidTitleContainerNameMessage)
+                }
+                if Self.isAbsolutePath(root) || runtime == nil {
+                    let hostPath = clean.replacingOccurrences(of: "\\", with: "/")
+                    guard FileManager.default.fileExists(atPath: hostPath),
+                          let stream = InputStream(fileAtPath: hostPath) else {
+                        let inner = CNAFileNotFoundException(
+                            message: Microsoft.Xna.Framework.TitleContainer
+                                .openStreamNotFoundMessage(assetName))
+                        throw ContentLoadException(
+                            message: Microsoft.Xna.Framework.TitleContainer
+                                .openStreamNotFoundMessage(assetName),
+                            innerException: inner)
+                    }
+                    if let size = try? FileManager.default.attributesOfItem(
+                        atPath: hostPath)[.size] as? NSNumber {
+                        RecordOpenedStreamLength(stream, size.uint64Value)
+                    }
+                    return stream
+                }
+                return try Microsoft.Xna.Framework.TitleContainer.OpenStream(clean)
+            } catch let error as ContentLoadException {
+                throw error
+            } catch let error as CNAFileNotFoundException {
+                throw ContentLoadException(
+                    message: Microsoft.Xna.Framework.TitleContainer
+                        .openStreamNotFoundMessage(assetName),
+                    innerException: error)
+            } catch let error as CNAException {
+                throw ContentLoadException(
+                    message: Microsoft.Xna.Framework.TitleContainer
+                        .openStreamErrorMessage(assetName),
+                    innerException: error)
+            }
+        }
+
+        internal func RecordDisposableObject(
+            _ disposable: any CNADisposable
+        ) throws {
+            guard disposableAssets != nil else {
+                throw CNAObjectDisposedException(objectName: "\(type(of: self))")
+            }
+            disposableAssets?.append(disposable)
+        }
+
+        internal func RecordOpenedStreamLength(
+            _ stream: InputStream, _ length: UInt64
+        ) {
+            let bounded = length > UInt64(Int32.max) ? Int32.max : Int32(length)
+            openedStreamLengths[ObjectIdentifier(stream)] = StreamLengthRecord(
+                stream: stream, length: bounded)
+        }
+
+        private func TakeOpenedStreamLength(_ stream: InputStream) -> Int32? {
+            guard let record = openedStreamLengths.removeValue(
+                forKey: ObjectIdentifier(stream)),
+                  record.stream === stream else { return nil }
+            return record.length
+        }
+
         /// `ContentManager.Unload()`.
         ///
         /// Releases every asset the manager loaded and empties the cache. The
         /// manager stays usable afterwards, which is what separates `Unload`
         /// from `Dispose`.
         public func Unload() throws {
-            try runtime.functions.check(
-                runtime.functions.contentManagerUnload(handle),
-                operation: "cna_content_manager_unload")
-            loadedAssets = [:]
+            guard loadedAssets != nil else {
+                throw CNAObjectDisposedException(objectName: "\(type(of: self))")
+            }
+            let disposables = disposableAssets ?? []
+            defer {
+                loadedAssets = [:]
+                disposableAssets = []
+                openedStreamLengths.removeAll(keepingCapacity: false)
+            }
+            for disposable in disposables { try disposable.Dispose() }
+            if let runtime, handle != 0 {
+                try runtime.functions.check(
+                    runtime.functions.contentManagerUnload(handle),
+                    operation: "cna_content_manager_unload")
+            }
         }
 
         /// `ContentManager.Dispose()` and `Dispose(Boolean)`.
@@ -252,11 +403,15 @@ extension Microsoft.Xna.Framework.Content {
 
         open func Dispose(_ disposing: Bool) throws {
             guard loadedAssets != nil else { return }
+            if disposing { try Unload() }
             loadedAssets = nil
-            try runtime.functions.check(
-                runtime.functions.contentManagerDestroy(handle),
-                operation: "cna_content_manager_destroy")
-            handle = 0
+            disposableAssets = nil
+            if let runtime, handle != 0 {
+                try runtime.functions.check(
+                    runtime.functions.contentManagerDestroy(handle),
+                    operation: "cna_content_manager_destroy")
+                handle = 0
+            }
         }
 
         /// `FrameworkResources.BadXnbWrongType`, a three-argument format.
@@ -275,9 +430,9 @@ extension Microsoft.Xna.Framework.Content {
         /// Not a Microsoft string: XNA has no such case, because it reads the
         /// type out of the `.xnb` rather than being told one.
         internal static func noLoaderMessage(_ wanted: String) -> String {
-            "This runtime loads content through one route per asset kind, and "
-            + "has none for \(wanted). It reads no .xnb header, so it cannot "
-            + "discover the type from the file."
+            "This runtime keeps projected built-in content on one route per "
+            + "asset kind, and has none for \(wanted). That built-in type "
+            + "cannot safely fall through to the custom managed .xnb reader."
         }
 
         /// The size this binding declares to CNA, exposed so a test can
@@ -294,7 +449,7 @@ extension Microsoft.Xna.Framework.Content {
         /// named for what it is, exactly as `GraphicsDeviceManager`'s own test
         /// hook is.
         internal func testOnlyRecordLoadedAsset(_ key: String) {
-            loadedAssets?[key] = key
+            loadedAssets?[key.lowercased()] = key
         }
 
         internal var runtimeObjectIsDisposed: Bool { loadedAssets == nil }
@@ -326,11 +481,38 @@ extension Microsoft.Xna.Framework.Content {
         /// may have reissued this handle number, and destroying from a foreign
         /// thread is not allowed.
         deinit {
-            guard handle != 0,
+            guard let runtime,
+                  handle != 0,
                   runtime.isActive,
                   runtime.generation == generation,
                   runtime.owner.isCurrent else { return }
             if runtime.functions.contentManagerDestroy(handle) == 0 { handle = 0 }
+        }
+
+        private static func isAbsolutePath(_ path: String) -> Bool {
+            path.hasPrefix("/")
+                || path.hasPrefix("\\")
+                || (path.count >= 3
+                    && path[path.index(path.startIndex, offsetBy: 1)] == ":")
+        }
+
+        private static func hasInvalidWindowsAssetPathCharacter(
+            _ path: String
+        ) -> Bool {
+            path.unicodeScalars.contains { scalar in
+                scalar.value == 0
+                    || scalar.value < 0x20
+                    || "\"<>|*?".unicodeScalars.contains(scalar)
+            }
+        }
+
+        private static func isNativeBuiltIn<T>(_ type: T.Type) -> Bool {
+            type is Microsoft.Xna.Framework.Graphics.Texture2D.Type
+                || type is Microsoft.Xna.Framework.Graphics.TextureCube.Type
+                || type is Microsoft.Xna.Framework.Graphics.SpriteFont.Type
+                || type is Microsoft.Xna.Framework.Graphics.Effect.Type
+                || type is Microsoft.Xna.Framework.Audio.SoundEffect.Type
+                || type is Microsoft.Xna.Framework.Graphics.Model.Type
         }
 
         private static func withStringView(

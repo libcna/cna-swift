@@ -14,6 +14,7 @@ disassemblies are inputs only and are never copied into the repository.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import importlib.util
 import json
@@ -136,6 +137,46 @@ FIXTURES = {
         "project-owned ResourceManager subclass returning the same XNB bytes",
     ],
 }
+
+
+def public_encoding_dependencies(records: list[dict[str, Any]]) -> list[str]:
+    findings: list[str] = []
+    for record in records:
+        for member in record["members"]:
+            types = [member.get("returnType"), member.get("type")]
+            types.extend(item.get("type") for item in member.get("parameters", []))
+            if any(item == "System.Text.Encoding" for item in types):
+                findings.append(
+                    f"{record['name']}.{member.get('name')} names System.Text.Encoding")
+    return findings
+
+
+def closure_self_tests(records: list[dict[str, Any]]) -> int:
+    # Negative control requested by the selected milestone: a planted public
+    # Encoding parameter must make the supposedly zero dependency count fail.
+    mutated = copy.deepcopy(records)
+    mutated[0]["members"].append({
+        "kind": "method",
+        "name": "PlantedEncodingDependency",
+        "returnType": "System.Void",
+        "parameters": [{"name": "encoding", "type": "System.Text.Encoding"}],
+    })
+    if len(public_encoding_dependencies(mutated)) != 1:
+        raise SystemExit("closure negative control survived planted Encoding dependency")
+
+    stream_ctor = {
+        "kind": "constructor", "name": ".ctor",
+        "parameters": [{"type": "System.IO.Stream"}],
+    }
+    encoding_ctor = {
+        "kind": "constructor", "name": ".ctor",
+        "parameters": [
+            {"type": "System.IO.Stream"}, {"type": "System.Text.Encoding"},
+        ],
+    }
+    if not binary_reader_selected(stream_ctor)[0] or binary_reader_selected(encoding_ctor)[0]:
+        raise SystemExit("BinaryReader constructor demand negative control failed")
+    return 2
 
 
 def load_bcl_parser():
@@ -286,6 +327,11 @@ def main() -> int:
     missing = sorted(set(SELECTED_XNA) - set(by_name))
     if missing:
         raise SystemExit(f"selected XNA types absent from contract: {missing}")
+    selected_records = [by_name[name] for name in SELECTED_XNA]
+    encoding_findings = public_encoding_dependencies(selected_records)
+    if encoding_findings:
+        raise SystemExit("; ".join(encoding_findings))
+    self_test_count = closure_self_tests(selected_records)
 
     strict = json.loads(STRICT_REPORT.read_text(encoding="utf-8"))
     missing_subjects = {
@@ -397,7 +443,8 @@ def main() -> int:
                 "projection": "CNAFormatException : CNASystemException",
             },
         ],
-        "publicEncodingDependencies": 0,
+        "publicEncodingDependencies": len(encoding_findings),
+        "closureMutationSelfTests": self_test_count,
         "contentReaderUnreviewed": sum(item["unreviewedMembers"] for item in xna),
         "bclContentClosureUnreviewed": binary["unreviewedMembers"] + resource["unreviewedMembers"],
         "counts": {
@@ -427,7 +474,8 @@ def main() -> int:
     print(
         "CONTENT_READER_UNREVIEWED=0 "
         "BCL_CONTENT_CLOSURE_UNREVIEWED=0 "
-        "CONTENT_READER_ENCODING_DEPENDENCIES=0"
+        "CONTENT_READER_ENCODING_DEPENDENCIES=0 "
+        f"CONTENT_READER_CLOSURE_SELF_TESTS={self_test_count}"
     )
     return 0
 

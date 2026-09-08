@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
-  "registrySha256": "63f46dded2a288a0c96c93cc749d0a898ed51ed4e66d62dce685902d00ff4873",
-  "manifestSha256": "ac795786ab8701e15b5030cb9edbd8a91ce10b4859d7206e840fe243fc165833",
+  "registrySha256": "ffc9c1ad092588b27c275f8ecb4326bb9c29f662be1b9d23f36584b33680ddf0",
+  "manifestSha256": "6bf920ddfb9421b5a17539590bb53d67d67fdb6c1c39ecd6fd3f8912ae7ea6ca",
   "BCL_AUTHORITY_STATUS": "PASS",
   "BCL_AUTHORITY_ASSEMBLIES": 2,
-  "BCL_AUTHORITY_TYPES": 44,
-  "BCL_AUTHORITY_MEMBERS": 514,
+  "BCL_AUTHORITY_TYPES": 49,
+  "BCL_AUTHORITY_MEMBERS": 577,
   "BCL_IDENTITY_CHECKS": 37,
   "BCL_SENTINEL_CHECKS": 651,
-  "BCL_MANIFEST_CHECKS": 79,
+  "BCL_MANIFEST_CHECKS": 94,
   "BCL_MUTATION_SELF_TESTS": 514,
-  "BCL_CROSS_CHECKS": 222,
-  "BCL_RESOURCE_CHECKS": 33,
+  "BCL_CROSS_CHECKS": 247,
+  "BCL_RESOURCE_CHECKS": 43,
   "BCL_IL_LITERAL_CHECKS": 1,
   "BCL_STATIC_TABLE_CHECKS": 1,
   "BCL_NEGATIVE_CONTROLS": 4,
@@ -94,14 +94,19 @@
       ]
     },
     {
-      "control": "mscorlib.dll",
-      "controlSha256": "4bea44963e71cabbad47e9d80689130416f6e8786a710c2fafe58f6d41c40ad6",
-      "offeredAs": "mscorlib.dll",
-      "checksRun": 21,
-      "rejectedBy": 2,
+      "control": "System.dll",
+      "controlSha256": "c701e0bbc246ec310dea2b892133e72686425ebb46a77c37429da2c5c0c9621c",
+      "offeredAs": "System.dll",
+      "checksRun": 16,
+      "rejectedBy": 7,
       "reasons": [
-        "mscorlib.dll: sha256 4bea44963e71cabbad47e9d80689130416f6e8786a710c2fafe58f6d41c40ad6 does not match the registered 5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
-        "mscorlib.dll: size 4960080 != registered 5196112"
+        "System.dll: sha256 c701e0bbc246ec310dea2b892133e72686425ebb46a77c37429da2c5c0c9621c does not match the registered c3182e40f09a8d3a0167a833dc1ce7c3cb2bfddbd32031d8d3f41481d0467462",
+        "System.dll: size 2775040 != registered 3481928",
+        "System.dll: version resource CompanyName='Mono development team' != registered 'Microsoft Corporation'",
+        "System.dll: version resource ProductName='Mono Common Language Infrastructure' != registered 'Microsoft\u00ae .NET Framework'",
+        "System.dll: version resource InternalName='System' != registered 'System.dll'",
+        "System.dll: the registered strong-name key file 'f:\\\\dd\\\\tools\\\\devdiv\\\\EcmaPublicKey.snk' is not present in the binary",
+        "System.dll: reimplementation marker 'MonoTODO' is present"
       ]
     }
   ],
@@ -114,8 +119,8 @@
       "publicKeyTokenRecomputed": "b77a5c561934e089",
       "sha256": "5634668d4775b0113f08ea31093b281fea69bfc4e99227f5ca761b4ed98acc63",
       "fileVersion": "4.0.30319.1 (RTMRel.030319-0100)",
-      "selectedTypes": 39,
-      "selectedMembers": 415
+      "selectedTypes": 44,
+      "selectedMembers": 478
     },
     {
       "assembly": "System.dll",

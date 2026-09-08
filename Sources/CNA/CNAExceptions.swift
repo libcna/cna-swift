@@ -272,6 +272,10 @@ open class CNAException: Error {
         "CNANullReferenceException": "System.NullReferenceException",
         "CNAIndexOutOfRangeException": "System.IndexOutOfRangeException",
         "CNAObjectDisposedException": "System.ObjectDisposedException",
+        "CNAIOException": "System.IO.IOException",
+        "CNAEndOfStreamException": "System.IO.EndOfStreamException",
+        "CNAFileNotFoundException": "System.IO.FileNotFoundException",
+        "CNAFormatException": "System.FormatException",
     ]
 }
 
@@ -863,6 +867,50 @@ open class CNAIOException: CNASystemException {
     public override init(message: String?, innerException: CNAException?) {
         super.init(message: message, innerException: innerException)
         HResult = CNAIOException.corIOHResult
+    }
+}
+
+/// `System.IO.EndOfStreamException`.
+open class CNAEndOfStreamException: CNAIOException {
+    internal static let corEndOfStreamHResult = Int32(bitPattern: 0x8007_0026)
+    internal static let argEndOfStreamMessage =
+        "Attempted to read past the end of the stream."
+
+    public override init() {
+        super.init(message: CNAEndOfStreamException.argEndOfStreamMessage)
+        HResult = CNAEndOfStreamException.corEndOfStreamHResult
+    }
+
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAEndOfStreamException.corEndOfStreamHResult
+    }
+
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAEndOfStreamException.corEndOfStreamHResult
+    }
+}
+
+/// `System.FormatException`.
+open class CNAFormatException: CNASystemException {
+    internal static let corFormatHResult = Int32(bitPattern: 0x8013_1537)
+    internal static let argFormatMessage =
+        "One of the identified items was in an invalid format."
+
+    public override init() {
+        super.init(message: CNAFormatException.argFormatMessage)
+        HResult = CNAFormatException.corFormatHResult
+    }
+
+    public override init(message: String?) {
+        super.init(message: message)
+        HResult = CNAFormatException.corFormatHResult
+    }
+
+    public override init(message: String?, innerException: CNAException?) {
+        super.init(message: message, innerException: innerException)
+        HResult = CNAFormatException.corFormatHResult
     }
 }
 

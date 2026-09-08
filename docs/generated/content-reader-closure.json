@@ -341,7 +341,7 @@
         "FrameworkResources",
         "TitleContainer.GetCleanPath"
       ],
-      "currentSwiftMappingStatus": "missing",
+      "currentSwiftMappingStatus": "projected",
       "currentCnaRouteRelevance": "NONE: cna_content_reader_* consumes CNA_StorageStreamHandle and is a save-game/storage transport, not the XNA title-asset BinaryReader",
       "fixtureRequirements": [
         "byte-authored uncompressed Windows XNB v5",
@@ -481,7 +481,7 @@
       "xnaPrivateInternalDependencies": [
         "TargetIsValueType field"
       ],
-      "currentSwiftMappingStatus": "missing",
+      "currentSwiftMappingStatus": "projected",
       "currentCnaRouteRelevance": "NONE: managed reader contract",
       "fixtureRequirements": [
         "test subclass exercising TargetType, version, initialize, existing instance"
@@ -590,7 +590,7 @@
       "xnaPrivateInternalDependencies": [
         "ContentTypeReader.Read erased override"
       ],
-      "currentSwiftMappingStatus": "missing",
+      "currentSwiftMappingStatus": "projected",
       "currentCnaRouteRelevance": "NONE: managed generic bridge",
       "fixtureRequirements": [
         "typed test reader plus erased bridge and wrong-T refusal"
@@ -642,7 +642,7 @@
         "ContentTypeReader.Initialize/TargetType/TypeVersion",
         "FrameworkResources type-reader failures"
       ],
-      "currentSwiftMappingStatus": "missing",
+      "currentSwiftMappingStatus": "projected",
       "currentCnaRouteRelevance": "NONE: managed registry",
       "fixtureRequirements": [
         "private creator registry: known name, duplicate, unknown name, stable identity"
@@ -746,7 +746,7 @@
       "xnaPrivateInternalDependencies": [
         "FrameworkResources resource lookup failures"
       ],
-      "currentSwiftMappingStatus": "missing",
+      "currentSwiftMappingStatus": "projected",
       "currentCnaRouteRelevance": "DO NOT BIND: cna_content_manager_create_resource is a documented placeholder whose loads report IO",
       "fixtureRequirements": [
         "project-owned ResourceManager subclass returning the same XNB bytes"
@@ -1376,6 +1376,7 @@
     }
   ],
   "publicEncodingDependencies": 0,
+  "closureMutationSelfTests": 2,
   "contentReaderUnreviewed": 0,
   "bclContentClosureUnreviewed": 0,
   "counts": {

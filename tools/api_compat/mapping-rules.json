@@ -212,7 +212,8 @@
     "System.SystemException": "CNASystemException",
     "System.Runtime.InteropServices.ExternalException": "CNAExternalException",
     "System.Collections.Generic.Dictionary`2": "CNADictionary",
-    "System.Attribute": "CNAAttribute"
+    "System.Attribute": "CNAAttribute",
+    "System.IO.BinaryReader": "CNABinaryReader"
   },
   "measuredSupportBaseMapping": "A non-XNA CLR base listed in measuredSupportBaseProjections is a MEASURED base, exactly as an XNA base is: the Swift type must be a class whose compiler-emitted superclass is the mapped support type. A missing base, AnyObject or Object in its place, a struct where the CLR declares a class, a different support base, composition in place of inheritance, or any other base projection is a BASE_MAPPING_MISMATCH. It is never silently dropped and never allowlisted. A GENERIC support base additionally requires its CLR generic argument to be preserved in the Swift specialization -- Collection<IGameComponent> projects to CNACollection<any IGameComponent>, never to CNACollection<Any> -- and that argument is measured by bclSupportBaseSpecializationMapping.",
   "bclSupportTypeProjections": {
@@ -240,7 +241,12 @@
     "System.IAsyncResult": "CNAAsyncResult",
     "System.IO.FileMode": "CNAFileMode",
     "System.IO.FileAccess": "CNAFileAccess",
-    "System.IO.FileShare": "CNAFileShare"
+    "System.IO.FileShare": "CNAFileShare",
+    "System.IDisposable": "CNADisposable",
+    "System.IO.BinaryReader": "CNABinaryReader",
+    "System.IO.EndOfStreamException": "CNAEndOfStreamException",
+    "System.FormatException": "CNAFormatException",
+    "System.Resources.ResourceManager": "CNAResourceManager"
   },
   "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
@@ -782,6 +788,193 @@
         "RemoveService"
       ]
     },
+    "CNADisposable": {
+      "kind": "protocol",
+      "inheritance": "public",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.IDisposable",
+      "requiredMembers": [
+        "Dispose"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "allowedPublicMembers": [
+        "Dispose"
+      ],
+      "forbiddenMembers": []
+    },
+    "CNABinaryReader": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [
+        "CNADisposable"
+      ],
+      "clrFamily": "System.IO.BinaryReader",
+      "requiredMembers": [
+        "BaseStream",
+        "Close",
+        "Dispose",
+        "FillBuffer",
+        "PeekChar",
+        "Read",
+        "Read7BitEncodedInt",
+        "ReadBoolean",
+        "ReadByte",
+        "ReadBytes",
+        "ReadChar",
+        "ReadChars",
+        "ReadDouble",
+        "ReadInt16",
+        "ReadInt32",
+        "ReadInt64",
+        "ReadSByte",
+        "ReadSingle",
+        "ReadString",
+        "ReadUInt16",
+        "ReadUInt32",
+        "ReadUInt64"
+      ],
+      "openMembers": [
+        "BaseStream",
+        "Close",
+        "Dispose",
+        "FillBuffer",
+        "PeekChar",
+        "Read",
+        "ReadBoolean",
+        "ReadByte",
+        "ReadBytes",
+        "ReadChar",
+        "ReadChars",
+        "ReadDouble",
+        "ReadInt16",
+        "ReadInt32",
+        "ReadInt64",
+        "ReadSByte",
+        "ReadSingle",
+        "ReadString",
+        "ReadUInt16",
+        "ReadUInt32",
+        "ReadUInt64"
+      ],
+      "finalMembers": [],
+      "allowedPublicMembers": [
+        ".ctor",
+        "BaseStream",
+        "Close",
+        "Dispose",
+        "FillBuffer",
+        "PeekChar",
+        "Read",
+        "Read7BitEncodedInt",
+        "ReadBoolean",
+        "ReadByte",
+        "ReadBytes",
+        "ReadChar",
+        "ReadChars",
+        "ReadDouble",
+        "ReadInt16",
+        "ReadInt32",
+        "ReadInt64",
+        "ReadSByte",
+        "ReadSingle",
+        "ReadString",
+        "ReadUInt16",
+        "ReadUInt32",
+        "ReadUInt64"
+      ],
+      "forbiddenMembers": [
+        "ReadDecimal"
+      ]
+    },
+    "CNAEndOfStreamException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNAIOException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.IO.EndOfStreamException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNAFormatException": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNASystemException",
+      "conformances": [
+        "Swift.Error"
+      ],
+      "clrFamily": "System.FormatException",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": [
+        "StackTrace",
+        "Source",
+        "TargetSite",
+        "Data",
+        "GetObjectData",
+        "GetType",
+        "ToString"
+      ]
+    },
+    "CNAResourceManager": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Resources.ResourceManager",
+      "requiredMembers": [
+        "BaseName",
+        "IgnoreCase",
+        "ResourceSetType",
+        "ReleaseAllResources",
+        "GetString",
+        "GetObject"
+      ],
+      "openMembers": [
+        "BaseName",
+        "IgnoreCase",
+        "ResourceSetType",
+        "ReleaseAllResources",
+        "GetString",
+        "GetObject"
+      ],
+      "finalMembers": [],
+      "allowedPublicMembers": [
+        ".ctor",
+        "BaseName",
+        "IgnoreCase",
+        "ResourceSetType",
+        "ReleaseAllResources",
+        "GetString",
+        "GetObject"
+      ],
+      "forbiddenMembers": [
+        "CreateFileBasedResourceManager",
+        "GetResourceFileName",
+        "GetResourceSet",
+        "GetStream"
+      ]
+    },
     "CNAAsyncResult": {
       "kind": "protocol",
       "inheritance": "public",
@@ -990,8 +1183,44 @@
       "reason": "ExceptionResource 28, raised by every Collection<T> mutator for a read-only backing list."
     },
     {
+      "key": "Arg_EndOfStreamException",
+      "reason": "EndOfStreamException's parameterless constructor substitutes it before setting COR_E_ENDOFSTREAM."
+    },
+    {
+      "key": "Arg_FormatException",
+      "reason": "FormatException's parameterless constructor substitutes it before setting COR_E_FORMAT."
+    },
+    {
       "key": "Arg_IOException",
       "reason": "IOException's parameterless constructor substitutes it before setting COR_E_IO, so CNAIOException() must answer it rather than Exception's Exception_WasThrown default."
+    },
+    {
+      "key": "Argument_InvalidOffLen",
+      "reason": "BinaryReader's array overloads raise it for an invalid index/count range."
+    },
+    {
+      "key": "Argument_StreamNotReadable",
+      "reason": "BinaryReader construction raises it when the stream cannot be read."
+    },
+    {
+      "key": "ArgumentOutOfRange_BinaryReaderFillBuffer",
+      "reason": "BinaryReader.FillBuffer refuses a request larger than its internal buffer."
+    },
+    {
+      "key": "Format_Bad7BitInt32",
+      "reason": "BinaryReader.Read7BitEncodedInt raises it after five continuation bytes."
+    },
+    {
+      "key": "IO.EOF_ReadBeyondEOF",
+      "reason": "BinaryReader fixed-width reads raise it on a short stream."
+    },
+    {
+      "key": "IO.IO_InvalidStringLen_Len",
+      "reason": "BinaryReader.ReadString formats it for a negative decoded length."
+    },
+    {
+      "key": "ObjectDisposed_FileClosed",
+      "reason": "BinaryReader raises it when a read follows Close."
     },
     {
       "key": "IO.FileNotFound",
@@ -1001,7 +1230,7 @@
   "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "ac795786ab8701e15b5030cb9edbd8a91ce10b4859d7206e840fe243fc165833",
+  "bclSelectedShapeSha256": "6bf920ddfb9421b5a17539590bb53d67d67fdb6c1c39ecd6fd3f8912ae7ea6ca",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class",
@@ -1341,6 +1570,42 @@
       "reason": "Load<T>'s first instruction after the disposal test is String.IsNullOrEmpty(assetName), and the null half of that test is a branch a caller can only reach by passing null. Declaring the parameter non-Optional would leave the ArgumentNullException unreachable from Swift, hiding half of a refusal the IL opens with -- the same reason TitleContainer.OpenStream's name is Optional."
     },
     {
+      "owner": "Microsoft.Xna.Framework.Content.ContentManager",
+      "member": "ReadAsset",
+      "parameter": "recordDisposableObject",
+      "reason": "ContentManager.Load passes null for this delegate and ContentReader treats that as the normal manager-owned disposal path. An Optional function value preserves that CLR null state."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ResourceContentManager",
+      "member": ".ctor",
+      "parameter": "resourceManager",
+      "reason": "The constructor calls the ContentManager base first and then explicitly null-tests resourceManager before storing it. Optional preserves that observable ArgumentNullException branch."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ContentReader",
+      "member": "ReadObject",
+      "parameter": "existingInstance",
+      "reason": "The unconstrained CLR generic can carry default(T), including null for a reference T. Swift needs Optional<T> to preserve that existing-object state rather than inventing an instance."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ContentReader",
+      "member": "ReadRawObject",
+      "parameter": "existingInstance",
+      "reason": "The same default(T) path as ReadObject: a reference-typed existing instance can be null and is passed through to the type reader."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ContentReader",
+      "member": "ReadSharedResource",
+      "parameter": "fixup",
+      "reason": "The method explicitly null-tests the Action<T> and raises ArgumentNullException; an Optional closure makes that refusal observable from Swift."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Content.ContentTypeReaderOfT",
+      "member": "Read",
+      "parameter": "existingInstance",
+      "reason": "CLR default(T) reaches this abstract hook as null for reference types. Optional<T> is the direct Swift representation of that unconstrained generic state."
+    },
+    {
       "owner": "Microsoft.Xna.Framework.Audio.SoundEffect",
       "member": "FromStream",
       "parameter": "stream",
@@ -1471,7 +1736,12 @@
   "indexedPropertyAccessorMapping": "The indexed case of the general accessor rule, unchanged in shape from the rule it generalises. A read-only indexed property stays a Swift subscript, gaining `get throws` when its getter is fallible. When its writer becomes a method the reader is spelled `Item(...)` beside `SetItem(...)` rather than as a subscript, so the two halves of one CLR member stay one named pair; the verifier combines both compiler symbols into one source property identity.",
   "accessorFallibilityReference": "tools/api_compat/reference/xna40-accessor-fallibility.json is the pinned per-accessor fallibility verdict for every public property in the contract, regenerated by tools/api_compat/accessor_fallibility.py from the CIL of the seven hash-registered assemblies. An accessor is fallible when a throw is reachable from it inside those assemblies, when an unguarded caller-supplied index reaches a CLR index operation, or -- for an abstract or interface accessor -- when a registered implementor is. Allocation, calls that leave the registered set, and universal CLR failures such as OutOfMemoryException are not XNA contract behaviour and are never fallibility.",
   "accessorFallibilitySha256": "417366927ba140d80e87a27312c05ecd04476afb0bee7d0f7ca2a5195a696463",
-  "returnNullabilityMapping": "CLR reference nullability and Swift fallibility are independent axes and are projected independently. A public reference-typed return position -- a property getter, a method, or a field read -- maps to Swift Optional exactly when the pinned inventory proves XNA can normally return null there, and it carries the Swift throws effect exactly when the member's own accessor rule says it is fallible. All four combinations are legitimate: T, T?, throws -> T, and throws -> T?. Swift throws must never stand in for a normal null result, and Optional must never absorb a real XNA failure.",
+  "optionalGenericReturnMembers": [
+    "Microsoft.Xna.Framework.Content.ContentReader.ReadObject",
+    "Microsoft.Xna.Framework.Content.ContentReader.ReadRawObject",
+    "Microsoft.Xna.Framework.Content.ContentReader.ReadExternalReference"
+  ],
+  "returnNullabilityMapping": "CLR reference nullability and Swift fallibility are independent axes and are projected independently. A public reference-typed return position -- a property getter, a method, or a field read -- maps to Swift Optional exactly when the pinned inventory proves XNA can normally return null there, and it carries the Swift throws effect exactly when the member's own accessor rule says it is fallible. All four combinations are legitimate: T, T?, throws -> T, and throws -> T?. Swift throws must never stand in for a normal null result, and Optional must never absorb a real XNA failure. ContentReader's unconstrained generic methods are listed separately because CLR initobj returns default(T), including null for reference substitutions, while the inventory deliberately classifies only statically reference-typed returns.",
   "returnNullabilityDeferral": "A reference return the CIL proves neither nullable nor non-null keeps the non-Optional projection and is named individually in the strict report's unknownReturnNullabilityProjections. That is a recorded deferral, not a decision: guessing such a return into Optional would invent a state XNA cannot produce, and guessing it out of Optional would hide one it can.",
   "referenceReturnNullabilityReference": "tools/api_compat/reference/xna40-reference-return-nullability.json is the pinned per-return-position nullability verdict for all 369 public reference-typed return positions, regenerated by tools/api_compat/return_nullability.py from the CIL of the seven registered assemblies and hash-checked here exactly as the contract is.",
   "returnNullabilitySha256": "2013c704387cfc27623f9fe13298cf23eb638cf1fc6464e3f44328400b5d98f6",
@@ -1484,7 +1754,7 @@
   "systemInterfaceMappings": {
     "System.IEquatable`1": "Equals/operator members; no Swift Equatable conformance required",
     "System.IComparable`1": "CompareTo(T) member; no Swift Comparable conformance or language-added ordering operators",
-    "System.IDisposable": "Dispose member; no public helper protocol",
+    "System.IDisposable": "CNADisposable protocol once ContentManager.ReadAsset carries the interface as an Action argument; Dispose remains its sole member",
     "System.Collections.Generic.ICollection`1": "the concrete XNA Add/Clear/Contains/CopyTo/Remove/Count/IsReadOnly members represent the direct interface; no automatic Swift Collection conformance",
     "System.Collections.Generic.IList`1": "the concrete XNA members represent the direct interface: the seven inherited ICollection<T> members plus IndexOf/Insert/RemoveAt and the indexed Item; no automatic Swift Collection, MutableCollection or RandomAccessCollection conformance",
     "System.Collections.Generic.IEnumerable`1": "GetEnumerator maps to CNAEnumerator<T>; no automatic Swift Sequence conformance",

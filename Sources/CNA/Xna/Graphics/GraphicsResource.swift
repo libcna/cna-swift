@@ -34,7 +34,7 @@ extension Microsoft.Xna.Framework.Graphics {
     /// `Tag` is a `System.Object` reference, and squeezing a Swift object
     /// identity into an integer token would be a fabrication rather than a
     /// projection.
-    open class GraphicsResource: RuntimeOwnedChild {
+    open class GraphicsResource: RuntimeOwnedChild, CNADisposable {
         /// The native object this resource owns, when it has one.
         ///
         /// **Not every `GraphicsResource` is native.** XNA's own state objects

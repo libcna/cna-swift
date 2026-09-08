@@ -184,6 +184,26 @@
           "reason": "The declared parameter type of both ContentManager constructors and the declared type of its ServiceProvider property, and the interface GameServiceContainer implements. Without it the constructor can only be spelled over the one concrete implementation this binding has, which narrows XNA's contract: a consumer's own service provider could not be handed to a ContentManager at all. Projected as CNAServiceProvider, a one-member protocol -- the smallest family admitted here, and the whole of it is GetService(Type)."
         },
         {
+          "type": "System.IDisposable",
+          "reason": "The declared argument of Action<IDisposable> on ContentManager.ReadAsset. Earlier XNA types could expose Dispose structurally, but this signature passes the interface as a value and therefore requires the one-member CNADisposable protocol."
+        },
+        {
+          "type": "System.IO.BinaryReader",
+          "reason": "The direct CLR base of Microsoft.Xna.Framework.Content.ContentReader. Its reachable public/protected surface is projected as the real Swift superclass CNABinaryReader; the Encoding constructor is authority-visible but refused by the demand-driven ContentReader closure because constructors are not inherited."
+        },
+        {
+          "type": "System.IO.EndOfStreamException",
+          "reason": "The exact exception BinaryReader primitive methods raise when the backing stream ends before a fixed-width value is complete. Projected as CNAEndOfStreamException."
+        },
+        {
+          "type": "System.FormatException",
+          "reason": "The exact exception BinaryReader.Read7BitEncodedInt raises after five continuation bytes. Projected as CNAFormatException."
+        },
+        {
+          "type": "System.Resources.ResourceManager",
+          "reason": "The exact mscorlib base class named by ResourceContentManager's public constructor and the source of its virtual GetObject(String) lookup. The selected projection retains the protected construction path, invariant-culture GetObject/GetString operations, BaseName, IgnoreCase, ResourceSetType and ReleaseAllResources; Assembly, CultureInfo, ResourceSet and UnmanagedMemoryStream overloads remain refused by the measured ContentReader closure."
+        },
+        {
           "type": "System.Globalization.CultureInfo",
           "reason": "The second parameter of ConvertFrom and ConvertTo on every converter. Foundation 74 corrected the claim that it is only ever opaque here: the math converters format and parse THROUGH it, so its number formatting is part of what they do."
         },
@@ -369,9 +389,59 @@
           "reason": "The template ObjectDisposedException.get_Message formats and appends after Environment.NewLine when ObjectName is neither null nor empty."
         },
         {
+          "key": "Arg_EndOfStreamException",
+          "value": "Attempted to read past the end of the stream.",
+          "reason": "EndOfStreamException's parameterless constructor substitutes it before setting COR_E_ENDOFSTREAM."
+        },
+        {
+          "key": "Arg_FormatException",
+          "value": "One of the identified items was in an invalid format.",
+          "reason": "FormatException's parameterless constructor substitutes it before setting COR_E_FORMAT."
+        },
+        {
           "key": "Arg_IOException",
           "value": "I/O error occurred.",
           "reason": "IOException's parameterless constructor substitutes it before setting COR_E_IO."
+        },
+        {
+          "key": "Argument_InvalidOffLen",
+          "value": "Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.",
+          "reason": "BinaryReader's byte and character array overloads use it for a range outside the caller's array."
+        },
+        {
+          "key": "Argument_StreamNotReadable",
+          "value": "Stream was not readable.",
+          "reason": "BinaryReader construction refuses a Stream whose CanRead property is false."
+        },
+        {
+          "key": "ArgumentOutOfRange_BinaryReaderFillBuffer",
+          "value": "The number of bytes requested does not fit into BinaryReader's internal buffer.",
+          "reason": "BinaryReader.FillBuffer refuses a byte count wider than its sixteen-byte internal buffer."
+        },
+        {
+          "key": "Format_Bad7BitInt32",
+          "value": "Too many bytes in what should have been a 7 bit encoded Int32.",
+          "reason": "BinaryReader.Read7BitEncodedInt raises it after five continuation bytes."
+        },
+        {
+          "key": "IO.EOF_ReadBeyondEOF",
+          "value": "Unable to read beyond the end of the stream.",
+          "reason": "BinaryReader's fixed-width reads raise EndOfStreamException with this message on a short input."
+        },
+        {
+          "key": "IO.IO_InvalidStringLen_Len",
+          "value": "BinaryReader encountered an invalid string length of {0} characters.",
+          "reason": "BinaryReader.ReadString formats it when the decoded seven-bit length is negative."
+        },
+        {
+          "key": "ObjectDisposed_FileClosed",
+          "value": "Cannot access a closed file.",
+          "reason": "BinaryReader reports this through ObjectDisposedException after Close has cleared its backing stream."
+        },
+        {
+          "key": "InvalidOperation_ResourceNotString_Type",
+          "value": "Resource was of type '{0}' instead of String - call GetObject instead.",
+          "reason": "ResourceManager.GetString raises InvalidOperationException with this formatted message when the named resource exists but is not a String."
         },
         {
           "key": "IO.FileNotFound",

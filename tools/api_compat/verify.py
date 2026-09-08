@@ -247,6 +247,11 @@ def map_clr_type(
     handler = re.fullmatch(r"System\.EventHandler`1\[(.+)]", text)
     if handler:
         return f"CNAEvent<{map_clr_type(handler.group(1), rules, generic_parameters)}>"
+    action = re.fullmatch(r"System\.Action`1\[(.+)]", text)
+    if action:
+        argument = map_clr_type(
+            action.group(1), rules, generic_parameters, method_generic_parameters)
+        return f"({argument}) throws -> Void"
     generic = re.fullmatch(r"(.+)`(\d+)\[(.*)]", text)
     if generic:
         base = map_type_name(f"{generic.group(1)}`{generic.group(2)}", rules)
@@ -416,7 +421,10 @@ def expected_member(
             for item in rules.get("optionalReferenceParameters", [])
         )
         if optional_reference and not mapped_parameter_type.endswith("?"):
-            mapped_parameter_type += "?"
+            mapped_parameter_type = (
+                f"({mapped_parameter_type})?"
+                if "->" in mapped_parameter_type else mapped_parameter_type + "?"
+            )
         # `System.IO.Stream` is one CLR type that reads and writes; Foundation
         # splits the two into `InputStream` and `OutputStream`, so one global
         # mapping cannot serve both. The direction is READ OUT OF THE IL, one
@@ -487,6 +495,14 @@ def expected_member(
     # arrive Optional from the type mapping and are not double-wrapped.
     verdict = (nullability or {}).get("nullability", {}).get("verdict")
     if verdict == PROVEN_NULLABLE_RETURN and not mapped_return.endswith("?"):
+        mapped_return += "?"
+    # CLR default(T) is an observable null result for these unconstrained
+    # generic reader methods. The return-nullability analyzer intentionally
+    # inventories only reference-typed signatures, so record the language
+    # projection explicitly instead of fabricating an unsafe Swift T value.
+    if (f"{owner}.{mapped_name}" in rules.get("optionalGenericReturnMembers", [])
+            and mapped_return in method_generic_parameters
+            and not mapped_return.endswith("?")):
         mapped_return += "?"
 
     return Member(
@@ -589,7 +605,7 @@ FOUNDATION_UNQUALIFIED_TYPES = frozenset({
 # Foundation set above, where the graph drops a module qualifier the mapping
 # keeps (Foundation 102).
 DELEGATE_ALIASES = {
-    "CNAAsyncResult -> Void": "CNAAsyncCallback",
+    "(CNAAsyncResult) -> Void": "CNAAsyncCallback",
 }
 
 
@@ -610,7 +626,16 @@ def normalize_swift_type(text: str) -> str:
     # neither matches, so neither is touched. Found on ContentManager's
     # ServiceProvider, the first optional existential in the binding.
     while True:
-        collapsed = re.sub(r"\(([A-Za-z_][A-Za-z0-9_.]*(?:<[^()<>]*>)?)\)", r"\1", value)
+        collapsed = re.sub(
+            r"\(([A-Za-z_][A-Za-z0-9_.]*(?:<[^()<>]*>)?)\)\?",
+            r"\1?",
+            value,
+        )
+        collapsed = re.sub(
+            r"\[\(([A-Za-z_][A-Za-z0-9_.]*(?:<[^()<>]*>)?)\)\]",
+            r"[\1]",
+            collapsed,
+        )
         if collapsed == value:
             break
         value = collapsed
@@ -1391,7 +1416,7 @@ def comparable_kind(expected: Member, actual: Member) -> bool:
 MEASURED_SUPPORT_BASES = (
     "CNAEventArgs", "CNACollection", "CNAReadOnlyCollection",
     "CNAException", "CNASystemException", "CNAExternalException",
-    "CNADictionary", "CNAAttribute",
+    "CNADictionary", "CNAAttribute", "CNABinaryReader",
 )
 
 # The support bases that are GENERIC. For these the Swift superclass identity
@@ -1506,7 +1531,8 @@ def is_inherited_language_projection(
 ) -> bool:
     if any(same_callable_identity(item, member) for item in owner.members):
         return False
-    if "System.IDisposable" in owner.interfaces and member.name == "Dispose" and not member.parameters:
+    if ({"System.IDisposable", "CNADisposable"} & set(owner.interfaces)
+            and member.name == "Dispose" and not member.parameters):
         return True
     visited: set[str] = set()
     base = owner.base
@@ -1856,6 +1882,8 @@ def normalizer_self_test() -> list[str]:
         ("(CNAServiceProvider)?", "CNAServiceProvider?"),
         ("[(any CNAServiceProvider)]", "[CNAServiceProvider]"),
         ("(any CNAEqualityComparer<Key>)?", "CNAEqualityComparer<Key>?"),
+        ("((T) throws -> Void)?", "((T) throws -> Void)?"),
+        ("((any CNADisposable) throws -> Void)?", "((CNADisposable) throws -> Void)?"),
         ("Swift.Int32", "Int32"),
         ("InputStream", "Foundation.InputStream"),
         ("InputStream?", "Foundation.InputStream?"),
@@ -4921,6 +4949,11 @@ def self_test() -> None:
         # The backing store must stay a fixed contract.
         ("CNAList not final",
          lambda m: setattr(m["CNAList"], "declaration", "class CNAList<Element>")),
+        # Resource fixtures and lookup tables are implementation support, not
+        # members of the selected ResourceManager projection.
+        ("CNAResourceManager leaking a fixture helper", lambda m:
+            m["CNAResourceManager"].members.append(
+                bcl_member("CNAResourceManager", "fixtureResources"))),
 
         # ------------------------------------------------------------------
         # The exception chain. Each of these is a projection someone could
@@ -6227,6 +6260,15 @@ def bcl_support_evidence(
                     "does not declare it here. Where the CLR member needs a "
                     "runtime service this projection does not have, an absence "
                     "is truthful and an implementation would be a fabrication",
+                ))
+
+        allowed_members = specification.get("allowedPublicMembers")
+        if allowed_members is not None:
+            for member_name in sorted(set(observed) - set(allowed_members)):
+                diagnostics.append(diagnostic(
+                    "BASE_MAPPING_MISMATCH", f"{name}.{member_name}",
+                    "public BCL support helper is outside the exact selected "
+                    "surface and leaks implementation infrastructure",
                 ))
 
         for member in model.members:
