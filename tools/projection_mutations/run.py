@@ -1040,13 +1040,23 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "            }\n"
         "            guard var assets = loadedAssets else {",
     ),
+    # `content-accepts-the-empty-asset-name` was planted and SURVIVED as a
+    # NO-OP: every cache miss immediately reaches ReadAsset, which repeats the
+    # empty-name refusal, while the public API cannot create an empty cache key.
+    # It is replaced rather than scored by
+    # `content-empty-name-reports-the-wrong-parameter`, which changes the
+    # observable exception from the same public branch.
     (
-        "content-accepts-the-empty-asset-name",
-        "Load refusing only a null name, so the empty one reaches the route "
-        "and is reported as a missing asset rather than a bad argument",
+        "content-empty-name-reports-the-wrong-parameter",
+        "Load's null-or-empty branch naming a different parameter, so callers "
+        "cannot identify the argument XNA rejected",
         CONTENT,
-        "            guard let assetName, !assetName.isEmpty else {",
-        "            guard let assetName else {",
+        "            guard let assetName, !assetName.isEmpty else {\n"
+        "                throw CNAArgumentNullException(paramName: \"assetName\")\n"
+        "            }",
+        "            guard let assetName, !assetName.isEmpty else {\n"
+        "                throw CNAArgumentNullException(paramName: \"name\")\n"
+        "            }",
     ),
     (
         "content-unload-disposes-the-manager",
