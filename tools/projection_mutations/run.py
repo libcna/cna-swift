@@ -2863,8 +2863,9 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "                      element.Offset + size <= vertexStride else {",
     ),
     (
-        "empty-element-array-refused",
-        "an empty element array rejected where XNA accepts it in silence",
+        "nonempty-element-array-erased",
+        "every nonempty declaration treated as XNA's accepted empty special "
+        "case, erasing its stride and elements",
         VERTEXDECL,
         "            guard !elements.isEmpty else {\n"
         "                storedElements = nil",
@@ -4201,6 +4202,8 @@ TEST_TIMEOUT_SECONDS = 600
 MUTATION_TEST_FILTERS = {
     "from-type-size-test-reads-the-wrong-size":
         "Foundation60BufferTests.testFromTypeAcceptsItsMatchingRegisteredSize",
+    "nonempty-element-array-erased":
+        "Foundation43VertexDeclarationTests.testTheStrideOnlyConstructorComputesTheStride",
 }
 
 
