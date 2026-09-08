@@ -1,9 +1,8 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 76.** The Foundation 30–36 handoff that used to be
-> this file is kept below, under its own heading, because the measurements it
-> records were real when it was written. `plan.md` remains the authority for
-> project rules; this file is the *state of the work* and *what is left*.
+> **Current as of Foundation 104.** Earlier frontier and milestone narratives
+> are retained below as historical measurement. `plan.md` remains the
+> authority for project rules; this top block is the current work state.
 
 ## Where the work stands
 
@@ -40,24 +39,77 @@ records one entry per control and the comparison is byte-for-byte; the report
 stores only their sha, so their paths live in this command.
 
 ```text
-943 tests, 0 failures (debug; release, ASan and TSan re-run at handoff)
-TOTAL_DIAGNOSTICS=43   COMPLETE_TYPES=225   PARTIAL_TYPES=8
-MISSING_TYPE=24  MISSING_MEMBER=16  OVERLOAD_MAPPING_MISMATCH=3
+978 tests, 0 failures (debug, release, ASan and TSan)
+TOTAL_DIAGNOSTICS=36   COMPLETE_TYPES=231   PARTIAL_TYPES=7
+MISSING_TYPE=19  MISSING_MEMBER=14  OVERLOAD_MAPPING_MISMATCH=3
 every category that would mean DISAGREEMENT with XNA: 0
 BOUND_FUNCTIONS=705  PROTOTYPE_TYPE_POSITIONS=2386  LAYOUTS=67  ABI_MISMATCHES=0
-PROJECTION_MUTATIONS=394  PROJECTION_MUTATIONS_LAST_FULL_RUN=137
-PROJECTION_MUTATIONS_CAUGHT=135
 WITHDRAWN_IN_SOURCE=27 with the reason written where each stood
-REPLACED_NO_OPS_IN_SOURCE=2
+REPLACED_NO_OPS_IN_SOURCE=3
 NATIVE_ABI_MUTATIONS=14 NATIVE_ABI_MUTATIONS_CAUGHT=14
-MESSAGE_COVERAGE_FINDINGS=0 over 1,614 implemented members
-API_COMPAT_SELF_TESTS=2494  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
-BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=44  BCL_SENTINEL_CHECKS=651
-RESOURCE_STRINGS_REPRODUCED=81  ACCESSOR_SELF_TESTS=41
+PROJECTION_MUTATIONS=405  PROJECTION_MUTATIONS_LAST_FULL_RUN=405
+PROJECTION_MUTATIONS_CAUGHT=405  PROJECTION_MUTATION_SURVIVORS=0
+PROJECTION_MUTATION_HUNG=0  PROJECTION_MUTATION_UNSCORED=0
+CONTENT_READER_MUTATIONS=11  CONTENT_READER_MUTATIONS_CAUGHT=11
+CONTENT_READER_MUTATION_SURVIVORS=0  CONTENT_READER_MUTATION_HUNG=0
+CONTENT_READER_MUTATION_UNSCORED=0
+MESSAGE_COVERAGE_FINDINGS=0 over 2,259 implemented members
+API_COMPAT_SELF_TESTS=2542  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
+BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=49  BCL_SENTINEL_CHECKS=651
+RESOURCE_STRINGS_REPRODUCED=97  ACCESSOR_SELF_TESTS=41
 ```
 
 **Every remaining diagnostic is an absence.** Nothing implemented disagrees
 with the pinned metadata.
+
+## Foundation 104 — the selected ContentReader family is closed
+
+All five selected XNA types are projected, and `ContentManager` is complete at
+10/10 members. `ContentReader` really inherits `CNABinaryReader`; the generic
+reader retains `T` while its private dispatch bridge handles heterogeneous
+reader tables; the manager's public shape remains its one measured member; and
+the registry needed in place of CLR reflection is private, deterministic and
+locked.
+
+The managed runtime validates an uncompressed Windows XNB v5 envelope, reads
+its type-reader table, preserves the one-based reader encoding, loads the
+primary object, then resolves shared-resource callbacks. Relative external
+references re-enter the same normalized `ContentManager` cache. A deterministic
+XNB authored byte-by-byte by the tests reaches that path through public
+`ContentManager.Load<T>`. Compressed XNB is recognized and explicitly refused;
+neither LZX nor non-XNA LZ4 support is claimed.
+
+The BCL closure is exact and fully reviewed. From .NET Framework 4.0
+`mscorlib.dll`, `BinaryReader` contributes 26 selected identities out of 28:
+the stream constructor exists only for internal base construction, 25 members
+are inherited by `ContentReader`, and the `Encoding` constructor plus
+`ReadDecimal` are refused. `ResourceManager` contributes 7 selected identities
+out of 26; the 19 culture/reflection/resource-set identities remain outside the
+selected reachability closure. `CONTENT_READER_ENCODING_DEPENDENCIES=0`.
+
+`ResourceContentManager` calls the selected virtual `ResourceManager.GetObject`
+and hands returned bytes to that same XNB path. It does not bind CNA's
+placeholder resource-content-manager route, and no `cna_content_reader_*`
+save-game/storage route is confused with XNA title-asset reading.
+
+```text
+CONTENT_READER_ACTIONABLE_LOCAL=0
+CONTENT_READER_UNREVIEWED=0
+BCL_CONTENT_CLOSURE_UNREVIEWED=0
+CONTENT_READER_MISSING_TYPES=0
+CONTENT_READER_STRICT_DIAGNOSTICS=0
+CONTENT_READER_ENCODING_DEPENDENCIES=0
+BINARY_READER_AUTHORITY_FINDINGS=0
+RESOURCE_MANAGER_AUTHORITY_FINDINGS=0
+BCL_MUTATION_SURVIVORS=0
+```
+
+The only remaining owner-selected frontiers are the Design/
+`InstanceDescriptor` representation decision and the XACT asset-policy family
+(including the external microphone/audio remainder). Neither was reopened by
+Foundation 104.
+
+<!-- status-gate:historical -->
 
 ## Where to start, after Foundation 101 re-costed everything
 
@@ -2490,8 +2542,6 @@ permanent test.
 > that session's record.** It is not the current state and is not maintained:
 > Foundation Milestones 37 through 76 have landed since. Nothing here is
 > deleted, because the measurements it records were real when it was written.
-
-<!-- status-gate:historical -->
 
 **Foundation Milestones 30 through 36: COMPLETE.** Eleven local commits, none
 pushed.

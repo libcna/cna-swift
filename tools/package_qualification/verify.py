@@ -1037,6 +1037,80 @@ func qualifyFoundation27To29BclSurface() throws {
               "visualization views are distinct")
 }
 
+// Foundation 104 ContentReader closure. This stays deliberately small: the
+// byte-authored end-to-end XNB fixture belongs in the package tests, while an
+// isolated consumer proves the new BCL/XNA names, inheritance and callable
+// surface survive source archiving and package import.
+private final class ExternalContentServiceProvider: CNAServiceProvider {
+    func GetService(_ serviceType: Any.Type) -> Any? { nil }
+}
+
+private final class ExternalContentDisposable: CNADisposable {
+    private(set) var disposed = false
+    func Dispose() throws { disposed = true }
+}
+
+private final class ExternalStringReader:
+    Microsoft.Xna.Framework.Content.ContentTypeReaderOfT<String> {
+    override func Read(
+        _ input: Microsoft.Xna.Framework.Content.ContentReader,
+        existingInstance: String?
+    ) throws -> String {
+        existingInstance ?? (try input.ReadString())
+    }
+}
+
+func qualifyFoundation104ContentSurface() throws {
+    func check(_ condition: Bool, _ what: String) throws {
+        guard condition else {
+            throw QualificationFailure.failed(
+                "isolated Foundation-104 \(what) qualification failed")
+        }
+    }
+
+    let stream = InputStream(data: Data([0x78, 0x56, 0x34, 0x12]))
+    let binary = try CNABinaryReader(stream)
+    try check(binary.BaseStream === stream, "BinaryReader BaseStream identity")
+    try check(try binary.ReadInt32() == 0x1234_5678,
+              "BinaryReader little-endian read")
+    try binary.Close()
+
+    let resources = CNAResourceManager()
+    try check(resources.BaseName == nil && (try resources.GetObject("absent")) == nil,
+              "ResourceManager empty lookup")
+
+    let typed = ExternalStringReader()
+    try check(ObjectIdentifier(typed.TargetType) == ObjectIdentifier(String.self),
+              "generic ContentTypeReader TargetType")
+    let erased: Microsoft.Xna.Framework.Content.ContentTypeReader = typed
+    try check(erased === typed, "generic ContentTypeReader superclass")
+
+    let disposable = ExternalContentDisposable()
+    let asInterface: any CNADisposable = disposable
+    try asInterface.Dispose()
+    try check(disposable.disposed, "IDisposable projection")
+
+    let service = ExternalContentServiceProvider()
+    let manager = try Microsoft.Xna.Framework.Content.ContentManager(
+        serviceProvider: service, rootDirectory: "")
+    try check(manager.ServiceProvider is ExternalContentServiceProvider,
+              "ContentManager construction")
+    try manager.Dispose()
+
+    // ContentReader and its manager are framework-created, but their public
+    // type identities must still be nameable by an importing package.
+    let readerType: Microsoft.Xna.Framework.Content.ContentReader.Type =
+        Microsoft.Xna.Framework.Content.ContentReader.self
+    let managerType: Microsoft.Xna.Framework.Content.ContentTypeReaderManager.Type =
+        Microsoft.Xna.Framework.Content.ContentTypeReaderManager.self
+    let resourceContentType: Microsoft.Xna.Framework.Content.ResourceContentManager.Type =
+        Microsoft.Xna.Framework.Content.ResourceContentManager.self
+    try check(String(describing: readerType) == "ContentReader"
+              && String(describing: managerType) == "ContentTypeReaderManager"
+              && String(describing: resourceContentType) == "ResourceContentManager",
+              "framework-created type identities")
+}
+
 do {
     try qualifyManagedCurve()
     try qualifyPublicDisplayModeSurface()
@@ -1049,11 +1123,12 @@ do {
     try qualifyFoundation23NullabilitySurface()
     try qualifyFoundation24ServiceSurface()
     try qualifyFoundation27To29BclSurface()
+    try qualifyFoundation104ContentSurface()
     let index = CommandLine.arguments.firstIndex(of: "--frames")!
     let requested = Int(CommandLine.arguments[index + 1])!
     let game = try ArchiveGame(requested)
     try game.Run()
-    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS foundation23=PASS foundation24=PASS foundation27to29=PASS")
+    print("ARCHIVE_CANARY requested=\(requested) updates=\(game.updates) draws=\(game.draws) texture=\(game.texture?.Width ?? 0)x\(game.texture?.Height ?? 0) curve=PASS displayMode=PASS renderTargetUsage=PASS foundation14=PASS foundation15to18=PASS foundation19=PASS foundation20=PASS foundation22=PASS foundation23=PASS foundation24=PASS foundation27to29=PASS foundation104=PASS")
     try game.Dispose()
 } catch {
     FileHandle.standardError.write(Data("archive canary failed: \(error)\n".utf8))
@@ -1175,7 +1250,8 @@ def validate_canary(output: str, requested: int) -> bool:
         r"texture=(\d+)x(\d+) curve=(PASS) displayMode=(PASS) "
         r"renderTargetUsage=(PASS) foundation14=(PASS) foundation15to18=(PASS) "
         r"foundation19=(PASS) foundation20=(PASS) foundation22=(PASS) "
-        r"foundation23=(PASS) foundation24=(PASS)",
+        r"foundation23=(PASS) foundation24=(PASS) foundation27to29=PASS "
+        r"foundation104=(PASS)",
         output,
     )
     if not match:
@@ -1187,7 +1263,7 @@ def validate_canary(output: str, requested: int) -> bool:
         draws == requested and
         width == 1 and
         height == 1 and
-        all(match.group(index) == "PASS" for index in range(6, 15))
+        all(match.group(index) == "PASS" for index in range(6, 17))
     )
 
 

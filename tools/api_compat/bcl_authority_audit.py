@@ -3254,6 +3254,7 @@ def main() -> int:
         "BCL_SENTINEL_CHECKS": sentinel_count,
         "BCL_MANIFEST_CHECKS": manifest_checks,
         "BCL_MUTATION_SELF_TESTS": mutation_count,
+        "BCL_MUTATION_SURVIVORS": len(mutation_failures),
         "BCL_CROSS_CHECKS": cross_check_checks,
         "BCL_RESOURCE_CHECKS": resource_check_count,
         "BCL_IL_LITERAL_CHECKS": literal_check_count,
@@ -3290,6 +3291,7 @@ def main() -> int:
         f"BCL_SENTINEL_CHECKS={sentinel_count} "
         f"BCL_MANIFEST_CHECKS={manifest_checks} "
         f"BCL_MUTATION_SELF_TESTS={mutation_count} "
+        f"BCL_MUTATION_SURVIVORS={len(mutation_failures)} "
         f"BCL_CROSS_CHECKS={cross_check_checks} "
         f"({report['BCL_CROSS_CHECK_TOOL']}) "
         f"BCL_RESOURCE_CHECKS={resource_check_count} "

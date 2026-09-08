@@ -338,6 +338,14 @@ def main() -> int:
         item["subject"] for item in strict.get("diagnostics", [])
         if item["category"] == "MISSING_TYPE"
     }
+    selected_diagnostics = [
+        item for item in strict.get("diagnostics", [])
+        if item["subject"] in SELECTED_XNA
+        or (
+            item["subject"] == "Microsoft.Xna.Framework.Content.ContentManager"
+            and any(name in item["detail"] for name in ("OpenStream", "ReadAsset"))
+        )
+    ]
 
     xna: list[dict[str, Any]] = []
     for name in SELECTED_XNA:
@@ -370,7 +378,7 @@ def main() -> int:
             "bclSignatureTypes": xna_signature_types(record),
             "bclBehaviouralDependencies": XNA_BEHAVIOURAL_DEPENDENCIES[name]["bcl"],
             "xnaPrivateInternalDependencies": XNA_BEHAVIOURAL_DEPENDENCIES[name]["xnaPrivateInternal"],
-            "currentSwiftMappingStatus": "missing" if mapped in missing_subjects else "projected",
+            "currentSwiftMappingStatus": "missing" if name in missing_subjects else "projected",
             "currentCnaRouteRelevance": ROUTE_RELEVANCE[name],
             "fixtureRequirements": FIXTURES[name],
             "unreviewedMembers": 0,
@@ -406,6 +414,12 @@ def main() -> int:
             if item["type"] == "Microsoft.Xna.Framework.Content.ContentReader"
             else []
         )
+
+    content_unreviewed = sum(item["unreviewedMembers"] for item in xna)
+    bcl_unreviewed = (
+        binary["unreviewedMembers"] + resource["unreviewedMembers"])
+    selected_missing = sum(
+        item["currentSwiftMappingStatus"] == "missing" for item in xna)
 
     document = {
         "schemaVersion": 1,
@@ -445,8 +459,16 @@ def main() -> int:
         ],
         "publicEncodingDependencies": len(encoding_findings),
         "closureMutationSelfTests": self_test_count,
-        "contentReaderUnreviewed": sum(item["unreviewedMembers"] for item in xna),
-        "bclContentClosureUnreviewed": binary["unreviewedMembers"] + resource["unreviewedMembers"],
+        "contentReaderUnreviewed": content_unreviewed,
+        "bclContentClosureUnreviewed": bcl_unreviewed,
+        "CONTENT_READER_ACTIONABLE_LOCAL": selected_missing + len(selected_diagnostics),
+        "CONTENT_READER_UNREVIEWED": content_unreviewed,
+        "BCL_CONTENT_CLOSURE_UNREVIEWED": bcl_unreviewed,
+        "CONTENT_READER_MISSING_TYPES": selected_missing,
+        "CONTENT_READER_STRICT_DIAGNOSTICS": len(selected_diagnostics),
+        "CONTENT_READER_ENCODING_DEPENDENCIES": len(encoding_findings),
+        "BINARY_READER_AUTHORITY_FINDINGS": binary["unreviewedMembers"],
+        "RESOURCE_MANAGER_AUTHORITY_FINDINGS": resource["unreviewedMembers"],
         "counts": {
             "selectedXnaTypes": len(xna),
             "selectedXnaDeclaredMembers": sum(item["declaredMemberCount"] for item in xna),
@@ -472,9 +494,14 @@ def main() -> int:
         print(rendered, end="")
 
     print(
-        "CONTENT_READER_UNREVIEWED=0 "
-        "BCL_CONTENT_CLOSURE_UNREVIEWED=0 "
-        "CONTENT_READER_ENCODING_DEPENDENCIES=0 "
+        f"CONTENT_READER_ACTIONABLE_LOCAL={document['CONTENT_READER_ACTIONABLE_LOCAL']} "
+        f"CONTENT_READER_UNREVIEWED={content_unreviewed} "
+        f"BCL_CONTENT_CLOSURE_UNREVIEWED={bcl_unreviewed} "
+        f"CONTENT_READER_MISSING_TYPES={selected_missing} "
+        f"CONTENT_READER_STRICT_DIAGNOSTICS={len(selected_diagnostics)} "
+        f"CONTENT_READER_ENCODING_DEPENDENCIES={len(encoding_findings)} "
+        f"BINARY_READER_AUTHORITY_FINDINGS={binary['unreviewedMembers']} "
+        f"RESOURCE_MANAGER_AUTHORITY_FINDINGS={resource['unreviewedMembers']} "
         f"CONTENT_READER_CLOSURE_SELF_TESTS={self_test_count}"
     )
     return 0

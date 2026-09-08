@@ -69,19 +69,11 @@ NORMATIVE_DOCUMENTS = ["plan.md", "README.md", "NEXT.md"]
 # policed as neither. Shrinking this table is the work; adding to it is a
 # decision that has to be written down.
 UNPOLICED_CLAIMS = {
-    "PROJECTION_MUTATIONS_LAST_FULL_RUN":
-        "how many mutations the last full harness pass selected -- an event, "
-        "not a property of the tree. Only a full run can produce it and the "
-        "harness writes no report, so nothing here can check it.",
-    "PROJECTION_MUTATIONS_CAUGHT":
-        "the outcome of that same pass. The harness now accepts --output, so "
-        "the next full run makes this derivable the way the native ABI pass "
-        "already is; deriving it here would mean running 137 mutations, each "
-        "a build and a test run.",
 }
 
 FACT_REPORTS = [
     "api-compat-report.json",
+    "content-reader-closure.json",
     "native-abi-report.json",
     "bcl-authority-audit.json",
     "pinned-assembly-audit.json",
@@ -96,6 +88,11 @@ FACT_REPORTS = [
     # mutation added without re-running makes the two sources disagree and
     # derive_facts fails.
     "native-abi-mutations.json",
+    # A full projection-mutation pass is expensive and mutates one source site
+    # at a time, so this is a committed run record rather than a report the
+    # status gate regenerates. The harness-derived PROJECTION_MUTATIONS count
+    # below makes an older record disagree as soon as a mutation is added.
+    "projection-mutations.json",
     # Also a RUN record, and for a stronger reason than the others: its host
     # facts -- how many pictures the media library holds, whether a controller
     # is attached -- are properties of the machine, so byte-comparing it across
@@ -861,7 +858,9 @@ def self_test() -> int:
         findings, _, count = check_document(excused, facts, "excused.md")
         expect(findings == [],
                "a key listed in UNPOLICED_CLAIMS must not be a finding")
-        expect(count == 1, "an excused key must still be counted")
+        expect(count == (1 if UNPOLICED_CLAIMS else 0),
+               "an excused key must be counted, and an empty exception table "
+               "must excuse nothing")
         expect(all(reason.strip() for reason in UNPOLICED_CLAIMS.values()),
                "every excused key must carry a written reason")
 

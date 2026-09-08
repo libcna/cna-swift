@@ -5,7 +5,7 @@ Framework 4.0 over the canonical CNA C ABI. It does not claim completion of the
 full 257-type profile.
 
 The strict public identity is `Microsoft.Xna.Framework...`. The qualified
-foundation has a compiler Symbol Graph scoreboard, exact ABI-0.7 admission, a
+foundation has a compiler Symbol Graph scoreboard, exact ABI-0.21 admission, a
 reviewed typed function table, owner-thread/generation/ownership enforcement,
 callback error containment, and a native Game/2D/input canary. Its managed
 surface includes exact binary32 linear algebra and intersection types, Color,
@@ -98,22 +98,22 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=233
-TARGET_MEMBERS=2717
-TOTAL_DIAGNOSTICS=43
-COMPLETE_TYPES=225
-PARTIAL_TYPES=8
-MISSING_TYPES=24
-MISSING_MEMBER=16
+TARGET_TYPES=238
+TARGET_MEMBERS=2751
+TOTAL_DIAGNOSTICS=36
+COMPLETE_TYPES=231
+PARTIAL_TYPES=7
+MISSING_TYPES=19
+MISSING_MEMBER=14
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=113
 PROVEN_NONNULL_RETURN_PROJECTIONS=134
 UNKNOWN_RETURN_NULLABILITY_PROJECTIONS=122
-BCL_BASE_PROJECTIONS=19
-PROJECTED_BCL_BASE_TYPES=19
+BCL_BASE_PROJECTIONS=20
+PROJECTED_BCL_BASE_TYPES=20
 PENDING_BCL_BASE_TYPES=0
-BCL_INHERITED_MEMBER_PROJECTIONS=105
-BCL_SUPPORT_TYPE_MEASUREMENTS=24
+BCL_INHERITED_MEMBER_PROJECTIONS=127
+BCL_SUPPORT_TYPE_MEASUREMENTS=29
 ```
 
 Normal strict verification remains red because deferred XNA types are genuinely
@@ -142,6 +142,14 @@ ResourceCreatedEventArgs, ResourceDestroyedEventArgs, AudioListener,
 TouchCollection, TouchCollection.Enumerator, Media.Video, AudioEmitter,
 IGraphicsDeviceService, GameComponentCollection and VisualizationData.
 Every implemented member has qualified behavior; missing members remain absent.
+
+Foundation 104 also completes the five-type Content reader family plus
+`ContentManager`'s reader-facing protected surface. It provides a real
+`CNABinaryReader` superclass, typed and erased content-reader dispatch,
+uncompressed XNB loading with shared and external references, and
+`CNAResourceManager`/`ResourceContentManager` integration. The end-to-end XNB
+and resource fixtures are project-authored; no Microsoft runtime binary is
+packaged and compressed XNB is reported as unsupported.
 
 ## BCL base classes
 
@@ -186,8 +194,10 @@ place of inheritance, an `Any` erasure and a wrong element type are all
 rather than assumed. There is no allowlist.
 
 `System.Exception`, `System.Attribute`, `Dictionary<K,V>`,
-`ExpandableObjectConverter` and `BinaryReader` remain **undecided**, and a type
-implemented on any of them still reports `UNMEASURED_STRUCTURAL_CATEGORY`.
+`ExpandableObjectConverter` and `BinaryReader` are admitted as real Swift base
+classes where selected XNA types inherit them. Foundation 104 adds the exact
+26-member `BinaryReader` subset reachable through `ContentReader` and refuses
+the `Encoding` constructor and `ReadDecimal` under the demand rule.
 
 ## Throwing property accessors
 
@@ -216,7 +226,7 @@ CIL of the seven registered assemblies by
 `tools/api_compat/accessor_fallibility.py`, pinned as
 `tools/api_compat/reference/xna40-accessor-fallibility.json`, and hash-checked
 by the verifier exactly as the metadata contract is — 114 fallible getters and
-113 fallible setters out of 840 properties, each carrying the call chain that
+114 fallible setters out of 840 properties, each carrying the call chain that
 reaches the throw. See `docs/xna-swift-mapping.md` and
 `docs/foundation-22-accessor-projection-evidence.md`.
 
@@ -244,8 +254,8 @@ Which returns are nullable is not a judgement call. It is derived from the CIL
 of the seven registered assemblies by
 `tools/api_compat/return_nullability.py`, pinned as
 `tools/api_compat/reference/xna40-reference-return-nullability.json`, and
-hash-checked by the verifier exactly as the metadata contract is — 115 proven
-nullable, 128 proven non-null and 126 unproven, over all 369 public
+hash-checked by the verifier exactly as the metadata contract is — 113 proven
+nullable, 134 proven non-null and 122 unproven, over all 369 public
 reference-typed return positions. An unproven return keeps the non-Optional
 projection and is named individually rather than guessed either way. See
 `docs/xna-swift-mapping.md` and

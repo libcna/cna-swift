@@ -491,6 +491,21 @@
       "operation": "Draw validation ownership",
       "status": "VERIFIED_MANAGED",
       "evidence": "The managed half of every draw is reproduced and is what the tests assert: the disposal check, MustDrawSomething for a non-positive primitiveCount, ProfileMaxPrimitiveCount against the extracted limit (65,535 on Reach), NumberVerticesMustBeGreaterZero BEFORE the primitive count on the indexed draws, NonZeroInstanceFrequency on the three non-instanced ones, InvalidInstanceStreams on the instanced one when the bound streams are all instanced or all not, and the user-primitive draws' seven tests including the unsigned offset-plus-element-count bound. VerifyCanDraw's eight messages are recorded native-owned: five read shader state outright, and three -- ProfileInvalidBlendFormat, ProfileInvalidFilterFormat, ProfileNoWrapNonPow2 -- LOOK derivable from the pinned profile table but decide on the D3D tracker's applied sampler state and bound textures, which canonical CNA code changes without this binding seeing it. A check reading a partial view would silently not fire."
+    },
+    {
+      "operation": "BinaryReader and uncompressed XNB content reading",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "ContentReader is a real subclass of the demand-driven .NET Framework 4.0 BinaryReader projection. Independent bytes verify explicit little-endian primitives, signedness, seven-bit UTF-8 strings, UTF-16 character units, EOF/short reads, BaseStream identity and deterministic close. A byte-authored Windows XNB v5 fixture passes through public ContentManager.Load, the type-reader manifest, typed/erased generic bridges, one-based reader IDs, deferred shared-resource fixups, relative external references, cache identity and disposal registration. The semantically unrelated cna_content_reader_* save-game routes are deliberately unbound."
+    },
+    {
+      "operation": "Compressed XNB content reading",
+      "status": "UNSUPPORTED_EXPLICITLY",
+      "evidence": "The managed header path recognizes the XNA 4.0 compressed flag and raises the pinned decompression failure. No LZX decompressor is admitted by this selected closure, and no claim is made for LZX or non-XNA LZ4 content; uncompressed XNB remains fully testable without a native library."
+    },
+    {
+      "operation": "ResourceManager-backed XNB content reading",
+      "status": "VERIFIED_MANAGED",
+      "evidence": "The selected self-contained ResourceManager projection provides virtual invariant-culture GetObject/GetString lookup, BaseName, IgnoreCase, ResourceSetType and ReleaseAllResources. ResourceContentManager obtains project-owned byte resources through that virtual GetObject path and feeds the same managed ContentReader/XNB pipeline; CNA's similarly named placeholder route is deliberately unbound. Assembly, CultureInfo, ResourceSet and UnmanagedMemoryStream overloads remain outside the measured closure."
     }
   ]
 }
