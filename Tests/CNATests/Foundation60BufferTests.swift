@@ -205,6 +205,16 @@ final class Foundation60BufferTests: XCTestCase {
                        Int(G.VertexPositionTexture.VertexDeclaration.VertexStride))
     }
 
+    /// Exercises the size stored in `FromType`'s private registration record,
+    /// not merely the independently visible struct and declaration sizes.
+    /// A bad registered size must be refused before any native resource is
+    /// created, which also keeps this invariant's mutation test deterministic.
+    func testFromTypeAcceptsItsMatchingRegisteredSize() throws {
+        let declaration = try G.VertexDeclaration.fromVertexType(
+            G.VertexPositionColor.self)
+        XCTAssertTrue(declaration === G.VertexPositionColor.VertexDeclaration)
+    }
+
     // MARK: - Vertex transfers
 
     /// What goes in comes back out, vertex for vertex.

@@ -4121,6 +4121,20 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
     ),
 ]
 
+CONTENT_READER_MUTATION_NAMES = {
+    "binary-reader-endian-swap",
+    "binary-reader-string-length-off-by-one",
+    "content-reader-index-zero-based",
+    "content-reader-skips-shared-resource",
+    "content-reader-external-reference-not-normalized",
+    "generic-reader-target-type-wrong",
+    "reader-creator-registry-wrong-name",
+    "content-manager-readasset-bypasses-cache",
+    "content-manager-openstream-ignores-root",
+    "resource-content-manager-bypasses-resource-manager",
+    "resource-manager-wrong-key-lookup",
+}
+
 
 def restore_on_termination() -> None:
     """Turn SIGTERM and SIGHUP into an exception, so `finally` still runs.
@@ -4161,17 +4175,23 @@ def require_native_library() -> str | None:
 
 
 # A mutated suite that HANGS is still a suite that does not pass, but without a
-# deadline it stalls the whole run: `from-type-size-test-reads-the-wrong-size`
-# inflates a registered vertex size by four, and the test binary it produces
-# blocks instead of failing. One such mutation held a 278-mutation run
-# indefinitely, which is worse than a survivor -- a survivor is at least
-# reported.
-#
-# The deadline is generous on purpose. It is not a performance budget; it is
-# the line between "slow" and "never", and a mutation that trips it is scored
-# as caught-by-hang rather than silently as caught, because the two are
-# different facts about the projection.
+# deadline it stalls the whole run. The deadline is generous on purpose. It is
+# not a performance budget; it is the line between "slow" and "never", and a
+# mutation that trips it is scored as caught-by-hang rather than silently as
+# caught, because the two are different facts about the projection.
 TEST_TIMEOUT_SECONDS = 600
+
+
+# Most mutations run the complete suite. This one historically invalidated a
+# vertex type used by hundreds of later tests: its intended assertion failed,
+# then an unrelated graphics teardown hung. The direct test below observes the
+# exact private registration value before native allocation and gives the
+# mutation a failure verdict without converting an already-caught defect into
+# a ten-minute HUNG verdict.
+MUTATION_TEST_FILTERS = {
+    "from-type-size-test-reads-the-wrong-size":
+        "Foundation60BufferTests.testFromTypeAcceptsItsMatchingRegisteredSize",
+}
 
 
 # Compilation parallelism for the inner `swift test`.
@@ -4200,7 +4220,8 @@ def _decoded(stream: object) -> str:
 
 
 def run_tests(swift_test: str,
-              jobs: int = DEFAULT_JOBS) -> tuple[int, bool, bool]:
+              jobs: int = DEFAULT_JOBS,
+              test_filter: str | None = None) -> tuple[int, bool, bool]:
     """(exit status, whether it ran out of time, whether a test failed).
 
     The third value exists because a run can do BOTH. A mutation is often
@@ -4211,8 +4232,11 @@ def run_tests(swift_test: str,
     scanned for failures even when the deadline fires.
     """
     try:
+        command = [swift_test, "-j", str(jobs)]
+        if test_filter is not None:
+            command.extend(["--filter", test_filter])
         result = subprocess.run(
-            [swift_test, "-j", str(jobs)],
+            command,
             cwd=ROOT, text=True, capture_output=True,
             timeout=TEST_TIMEOUT_SECONDS)
     except subprocess.TimeoutExpired as expired:
@@ -4379,6 +4403,7 @@ def main() -> int:
 
 
     survivors: list[str] = []
+    statuses: dict[str, str] = {}
     for name, description, path, old, new in selected:
         text = originals[path]
         if text.count(old) != 1:
@@ -4388,7 +4413,8 @@ def main() -> int:
         mutated = text.replace(old, new)
         try:
             path.write_text(mutated, encoding="utf-8")
-            code, hung, failed = run_tests(args.swift_test, args.jobs)
+            code, hung, failed = run_tests(
+                args.swift_test, args.jobs, MUTATION_TEST_FILTERS.get(name))
         finally:
             # Restore ONLY what this harness wrote.
             #
@@ -4423,6 +4449,7 @@ def main() -> int:
             status = "HUNG"
         else:
             status = "SURVIVED"
+        statuses[name] = status
         # flush: a full run takes hours and stdout is block-buffered when
         # redirected, so without this a redirected run shows NOTHING until
         # it finishes -- which is exactly when the progress stops mattering.
@@ -4435,6 +4462,19 @@ def main() -> int:
             survivors.append(f"{path} was not restored")
 
     scope = "" if args.only is None else f" SELECTED={args.only!r}"
+    caught = sum(status.startswith("CAUGHT") for status in statuses.values())
+    hung_count = sum("HUNG" in status for status in statuses.values())
+    unscored = len(selected) - len(statuses)
+    content_selected = {
+        item[0] for item in selected if item[0] in CONTENT_READER_MUTATION_NAMES
+    }
+    content_caught = sum(
+        statuses.get(name, "").startswith("CAUGHT") for name in content_selected)
+    content_hung = sum(
+        "HUNG" in statuses.get(name, "") for name in content_selected)
+    content_unscored = len(content_selected) - sum(
+        name in statuses for name in content_selected)
+    content_survivors = len(content_selected) - content_caught
     if args.output is not None and args.only is None:
         # Only a FULL pass may write the record: a --only run selects a subset
         # and its counts would understate the harness. The status gate derives
@@ -4444,8 +4484,15 @@ def main() -> int:
         args.output.write_text(json.dumps({
             "PROJECTION_MUTATIONS": len(MUTATIONS),
             "PROJECTION_MUTATIONS_LAST_FULL_RUN": len(selected),
-            "PROJECTION_MUTATIONS_CAUGHT": len(selected) - len(survivors),
+            "PROJECTION_MUTATIONS_CAUGHT": caught,
             "PROJECTION_MUTATION_SURVIVORS": len(survivors),
+            "PROJECTION_MUTATION_HUNG": hung_count,
+            "PROJECTION_MUTATION_UNSCORED": unscored,
+            "CONTENT_READER_MUTATIONS": len(content_selected),
+            "CONTENT_READER_MUTATIONS_CAUGHT": content_caught,
+            "CONTENT_READER_MUTATION_SURVIVORS": content_survivors,
+            "CONTENT_READER_MUTATION_HUNG": content_hung,
+            "CONTENT_READER_MUTATION_UNSCORED": content_unscored,
             "survivors": survivors,
         }, indent=2) + "\n", encoding="utf-8")
     # Qualified names, not a bare CAUGHT=. Both this harness and the native
@@ -4453,8 +4500,15 @@ def main() -> int:
     # fact key can only mean one thing -- so the gate could derive neither and
     # skipped both in silence. One key, one meaning (Foundation 100).
     print(f"PROJECTION_MUTATIONS={len(selected)} "
-          f"PROJECTION_MUTATIONS_CAUGHT={len(selected) - len(survivors)} "
-          f"PROJECTION_MUTATION_SURVIVORS={len(survivors)}"
+          f"PROJECTION_MUTATIONS_CAUGHT={caught} "
+          f"PROJECTION_MUTATION_SURVIVORS={len(survivors)} "
+          f"PROJECTION_MUTATION_HUNG={hung_count} "
+          f"PROJECTION_MUTATION_UNSCORED={unscored} "
+          f"CONTENT_READER_MUTATIONS={len(content_selected)} "
+          f"CONTENT_READER_MUTATIONS_CAUGHT={content_caught} "
+          f"CONTENT_READER_MUTATION_SURVIVORS={content_survivors} "
+          f"CONTENT_READER_MUTATION_HUNG={content_hung} "
+          f"CONTENT_READER_MUTATION_UNSCORED={content_unscored}"
           f"{scope} DECLARED={len(MUTATIONS)}")
     for survivor in survivors:
         print(f"  SURVIVOR {survivor}")
