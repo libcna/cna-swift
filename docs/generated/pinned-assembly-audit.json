@@ -1,10 +1,7 @@
 {
   "schemaVersion": 1,
   "referenceSha256": "681e55b33c1e5a09a31d5b5cdd0a137f6d3f10b37fdbdab1f5b85bc9580dde6d",
-  "calibrationAssemblies": [
-    "Microsoft.Xna.Framework.Graphics.dll",
-    "Microsoft.Xna.Framework.dll"
-  ],
+  "calibrationAssemblies": [],
   "CALIBRATION_STATUS": "PASS",
   "RESOURCE_STRING_CHECKS": 194,
   "RESOURCE_STRINGS_REPRODUCED": 97,

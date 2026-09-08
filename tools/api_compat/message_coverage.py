@@ -35,6 +35,7 @@ table at all fails rather than passing vacuously.
 from __future__ import annotations
 
 import argparse
+from collections import deque
 import json
 import re
 import sys
@@ -211,16 +212,22 @@ def reachable_keys(
     keys: set[str] = set()
     starts = ([key for key in methods if key[0] == start]
               if isinstance(start, str) else [start])
-    frontier = [(key, 0) for key in starts]
+    # Breadth-first traversal is contract-significant here. A method can be
+    # reached both directly and through a longer helper chain; depth-first
+    # traversal used to mark whichever path happened to come first in a set,
+    # so Python's hash seed could make the longer path consume the method at
+    # MAX_CALL_DEPTH and hide one of its callees. BFS visits every method at
+    # its shortest depth, and sorting makes the generated report byte-stable.
+    frontier = deque((key, 0) for key in sorted(starts))
     while frontier:
-        method, depth = frontier.pop()
+        method, depth = frontier.popleft()
         if method in seen or depth > MAX_CALL_DEPTH:
             continue
         seen.add(method)
         for segment in methods.get(method, []):
             keys.update(re.findall(r"Resources::get_(\w+)", segment))
             if depth < MAX_CALL_DEPTH:
-                for callee in called_methods(segment):
+                for callee in sorted(called_methods(segment)):
                     if callee in methods and callee not in seen:
                         frontier.append((callee, depth + 1))
     return keys
