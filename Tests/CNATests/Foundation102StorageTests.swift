@@ -141,6 +141,28 @@ final class Foundation102StorageTests: XCTestCase {
         try container.Dispose()
     }
 
+    func testDroppingAContainerReleasesItsHandleBeforeItsDevice() throws {
+        let selector = try device()
+        let opened = try selector.BeginOpenContainer(
+            Self.container, callback: { _ in }, state: nil)
+        var container: Microsoft.Xna.Framework.Storage.StorageContainer? =
+            try selector.EndOpenContainer(opened)
+        weak var released = container
+
+        container = nil
+        XCTAssertNil(released, "the last Swift reference must run deinit")
+
+        // CNA refuses to destroy a StorageDevice while any native container
+        // handle remains open. This is the direct native observation that a
+        // weak-reference-only test lacked: replacing the deinit destroy call
+        // with a no-op leaves openContainers non-zero and returns
+        // CNA_RESULT_INVALID_STATE here.
+        let functions = try NativeFunctions.load()
+        XCTAssertEqual(
+            functions.storageDeviceDestroy(selector.nativeHandle), 0,
+            "StorageContainer.deinit must release the child before its device")
+    }
+
     // MARK: - Files and directories
 
     func testAFileRoundTripsThroughExistenceAndNames() throws {
