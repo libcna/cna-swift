@@ -1056,7 +1056,10 @@ private final class ExternalStringReader:
         _ input: Microsoft.Xna.Framework.Content.ContentReader,
         existingInstance: String?
     ) throws -> String {
-        existingInstance ?? (try input.ReadString())
+        if let existingInstance {
+            return existingInstance
+        }
+        return try input.ReadString()
     }
 }
 
