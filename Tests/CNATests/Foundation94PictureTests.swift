@@ -56,20 +56,18 @@ final class Foundation94PictureTests: XCTestCase {
         XCTAssertTrue(game.nullTokenFailure is CNAArgumentNullException)
     }
 
-    func testSavePictureRefusesBothNulls() throws {
+    func testSavePictureOverloadsAreDirectlyUnsupported() throws {
         let game = try PictureProbeGame(exerciseSaveNulls: true)
         try game.Run()
         try game.Dispose()
         if let failure = game.failure { throw failure }
         guard game.libraryFailure == nil else { throw XCTSkip("no media library") }
-        let noName = try XCTUnwrap(game.nullNameFailure as? CNAArgumentNullException)
-        XCTAssertEqual(noName.ParamName, "name")
-        let noBuffer = try XCTUnwrap(game.nullBufferFailure as? CNAArgumentNullException)
-        XCTAssertEqual(noBuffer.ParamName, "imageBuffer")
+        XCTAssertTrue(game.nullNameFailure is CNANotSupportedException)
+        XCTAssertTrue(game.nullBufferFailure is CNANotSupportedException)
+        XCTAssertTrue(game.streamFailure is CNANotSupportedException)
     }
 
-    /// **`SavePicture` is exercised only through its refusals, and that is a
-    /// deliberate limit.**
+    /// **`SavePicture` is exercised only through its authoritative refusal.**
     ///
     /// The obvious test -- save a picture and read it back -- was written,
     /// passed, and was removed: it writes into the **user's own media
@@ -78,10 +76,9 @@ final class Foundation94PictureTests: XCTestCase {
     /// bindings had left there. CNA publishes no route to remove one, so the
     /// side effect is permanent and outside this repository.
     ///
-    /// A test suite may not leave things in a person's photo album. What that
-    /// costs is written down in `NEXT.md`: three mutations on members only a
-    /// real picture can reach are withdrawn, and they wait for a host with a
-    /// media store the suite did not have to create.
+    /// The pinned Windows XNA 4.0 IL directly throws NotSupportedException for
+    /// both overloads, so no test needs or is allowed to touch a person's
+    /// photo album.
     func testSavePictureIsNotExercisedAgainstTheRealLibrary() throws {
         // Nothing to run: the assertion is the absence of a save, and the
         // reason is above. The refusal tests cover what can be covered safely.
@@ -104,6 +101,7 @@ private final class PictureProbeGame: Microsoft.Xna.Framework.Game {
     var nullTokenFailure: Error?
     var nullNameFailure: Error?
     var nullBufferFailure: Error?
+    var streamFailure: Error?
 
     init(readRootAlbum: Bool = false, exerciseToken: Bool = false,
          exerciseSaveNulls: Bool = false) throws {
@@ -142,6 +140,10 @@ private final class PictureProbeGame: Microsoft.Xna.Framework.Game {
                 catch { nullNameFailure = error }
                 do { _ = try library.SavePicture("x", imageBuffer: nil) }
                 catch { nullBufferFailure = error }
+                do {
+                    _ = try library.SavePicture(
+                        "x", source: InputStream(data: Data([0])))
+                } catch { streamFailure = error }
             }
 
             try library.Dispose()

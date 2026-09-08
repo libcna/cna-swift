@@ -12,6 +12,7 @@
     "Microsoft.Xna.Framework.Input.Touch",
     "Microsoft.Xna.Framework.Audio",
     "Microsoft.Xna.Framework.Content",
+    "Microsoft.Xna.Framework.Design",
     "Microsoft.Xna.Framework.Media",
     "Microsoft.Xna.Framework.Storage",
     "Microsoft.Xna.Framework.GamerServices"
@@ -125,7 +126,24 @@
     "System.AsyncCallback": "CNAAsyncCallback",
     "System.IO.FileMode": "CNAFileMode",
     "System.IO.FileAccess": "CNAFileAccess",
-    "System.IO.FileShare": "CNAFileShare"
+    "System.IO.FileShare": "CNAFileShare",
+    "System.ComponentModel.TypeConverter": "CNATypeConverter",
+    "System.ComponentModel.ExpandableObjectConverter": "CNAExpandableObjectConverter",
+    "System.ComponentModel.ITypeDescriptorContext": "CNATypeDescriptorContext",
+    "System.ComponentModel.PropertyDescriptor": "CNAPropertyDescriptor",
+    "System.ComponentModel.PropertyDescriptorCollection": "CNAPropertyDescriptorCollection",
+    "System.ComponentModel.Design.Serialization.InstanceDescriptor": "CNAInstanceDescriptor",
+    "System.ComponentModel.TypeConverter+StandardValuesCollection": "CNATypeConverterStandardValuesCollection",
+    "System.Globalization.CultureInfo": "CNACultureInfo",
+    "System.Globalization.TextInfo": "CNATextInfo",
+    "System.Collections.IDictionary": "CNAIDictionary",
+    "System.Reflection.MemberInfo": "CNAMemberInfo",
+    "System.Reflection.MethodBase": "CNAMemberInfo",
+    "System.Reflection.ConstructorInfo": "CNAConstructorInfo",
+    "System.Reflection.ParameterInfo": "CNAParameterInfo",
+    "System.Reflection.MemberTypes": "CNAMemberTypes",
+    "System.Runtime.Serialization.SerializationInfo": "CNASerializationInfo",
+    "System.Runtime.Serialization.StreamingContext": "CNAStreamingContext"
   },
   "streamDirectionParameters": [
     {
@@ -141,6 +159,20 @@
       "parameter": "stream",
       "swift": "Foundation.OutputStream",
       "evidence": "The same SaveAsImage body; SaveAsJpeg differs from SaveAsPng only in the XnaImageFormat literal it passes (0 against 2)."
+    }
+  ],
+  "streamDirectionReturns": [
+    {
+      "owner": "Microsoft.Xna.Framework.Storage.StorageContainer",
+      "member": "CreateFile",
+      "swift": "CNAStorageStream",
+      "evidence": "StorageContainer.CreateFile calls System.IO.File.Create and returns the resulting FileStream. The returned CLR Stream is writable and seekable; CNA's storage stream routes preserve read, write, seek, flush and resize on CNAStorageStream, an InputStream subclass."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Storage.StorageContainer",
+      "member": "OpenFile",
+      "swift": "CNAStorageStream",
+      "evidence": "All three OpenFile overloads call System.IO.File.Open and return its FileStream. FileAccess defaults to ReadWrite in the shortest overload and is explicit in the others, so a read-only Foundation.InputStream return would erase selected behavior."
     }
   ],
   "refOutMapping": "inout",
@@ -189,7 +221,7 @@
     "Microsoft.Xna.Framework.GraphicsDeviceManager.EndDraw"
   ],
   "protocolWitnessMapping": "A public Swift conformance witness forced by a CLR explicit interface implementation is compiler-measured through sourceOrigin and excluded from the concrete type member count. GraphicsDeviceManager's three IGraphicsDeviceManager members are the first non-PackedVector entries: the pinned contract declares no CreateDevice, BeginDraw or EndDraw on the class, because XNA implements all three EXPLICITLY and they are therefore private on its own surface. Swift has no explicit conformance: a witness must be at least as visible as the protocol, so the three are public here. That is a language widening, recorded rather than hidden, and it is the same shape as the PackedVector witnesses above.",
-  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots. Where the parameter NAME cannot decide -- Texture2D.SetData and GetData both call their array `data`, and only GetData writes through it -- the member is listed in arrayMutationMembers instead. Foundation 103 added Model's two CopyBoneTransforms*To members that way: XNA names the destination `destinationBoneTransforms`, which the name list does not cover, and the third member of the trio -- CopyBoneTransformsFrom -- READS a `sourceBoneTransforms` and stays a value snapshot, so the name alone could not have decided either.",
+  "arrayMutationMapping": "CLR caller-owned destination arrays named destinationArray or corners, plus ICollection<T>.CopyTo array destinations, map to Swift inout Array; source arrays remain value snapshots. Where the parameter NAME cannot decide -- Texture2D.SetData and GetData both call their array `data`, and only GetData writes through it -- the member is listed in arrayMutationMembers instead. Foundation 103 added Model's two CopyBoneTransforms*To members that way: XNA names the destination `destinationBoneTransforms`, which the name list does not cover, and the third member of the trio -- CopyBoneTransformsFrom -- READS a `sourceBoneTransforms` and stays a value snapshot, so the name alone could not have decided either. GraphicsDevice.GetBackBufferData likewise writes every data overload and therefore shares the inout projection.",
   "arrayMutationParameterNames": [
     "destinationArray",
     "corners"
@@ -213,7 +245,8 @@
     "System.Runtime.InteropServices.ExternalException": "CNAExternalException",
     "System.Collections.Generic.Dictionary`2": "CNADictionary",
     "System.Attribute": "CNAAttribute",
-    "System.IO.BinaryReader": "CNABinaryReader"
+    "System.IO.BinaryReader": "CNABinaryReader",
+    "System.ComponentModel.ExpandableObjectConverter": "CNAExpandableObjectConverter"
   },
   "measuredSupportBaseMapping": "A non-XNA CLR base listed in measuredSupportBaseProjections is a MEASURED base, exactly as an XNA base is: the Swift type must be a class whose compiler-emitted superclass is the mapped support type. A missing base, AnyObject or Object in its place, a struct where the CLR declares a class, a different support base, composition in place of inheritance, or any other base projection is a BASE_MAPPING_MISMATCH. It is never silently dropped and never allowlisted. A GENERIC support base additionally requires its CLR generic argument to be preserved in the Swift specialization -- Collection<IGameComponent> projects to CNACollection<any IGameComponent>, never to CNACollection<Any> -- and that argument is measured by bclSupportBaseSpecializationMapping.",
   "bclSupportTypeProjections": {
@@ -246,9 +279,26 @@
     "System.IO.BinaryReader": "CNABinaryReader",
     "System.IO.EndOfStreamException": "CNAEndOfStreamException",
     "System.FormatException": "CNAFormatException",
-    "System.Resources.ResourceManager": "CNAResourceManager"
+    "System.Resources.ResourceManager": "CNAResourceManager",
+    "System.ComponentModel.TypeConverter": "CNATypeConverter",
+    "System.ComponentModel.ExpandableObjectConverter": "CNAExpandableObjectConverter",
+    "System.ComponentModel.ITypeDescriptorContext": "CNATypeDescriptorContext",
+    "System.ComponentModel.PropertyDescriptor": "CNAPropertyDescriptor",
+    "System.ComponentModel.PropertyDescriptorCollection": "CNAPropertyDescriptorCollection",
+    "System.ComponentModel.Design.Serialization.InstanceDescriptor": "CNAInstanceDescriptor",
+    "System.ComponentModel.TypeConverter+StandardValuesCollection": "CNATypeConverterStandardValuesCollection",
+    "System.Globalization.CultureInfo": "CNACultureInfo",
+    "System.Globalization.TextInfo": "CNATextInfo",
+    "System.Collections.IDictionary": "CNAIDictionary",
+    "System.Reflection.MemberInfo": "CNAMemberInfo",
+    "System.Reflection.MethodBase": "CNAMemberInfo",
+    "System.Reflection.ConstructorInfo": "CNAConstructorInfo",
+    "System.Reflection.ParameterInfo": "CNAParameterInfo",
+    "System.Reflection.MemberTypes": "CNAMemberTypes",
+    "System.Runtime.Serialization.SerializationInfo": "CNASerializationInfo",
+    "System.Runtime.Serialization.StreamingContext": "CNAStreamingContext"
   },
-  "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured.",
+  "bclSupportTypeMapping": "A selected BCL family admitted through tools/api_compat/bcl-authorities.json and pinned in reference/bcl40-selected-shape.json projects to the named public Swift support class wherever it occurs -- as a base, as a member type, or as a generic argument. These are LANGUAGE/BCL support types, not XNA types: they live outside Microsoft.Xna.Framework, are counted in no XNA scoreboard, and no ::System namespace is fabricated for them. Admitted BCL behaviour is not an approved projection: a family appears here only once its Swift support class exists and is measured. SerializationInfo and StreamingContext are the exact parameter carriers of two protected XNA exception constructors; their own public construction surface is refused because constructors are not inherited and SerializationInfo(IFormatterConverter) would admit unrelated conversion families. The selected carrier restores only Exception state already exposed by this projection.",
   "bclSupportBaseSpecializationMapping": "The Swift Symbol Graph's inheritsFrom relationship names only the generic superclass symbol and carries no generic argument, so the argument is supplemented from the same compiled Swift source declaration the enum raw types already are. A selected type whose expected base is a generic support base must declare the exact specialization; a wrong element type or an Any erasure is a BASE_MAPPING_MISMATCH, and source evidence that cannot be read is an UNMEASURED_STRUCTURAL_CATEGORY rather than an assumption.",
   "bclSupportContract": {
     "CNAStringBuilder": {
@@ -560,6 +610,207 @@
         "ToString",
         "GetType"
       ]
+    },
+    "CNAIDictionary": {
+      "kind": "protocol",
+      "inheritance": "public",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Collections.IDictionary",
+      "requiredMembers": [
+        "IsFixedSize", "IsReadOnly", "Keys", "Values", "Item", "SetItem",
+        "Add", "Clear", "Contains", "Remove"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNACultureInfo": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Globalization.CultureInfo",
+      "requiredMembers": [
+        "CurrentCulture", "InvariantCulture", "Name", "UseUserOverride",
+        "TextInfo", "Clone", "Equals", "GetHashCode", "ToString"
+      ],
+      "openMembers": ["Clone", "Equals", "GetHashCode", "ToString"],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNATextInfo": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Globalization.TextInfo",
+      "requiredMembers": ["ListSeparator"],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNATypeDescriptorContext": {
+      "kind": "protocol",
+      "inheritance": "public",
+      "generics": [],
+      "base": null,
+      "conformances": ["CNAServiceProvider"],
+      "clrFamily": "System.ComponentModel.ITypeDescriptorContext",
+      "requiredMembers": [
+        "Container", "Instance", "PropertyDescriptor",
+        "OnComponentChanged", "OnComponentChanging"
+      ],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAPropertyDescriptor": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.ComponentModel.PropertyDescriptor",
+      "clrAbstract": true,
+      "requiredMembers": [
+        "Name", "ComponentType", "PropertyType", "IsReadOnly",
+        "CanResetValue", "ResetValue", "ShouldSerializeValue", "GetValue", "SetValue"
+      ],
+      "openMembers": [
+        "IsReadOnly", "CanResetValue", "ResetValue", "ShouldSerializeValue",
+        "GetValue", "SetValue"
+      ],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAPropertyDescriptorCollection": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.ComponentModel.PropertyDescriptorCollection",
+      "requiredMembers": [
+        "Empty", "Count", "Item", "Add", "Clear", "Contains", "CopyTo",
+        "Find", "GetEnumerator", "IndexOf", "Insert", "Remove", "RemoveAt", "Sort"
+      ],
+      "openMembers": ["Item", "Find", "Sort"],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNATypeConverterStandardValuesCollection": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.ComponentModel.TypeConverter+StandardValuesCollection",
+      "requiredMembers": ["Count", "Item", "CopyTo"],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNATypeConverter": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.ComponentModel.TypeConverter",
+      "requiredMembers": [
+        "CanConvertFrom", "CanConvertTo", "ConvertFrom", "ConvertFromInvariantString",
+        "ConvertFromString", "ConvertTo", "ConvertToInvariantString", "ConvertToString",
+        "CreateInstance", "GetCreateInstanceSupported", "GetProperties",
+        "GetPropertiesSupported", "GetStandardValues", "GetStandardValuesExclusive",
+        "GetStandardValuesSupported", "IsValid", "SortProperties"
+      ],
+      "openMembers": [
+        "CanConvertFrom", "CanConvertTo", "ConvertFrom", "ConvertTo", "CreateInstance",
+        "GetCreateInstanceSupported", "GetProperties", "GetPropertiesSupported",
+        "GetStandardValues", "GetStandardValuesExclusive", "GetStandardValuesSupported", "IsValid"
+      ],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAExpandableObjectConverter": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": "CNATypeConverter",
+      "conformances": [],
+      "clrFamily": "System.ComponentModel.ExpandableObjectConverter",
+      "requiredMembers": ["GetProperties", "GetPropertiesSupported"],
+      "openMembers": ["GetProperties", "GetPropertiesSupported"],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAMemberInfo": {
+      "kind": "class",
+      "inheritance": "open",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Reflection.MemberInfo",
+      "clrAbstract": true,
+      "requiredMembers": [
+        "Name", "DeclaringType", "ReflectedType", "MemberType", "Equals", "GetHashCode"
+      ],
+      "openMembers": ["Equals", "GetHashCode"],
+      "finalMembers": [],
+      "forbiddenMembers": ["GetCustomAttributes", "IsDefined", "Module"]
+    },
+    "CNAMemberTypes": {
+      "kind": "enum",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Reflection.MemberTypes",
+      "requiredMembers": ["Constructor"],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAConstructorInfo": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": "CNAMemberInfo",
+      "conformances": [],
+      "clrFamily": "System.Reflection.ConstructorInfo",
+      "clrAbstract": true,
+      "requiredMembers": ["GetParameters", "Invoke"],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAParameterInfo": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Reflection.ParameterInfo",
+      "requiredMembers": ["Name", "ParameterType", "Position"],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
+    },
+    "CNAInstanceDescriptor": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.ComponentModel.Design.Serialization.InstanceDescriptor",
+      "requiredMembers": ["MemberInfo", "Arguments", "IsComplete", "Invoke"],
+      "openMembers": [],
+      "finalMembers": [],
+      "forbiddenMembers": []
     },
     "CNAEqualityComparer": {
       "kind": "protocol",
@@ -975,6 +1226,50 @@
         "GetStream"
       ]
     },
+    "CNASerializationInfo": {
+      "kind": "class",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Runtime.Serialization.SerializationInfo",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "allowedPublicMembers": [],
+      "forbiddenMembers": [
+        ".ctor",
+        "FullTypeName",
+        "AssemblyName",
+        "SetType",
+        "MemberCount",
+        "ObjectType",
+        "AddValue",
+        "GetValue",
+        "GetString",
+        "GetInt32",
+        "GetEnumerator"
+      ]
+    },
+    "CNAStreamingContext": {
+      "kind": "struct",
+      "inheritance": "final",
+      "generics": [],
+      "base": null,
+      "conformances": [],
+      "clrFamily": "System.Runtime.Serialization.StreamingContext",
+      "requiredMembers": [],
+      "openMembers": [],
+      "finalMembers": [],
+      "allowedPublicMembers": [],
+      "forbiddenMembers": [
+        ".ctor",
+        "Context",
+        "State",
+        "Equals",
+        "GetHashCode"
+      ]
+    },
     "CNAAsyncResult": {
       "kind": "protocol",
       "inheritance": "public",
@@ -1054,7 +1349,7 @@
   },
   "bclSupportMapping": "The BCL support classes live outside Microsoft.Xna.Framework and are language/BCL-support API, so they are counted in no XNA scoreboard. They are nevertheless MEASURED against the pinned shape above, which is itself derived from reference/bcl40-selected-shape.json: an absent support type is an UNMEASURED_STRUCTURAL_CATEGORY, and a wrong kind, wrong generic arity, a struct where CLR reference semantics are required, a missing required member, a protected virtual hook that is not `open`, or a forbidden member is a BASE_MAPPING_MISMATCH. Pointer, opaque-handle and CNA FFI spellings inside a support type remain RAW_HANDLE_LEAK and PUBLIC_NATIVE_FFI_LEAK.",
   "bclExceptionSupportMapping": "A CLR exception class projects to a real Swift CLASS conforming to Swift Error, so a projected XNA exception is a genuine throwable Swift error and the CLR inheritance chain survives as a Swift inheritance chain. The chain is exact and unabbreviated: System.Exception -> CNAException, System.SystemException -> CNASystemException, System.Runtime.InteropServices.ExternalException -> CNAExternalException. Collapsing ExternalException straight onto CNAException would erase SystemException's substituted default message and its 0x80131501 HResult, both of which are observable, and is a BASE_MAPPING_MISMATCH. A struct, an enum, an alias to CNAError, a non-throwable NSObject, or a missing Error conformance are each a mismatch and not a shortcut. CNAError is a SEPARATE channel and is deliberately NOT in this hierarchy: it reports CNA-Swift runtime and language-support failures -- native library failure, owner-thread violation, stale runtime generation, unsupported platform, callback lifecycle misuse -- which correspond to no selected XNA exception identity. CNAError is not a CNAException and CNAException does not wrap CNAError.",
-  "bclExceptionSelectedSurfaceMapping": "The projected members of the exception support family are exactly those whose CLR behaviour is reconstructible from managed state alone: Message, InnerException, HResult, HelpLink, GetBaseException and ExternalException.ErrorCode. Every remaining declared member requires a CLR RUNTIME SERVICE this projection does not have -- StackTrace and Source need the runtime's captured managed stack, TargetSite needs System.Reflection.MethodBase, GetType needs System.Type, Data needs System.Collections.IDictionary and an internal dictionary implementation, GetObjectData and the SerializeObjectState event need the serialization runtime, and ToString appends the stack trace -- so each is FORBIDDEN rather than absent: a member that answered with an empty string, a nil or a fabricated stack would be a lie, and the verifier fails if one appears. The same rule keeps the protected (SerializationInfo, StreamingContext) constructors of ContentLoadException and StorageDeviceNotConnectedException unimplemented and counted as MISSING_MEMBER rather than faked. Foundation 37 adds the eight classes the support layer RAISES rather than inherits from. Their projected surface is ParamName on ArgumentException and the Message override that composes it; everything else they declare is a constructor. ArgumentOutOfRangeException.ActualValue and the (paramName, actualValue, message) constructor that stores one are FORBIDDEN rather than absent, because the Message branch that reads it calls System.Object.ToString() on an arbitrary object, which is a virtual call whose result is not reconstructible from IL; a Swift String(describing:) in its place would be this projection's formatting and not the CLR's. IndexOutOfRangeException is the one SEALED member of the family and is projected final; the other seven are open, as mscorlib leaves them.",
+  "bclExceptionSelectedSurfaceMapping": "The projected members of the exception support family are exactly those whose CLR behaviour is reconstructible from managed state alone: Message, InnerException, HResult, HelpLink, GetBaseException and ExternalException.ErrorCode. Every remaining declared member requires a CLR RUNTIME SERVICE this projection does not have -- StackTrace and Source need the runtime's captured managed stack, TargetSite needs System.Reflection.MethodBase, GetType needs System.Type, Data needs System.Collections.IDictionary and an internal dictionary implementation, GetObjectData and the SerializeObjectState event need the serialization runtime, and ToString appends the stack trace -- so each is FORBIDDEN rather than absent: a member that answered with an empty string, a nil or a fabricated stack would be a lie, and the verifier fails if one appears. The protected (SerializationInfo, StreamingContext) constructors of ContentLoadException and StorageDeviceNotConnectedException are admitted through two opaque BCL carriers and restore exactly the already-selected observable Exception state: serialized class name, Message, InnerException, HelpLink and HResult. Swift widens protected construction to public; the carriers' own IFormatterConverter construction and CLR remoting/stack machinery remain refused. Foundation 37 adds the eight classes the support layer RAISES rather than inherits from. Their projected surface is ParamName on ArgumentException and the Message override that composes it; everything else they declare is a constructor. ArgumentOutOfRangeException.ActualValue and the (paramName, actualValue, message) constructor that stores one are FORBIDDEN rather than absent, because the Message branch that reads it calls System.Object.ToString() on an arbitrary object, which is a virtual call whose result is not reconstructible from IL; a Swift String(describing:) in its place would be this projection's formatting and not the CLR's. IndexOutOfRangeException is the one SEALED member of the family and is projected final; the other seven are open, as mscorlib leaves them.",
   "bclAbstractClassProjectionMapping": "Swift has no abstract class, so a CLR abstract class with a protected constructor projects to an `open` Swift class with a public initializer. That WIDENS construction -- CNAAttribute() compiles where `new Attribute()` does not -- and the widening is recorded on the support type's measured shape as clrAbstract rather than hidden behind an invented runtime trap. It is the same kind of widening the protected-to-public accessor mapping already makes, and it is the only one an abstract base with no abstract members produces.",
   "bclStaticTableProjections": [
     {
@@ -1230,7 +1525,7 @@
   "xnaResourceStringMapping": "A user-visible XNA message is a resource lookup and not an IL literal, so every message this binding reproduces is read out of the registered assembly's own embedded string table by tools/api_compat/pinned_assembly_audit.py, pinned in reference/xna40-selected-resource-strings.json, and compared against the Swift sources here. Registration is demand-driven exactly as the BCL authority is: a key appears once something reproduces it. A message transcribed from memory is a LANGUAGE_MAPPING_MISMATCH even when it looks right.",
   "bclResourceStringMapping": "A default exception message is a resource lookup in the admitted binary, never an IL literal, so the Swift support source must reproduce the exact value pinned in reference/bcl40-selected-shape.json under resourceStrings. The verifier reads the literals back out of the compiled Swift source and compares them; a message transcribed from documentation or memory instead of from the assembly is a BASE_MAPPING_MISMATCH.",
   "bclSelectedShapeReference": "tools/api_compat/reference/bcl40-selected-shape.json",
-  "bclSelectedShapeSha256": "6bf920ddfb9421b5a17539590bb53d67d67fdb6c1c39ecd6fd3f8912ae7ea6ca",
+  "bclSelectedShapeSha256": "26ef694b18fb123b8fcf261912f33e1bb70a701035639a695d591e04046ac23d",
   "eventSupportContract": {
     "CNAEventArgs": {
       "kind": "class",
@@ -1724,6 +2019,117 @@
       "member": "Play",
       "parameter": "video",
       "reason": "Play null-tests the video before it reaches the runtime, and that branch is one a caller can only take by passing null."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.AudioEngine",
+      "member": ".ctor",
+      "parameter": "settingsFile",
+      "reason": "Both public constructors open with String.IsNullOrEmpty(settingsFile) and raise ArgumentNullException with XNA's NullNotAllowed text; Optional preserves the null half separately from the empty-string half."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.AudioEngine",
+      "member": "GetCategory",
+      "parameter": "name",
+      "reason": "AudioCategory's internal constructor applies String.IsNullOrEmpty to this name before lookup, so null and empty are both selected observable refusals."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.AudioEngine",
+      "member": "GetGlobalVariable",
+      "parameter": "name",
+      "reason": "GetGlobalVariable explicitly null-or-empty checks the variable name before native lookup."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.AudioEngine",
+      "member": "SetGlobalVariable",
+      "parameter": "name",
+      "reason": "SetGlobalVariable has the same explicit null-or-empty branch as its getter."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.Cue",
+      "member": "GetVariable",
+      "parameter": "name",
+      "reason": "Cue.GetVariable explicitly null-or-empty checks the variable name before native lookup."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.Cue",
+      "member": "SetVariable",
+      "parameter": "name",
+      "reason": "Cue.SetVariable has the same explicit null-or-empty branch as its getter."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.Cue",
+      "member": "Apply3D",
+      "parameter": "listener",
+      "reason": "Cue.Apply3D explicitly null-tests listener and raises ArgumentNullException before it examines playback state."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.Cue",
+      "member": "Apply3D",
+      "parameter": "emitter",
+      "reason": "Cue.Apply3D explicitly null-tests emitter immediately after listener, preserving an observable exception order."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundBank",
+      "member": ".ctor",
+      "parameter": "audioEngine",
+      "reason": "The constructor explicitly refuses a null engine before it opens the bank file."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundBank",
+      "member": ".ctor",
+      "parameter": "filename",
+      "reason": "The constructor applies String.IsNullOrEmpty to filename before resolving its full path."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundBank",
+      "member": "GetCue",
+      "parameter": "name",
+      "reason": "GetCue explicitly refuses a null-or-empty cue name before lookup."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundBank",
+      "member": "PlayCue",
+      "parameter": "name",
+      "reason": "Both PlayCue overloads explicitly refuse a null-or-empty cue name before lookup."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundBank",
+      "member": "PlayCue",
+      "parameter": "listener",
+      "reason": "The 3D overload constructs a Cue and calls Cue.Apply3D, whose first argument is explicitly null-tested before playback."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.SoundBank",
+      "member": "PlayCue",
+      "parameter": "emitter",
+      "reason": "The 3D overload reaches Cue.Apply3D's explicit emitter null check before playback."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.WaveBank",
+      "member": ".ctor",
+      "parameter": "audioEngine",
+      "reason": "Both WaveBank constructors explicitly refuse a null audio engine before opening a bank."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.WaveBank",
+      "member": ".ctor",
+      "parameter": "nonStreamingWaveBankFilename",
+      "reason": "The resident-bank constructor explicitly null-or-empty checks its filename before full-path resolution."
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.WaveBank",
+      "member": ".ctor",
+      "parameter": "streamingWaveBankFilename",
+      "reason": "The streaming-bank constructor explicitly null-or-empty checks its filename before native creation."
+    }
+  ],
+  "optionalReferenceParameterGroups": [
+    {
+      "ownerPrefix": "Microsoft.Xna.Framework.Design.",
+      "parameters": [
+        "context", "culture", "sourceType", "destinationType", "propertyValues"
+      ],
+      "reason": "The Design converter family is a virtual TypeConverter surface: null context/culture select the documented current-culture path, null destination type reaches the explicit ArgumentNullException, and null propertyValues reaches each CreateInstance override's explicit refusal. Grouping the five repeated reference positions keeps all thirteen converter identities mechanically consistent."
     }
   ],
   "globalOperatorProjections": [
@@ -1733,6 +2139,14 @@
   "clrTypeLanguageProjection": "System.Type maps to the Swift metatype Any.Type. It is a LANGUAGE PROJECTION in the same sense as System.IntPtr -> Int and System.Object -> Any?: the Swift type that carries the same VALUE, which here is a runtime type token. The pinned contract names System.Type in twenty-four positions and calls a member on it in none of them -- every one passes it, compares it or returns it -- so the selected surface of the family is identity and assignability, both of which a Swift metatype has: `==` decides identity and `_openExistential` decides `Type.IsAssignableFrom`, exactly, including protocol conformance and class inheritance. What a Swift metatype does NOT have is System.Type's reflection surface -- Name, FullName, Assembly, GetMethods and the rest -- so any XNA member that needed one of those would be blocked on this projection rather than served by it, and none does. A wrapper class would have had to either invent those members or be an empty box; neither is better than the language type.",
   "intPtrLanguageProjection": "System.IntPtr maps to Swift Int: the opaque pointer-width signed numeric value of the CLR IntPtr, and IntPtr.Zero maps to 0. It is a LANGUAGE PROJECTION and is not a Swift pointer, a dereferenceable address, a CNA native handle, an SDL window, or proof that the value is valid. The expected projection is never RAW_HANDLE_LEAK; UnsafeRawPointer, UnsafeMutableRawPointer, OpaquePointer and native-handle wrappers remain leaks, and a fixed-width Int64 or an unsigned UInt substitute remains a mapping mismatch. RAW_HANDLE_LEAK stays required at zero.",
   "accessorProjectionMapping": "One general accessor-level rule covers every CLR property, indexed or not. A getter keeps Swift accessor syntax -- `var P` for a plain property, `subscript` for an indexed one -- and gains the `get throws` effect exactly when the CLR getter is fallible. A writer keeps Swift `set` syntax only when Swift can express it: a setter accessor cannot throw, and the compiler additionally refuses any `set` beside a throwing getter, so a writer whose own setter is fallible, or whose getter is, becomes the method `Set<PropertyName>` carrying the setter's own `throws` and preserving XNA capitalisation. Getter fallibility and setter fallibility are decided independently and never infect one another, apart from that one compiler constraint, which is recorded as the compiler fact it is. The writer method is the projection of the CLR setter ACCESSOR, never a new XNA member: the verifier recombines reader and writer into the one source property identity every scoreboard counts.",
+  "shadowedPropertyAccessorMethods": [
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance",
+      "property": "IsLooped",
+      "reader": "GetIsLooped",
+      "reason": "DynamicSoundEffectInstance redeclares virtual IsLooped with a fallible getter while its SoundEffectInstance base declares the same virtual property with an infallible getter. Swift cannot override a nonthrowing getter with a throwing one, so the derived getter is named GetIsLooped and is recombined with the derived SetIsLooped override into the one CLR property identity. The verifier validates both measured accessor effects and the inherited collision before applying this rule."
+    }
+  ],
   "indexedPropertyAccessorMapping": "The indexed case of the general accessor rule, unchanged in shape from the rule it generalises. A read-only indexed property stays a Swift subscript, gaining `get throws` when its getter is fallible. When its writer becomes a method the reader is spelled `Item(...)` beside `SetItem(...)` rather than as a subscript, so the two halves of one CLR member stay one named pair; the verifier combines both compiler symbols into one source property identity.",
   "accessorFallibilityReference": "tools/api_compat/reference/xna40-accessor-fallibility.json is the pinned per-accessor fallibility verdict for every public property in the contract, regenerated by tools/api_compat/accessor_fallibility.py from the CIL of the seven hash-registered assemblies. An accessor is fallible when a throw is reachable from it inside those assemblies, when an unguarded caller-supplied index reaches a CLR index operation, or -- for an abstract or interface accessor -- when a registered implementor is. Allocation, calls that leave the registered set, and universal CLR failures such as OutOfMemoryException are not XNA contract behaviour and are never fallibility.",
   "accessorFallibilitySha256": "417366927ba140d80e87a27312c05ecd04476afb0bee7d0f7ca2a5195a696463",
@@ -1803,6 +2217,16 @@
       "owner": "Microsoft.Xna.Framework.Graphics.Model",
       "member": "CopyAbsoluteBoneTransformsTo",
       "parameter": "destinationBoneTransforms"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Audio.Microphone",
+      "member": "GetData",
+      "parameter": "buffer"
+    },
+    {
+      "owner": "Microsoft.Xna.Framework.Graphics.GraphicsDevice",
+      "member": "GetBackBufferData",
+      "parameter": "data"
     }
   ],
   "recombinedPropertyWriters": [

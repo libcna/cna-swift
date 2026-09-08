@@ -9,7 +9,8 @@ declared in the pinned contract are nodes; BCL types are not.
 
 Node names are mapped through `mapping-rules.json` exactly as the strict
 verifier maps them, so a CLR nested name (`A+B`) and a generic collision name
-(`ContentTypeReader\`1`) resolve to the same identity the strict report uses.
+such as ContentTypeReader with arity 1 resolve to the same identity the strict
+report uses.
 Without that mapping a nested or generic type is looked up under a name the
 graph does not contain, silently reports zero dependencies, and is ranked as
 trivially dependency-complete when it is not.

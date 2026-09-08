@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 import CNAShim
+import Foundation
 
 extension Microsoft.Xna.Framework.Media {
 
@@ -12,11 +13,10 @@ extension Microsoft.Xna.Framework.Media {
     /// can obtain one. A song created from a file path has no library context
     /// at all -- CNA says so and `Song.Artist` reports it.
     ///
-    /// **One member short.** The `SavePicture` overload that takes a `Stream`
-    /// is blocked differently from everything else that waited:
-    /// `cna_media_library_save_picture_from_stream` wants a CNA stream handle,
-    /// and this binding has no way to make one from a
-    /// `Foundation.InputStream`. Everything else the type declares is here.
+    /// Both `SavePicture` overloads preserve the pinned Windows XNA runtime's
+    /// direct `NotSupportedException` after its disposal check. CNA's host
+    /// media-saving routes are deliberately not bound to them: those routes
+    /// implement a broader host policy that the selected XNA assembly does not.
     public final class MediaLibrary: RuntimeOwnedChild {
 
         private var runtime: RuntimeState!
@@ -193,26 +193,23 @@ extension Microsoft.Xna.Framework.Media {
         }
 
         /// `MediaLibrary.SavePicture(String name, Byte[] imageBuffer)`.
-        public func SavePicture(_ name: String?, imageBuffer: [UInt8]?) throws -> Picture {
-            guard let name else {
-                throw CNAArgumentNullException(paramName: "name")
-            }
-            guard let imageBuffer else {
-                throw CNAArgumentNullException(paramName: "imageBuffer")
-            }
-            let live = try validated()
-            var utf8 = Array(name.utf8)
-            var produced: UInt64 = 0
-            try runtime.functions.check(
-                MediaLibrary.withStringView(&utf8) { view in
-                    imageBuffer.withUnsafeBufferPointer { bytes in
-                        runtime.functions.mediaLibrarySavePicture(
-                            live, view, bytes.baseAddress,
-                            UInt64(bytes.count), &produced)
-                    }
-                },
-                operation: "cna_media_library_save_picture")
-            return Picture(handle: produced, runtime: runtime)
+        public func SavePicture(
+            _ name: String?, imageBuffer: [UInt8]?
+        ) throws -> Picture {
+            _ = name
+            _ = imageBuffer
+            _ = try validated()
+            throw CNANotSupportedException()
+        }
+
+        /// `MediaLibrary.SavePicture(String name, Stream source)`.
+        public func SavePicture(
+            _ name: String?, source: Foundation.InputStream
+        ) throws -> Picture {
+            _ = name
+            _ = source
+            _ = try validated()
+            throw CNANotSupportedException()
         }
 
         /// `MediaLibrary.GetPictureFromToken(String token)`.

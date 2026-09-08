@@ -150,6 +150,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CannotGetBackBufferActiveRenderTargets",
+      "value": "Cannot use GetBackBufferData when a render target is active."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "CannotSetAlreadyUsedRenderTarget",
       "value": "The render target has already been set on another index. Each render target may only be set on a single index at a time."
     },
@@ -205,6 +210,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidDynamicIsLoopedCall",
+      "value": "IsLooped property is not supported for DynamicSoundEffectInstance."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidEmitterDopplerScale",
       "value": "The doppler scale of an audio emitter must be greater than or equal to zero."
     },
@@ -215,8 +225,18 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidMicrophoneBufferDuration",
+      "value": "Microphone buffer duration must be between 100ms and 1sec and  10ms aligned."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidRectangle",
       "value": "The rectangle is too large or too small for this resource."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidStringFormat",
+      "value": "Invalid string format. Expected a string in the format \"{0}\"."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -227,6 +247,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "InvalidTotalSize",
       "value": "The size of the data passed in is too large or too small for this resource."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidXactVolume",
+      "value": "Volume must be a positive float value."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -337,6 +362,11 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ProfileAspectRatio",
       "value": "XNA Framework {0} profile supports a maximum {1} aspect ratio of {2}."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileFeatureNotSupported",
+      "value": "XNA Framework {0} profile does not support {1}."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

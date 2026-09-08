@@ -43,7 +43,8 @@ KEYS = ROOT / "Sources/CNA/Xna/Input/Keyboard.swift"
 # The shim mirrors exactly these canonical structures, one for one.
 MIRRORED_STRUCTS = [
     "BoundingSphere", "VertexBufferInfo", "IndexBufferInfo",
-    "StringView", "Color", "Vector2", "Rectangle", "GameTime", "CallbackError",
+    "StringView", "Color", "Vector2", "Rectangle", "BackBufferReadback",
+    "GameTime", "CallbackError",
     "GameCallbacks", "GameFrameHooks", "GameCreateInfo", "Viewport",
     "Texture2DInfo", "Texture2DCreateInfo", "Texture2DTransfer",
     "Texture2DDecodeInfo",
@@ -92,8 +93,9 @@ MIRRORED_CALLBACKS = [
 # The scalar typedefs a mirrored declaration may name on either side. The
 # callback wall proves each pair is the same underlying type, which is what
 # makes translating a shim signature into canonical names sound.
-MIRRORED_SCALARS = ["Result", "Bool", "Handle",
-                    "VertexBufferHandle", "IndexBufferHandle"]
+MIRRORED_SCALARS = ["Result", "Bool", "Handle", "AudioStopOptions",
+                    "MicrophoneState", "FileMode", "FileAccess", "FileShare",
+                    "SeekOrigin", "VertexBufferHandle", "IndexBufferHandle"]
 
 
 # --------------------------------------------------------------------------
@@ -303,7 +305,7 @@ def swift_type(value: str) -> str:
         return f"const {swift_type(immutable.group(1))}*"
     mapping = {
         "UInt8": "uint8_t", "UInt16": "uint16_t", "UInt32": "uint32_t",
-        "UInt64": "uint64_t", "Int32": "int32_t",
+        "UInt64": "uint64_t", "Int16": "int16_t", "Int32": "int32_t",
         "Int64": "int64_t", "Float": "float", "Double": "double", "CChar": "char",
         "UnsafeMutableRawPointer": "void*", "UnsafeRawPointer": "const void*",
     }

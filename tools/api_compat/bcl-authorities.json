@@ -204,12 +204,44 @@
           "reason": "The exact mscorlib base class named by ResourceContentManager's public constructor and the source of its virtual GetObject(String) lookup. The selected projection retains the protected construction path, invariant-culture GetObject/GetString operations, BaseName, IgnoreCase, ResourceSetType and ReleaseAllResources; Assembly, CultureInfo, ResourceSet and UnmanagedMemoryStream overloads remain refused by the measured ContentReader closure."
         },
         {
+          "type": "System.Runtime.Serialization.SerializationInfo",
+          "reason": "The first parameter of the protected serialization constructor declared by ContentLoadException and StorageDeviceNotConnectedException. Exception's base constructor reads the serialized class name, message, inner exception, help link and HResult from it; those already-projected observable fields form the selected carrier. Its own IFormatterConverter constructor and general value-conversion API are not inherited and remain refused."
+        },
+        {
+          "type": "System.Runtime.Serialization.StreamingContext",
+          "reason": "The second parameter of both protected XNA exception serialization constructors. Exception reads its State only for CLR remoting stack-trace rewriting; because stack state remains outside the selected Exception surface, the XNA-facing value is admitted as an opaque carrier and no StreamingContextStates API is projected."
+        },
+        {
           "type": "System.Globalization.CultureInfo",
           "reason": "The second parameter of ConvertFrom and ConvertTo on every converter. Foundation 74 corrected the claim that it is only ever opaque here: the math converters format and parse THROUGH it, so its number formatting is part of what they do."
         },
         {
+          "type": "System.Globalization.TextInfo",
+          "reason": "MathTypeConverter reads CultureInfo.TextInfo.ListSeparator both to split input and join output, and CultureInfo publicly exposes the same TextInfo object."
+        },
+        {
           "type": "System.Collections.IDictionary",
           "reason": "The parameter of TypeConverter.CreateInstance, which MathTypeConverter overrides to build a value out of the property bag GetProperties described."
+        },
+        {
+          "type": "System.Reflection.MemberInfo",
+          "reason": "InstanceDescriptor.MemberInfo exposes the constructor selected by every XNA Design converter. The projection retains stable member identity and the constructor metadata the descriptor can actually return; assembly/module/custom-attribute reflection remains outside the selected Design closure."
+        },
+        {
+          "type": "System.Reflection.MemberTypes",
+          "reason": "MemberInfo.MemberType identifies every converter-produced descriptor member as a constructor. The enum preserves that public reflection identity without admitting unrelated reflection services."
+        },
+        {
+          "type": "System.Reflection.MethodBase",
+          "reason": "The direct CLR base of ConstructorInfo. It carries the parameter-list and invocation contract reached through the InstanceDescriptor returned by every XNA Design converter."
+        },
+        {
+          "type": "System.Reflection.ConstructorInfo",
+          "reason": "Every XNA Design converter creates an InstanceDescriptor over the value type's public constructor. A real constructor identity is therefore observable through MemberInfo and Invoke, not an implementation-only closure."
+        },
+        {
+          "type": "System.Reflection.ParameterInfo",
+          "reason": "ConstructorInfo.GetParameters exposes the ordered constructor parameter types and names behind the InstanceDescriptor returned by the XNA Design converters."
         },
         {
           "type": "System.IAsyncResult",
@@ -497,6 +529,10 @@
           "reason": "The transitive base of all thirteen XNA Design converters and the type whose eight virtual members they override. Its ConvertFrom/ConvertTo/CanConvertFrom/CanConvertTo pairs are the whole behaviour a converter has."
         },
         {
+          "type": "System.ComponentModel.TypeConverter+StandardValuesCollection",
+          "reason": "The public return of TypeConverter.GetStandardValues(ITypeDescriptorContext), inherited by MathTypeConverter even though the XNA converters return null from the base implementation."
+        },
+        {
           "type": "System.ComponentModel.ExpandableObjectConverter",
           "reason": "The DIRECT base of MathTypeConverter, which is itself the direct base of the other twelve. It adds only GetProperties/GetPropertiesSupported over TypeConverter, and those two are exactly what the math converters override."
         },
@@ -511,6 +547,10 @@
         {
           "type": "System.ComponentModel.PropertyDescriptorCollection",
           "reason": "The declared return of GetProperties on ExpandableObjectConverter and on every math converter that overrides it."
+        },
+        {
+          "type": "System.ComponentModel.Design.Serialization.InstanceDescriptor",
+          "reason": "MathTypeConverter.CanConvertTo explicitly accepts this destination type and all twelve concrete converters return one from ConvertTo. Its MemberInfo, Arguments, IsComplete and Invoke surface is the observable round-trip contract selected for the Design family."
         }
       ],
       "selectedResourceStrings": [],

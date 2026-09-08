@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "authority": "PURE_XNA_DERIVED",
-  "OBSERVATIONS": 2322,
-  "ASSERTIONS": 2322,
+  "OBSERVATIONS": 2331,
+  "ASSERTIONS": 2331,
   "FAILURES": 0,
   "testCases": [
     "testNamespaceAndTypeKindsCompile",
@@ -232,6 +232,7 @@
     "testExceptionDerivedXnaTypesSynthesizeTheirOwnClassNameMessage",
     "testExternalDerivedXnaTypesReportTheExternalComponentMessage",
     "testXnaExceptionConstructorsForwardWithoutSynthesizingAnything",
+    "testXnaSerializationConstructorsRestoreObservableBaseState",
     "testXnaExceptionsThrowAndCatchByExactTypeAndByBase",
     "testExternalXnaExceptionIsCaughtByEachLinkOfTheChain",
     "testXnaExceptionsAreNotCNAErrors",

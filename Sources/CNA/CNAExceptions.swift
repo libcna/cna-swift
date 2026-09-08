@@ -118,6 +118,11 @@ open class CNAException: Error {
     // nil is a real state and not an empty string.
     private let storedMessage: String?
 
+    // `Exception._className`. Ordinary construction leaves this for the CLR
+    // runtime to derive from the dynamic type; deserialization restores the
+    // serialized value and `Message` observes it when no message was stored.
+    private let storedClassName: String?
+
     // `Exception._innerException`, stored by the constructor and never
     // rewritten.
     private let storedInnerException: CNAException?
@@ -146,6 +151,7 @@ open class CNAException: Error {
     /// synthesized default.
     public init() {
         self.storedMessage = nil
+        self.storedClassName = nil
         self.storedInnerException = nil
         self.HelpLink = nil
         self.HResult = CNAException.corExceptionHResult
@@ -159,6 +165,7 @@ open class CNAException: Error {
     /// parameter is Optional rather than an empty-string stand-in.
     public init(message: String?) {
         self.storedMessage = message
+        self.storedClassName = nil
         self.storedInnerException = nil
         self.HelpLink = nil
         self.HResult = CNAException.corExceptionHResult
@@ -169,9 +176,26 @@ open class CNAException: Error {
     /// The IL stores both arguments and validates neither.
     public init(message: String?, innerException: CNAException?) {
         self.storedMessage = message
+        self.storedClassName = nil
         self.storedInnerException = innerException
         self.HelpLink = nil
         self.HResult = CNAException.corExceptionHResult
+    }
+
+    /// `protected Exception(SerializationInfo, StreamingContext)`.
+    ///
+    /// Swift has no `protected`, so the same visibility widening already used
+    /// for protected XNA constructors makes this initializer public. The
+    /// admitted carrier contains exactly the state observable through the
+    /// selected Exception projection; stack, source, data and remoting fields
+    /// remain refused rather than fabricated.
+    public init(info: CNASerializationInfo, context: CNAStreamingContext) {
+        self.storedMessage = info.message
+        self.storedClassName = info.className
+        self.storedInnerException = info.innerException
+        self.HelpLink = info.helpLink
+        self.HResult = info.hResult
+        _ = context.state
     }
 
     /// `Exception.Message`.
@@ -231,6 +255,7 @@ open class CNAException: Error {
     /// test asserts the result for every projected XNA exception and for each
     /// support class.
     internal var cnaClassName: String {
+        if let storedClassName { return storedClassName }
         let reflected = String(reflecting: type(of: self))
         // Only THIS module's qualifier is removed, and only when it is
         // actually there. Stripping whichever component happens to come first
@@ -310,6 +335,14 @@ open class CNASystemException: CNAException {
         super.init(message: message, innerException: innerException)
         HResult = CNAException.corSystemHResult
     }
+
+    /// The serialization constructor forwards without replacing the restored
+    /// HResult, exactly as `SystemException` does.
+    public override init(
+        info: CNASerializationInfo, context: CNAStreamingContext
+    ) {
+        super.init(info: info, context: context)
+    }
 }
 
 /// The `System.Runtime.InteropServices.ExternalException` projection.
@@ -346,6 +379,14 @@ open class CNAExternalException: CNASystemException {
     public override init(message: String?, innerException: CNAException?) {
         super.init(message: message, innerException: innerException)
         HResult = CNAException.externalExceptionHResult
+    }
+
+    /// The serialization constructor preserves the HResult restored by the
+    /// base rather than applying `E_FAIL` again.
+    public override init(
+        info: CNASerializationInfo, context: CNAStreamingContext
+    ) {
+        super.init(info: info, context: context)
     }
 
     /// `ExternalException..ctor(String message, Int32 errorCode)`.

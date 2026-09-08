@@ -195,6 +195,46 @@ extension PureValueTests {
             "no device")
     }
 
+    /// Both protected serialization constructors are bare base forwards in
+    /// the pinned XNA IL. The admitted carriers therefore have to restore the
+    /// base state without applying either XNA defaults or ExternalException's
+    /// normal-construction E_FAIL value a second time.
+    func testXnaSerializationConstructorsRestoreObservableBaseState() {
+        let inner = CNAException(message: "serialized inner")
+        let context = CNAStreamingContext(state: 0x80)
+
+        let contentInfo = CNASerializationInfo(
+            className: "Fixture.SerializedContentFailure",
+            message: nil,
+            innerException: inner,
+            helpLink: "https://example.invalid/content-help",
+            hResult: 0x1234)
+        let content = Microsoft.Xna.Framework.Content.ContentLoadException(
+            info: contentInfo, context: context)
+        XCTAssertEqual(
+            content.Message,
+            "Exception of type 'Fixture.SerializedContentFailure' was thrown.")
+        XCTAssertTrue(content.InnerException === inner)
+        XCTAssertEqual(content.HelpLink, "https://example.invalid/content-help")
+        XCTAssertEqual(content.HResult, 0x1234)
+
+        let storageInfo = CNASerializationInfo(
+            className: "Fixture.SerializedStorageFailure",
+            message: "device vanished",
+            innerException: inner,
+            helpLink: nil,
+            hResult: -77)
+        let storage = Microsoft.Xna.Framework.Storage
+            .StorageDeviceNotConnectedException(
+                info: storageInfo, context: context)
+        XCTAssertEqual(storage.Message, "device vanished")
+        XCTAssertTrue(storage.InnerException === inner)
+        XCTAssertNil(storage.HelpLink)
+        XCTAssertEqual(storage.HResult, -77)
+        XCTAssertEqual(storage.ErrorCode, -77,
+                       "ExternalException serialization preserves HResult")
+    }
+
     // ------------------------------------------------------------------
     // They are real Swift errors.
     // ------------------------------------------------------------------

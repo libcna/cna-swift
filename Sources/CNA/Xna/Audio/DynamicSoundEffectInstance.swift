@@ -30,19 +30,12 @@ extension Microsoft.Xna.Framework.Audio {
     /// Built from a sample rate and a channel count rather than from an asset,
     /// which is what makes it reachable here while the XACT family is not.
     ///
-    /// **Two of its members cannot be projected, and that is a language limit
-    /// rather than an omission.** XNA declares `IsLooped` and `Play` on this
-    /// type *again*, hiding the base's with C#'s `new`, and the redeclared
-    /// `IsLooped` throws in both directions where the base's getter cannot
-    /// fail -- a dynamic instance does not loop, so reading the property
-    /// refuses instead of answering false. Swift has neither member hiding nor
-    /// a way to override an infallible property with a fallible one, so both
-    /// stay inherited: `IsLooped` answers the base's value, and `Play` reaches
-    /// the same CNA route, which dispatches on the handle and therefore does
-    /// the dynamic instance's own work anyway.
-    ///
-    /// The consequence a caller can see is one refusal fewer, and it is
-    /// recorded rather than hidden.
+    /// XNA declares `IsLooped` and `Play` again on this sealed subclass. Swift
+    /// can express `Play` and the fallible writer as overrides. It cannot
+    /// override the base's infallible property getter with a fallible getter,
+    /// so the accessor is projected as `GetIsLooped()` beside
+    /// `SetIsLooped(_:)`; the strict verifier recombines those two compiler
+    /// symbols into XNA's one property identity.
     public final class DynamicSoundEffectInstance: SoundEffectInstance {
 
         private let dynamicRuntime: RuntimeState
@@ -91,6 +84,36 @@ extension Microsoft.Xna.Framework.Audio {
         /// `EventArgs.Empty`, the shape every XNA `EventHandler<EventArgs>`
         /// raise site uses.
         public var BufferNeeded: CNAEvent<CNAEventArgs> { bufferNeededSource.Event }
+
+        /// The getter of `DynamicSoundEffectInstance.IsLooped`.
+        ///
+        /// Unlike the base getter, XNA first refuses a disposed instance and
+        /// otherwise always returns false. The named method is the required
+        /// Swift spelling because a throwing getter cannot override the
+        /// inherited nonthrowing property.
+        public func GetIsLooped() throws -> Bool {
+            _ = try validatedDynamicHandle()
+            return false
+        }
+
+        /// The setter of `DynamicSoundEffectInstance.IsLooped`.
+        ///
+        /// False is accepted as a no-op; true is never supported by a dynamic
+        /// instance. Disposal is checked first, matching the pinned IL.
+        public override func SetIsLooped(_ value: Bool) throws {
+            _ = try validatedDynamicHandle()
+            guard !value else {
+                throw CNAInvalidOperationException(
+                    message: DynamicSoundEffectInstance.dynamicInvalidIsLoopedCallMessage)
+            }
+        }
+
+        /// `DynamicSoundEffectInstance.Play()` is a distinct virtual member in
+        /// XNA. CNA dispatches the shared route by handle kind, while this
+        /// override preserves the declaring-type identity in Swift.
+        public override func Play() throws {
+            try super.Play()
+        }
 
         /// `SubmitBuffer(Byte[] buffer)`.
         public func SubmitBuffer(_ buffer: [UInt8]?) throws {
@@ -153,6 +176,11 @@ extension Microsoft.Xna.Framework.Audio {
         internal static let overTheInstancePacketLimitMessage =
             "Please ensure that there are less than 64 buffers pending on this "
             + "instance."
+
+        /// `FrameworkResources.InvalidDynamicIsLoopedCall`, pinned from the
+        /// registered XNA Framework resource table.
+        internal static let dynamicInvalidIsLoopedCallMessage =
+            "IsLooped property is not supported for DynamicSoundEffectInstance."
 
         /// `GetSampleDuration(Int32 sizeInBytes)`.
         ///

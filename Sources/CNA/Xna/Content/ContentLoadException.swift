@@ -12,15 +12,9 @@ extension Microsoft.Xna.Framework.Content {
     /// One of the two XNA exception types the CLR leaves **unsealed**, so
     /// it is `open` rather than `final` and a consumer may derive from it.
     ///
-    /// It also declares a fourth, `protected`, constructor taking
-    /// `(SerializationInfo, StreamingContext)`. That one is deliberately
-    /// **not** implemented: reconstructing it means reading named values
-    /// back out of a `SerializationInfo`, which needs `System.Type`,
-    /// `System.Collections.IDictionary` and a deserialization runtime this
-    /// projection does not have. Swift has no `protected`, so a projected
-    /// version would be publicly callable and would silently produce an
-    /// exception carrying none of the serialized state. It is therefore
-    /// counted as a MISSING_MEMBER with a named blocker rather than faked.
+    /// Its fourth constructor takes the admitted serialization carriers and
+    /// forwards to the base exactly as the XNA IL does. Swift has no
+    /// `protected`, so it is public here as a measured visibility widening.
     ///
     /// Every constructor body in the IL is a bare forward to the base:
     /// `ldarg.0`, the arguments, `call base..ctor`, `ret`. No message is
@@ -45,6 +39,13 @@ extension Microsoft.Xna.Framework.Content {
         /// `.ctor(String message, Exception innerException)`.
         public override init(message: String?, innerException: CNAException?) {
             super.init(message: message, innerException: innerException)
+        }
+
+        /// `protected .ctor(SerializationInfo info, StreamingContext context)`.
+        public override init(
+            info: CNASerializationInfo, context: CNAStreamingContext
+        ) {
+            super.init(info: info, context: context)
         }
     }
 }

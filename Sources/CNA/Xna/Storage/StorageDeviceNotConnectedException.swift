@@ -11,10 +11,9 @@ extension Microsoft.Xna.Framework.Storage {
     ///
     /// The other XNA exception type the CLR leaves **unsealed**, so it is
     /// `open`. Like `ContentLoadException` it declares a fourth,
-    /// `protected`, `(SerializationInfo, StreamingContext)` constructor,
-    /// deliberately unimplemented for the same reason and counted as a
-    /// MISSING_MEMBER rather than faked. Its own IL carries the assembly
-    /// author's note that the serialization types do not exist on Xbox.
+    /// `protected`, `(SerializationInfo, StreamingContext)` constructor. Its
+    /// body is only a base forward, now reproduced over the admitted carriers;
+    /// Swift widens it to public because the language has no `protected`.
     ///
     /// `StorageDevice` is not implemented, so nothing throws it yet.
     ///
@@ -41,6 +40,13 @@ extension Microsoft.Xna.Framework.Storage {
         /// `.ctor(String message, Exception innerException)`.
         public override init(message: String?, innerException: CNAException?) {
             super.init(message: message, innerException: innerException)
+        }
+
+        /// `protected .ctor(SerializationInfo info, StreamingContext context)`.
+        public override init(
+            info: CNASerializationInfo, context: CNAStreamingContext
+        ) {
+            super.init(info: info, context: context)
         }
     }
 }

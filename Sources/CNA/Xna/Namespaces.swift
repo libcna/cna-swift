@@ -25,6 +25,9 @@ public enum Microsoft {
             public enum Content {}
 
             /// Namespace marker only; excluded from XNA type counts.
+            public enum Design {}
+
+            /// Namespace marker only; excluded from XNA type counts.
             public enum Media {}
             public enum GamerServices {}
 

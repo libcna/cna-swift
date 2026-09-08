@@ -1,6 +1,45 @@
 // SPDX-License-Identifier: MIT
 
 import CNAShim
+import Foundation
+
+internal final class StorageDeviceEventState {
+    let source = CNAEventSource<CNAEventArgs>()
+    private let lock = NSLock()
+    private var armed = false
+    private var registration: UInt64 = 0
+    private var callbackBox: Unmanaged<StorageDeviceEventState>?
+
+    func arm() {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !armed, let functions = try? NativeFunctions.load() else { return }
+        let retained = Unmanaged.passRetained(self)
+        var produced: UInt64 = 0
+        let result = functions.storageDeviceSubscribeDeviceChanged(
+            storageDeviceChangedCallback, retained.toOpaque(), &produced)
+        guard result == 0 else {
+            retained.release()
+            return
+        }
+        registration = produced
+        callbackBox = retained
+        armed = true
+    }
+
+    func raise() {
+        try? source.Raise(nil, args: CNAEventArgs.Empty)
+    }
+}
+
+internal let storageDeviceEventState = StorageDeviceEventState()
+
+internal let storageDeviceChangedCallback: CNASwift_StorageCompletionCallback = {
+    context in
+    guard let context else { return }
+    Unmanaged<StorageDeviceEventState>.fromOpaque(context)
+        .takeUnretainedValue().raise()
+}
 
 extension Microsoft.Xna.Framework.Storage {
 
@@ -38,6 +77,14 @@ extension Microsoft.Xna.Framework.Storage {
         // ------------------------------------------------------------------
         // Selection
         // ------------------------------------------------------------------
+
+        /// `StorageDevice.DeviceChanged`. XNA raises the static event with a
+        /// null sender; the process-global CNA subscription is armed lazily
+        /// when the event is first named and then lives for the process.
+        public static var DeviceChanged: CNAEvent<CNAEventArgs> {
+            storageDeviceEventState.arm()
+            return storageDeviceEventState.source.Event
+        }
 
         /// `BeginShowSelector(AsyncCallback callback, Object state)`.
         public static func BeginShowSelector(
@@ -138,7 +185,7 @@ extension Microsoft.Xna.Framework.Storage {
                     message: StorageDevice.wrongResultMessage,
                     paramName: "result")
             }
-            return Microsoft.Xna.Framework.Storage.StorageContainer(
+            return try Microsoft.Xna.Framework.Storage.StorageContainer(
                 handle: produced.produced, functions: functions, device: self)
         }
 

@@ -8,12 +8,9 @@ extension Microsoft.Xna.Framework.Audio {
     /// Entirely managed -- two strings, value equality over them, and the
     /// `ToString` that renders the friendly name.
     ///
-    /// **Nothing populates one yet, and that is stated rather than hidden.**
-    /// XNA produces these from `AudioEngine.RendererDetails`, and the XACT
-    /// family is blocked on a `.xgs` settings file this repository does not
-    /// have. The type is projected anyway because it is part of the pinned
-    /// contract and its whole behaviour is managed: a consumer can hold one,
-    /// compare it and print it, which is all XNA lets them do with one either.
+    /// XNA produces these from `AudioEngine.RendererDetails`; the projected
+    /// engine now does the same by copying CNA's renderer name and id into this
+    /// managed value.
     ///
     /// Both getters are `IL_NO_FAILURE_PATH` and neither return is *proven*
     /// nullable, so both are non-Optional -- the same rule
@@ -28,7 +25,7 @@ extension Microsoft.Xna.Framework.Audio {
         /// struct an implicit parameterless constructor, but the pinned
         /// contract declares none -- so a public Swift `init()` is a member
         /// XNA does not have, and the strict comparison says so by name. The
-        /// engine that will fill these does not exist here yet either.
+        /// engine fills values through the internal two-string initializer.
         internal init() {
             self.init(friendlyName: "", rendererId: "")
         }

@@ -132,6 +132,28 @@ final class Foundation102StorageTests: XCTestCase {
         XCTAssertNoThrow(try container.Dispose())
     }
 
+    func testDisposingEventFiresOnceAfterNativeDisposal() throws {
+        let selector = try device()
+        let opened = try selector.BeginOpenContainer(
+            Self.container, callback: { _ in }, state: nil)
+        let container = try selector.EndOpenContainer(opened)
+        var observations: [Bool] = []
+        _ = container.Disposing.Add { sender, _ in
+            XCTAssertTrue(sender as AnyObject === container)
+            observations.append(container.IsDisposed)
+        }
+
+        try container.Dispose()
+        try container.Dispose()
+        XCTAssertEqual(observations, [true])
+    }
+
+    func testDeviceChangedHasStableProcessWideIdentity() {
+        XCTAssertTrue(
+            Microsoft.Xna.Framework.Storage.StorageDevice.DeviceChanged ===
+            Microsoft.Xna.Framework.Storage.StorageDevice.DeviceChanged)
+    }
+
     func testTheContainerCarriesTheDeviceItCameFrom() throws {
         let selector = try device()
         let opened = try selector.BeginOpenContainer(
@@ -191,6 +213,58 @@ final class Foundation102StorageTests: XCTestCase {
         defer { try? container.Dispose() }
         XCTAssertFalse(try container.FileExists("no-such-file"))
         XCTAssertEqual(try container.GetFileNames("no-such-*"), [])
+    }
+
+    func testDuplexStorageStreamWritesSeeksReadsAndResizes() throws {
+        let selector = try device()
+        let opened = try selector.BeginOpenContainer(
+            Self.container, callback: { _ in }, state: nil)
+        let container = try selector.EndOpenContainer(opened)
+        let stream = try container.CreateFile("duplex.bin")
+
+        XCTAssertTrue(try stream.CanWrite)
+        XCTAssertTrue(try stream.CanSeek)
+        let bytes: [UInt8] = [0x10, 0x20, 0x30, 0x40]
+        try stream.Write(bytes, offset: 0, count: Int32(bytes.count))
+        try stream.Flush()
+        XCTAssertEqual(try stream.Length, 4)
+        XCTAssertEqual(try stream.Seek(0, origin: .Begin), 0)
+        var read = [UInt8](repeating: 0, count: 4)
+        XCTAssertEqual(try stream.Read(&read, offset: 0, count: 4), 4)
+        XCTAssertEqual(read, bytes)
+        try stream.SetLength(2)
+        XCTAssertEqual(try stream.Length, 2)
+        try stream.Close()
+        XCTAssertNoThrow(try stream.Close())
+        XCTAssertThrowsError(try stream.Flush()) { error in
+            XCTAssertTrue(error is CNAObjectDisposedException)
+        }
+        XCTAssertTrue(try container.FileExists("duplex.bin"))
+        try container.Dispose()
+    }
+
+    func testEveryOpenFileOverloadReturnsAWorkingStream() throws {
+        let selector = try device()
+        let opened = try selector.BeginOpenContainer(
+            Self.container, callback: { _ in }, state: nil)
+        let container = try selector.EndOpenContainer(opened)
+        let created = try container.CreateFile("overloads.bin")
+        try created.Write([1, 2, 3], offset: 0, count: 3)
+        try created.Close()
+
+        let byMode = try container.OpenFile("overloads.bin", fileMode: .Open)
+        XCTAssertEqual(try byMode.Length, 3)
+        try byMode.Close()
+        let byAccess = try container.OpenFile(
+            "overloads.bin", fileMode: .Open, fileAccess: .Read)
+        XCTAssertTrue(try byAccess.CanRead)
+        try byAccess.Close()
+        let byShare = try container.OpenFile(
+            "overloads.bin", fileMode: .Open, fileAccess: .Read,
+            fileShare: .Read)
+        XCTAssertEqual(try byShare.Length, 3)
+        try byShare.Close()
+        try container.Dispose()
     }
 
     // MARK: - Cleanup

@@ -419,6 +419,10 @@ def expected_member(
             item.get("member") == mapped_name and
             item.get("parameter") == parameter.get("name")
             for item in rules.get("optionalReferenceParameters", [])
+        ) or any(
+            owner.startswith(item.get("ownerPrefix", "")) and
+            parameter.get("name") in item.get("parameters", [])
+            for item in rules.get("optionalReferenceParameterGroups", [])
         )
         if optional_reference and not mapped_parameter_type.endswith("?"):
             mapped_parameter_type = (
@@ -490,6 +494,20 @@ def expected_member(
     clr_return = source.get("returnType") or source.get("type")
     mapped_return = map_clr_type(
         clr_return, rules, owner_generic_parameters, method_generic_parameters)
+    # Foundation has no one class carrying CLR Stream's duplex contract. Most
+    # selected return positions are read-only and keep InputStream; XNA
+    # StorageContainer is the measured exception, returning a seekable file
+    # that callers write and resize. A member-scoped rule may therefore refine
+    # only an actual System.IO.Stream return to the concrete duplex subclass.
+    for item in rules.get("streamDirectionReturns", []):
+        if (item.get("owner") == owner
+                and item.get("member") == mapped_name):
+            if clr_return != "System.IO.Stream":
+                raise SystemExit(
+                    "streamDirectionReturns names "
+                    f"{owner}.{mapped_name}, whose CLR return is {clr_return} "
+                    "and not System.IO.Stream")
+            mapped_return = item["swift"]
     # Optional is applied exactly where the pinned inventory proves XNA can
     # normally return null. `System.Object` and `System.Nullable<T>` already
     # arrive Optional from the type mapping and are not double-wrapped.
@@ -1214,6 +1232,47 @@ def parse_symbol_graph(
         for member in model.members
         if member.kind == "property" and member.writer_kind == WRITER_METHOD
     }
+    # A CLR subclass may redeclare a virtual property whose accessor effects
+    # differ from the base property. Swift cannot override an infallible getter
+    # with a throwing getter, so the selected collision is represented by an
+    # explicitly named reader method and recombined below with its writer.
+    # Every rule is validated against both sides of the measured collision;
+    # stale or gratuitous entries fail rather than becoming an allowlist.
+    shadowed_reader_rules: dict[tuple[str, str], dict[str, Any]] = {}
+    shadowed_reader_identities: dict[tuple[str, str], tuple[str, str]] = {}
+    for entry in rules.get("shadowedPropertyAccessorMethods", []):
+        owner_name = entry.get("owner")
+        property_name = entry.get("property")
+        reader_name = entry.get("reader")
+        key = (owner_name, property_name)
+        model = expected.get(owner_name)
+        matching = [
+            member for member in (model.members if model else [])
+            if member.kind == "property" and member.name == property_name
+        ]
+        base_model = expected.get(model.base) if model and model.base else None
+        base_matching = [
+            member for member in (base_model.members if base_model else [])
+            if member.kind == "property" and member.name == property_name
+        ]
+        if (
+            len(matching) != 1 or matching[0].parameters or
+            not matching[0].getter_throws or
+            len(base_matching) != 1 or base_matching[0].getter_throws or
+            not isinstance(reader_name, str) or not reader_name
+        ):
+            raise SystemExit(
+                "shadowedPropertyAccessorMethods entry does not name one "
+                "non-indexed fallible property hiding an infallible base "
+                f"property: {owner_name}.{property_name}")
+        if key in shadowed_reader_rules or (
+            owner_name, reader_name
+        ) in shadowed_reader_identities:
+            raise SystemExit(
+                "duplicate shadowedPropertyAccessorMethods entry for "
+                f"{owner_name}.{property_name}")
+        shadowed_reader_rules[key] = entry
+        shadowed_reader_identities[(owner_name, reader_name)] = key
     indexed_method_readers = {
         key for key, member in method_writer_properties.items() if member.parameters
     }
@@ -1241,6 +1300,13 @@ def parse_symbol_graph(
         ):
             accessor_candidates[(parent, member.name, "reader")] = member
             continue
+        if (
+            (parent, member.name) in shadowed_reader_identities and
+            symbol["kind"]["identifier"] in ("swift.method", "swift.type.method")
+        ):
+            owner_key = shadowed_reader_identities[(parent, member.name)]
+            accessor_candidates[(owner_key[0], owner_key[1], "reader")] = member
+            continue
         if (parent, member.name) in writer_identities:
             owner_key = writer_identities[(parent, member.name)]
             accessor_candidates[(owner_key[0], owner_key[1], "writer")] = member
@@ -1266,7 +1332,10 @@ def parse_symbol_graph(
             continue
         indexed = bool(expected_property.parameters)
         writer = accessor_candidates.get((owner_name, property_name, "writer"))
-        if indexed:
+        reader_is_method = indexed or (
+            owner_name, property_name
+        ) in shadowed_reader_rules
+        if reader_is_method:
             reader = accessor_candidates.get((owner_name, property_name, "reader"))
             if reader is not None:
                 types[owner_name].members.append(dataclasses.replace(
@@ -1303,7 +1372,7 @@ def parse_symbol_graph(
             "indexed": indexed,
             "readerSymbol": reader.display if reader else None,
             "readerForm": (
-                "method" if indexed else "property"
+                "method" if reader_is_method else "property"
             ),
             "readerThrows": bool(expected_property.getter_throws),
             "writerSymbol": writer.display if writer else None,
@@ -1311,10 +1380,13 @@ def parse_symbol_graph(
             "writerThrows": bool(expected_property.writer_throws),
             "readerObserved": reader is not None,
             "writerObserved": writer is not None,
-            "reason":
+            "reason": (
+                shadowed_reader_rules[(owner_name, property_name)]["reason"]
+                if (owner_name, property_name) in shadowed_reader_rules else
                 "Swift has no throwing property setter and forbids `set` beside "
                 "a throwing getter, so this CLR setter accessor projects to a "
-                "named writer method measured as part of one property identity",
+                "named writer method measured as part of one property identity"
+            ),
         })
 
     # Optional-reference operators cannot be declared as type members in
@@ -1417,6 +1489,7 @@ MEASURED_SUPPORT_BASES = (
     "CNAEventArgs", "CNACollection", "CNAReadOnlyCollection",
     "CNAException", "CNASystemException", "CNAExternalException",
     "CNADictionary", "CNAAttribute", "CNABinaryReader",
+    "CNAExpandableObjectConverter",
 )
 
 # The support bases that are GENERIC. For these the Swift superclass identity
@@ -2087,6 +2160,52 @@ def self_test() -> None:
             failures.append(
                 f"streamDirectionParameters entry {item['owner']}."
                 f"{item['member']}({item['parameter']}) carries no IL evidence")
+
+    storage_return_source = {
+        "kind": "method", "name": "CreateFile", "static": False,
+        "returnType": "System.IO.Stream", "parameters": [
+            {"name": "file", "type": "System.String"},
+        ],
+    }
+    storage_return = expected_member(
+        "Microsoft.Xna.Framework.Storage.StorageContainer",
+        storage_return_source, rules, "class")
+    stream_direction_self_tests += 1
+    if storage_return.return_type != "CNAStorageStream":
+        failures.append(
+            "a duplex storage Stream return is not mapped to CNAStorageStream: "
+            f"{storage_return.return_type}")
+    mistyped_return_rules = dict(rules)
+    mistyped_return_rules["streamDirectionReturns"] = [{
+        "owner": "Microsoft.Xna.Framework.Storage.StorageContainer",
+        "member": "CreateFile", "swift": "CNAStorageStream",
+    }]
+    mistyped_return_source = dict(storage_return_source)
+    mistyped_return_source["returnType"] = "System.String"
+    stream_direction_self_tests += 1
+    try:
+        expected_member(
+            "Microsoft.Xna.Framework.Storage.StorageContainer",
+            mistyped_return_source, mistyped_return_rules, "class")
+        failures.append(
+            "a stream-return override on a non-Stream return was applied")
+    except SystemExit:
+        pass
+    contract_returns = {
+        (item["name"], member["name"])
+        for item in load_json(REFERENCE)["types"] for member in item["members"]
+        if member.get("returnType") == "System.IO.Stream"
+    }
+    for item in rules.get("streamDirectionReturns", []):
+        stream_direction_self_tests += 1
+        if (item["owner"], item["member"]) not in contract_returns:
+            failures.append(
+                f"streamDirectionReturns names {item['owner']}."
+                f"{item['member']}, which has no Stream return in the contract")
+        if not item.get("evidence"):
+            failures.append(
+                f"streamDirectionReturns entry {item['owner']}."
+                f"{item['member']} carries no IL evidence")
 
     if map_clr_type("System.Nullable`1[System.Single]", rules) != "Float?":
         failures.append("nullable value projection")
@@ -5465,6 +5584,7 @@ def symbol_graph_self_test(path: Path) -> None:
     destroyed = "Microsoft.Xna.Framework.Graphics.ResourceDestroyedEventArgs"
     corners = "Microsoft.Xna.Framework.BoundingBox"
     elapsed = "Microsoft.Xna.Framework.GameTime"
+    dynamic = "Microsoft.Xna.Framework.Audio.DynamicSoundEffectInstance"
 
     def drop_symbol(suffix: str):
         def mutate(graph: dict[str, Any]) -> None:
@@ -5570,13 +5690,16 @@ def symbol_graph_self_test(path: Path) -> None:
          retype_return(f"{corners}.GetCorners()", "]", "?]")),
         ("Optional applied to a plain CLR value type", "PROPERTY_MAPPING_MISMATCH",
          retype_return(f"{elapsed}.ElapsedGameTime", "Duration", "Duration?")),
+        ("shadowed-property reader method deleted", "MISSING_MEMBER",
+         drop_symbol(f"{dynamic}.GetIsLooped")),
     ]
 
     baseline = observed(copy.deepcopy(base))
     failures: list[str] = []
     if any(
         item[1].startswith(
-            (emitter, fog, enumerator, created, destroyed, corners, elapsed))
+            (emitter, fog, enumerator, created, destroyed, corners, elapsed,
+             dynamic))
         for item in baseline
     ):
         failures.append(
@@ -6969,7 +7092,9 @@ def render_missing_inventory(report: dict[str, Any]) -> str:
         "# XNA to Swift missing-type inventory",
         "",
         "Generated from the compiler Symbol Graph and the pinned XNA 4.0 Windows runtime contract.",
-        "Normal strict status is intentionally red.",
+        ("Normal strict status is green: the selected profile is complete."
+         if report["summary"]["TOTAL_DIAGNOSTICS"] == 0
+         else "Normal strict status is intentionally red."),
         "",
         "```text",
     ]
@@ -6992,8 +7117,10 @@ def render_missing_inventory(report: dict[str, Any]) -> str:
             for diagnostic_item in item["diagnostics"]
         )
         lines.append("")
-    lines.extend(["## Missing types", ""])
-    lines.extend(f"- `{name}`" for name in report["missingTypes"])
+    lines.append("## Missing types")
+    if report["missingTypes"]:
+        lines.append("")
+        lines.extend(f"- `{name}`" for name in report["missingTypes"])
     return "\n".join(lines) + "\n"
 
 

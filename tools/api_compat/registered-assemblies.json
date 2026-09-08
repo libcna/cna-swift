@@ -133,6 +133,11 @@
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "CannotGetBackBufferActiveRenderTargets",
+      "reason": "GraphicsDevice.GetBackBufferData raises InvalidOperationException with this after copy-window validation when any render target is active."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
       "key": "CantDisableLighting",
       "reason": "EnvironmentMapEffect and SkinnedEffect implement IEffectLights.LightingEnabled EXPLICITLY: the getter of each is `ldc.i4.1; ret` and the setter raises NotSupportedException(Format(CantDisableLighting, GetType().Name)) for false. CNA refuses the same call independently with a message of its own, so the managed message is the one a caller must be shown."
     },
@@ -234,6 +239,11 @@
     {
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ProfileFormatNotSupported"
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "ProfileFeatureNotSupported",
+      "reason": "ProfileCapabilities.ThrowNotSupportedException formats this with the active profile and GetBackBufferData when that profile forbids back-buffer readback."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",
@@ -389,6 +399,11 @@
       "reason": "DrawInstancedPrimitives raises InvalidOperationException with this when the bound bindings are ALL instanced or ALL non-instanced -- it needs per-instance data and per-vertex data, and either extreme supplies only half. Derived from the same cached bindings GetVertexBuffers reads."
     },
     {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidStringFormat",
+      "reason": "MathTypeConverter.ConvertToValues formats this with the culture's list separator and expected field names when a Design converter receives the wrong component count or a component cannot be parsed."
+    },
+    {
       "assembly": "Microsoft.Xna.Framework.Game.dll",
       "key": "NoCompatibleDevices",
       "reason": "GraphicsDeviceManager.CreateDevice raises NoSuitableGraphicsDeviceException with this when no adapter supports the requested profile. The message takes the profile name as {0}, so the projection formats it rather than quoting a fixed string."
@@ -497,6 +512,21 @@
       "assembly": "Microsoft.Xna.Framework.dll",
       "key": "ContentManagerCannotChangeRootDirectory",
       "reason": "ContentManager's RootDirectory setter refuses to move an already-populated cache with this exact message."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidXactVolume",
+      "reason": "AudioCategory.SetVolume raises ArgumentException with this when the supplied volume is ordered below zero."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidMicrophoneBufferDuration",
+      "reason": "Microphone.set_BufferDuration raises ArgumentOutOfRangeException with this unless the duration is 100 through 1000 milliseconds in exact 10-millisecond increments."
+    },
+    {
+      "assembly": "Microsoft.Xna.Framework.dll",
+      "key": "InvalidDynamicIsLoopedCall",
+      "reason": "DynamicSoundEffectInstance.set_IsLooped raises InvalidOperationException with this when true is requested; false is a no-op after the disposed check."
     },
     {
       "assembly": "Microsoft.Xna.Framework.dll",

@@ -99,6 +99,7 @@ internal final class NativeFunctions {
     typealias IndexBufferSubscribeContentLostRoute = @convention(c) (UInt64, CNASwift_IndexBufferContentLostCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias IndexBufferUnsubscribeContentLostRoute = @convention(c) (UInt64) -> UInt32
     typealias GraphicsDeviceGetGraphicsProfileRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt32>?) -> UInt32
+    typealias GraphicsDeviceGetBackbufferDataWindowRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_BackBufferReadback>?, UnsafeMutablePointer<CNASwift_Color>?, UInt64) -> UInt32
     typealias GraphicsDeviceSetVertexBuffersRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_VertexBufferBinding>?, UInt64) -> UInt32
     typealias GraphicsDeviceSetIndexBufferRoute = @convention(c) (UInt64, UInt64) -> UInt32
     typealias TexturecubeCreateRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_TextureCubeCreateInfo>?, UnsafeMutablePointer<UInt64>?) -> UInt32
@@ -209,6 +210,64 @@ internal final class NativeFunctions {
     typealias DynamicSoundEffectInstanceGetSampleSizeInBytesRoute = @convention(c) (UInt64, Int64, UnsafeMutablePointer<Int32>?) -> UInt32
     typealias DynamicSoundEffectInstanceSubscribeBufferNeededRoute = @convention(c) (UInt64, CNASwift_AudioEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias AudioUnsubscribeExtRoute = @convention(c) (UInt64) -> UInt32
+    typealias AudioEngineCreateRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioEngineCreateWithRendererRoute = @convention(c) (UInt64, CNASwift_StringView, Int64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioEngineDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias AudioEngineGetRendererCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioEngineGetRendererFriendlyNameSizeRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioEngineCopyRendererFriendlyNameRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioEngineGetRendererIdSizeRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioEngineCopyRendererIdRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioEngineGetGlobalVariableRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias AudioEngineSetGlobalVariableRoute = @convention(c) (UInt64, CNASwift_StringView, Float) -> UInt32
+    typealias AudioEngineUpdateRoute = @convention(c) (UInt64) -> UInt32
+    typealias AudioEngineGetCategoryRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioCategoryDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias AudioCategoryGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioCategoryCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias AudioCategoryPauseRoute = @convention(c) (UInt64) -> UInt32
+    typealias AudioCategoryResumeRoute = @convention(c) (UInt64) -> UInt32
+    typealias AudioCategorySetVolumeRoute = @convention(c) (UInt64, Float) -> UInt32
+    typealias AudioCategoryStopRoute = @convention(c) (UInt64, CNASwift_AudioStopOptions) -> UInt32
+    typealias AudioCategoryEqualsRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias AudioCategoryGetHashCodeRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias WaveBankCreateRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias WaveBankCreateStreamingRoute = @convention(c) (UInt64, CNASwift_StringView, Int32, Int16, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias WaveBankDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias WaveBankGetIsInUseRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias WaveBankGetIsPreparedRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SoundBankCreateRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundBankDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias SoundBankGetIsInUseRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias SoundBankGetCueRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias SoundBankPlayCueRoute = @convention(c) (UInt64, CNASwift_StringView) -> UInt32
+    typealias SoundBankPlayCue3dRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafePointer<CNASwift_AudioListener>?, UnsafePointer<CNASwift_AudioEmitter>?) -> UInt32
+    typealias CueDestroyRoute = @convention(c) (UInt64) -> UInt32
+    typealias CueGetInfoRoute = @convention(c) (UInt64, UnsafeMutablePointer<CNASwift_CueInfo>?) -> UInt32
+    typealias CueGetNameSizeRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias CueCopyNameRoute = @convention(c) (UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias CueApply3dRoute = @convention(c) (UInt64, UnsafePointer<CNASwift_AudioListener>?, UnsafePointer<CNASwift_AudioEmitter>?) -> UInt32
+    typealias CueGetVariableRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<Float>?) -> UInt32
+    typealias CueSetVariableRoute = @convention(c) (UInt64, CNASwift_StringView, Float) -> UInt32
+    typealias CuePlayRoute = @convention(c) (UInt64) -> UInt32
+    typealias CuePauseRoute = @convention(c) (UInt64) -> UInt32
+    typealias CueResumeRoute = @convention(c) (UInt64) -> UInt32
+    typealias CueStopRoute = @convention(c) (UInt64, CNASwift_AudioStopOptions) -> UInt32
+    typealias MicrophoneGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MicrophoneGetDefaultIndexExtRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MicrophoneGetNameSizeAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MicrophoneCopyNameAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MicrophoneGetBufferDurationTicksAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias MicrophoneSetBufferDurationTicksAtRoute = @convention(c) (UInt64, UInt64, Int64) -> UInt32
+    typealias MicrophoneGetIsHeadsetAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias MicrophoneGetSampleRateAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias MicrophoneGetStateAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<CNASwift_MicrophoneState>?) -> UInt32
+    typealias MicrophoneStartAtRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias MicrophoneStopAtRoute = @convention(c) (UInt64, UInt64) -> UInt32
+    typealias MicrophoneGetDataAtRoute = @convention(c) (UInt64, UInt64, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias MicrophoneGetSampleDurationTicksAtRoute = @convention(c) (UInt64, UInt64, Int32, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias MicrophoneGetSampleSizeInBytesAtRoute = @convention(c) (UInt64, UInt64, Int64, UnsafeMutablePointer<Int32>?) -> UInt32
+    typealias MicrophoneSubscribeBufferReadyAtRoute = @convention(c) (UInt64, UInt64, CNASwift_AudioEventCallback?, UnsafeMutableRawPointer?, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SongCreateFromUriRoute = @convention(c) (UInt64, CNASwift_StringView, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias SongDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias SongDisposeRoute = @convention(c) (UInt64) -> UInt32
@@ -377,6 +436,21 @@ internal final class NativeFunctions {
     typealias StorageContainerCopyDirectoryNameRoute = @convention(c) (UInt64, CNASwift_StringView, UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias StorageContainerGetFileNameCountRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias StorageContainerCopyFileNameRoute = @convention(c) (UInt64, CNASwift_StringView, UInt64, UnsafeMutablePointer<CChar>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerCreateFileRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerOpenFileRoute = @convention(c) (UInt64, CNASwift_StringView, CNASwift_FileMode, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerOpenFileAccessRoute = @convention(c) (UInt64, CNASwift_StringView, CNASwift_FileMode, CNASwift_FileAccess, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageContainerOpenFileShareRoute = @convention(c) (UInt64, CNASwift_StringView, CNASwift_FileMode, CNASwift_FileAccess, CNASwift_FileShare, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageStreamReadRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
+    typealias StorageStreamWriteRoute = @convention(c) (UInt64, UnsafePointer<UInt8>?, UInt64) -> UInt32
+    typealias StorageStreamSeekRoute = @convention(c) (UInt64, Int64, CNASwift_SeekOrigin, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias StorageStreamGetPositionRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias StorageStreamGetLengthRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int64>?) -> UInt32
+    typealias StorageStreamSetLengthRoute = @convention(c) (UInt64, Int64) -> UInt32
+    typealias StorageStreamGetCanReadRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias StorageStreamGetCanWriteRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias StorageStreamGetCanSeekRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt8>?) -> UInt32
+    typealias StorageStreamFlushRoute = @convention(c) (UInt64) -> UInt32
+    typealias StorageStreamCloseRoute = @convention(c) (UInt64) -> UInt32
     typealias StorageContainerDestroyRoute = @convention(c) (UInt64) -> UInt32
     typealias MediaLibraryDisposeRoute = @convention(c) (UInt64) -> UInt32
     typealias MediaLibraryDestroyRoute = @convention(c) (UInt64) -> UInt32
@@ -423,7 +497,6 @@ internal final class NativeFunctions {
     typealias MediaLibraryGetPicturesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaLibraryGetSavedPicturesRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaLibraryGetRootPictureAlbumRoute = @convention(c) (UInt64, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
-    typealias MediaLibrarySavePictureRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafePointer<UInt8>?, UInt64, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias MediaLibraryGetPictureFromTokenRoute = @convention(c) (UInt64, CNASwift_StringView, UnsafeMutablePointer<UInt64>?, UnsafeMutablePointer<UInt8>?) -> UInt32
     typealias PlaylistCollectionGetAtRoute = @convention(c) (UInt64, Int32, UnsafeMutablePointer<UInt64>?) -> UInt32
     typealias PlaylistCollectionGetCountRoute = @convention(c) (UInt64, UnsafeMutablePointer<Int32>?) -> UInt32
@@ -816,6 +889,7 @@ internal final class NativeFunctions {
     let indexBufferSubscribeContentLost: IndexBufferSubscribeContentLostRoute
     let indexBufferUnsubscribeContentLost: IndexBufferUnsubscribeContentLostRoute
     let graphicsDeviceGetGraphicsProfile: GraphicsDeviceGetGraphicsProfileRoute
+    let graphicsDeviceGetBackBufferData: GraphicsDeviceGetBackbufferDataWindowRoute
     let graphicsDeviceSetVertexBuffers: GraphicsDeviceSetVertexBuffersRoute
     let graphicsDeviceSetIndexBuffer: GraphicsDeviceSetIndexBufferRoute
     let textureCubeCreate: TexturecubeCreateRoute
@@ -1014,7 +1088,6 @@ internal final class NativeFunctions {
     let mediaLibraryGetPictures: MediaLibraryGetPicturesRoute
     let mediaLibraryGetSavedPictures: MediaLibraryGetSavedPicturesRoute
     let mediaLibraryGetRootPictureAlbum: MediaLibraryGetRootPictureAlbumRoute
-    let mediaLibrarySavePicture: MediaLibrarySavePictureRoute
     let mediaLibraryGetPictureFromToken: MediaLibraryGetPictureFromTokenRoute
     let mediaLibraryCreate: MediaLibraryCreateRoute
 
@@ -1110,6 +1183,21 @@ internal final class NativeFunctions {
     let storageContainerCopyDirectoryName: StorageContainerCopyDirectoryNameRoute
     let storageContainerGetFileNameCount: StorageContainerGetFileNameCountRoute
     let storageContainerCopyFileName: StorageContainerCopyFileNameRoute
+    let storageContainerCreateFile: StorageContainerCreateFileRoute
+    let storageContainerOpenFile: StorageContainerOpenFileRoute
+    let storageContainerOpenFileAccess: StorageContainerOpenFileAccessRoute
+    let storageContainerOpenFileShare: StorageContainerOpenFileShareRoute
+    let storageStreamRead: StorageStreamReadRoute
+    let storageStreamWrite: StorageStreamWriteRoute
+    let storageStreamSeek: StorageStreamSeekRoute
+    let storageStreamGetPosition: StorageStreamGetPositionRoute
+    let storageStreamGetLength: StorageStreamGetLengthRoute
+    let storageStreamSetLength: StorageStreamSetLengthRoute
+    let storageStreamGetCanRead: StorageStreamGetCanReadRoute
+    let storageStreamGetCanWrite: StorageStreamGetCanWriteRoute
+    let storageStreamGetCanSeek: StorageStreamGetCanSeekRoute
+    let storageStreamFlush: StorageStreamFlushRoute
+    let storageStreamClose: StorageStreamCloseRoute
     let storageContainerDestroy: StorageContainerDestroyRoute
     let mediaLibraryDispose: MediaLibraryDisposeRoute
     let mediaLibraryDestroy: MediaLibraryDestroyRoute
@@ -1196,6 +1284,64 @@ internal final class NativeFunctions {
     let dynamicSoundEffectInstanceGetSampleSizeInBytes: DynamicSoundEffectInstanceGetSampleSizeInBytesRoute
     let dynamicSoundEffectInstanceSubscribeBufferNeeded: DynamicSoundEffectInstanceSubscribeBufferNeededRoute
     let audioUnsubscribe: AudioUnsubscribeExtRoute
+    let audioEngineCreate: AudioEngineCreateRoute
+    let audioEngineCreateWithRenderer: AudioEngineCreateWithRendererRoute
+    let audioEngineDestroy: AudioEngineDestroyRoute
+    let audioEngineGetRendererCount: AudioEngineGetRendererCountRoute
+    let audioEngineGetRendererFriendlyNameSize: AudioEngineGetRendererFriendlyNameSizeRoute
+    let audioEngineCopyRendererFriendlyName: AudioEngineCopyRendererFriendlyNameRoute
+    let audioEngineGetRendererIdSize: AudioEngineGetRendererIdSizeRoute
+    let audioEngineCopyRendererId: AudioEngineCopyRendererIdRoute
+    let audioEngineGetGlobalVariable: AudioEngineGetGlobalVariableRoute
+    let audioEngineSetGlobalVariable: AudioEngineSetGlobalVariableRoute
+    let audioEngineUpdate: AudioEngineUpdateRoute
+    let audioEngineGetCategory: AudioEngineGetCategoryRoute
+    let audioCategoryDestroy: AudioCategoryDestroyRoute
+    let audioCategoryGetNameSize: AudioCategoryGetNameSizeRoute
+    let audioCategoryCopyName: AudioCategoryCopyNameRoute
+    let audioCategoryPause: AudioCategoryPauseRoute
+    let audioCategoryResume: AudioCategoryResumeRoute
+    let audioCategorySetVolume: AudioCategorySetVolumeRoute
+    let audioCategoryStop: AudioCategoryStopRoute
+    let audioCategoryEquals: AudioCategoryEqualsRoute
+    let audioCategoryGetHashCode: AudioCategoryGetHashCodeRoute
+    let waveBankCreate: WaveBankCreateRoute
+    let waveBankCreateStreaming: WaveBankCreateStreamingRoute
+    let waveBankDestroy: WaveBankDestroyRoute
+    let waveBankGetIsInUse: WaveBankGetIsInUseRoute
+    let waveBankGetIsPrepared: WaveBankGetIsPreparedRoute
+    let soundBankCreate: SoundBankCreateRoute
+    let soundBankDestroy: SoundBankDestroyRoute
+    let soundBankGetIsInUse: SoundBankGetIsInUseRoute
+    let soundBankGetCue: SoundBankGetCueRoute
+    let soundBankPlayCue: SoundBankPlayCueRoute
+    let soundBankPlayCue3D: SoundBankPlayCue3dRoute
+    let cueDestroy: CueDestroyRoute
+    let cueGetInfo: CueGetInfoRoute
+    let cueGetNameSize: CueGetNameSizeRoute
+    let cueCopyName: CueCopyNameRoute
+    let cueApply3D: CueApply3dRoute
+    let cueGetVariable: CueGetVariableRoute
+    let cueSetVariable: CueSetVariableRoute
+    let cuePlay: CuePlayRoute
+    let cuePause: CuePauseRoute
+    let cueResume: CueResumeRoute
+    let cueStop: CueStopRoute
+    let microphoneGetCount: MicrophoneGetCountRoute
+    let microphoneGetDefaultIndex: MicrophoneGetDefaultIndexExtRoute
+    let microphoneGetNameSize: MicrophoneGetNameSizeAtRoute
+    let microphoneCopyName: MicrophoneCopyNameAtRoute
+    let microphoneGetBufferDuration: MicrophoneGetBufferDurationTicksAtRoute
+    let microphoneSetBufferDuration: MicrophoneSetBufferDurationTicksAtRoute
+    let microphoneGetIsHeadset: MicrophoneGetIsHeadsetAtRoute
+    let microphoneGetSampleRate: MicrophoneGetSampleRateAtRoute
+    let microphoneGetState: MicrophoneGetStateAtRoute
+    let microphoneStart: MicrophoneStartAtRoute
+    let microphoneStop: MicrophoneStopAtRoute
+    let microphoneGetData: MicrophoneGetDataAtRoute
+    let microphoneGetSampleDuration: MicrophoneGetSampleDurationTicksAtRoute
+    let microphoneGetSampleSize: MicrophoneGetSampleSizeInBytesAtRoute
+    let microphoneSubscribeBufferReady: MicrophoneSubscribeBufferReadyAtRoute
     let soundEffectInstanceApply3D: SoundEffectInstanceApply3dRoute
     let soundEffectInstanceApply3DMulti: SoundEffectInstanceApply3dMultiExtRoute
     let soundEffectCreatePcm16: SoundEffectCreatePcm16Route
@@ -1550,6 +1696,7 @@ internal final class NativeFunctions {
         indexBufferSubscribeContentLost = try library.resolve("cna_index_buffer_subscribe_content_lost", as: IndexBufferSubscribeContentLostRoute.self)
         indexBufferUnsubscribeContentLost = try library.resolve("cna_index_buffer_unsubscribe_content_lost", as: IndexBufferUnsubscribeContentLostRoute.self)
         graphicsDeviceGetGraphicsProfile = try library.resolve("cna_graphics_device_get_graphics_profile", as: GraphicsDeviceGetGraphicsProfileRoute.self)
+        graphicsDeviceGetBackBufferData = try library.resolve("cna_graphics_device_get_backbuffer_data_window", as: GraphicsDeviceGetBackbufferDataWindowRoute.self)
         graphicsDeviceSetVertexBuffers = try library.resolve("cna_graphics_device_set_vertex_buffers", as: GraphicsDeviceSetVertexBuffersRoute.self)
         graphicsDeviceSetIndexBuffer = try library.resolve("cna_graphics_device_set_index_buffer", as: GraphicsDeviceSetIndexBufferRoute.self)
         textureCubeCreate = try library.resolve("cna_texturecube_create", as: TexturecubeCreateRoute.self)
@@ -1798,6 +1945,21 @@ internal final class NativeFunctions {
         storageContainerCopyDirectoryName = try library.resolve("cna_storage_container_copy_directory_name", as: StorageContainerCopyDirectoryNameRoute.self)
         storageContainerGetFileNameCount = try library.resolve("cna_storage_container_get_file_name_count", as: StorageContainerGetFileNameCountRoute.self)
         storageContainerCopyFileName = try library.resolve("cna_storage_container_copy_file_name", as: StorageContainerCopyFileNameRoute.self)
+        storageContainerCreateFile = try library.resolve("cna_storage_container_create_file", as: StorageContainerCreateFileRoute.self)
+        storageContainerOpenFile = try library.resolve("cna_storage_container_open_file", as: StorageContainerOpenFileRoute.self)
+        storageContainerOpenFileAccess = try library.resolve("cna_storage_container_open_file_access", as: StorageContainerOpenFileAccessRoute.self)
+        storageContainerOpenFileShare = try library.resolve("cna_storage_container_open_file_share", as: StorageContainerOpenFileShareRoute.self)
+        storageStreamRead = try library.resolve("cna_storage_stream_read", as: StorageStreamReadRoute.self)
+        storageStreamWrite = try library.resolve("cna_storage_stream_write", as: StorageStreamWriteRoute.self)
+        storageStreamSeek = try library.resolve("cna_storage_stream_seek", as: StorageStreamSeekRoute.self)
+        storageStreamGetPosition = try library.resolve("cna_storage_stream_get_position", as: StorageStreamGetPositionRoute.self)
+        storageStreamGetLength = try library.resolve("cna_storage_stream_get_length", as: StorageStreamGetLengthRoute.self)
+        storageStreamSetLength = try library.resolve("cna_storage_stream_set_length", as: StorageStreamSetLengthRoute.self)
+        storageStreamGetCanRead = try library.resolve("cna_storage_stream_get_can_read", as: StorageStreamGetCanReadRoute.self)
+        storageStreamGetCanWrite = try library.resolve("cna_storage_stream_get_can_write", as: StorageStreamGetCanWriteRoute.self)
+        storageStreamGetCanSeek = try library.resolve("cna_storage_stream_get_can_seek", as: StorageStreamGetCanSeekRoute.self)
+        storageStreamFlush = try library.resolve("cna_storage_stream_flush", as: StorageStreamFlushRoute.self)
+        storageStreamClose = try library.resolve("cna_storage_stream_close", as: StorageStreamCloseRoute.self)
         storageContainerDestroy = try library.resolve("cna_storage_container_destroy", as: StorageContainerDestroyRoute.self)
         mediaSourceGetAvailableCount = try library.resolve("cna_media_source_get_available_count", as: MediaSourceGetAvailableCountRoute.self)
         mediaSourceGetNameSizeAt = try library.resolve("cna_media_source_get_name_size_at", as: MediaSourceGetNameSizeAtRoute.self)
@@ -1841,7 +2003,6 @@ internal final class NativeFunctions {
         mediaLibraryGetPictures = try library.resolve("cna_media_library_get_pictures", as: MediaLibraryGetPicturesRoute.self)
         mediaLibraryGetSavedPictures = try library.resolve("cna_media_library_get_saved_pictures", as: MediaLibraryGetSavedPicturesRoute.self)
         mediaLibraryGetRootPictureAlbum = try library.resolve("cna_media_library_get_root_picture_album", as: MediaLibraryGetRootPictureAlbumRoute.self)
-        mediaLibrarySavePicture = try library.resolve("cna_media_library_save_picture", as: MediaLibrarySavePictureRoute.self)
         mediaLibraryGetPictureFromToken = try library.resolve("cna_media_library_get_picture_from_token", as: MediaLibraryGetPictureFromTokenRoute.self)
         mediaLibraryCreate = try library.resolve("cna_media_library_create", as: MediaLibraryCreateRoute.self)
         mediaLibraryDispose = try library.resolve("cna_media_library_dispose", as: MediaLibraryDisposeRoute.self)
@@ -1929,6 +2090,64 @@ internal final class NativeFunctions {
         dynamicSoundEffectInstanceGetSampleSizeInBytes = try library.resolve("cna_dynamic_sound_effect_instance_get_sample_size_in_bytes", as: DynamicSoundEffectInstanceGetSampleSizeInBytesRoute.self)
         dynamicSoundEffectInstanceSubscribeBufferNeeded = try library.resolve("cna_dynamic_sound_effect_instance_subscribe_buffer_needed", as: DynamicSoundEffectInstanceSubscribeBufferNeededRoute.self)
         audioUnsubscribe = try library.resolve("cna_audio_unsubscribe_ext", as: AudioUnsubscribeExtRoute.self)
+        audioEngineCreate = try library.resolve("cna_audio_engine_create", as: AudioEngineCreateRoute.self)
+        audioEngineCreateWithRenderer = try library.resolve("cna_audio_engine_create_with_renderer", as: AudioEngineCreateWithRendererRoute.self)
+        audioEngineDestroy = try library.resolve("cna_audio_engine_destroy", as: AudioEngineDestroyRoute.self)
+        audioEngineGetRendererCount = try library.resolve("cna_audio_engine_get_renderer_count", as: AudioEngineGetRendererCountRoute.self)
+        audioEngineGetRendererFriendlyNameSize = try library.resolve("cna_audio_engine_get_renderer_friendly_name_size", as: AudioEngineGetRendererFriendlyNameSizeRoute.self)
+        audioEngineCopyRendererFriendlyName = try library.resolve("cna_audio_engine_copy_renderer_friendly_name", as: AudioEngineCopyRendererFriendlyNameRoute.self)
+        audioEngineGetRendererIdSize = try library.resolve("cna_audio_engine_get_renderer_id_size", as: AudioEngineGetRendererIdSizeRoute.self)
+        audioEngineCopyRendererId = try library.resolve("cna_audio_engine_copy_renderer_id", as: AudioEngineCopyRendererIdRoute.self)
+        audioEngineGetGlobalVariable = try library.resolve("cna_audio_engine_get_global_variable", as: AudioEngineGetGlobalVariableRoute.self)
+        audioEngineSetGlobalVariable = try library.resolve("cna_audio_engine_set_global_variable", as: AudioEngineSetGlobalVariableRoute.self)
+        audioEngineUpdate = try library.resolve("cna_audio_engine_update", as: AudioEngineUpdateRoute.self)
+        audioEngineGetCategory = try library.resolve("cna_audio_engine_get_category", as: AudioEngineGetCategoryRoute.self)
+        audioCategoryDestroy = try library.resolve("cna_audio_category_destroy", as: AudioCategoryDestroyRoute.self)
+        audioCategoryGetNameSize = try library.resolve("cna_audio_category_get_name_size", as: AudioCategoryGetNameSizeRoute.self)
+        audioCategoryCopyName = try library.resolve("cna_audio_category_copy_name", as: AudioCategoryCopyNameRoute.self)
+        audioCategoryPause = try library.resolve("cna_audio_category_pause", as: AudioCategoryPauseRoute.self)
+        audioCategoryResume = try library.resolve("cna_audio_category_resume", as: AudioCategoryResumeRoute.self)
+        audioCategorySetVolume = try library.resolve("cna_audio_category_set_volume", as: AudioCategorySetVolumeRoute.self)
+        audioCategoryStop = try library.resolve("cna_audio_category_stop", as: AudioCategoryStopRoute.self)
+        audioCategoryEquals = try library.resolve("cna_audio_category_equals", as: AudioCategoryEqualsRoute.self)
+        audioCategoryGetHashCode = try library.resolve("cna_audio_category_get_hash_code", as: AudioCategoryGetHashCodeRoute.self)
+        waveBankCreate = try library.resolve("cna_wave_bank_create", as: WaveBankCreateRoute.self)
+        waveBankCreateStreaming = try library.resolve("cna_wave_bank_create_streaming", as: WaveBankCreateStreamingRoute.self)
+        waveBankDestroy = try library.resolve("cna_wave_bank_destroy", as: WaveBankDestroyRoute.self)
+        waveBankGetIsInUse = try library.resolve("cna_wave_bank_get_is_in_use", as: WaveBankGetIsInUseRoute.self)
+        waveBankGetIsPrepared = try library.resolve("cna_wave_bank_get_is_prepared", as: WaveBankGetIsPreparedRoute.self)
+        soundBankCreate = try library.resolve("cna_sound_bank_create", as: SoundBankCreateRoute.self)
+        soundBankDestroy = try library.resolve("cna_sound_bank_destroy", as: SoundBankDestroyRoute.self)
+        soundBankGetIsInUse = try library.resolve("cna_sound_bank_get_is_in_use", as: SoundBankGetIsInUseRoute.self)
+        soundBankGetCue = try library.resolve("cna_sound_bank_get_cue", as: SoundBankGetCueRoute.self)
+        soundBankPlayCue = try library.resolve("cna_sound_bank_play_cue", as: SoundBankPlayCueRoute.self)
+        soundBankPlayCue3D = try library.resolve("cna_sound_bank_play_cue_3d", as: SoundBankPlayCue3dRoute.self)
+        cueDestroy = try library.resolve("cna_cue_destroy", as: CueDestroyRoute.self)
+        cueGetInfo = try library.resolve("cna_cue_get_info", as: CueGetInfoRoute.self)
+        cueGetNameSize = try library.resolve("cna_cue_get_name_size", as: CueGetNameSizeRoute.self)
+        cueCopyName = try library.resolve("cna_cue_copy_name", as: CueCopyNameRoute.self)
+        cueApply3D = try library.resolve("cna_cue_apply_3d", as: CueApply3dRoute.self)
+        cueGetVariable = try library.resolve("cna_cue_get_variable", as: CueGetVariableRoute.self)
+        cueSetVariable = try library.resolve("cna_cue_set_variable", as: CueSetVariableRoute.self)
+        cuePlay = try library.resolve("cna_cue_play", as: CuePlayRoute.self)
+        cuePause = try library.resolve("cna_cue_pause", as: CuePauseRoute.self)
+        cueResume = try library.resolve("cna_cue_resume", as: CueResumeRoute.self)
+        cueStop = try library.resolve("cna_cue_stop", as: CueStopRoute.self)
+        microphoneGetCount = try library.resolve("cna_microphone_get_count", as: MicrophoneGetCountRoute.self)
+        microphoneGetDefaultIndex = try library.resolve("cna_microphone_get_default_index_ext", as: MicrophoneGetDefaultIndexExtRoute.self)
+        microphoneGetNameSize = try library.resolve("cna_microphone_get_name_size_at", as: MicrophoneGetNameSizeAtRoute.self)
+        microphoneCopyName = try library.resolve("cna_microphone_copy_name_at", as: MicrophoneCopyNameAtRoute.self)
+        microphoneGetBufferDuration = try library.resolve("cna_microphone_get_buffer_duration_ticks_at", as: MicrophoneGetBufferDurationTicksAtRoute.self)
+        microphoneSetBufferDuration = try library.resolve("cna_microphone_set_buffer_duration_ticks_at", as: MicrophoneSetBufferDurationTicksAtRoute.self)
+        microphoneGetIsHeadset = try library.resolve("cna_microphone_get_is_headset_at", as: MicrophoneGetIsHeadsetAtRoute.self)
+        microphoneGetSampleRate = try library.resolve("cna_microphone_get_sample_rate_at", as: MicrophoneGetSampleRateAtRoute.self)
+        microphoneGetState = try library.resolve("cna_microphone_get_state_at", as: MicrophoneGetStateAtRoute.self)
+        microphoneStart = try library.resolve("cna_microphone_start_at", as: MicrophoneStartAtRoute.self)
+        microphoneStop = try library.resolve("cna_microphone_stop_at", as: MicrophoneStopAtRoute.self)
+        microphoneGetData = try library.resolve("cna_microphone_get_data_at", as: MicrophoneGetDataAtRoute.self)
+        microphoneGetSampleDuration = try library.resolve("cna_microphone_get_sample_duration_ticks_at", as: MicrophoneGetSampleDurationTicksAtRoute.self)
+        microphoneGetSampleSize = try library.resolve("cna_microphone_get_sample_size_in_bytes_at", as: MicrophoneGetSampleSizeInBytesAtRoute.self)
+        microphoneSubscribeBufferReady = try library.resolve("cna_microphone_subscribe_buffer_ready_at", as: MicrophoneSubscribeBufferReadyAtRoute.self)
         soundEffectInstanceApply3D = try library.resolve("cna_sound_effect_instance_apply_3d", as: SoundEffectInstanceApply3dRoute.self)
         soundEffectInstanceApply3DMulti = try library.resolve("cna_sound_effect_instance_apply_3d_multi_ext", as: SoundEffectInstanceApply3dMultiExtRoute.self)
         soundEffectCreatePcm16 = try library.resolve("cna_sound_effect_create_pcm16", as: SoundEffectCreatePcm16Route.self)

@@ -1,6 +1,6 @@
 # CNA-Swift continuation handoff
 
-> **Current as of Foundation 104.** Earlier frontier and milestone narratives
+> **Current as of Foundation 106.** Earlier frontier and milestone narratives
 > are retained below as historical measurement. `plan.md` remains the
 > authority for project rules; this top block is the current work state.
 
@@ -39,28 +39,66 @@ records one entry per control and the comparison is byte-for-byte; the report
 stores only their sha, so their paths live in this command.
 
 ```text
-978 tests, 0 failures (debug, release, ASan and TSan)
-TOTAL_DIAGNOSTICS=36   COMPLETE_TYPES=231   PARTIAL_TYPES=7
-MISSING_TYPE=19  MISSING_MEMBER=14  OVERLOAD_MAPPING_MISMATCH=3
+994 tests, 0 failures in the latest debug baseline
+TOTAL_DIAGNOSTICS=0   COMPLETE_TYPES=257   PARTIAL_TYPES=0
+MISSING_TYPE=0  MISSING_MEMBER=0  OVERLOAD_MAPPING_MISMATCH=0
 every category that would mean DISAGREEMENT with XNA: 0
-BOUND_FUNCTIONS=705  PROTOTYPE_TYPE_POSITIONS=2386  LAYOUTS=67  ABI_MISMATCHES=0
+BOUND_FUNCTIONS=778  PROTOTYPE_TYPE_POSITIONS=2657  LAYOUTS=68  ABI_MISMATCHES=0
 WITHDRAWN_IN_SOURCE=27 with the reason written where each stood
 REPLACED_NO_OPS_IN_SOURCE=3
 NATIVE_ABI_MUTATIONS=14 NATIVE_ABI_MUTATIONS_CAUGHT=14
-PROJECTION_MUTATIONS=405  PROJECTION_MUTATIONS_LAST_FULL_RUN=405
-PROJECTION_MUTATIONS_CAUGHT=405  PROJECTION_MUTATION_SURVIVORS=0
+PROJECTION_MUTATIONS=413  PROJECTION_MUTATIONS_LAST_FULL_RUN=413
+PROJECTION_MUTATIONS_CAUGHT=413  PROJECTION_MUTATION_SURVIVORS=0
 PROJECTION_MUTATION_HUNG=0  PROJECTION_MUTATION_UNSCORED=0
 CONTENT_READER_MUTATIONS=11  CONTENT_READER_MUTATIONS_CAUGHT=11
 CONTENT_READER_MUTATION_SURVIVORS=0  CONTENT_READER_MUTATION_HUNG=0
 CONTENT_READER_MUTATION_UNSCORED=0
-MESSAGE_COVERAGE_FINDINGS=0 over 2,259 implemented members
-API_COMPAT_SELF_TESTS=2542  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
-BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=49  BCL_SENTINEL_CHECKS=651
-RESOURCE_STRINGS_REPRODUCED=97  ACCESSOR_SELF_TESTS=41
+MESSAGE_COVERAGE_FINDINGS=0 over 2,336 implemented members
+API_COMPAT_SELF_TESTS=2684  AUDIT_SELF_TESTS=80  BCL_MUTATION_SELF_TESTS=514
+BCL_AUTHORITY_ASSEMBLIES=2  BCL_AUTHORITY_TYPES=59  BCL_SENTINEL_CHECKS=651
+RESOURCE_STRINGS_REPRODUCED=103  ACCESSOR_SELF_TESTS=41
 ```
 
-**Every remaining diagnostic is an absence.** Nothing implemented disagrees
-with the pinned metadata.
+The retained public profile is complete and nothing disagrees with the pinned
+metadata.
+
+## Foundation 106 — the retained XNA profile is closed
+
+The six XACT/microphone types now use CNA's canonical engine, category, cue,
+bank and capture-device routes with explicit parent/child ownership. The final
+member-level absences are closed as well: storage exposes working duplex file
+streams, `GraphicsDevice.GetBackBufferData` has all three generic overloads,
+`MediaLibrary.SavePicture` follows the pinned direct refusal, the two XNA
+exception serialization constructors forward admitted state, and
+`DynamicSoundEffectInstance` preserves its redeclared getter/setter behavior.
+
+The strict Symbol Graph now reports all 257 types complete and zero diagnostics.
+The final projection mutation campaign executed all 413 declarations and
+caught all 413, including all eleven ContentReader mutations, with no survivor,
+hang or unscored entry. Remaining limitations are capability refusals, not a
+local missing-type or missing-member frontier.
+
+## Foundation 105 — the Design/InstanceDescriptor decision is closed
+
+The owner selected completion of CNA-Swift, so the earlier Design decision is
+resolved in favor of faithful capability. All thirteen Design types now stand:
+`MathTypeConverter` plus the twelve XNA value converters. Their selected BCL
+closure is a real, self-contained Swift projection of `TypeConverter`,
+`ExpandableObjectConverter`, property descriptors, culture/list-separator
+support, the required reflection identities, and `InstanceDescriptor`.
+
+An instance descriptor is not a string or inert box: it owns the exact
+`ConstructorInfo` identity and argument list and invokes the represented Swift
+constructor. Text converters honor the culture's decimal and list separators,
+invalid component counts use XNA's pinned `InvalidStringFormat` resource, and
+property order/CreateInstance behavior is covered for every converter. The
+strict report moved 13 types from missing to complete with every disagreement
+and public-leak category still zero. Eight focused tests and four meaningful
+mutations pass; the mutations are 4/4 `CAUGHT`, with zero survivors, hangs and
+unscored entries.
+
+Foundation 106 subsequently closes the six XACT/audio types and all fourteen
+member-level absences.
 
 ## Foundation 104 — the selected ContentReader family is closed
 
@@ -104,10 +142,8 @@ RESOURCE_MANAGER_AUTHORITY_FINDINGS=0
 BCL_MUTATION_SURVIVORS=0
 ```
 
-The only remaining owner-selected frontiers are the Design/
-`InstanceDescriptor` representation decision and the XACT asset-policy family
-(including the external microphone/audio remainder). Neither was reopened by
-Foundation 104.
+Foundation 104 deliberately left Design and XACT unselected; Foundation 105
+subsequently resolves Design. XACT/audio remains the only type-level frontier.
 
 <!-- status-gate:historical -->
 

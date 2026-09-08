@@ -148,7 +148,7 @@ extension Microsoft.Xna.Framework.Audio {
         }
 
         /// `set_IsLooped`.
-        public func SetIsLooped(_ value: Bool) throws {
+        open func SetIsLooped(_ value: Bool) throws {
             // The loop flag is fixed when playback starts; XNA says so and CNA
             // would accept a change nobody would hear.
             guard !hasPlayed else {
@@ -163,7 +163,7 @@ extension Microsoft.Xna.Framework.Audio {
         }
 
         /// `SoundEffectInstance.Play()`.
-        public func Play() throws {
+        open func Play() throws {
             try call("Play", runtime.functions.soundEffectInstancePlay,
                      "cna_sound_effect_instance_play")
             hasPlayed = true

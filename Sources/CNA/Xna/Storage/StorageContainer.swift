@@ -2,6 +2,21 @@
 
 import CNAShim
 
+internal final class StorageContainerDisposingBox {
+    weak var target: Microsoft.Xna.Framework.Storage.StorageContainer?
+    init(_ target: Microsoft.Xna.Framework.Storage.StorageContainer) {
+        self.target = target
+    }
+}
+
+internal let storageContainerDisposingCallback: CNASwift_StorageCompletionCallback = {
+    context in
+    guard let context else { return }
+    let box = Unmanaged<StorageContainerDisposingBox>.fromOpaque(context)
+        .takeUnretainedValue()
+    box.target?.nativeDisposing()
+}
+
 extension Microsoft.Xna.Framework.Storage {
 
     /// `Microsoft.Xna.Framework.Storage.StorageContainer`.
@@ -13,36 +28,32 @@ extension Microsoft.Xna.Framework.Storage {
     /// finalizer's language projection, so a container a consumer drops does
     /// not leak its handle.
     ///
-    /// **Four members are absent and it is the Swift side that cannot spell
-    /// them.** `CreateFile` and the three `OpenFile` overloads return
-    /// `System.IO.Stream`, which `mapping-rules.json` maps to
-    /// `Foundation.InputStream` -- a READ stream. CNA has the whole thing:
-    /// `cna_storage_container_create_file` hands back a
-    /// `CNA_StorageStreamHandle` and eleven routes read, write, seek, flush
-    /// and resize it, measured working in `build-probe/f102_storage.c`. A
-    /// projection could return an `InputStream` here and the signature gate
-    /// would pass, because a signature gate compares spellings. It would also
-    /// hand a caller an object that cannot write to a file XNA says is
-    /// writable, which is the same lie as a fabricated stack trace. So they
-    /// are recorded as missing until `System.IO.Stream`'s mapping can express
-    /// a writable stream, which is a decision about an already-shipped mapping
-    /// that `TitleContainer.OpenStream` also depends on.
+    /// Storage file returns are projected as `CNAStorageStream`, the concrete
+    /// `Foundation.InputStream` subclass that also exposes XNA's write, seek,
+    /// flush and resize behavior. Read-only stream positions elsewhere keep
+    /// the established global `InputStream` mapping.
     public final class StorageContainer {
 
         private let functions: NativeFunctions
         private let device: StorageDevice
         private var handle: UInt64
         private var disposed = false
+        private let disposingSource = CNAEventSource<CNAEventArgs>()
+        private var disposingRegistration: UInt64 = 0
+        private var disposingBox: Unmanaged<StorageContainerDisposingBox>?
+        private var suppressNativeDisposing = false
 
         internal init(handle: UInt64, functions: NativeFunctions,
-                      device: StorageDevice) {
+                      device: StorageDevice) throws {
             self.handle = handle
             self.functions = functions
             self.device = device
+            try subscribeDisposing()
         }
 
         deinit {
             guard handle != 0 else { return }
+            releaseDisposingSubscription()
             _ = functions.storageContainerDestroy(handle)
         }
 
@@ -95,13 +106,18 @@ extension Microsoft.Xna.Framework.Storage {
             return value != 0
         }
 
+        /// `StorageContainer.Disposing`.
+        public var Disposing: CNAEvent<CNAEventArgs> { disposingSource.Event }
+
         /// `StorageContainer.Dispose()`.
         public func Dispose() throws {
             guard !disposed, handle != 0 else { return }
-            try functions.check(
-                functions.storageContainerDispose(handle),
-                operation: "cna_storage_container_dispose")
+            suppressNativeDisposing = true
+            defer { suppressNativeDisposing = false }
+            try functions.check(functions.storageContainerDispose(handle),
+                                operation: "cna_storage_container_dispose")
             disposed = true
+            try disposingSource.Raise(self, args: CNAEventArgs.Empty)
         }
 
         // ------------------------------------------------------------------
@@ -127,6 +143,71 @@ extension Microsoft.Xna.Framework.Storage {
             try withName(file, "file") { live, view in
                 self.functions.storageContainerDeleteFile(live, view)
             } operation: { "cna_storage_container_delete_file" }
+        }
+
+        /// `StorageContainer.CreateFile(String)`.
+        public func CreateFile(_ file: String) throws -> CNAStorageStream {
+            let live = try validated()
+            var utf8 = Array(file.utf8)
+            var created: UInt64 = 0
+            try functions.check(
+                StorageContainer.withStringView(&utf8) {
+                    functions.storageContainerCreateFile(live, $0, &created)
+                }, operation: "cna_storage_container_create_file")
+            return CNAStorageStream(
+                handle: created, functions: functions, container: self)
+        }
+
+        /// `StorageContainer.OpenFile(String, FileMode)`.
+        public func OpenFile(
+            _ file: String, fileMode: CNAFileMode
+        ) throws -> CNAStorageStream {
+            let live = try validated()
+            var utf8 = Array(file.utf8)
+            var opened: UInt64 = 0
+            try functions.check(
+                StorageContainer.withStringView(&utf8) {
+                    functions.storageContainerOpenFile(
+                        live, $0, UInt32(bitPattern: fileMode.rawValue), &opened)
+                }, operation: "cna_storage_container_open_file")
+            return CNAStorageStream(
+                handle: opened, functions: functions, container: self)
+        }
+
+        /// `StorageContainer.OpenFile(String, FileMode, FileAccess)`.
+        public func OpenFile(
+            _ file: String, fileMode: CNAFileMode, fileAccess: CNAFileAccess
+        ) throws -> CNAStorageStream {
+            let live = try validated()
+            var utf8 = Array(file.utf8)
+            var opened: UInt64 = 0
+            try functions.check(
+                StorageContainer.withStringView(&utf8) {
+                    functions.storageContainerOpenFileAccess(
+                        live, $0, UInt32(bitPattern: fileMode.rawValue),
+                        UInt32(bitPattern: fileAccess.rawValue), &opened)
+                }, operation: "cna_storage_container_open_file_access")
+            return CNAStorageStream(
+                handle: opened, functions: functions, container: self)
+        }
+
+        /// `StorageContainer.OpenFile(String, FileMode, FileAccess, FileShare)`.
+        public func OpenFile(
+            _ file: String, fileMode: CNAFileMode, fileAccess: CNAFileAccess,
+            fileShare: CNAFileShare
+        ) throws -> CNAStorageStream {
+            let live = try validated()
+            var utf8 = Array(file.utf8)
+            var opened: UInt64 = 0
+            try functions.check(
+                StorageContainer.withStringView(&utf8) {
+                    functions.storageContainerOpenFileShare(
+                        live, $0, UInt32(bitPattern: fileMode.rawValue),
+                        UInt32(bitPattern: fileAccess.rawValue),
+                        UInt32(bitPattern: fileShare.rawValue), &opened)
+                }, operation: "cna_storage_container_open_file_share")
+            return CNAStorageStream(
+                handle: opened, functions: functions, container: self)
         }
 
         /// `DirectoryExists(String directory)`.
@@ -172,6 +253,37 @@ extension Microsoft.Xna.Framework.Storage {
                 throw CNAObjectDisposedException(objectName: "\(type(of: self))")
             }
             return handle
+        }
+
+        internal func nativeDisposing() {
+            guard !suppressNativeDisposing else { return }
+            try? disposingSource.Raise(self, args: CNAEventArgs.Empty)
+        }
+
+        private func subscribeDisposing() throws {
+            let retained = Unmanaged.passRetained(StorageContainerDisposingBox(self))
+            var registration: UInt64 = 0
+            let result = functions.storageContainerSubscribeDisposing(
+                handle, storageContainerDisposingCallback,
+                retained.toOpaque(), &registration)
+            guard result == 0 else {
+                retained.release()
+                try functions.check(
+                    result, operation: "cna_storage_container_subscribe_disposing")
+                return
+            }
+            disposingRegistration = registration
+            disposingBox = retained
+        }
+
+        private func releaseDisposingSubscription() {
+            if disposingRegistration != 0 {
+                _ = functions.storageContainerUnsubscribeDisposing(
+                    disposingRegistration)
+                disposingRegistration = 0
+            }
+            disposingBox?.release()
+            disposingBox = nil
         }
 
         private func withName(

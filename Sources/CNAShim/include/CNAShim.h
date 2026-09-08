@@ -16,6 +16,12 @@ extern "C" {
 typedef uint32_t CNASwift_Result;
 typedef uint8_t CNASwift_Bool;
 typedef uint64_t CNASwift_Handle;
+typedef uint32_t CNASwift_AudioStopOptions;
+typedef uint32_t CNASwift_MicrophoneState;
+typedef uint32_t CNASwift_FileMode;
+typedef uint32_t CNASwift_FileAccess;
+typedef uint32_t CNASwift_FileShare;
+typedef uint32_t CNASwift_SeekOrigin;
 
 typedef struct CNASwift_StringView {
     const char* data;
@@ -40,6 +46,16 @@ typedef struct CNASwift_Rectangle {
     int32_t width;
     int32_t height;
 } CNASwift_Rectangle;
+
+typedef struct CNASwift_BackBufferReadback {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint8_t has_source_rectangle;
+    uint8_t reserved[3];
+    CNASwift_Rectangle source_rectangle;
+    uint64_t start_index;
+    uint64_t element_count;
+} CNASwift_BackBufferReadback;
 
 typedef struct CNASwift_GameTime {
     int64_t total_game_time_ticks;
@@ -617,6 +633,19 @@ typedef struct CNASwift_VisualizationData {
 } CNASwift_VisualizationData;
 
 typedef void (*CNASwift_AudioEventCallback)(void* context);
+
+typedef struct CNASwift_CueInfo {
+    uint32_t struct_size;
+    uint32_t struct_version;
+    uint8_t is_created;
+    uint8_t is_disposed;
+    uint8_t is_paused;
+    uint8_t is_playing;
+    uint8_t is_prepared;
+    uint8_t is_preparing;
+    uint8_t is_stopped;
+    uint8_t is_stopping;
+} CNASwift_CueInfo;
 
 /* CNA_StorageCompletionCallback. The same `void (*)(void*)` shape as the audio
  * one, and mirrored separately rather than reused: the ABI gate pairs a shim

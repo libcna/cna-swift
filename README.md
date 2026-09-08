@@ -1,8 +1,9 @@
 # CNA-Swift
 
-CNA-Swift is a real, deliberately partial Swift projection of Microsoft XNA
-Framework 4.0 over the canonical CNA C ABI. It does not claim completion of the
-full 257-type profile.
+CNA-Swift is a real Swift projection of the retained Microsoft XNA Framework
+4.0 public profile over the canonical CNA C ABI. All 257 retained types are
+strict-complete; runtime capabilities CNA cannot provide remain explicit
+refusals rather than silent compatibility claims.
 
 The strict public identity is `Microsoft.Xna.Framework...`. The qualified
 foundation has a compiler Symbol Graph scoreboard, exact ABI-0.21 admission, a
@@ -98,33 +99,30 @@ REFERENCE_TYPES=257
 REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257
 EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=238
-TARGET_MEMBERS=2751
-TOTAL_DIAGNOSTICS=36
-COMPLETE_TYPES=231
-PARTIAL_TYPES=7
-MISSING_TYPES=19
-MISSING_MEMBER=14
+TARGET_TYPES=257
+TARGET_MEMBERS=2890
+TOTAL_DIAGNOSTICS=0
+COMPLETE_TYPES=257
+PARTIAL_TYPES=0
+MISSING_TYPES=0
+MISSING_MEMBER=0
 REFERENCE_RETURN_PROJECTIONS=369
 PROVEN_NULLABLE_RETURN_PROJECTIONS=113
 PROVEN_NONNULL_RETURN_PROJECTIONS=134
 UNKNOWN_RETURN_NULLABILITY_PROJECTIONS=122
-BCL_BASE_PROJECTIONS=20
-PROJECTED_BCL_BASE_TYPES=20
+BCL_BASE_PROJECTIONS=21
+PROJECTED_BCL_BASE_TYPES=21
 PENDING_BCL_BASE_TYPES=0
-BCL_INHERITED_MEMBER_PROJECTIONS=127
-BCL_SUPPORT_TYPE_MEASUREMENTS=29
+BCL_INHERITED_MEMBER_PROJECTIONS=144
+BCL_SUPPORT_TYPE_MEASUREMENTS=45
 ```
 
-Normal strict verification remains red because deferred XNA types are genuinely
-absent. Leak-only is green: no internal type, pointer, native handle, or public
-FFI declaration leaks into the XNA surface. Every remaining diagnostic is an ABSENCE: `MISSING_TYPE`, `MISSING_MEMBER`, and
-an `OVERLOAD_MAPPING_MISMATCH` count whose every entry reads "required overload
-is absent". Every category that would mean the projection *disagrees* with XNA —
+Normal strict verification is green. No internal type, pointer, native handle,
+or public FFI declaration leaks into the XNA surface. Every category that would
+mean the projection *disagrees* with XNA —
 kind, base, interface, field, property, signature, parameter, return, generic,
 enum value, flags, event, operator, ref/out, inheritance, unexpected type or
-member, unmeasured category, and all three leak categories — is 0. The binding
-is incomplete, not incorrect. See `docs/generated/api-compat-report.json` and
+member, unmeasured category, and all three leak categories — is 0. See `docs/generated/api-compat-report.json` and
 `docs/generated/missing-type-inventory.md` for the exact inventory.
 
 The strict-complete managed foundation includes MathHelper, Point, Rectangle,
@@ -141,7 +139,7 @@ IUpdateable, IDrawable, GameComponentCollectionEventArgs,
 ResourceCreatedEventArgs, ResourceDestroyedEventArgs, AudioListener,
 TouchCollection, TouchCollection.Enumerator, Media.Video, AudioEmitter,
 IGraphicsDeviceService, GameComponentCollection and VisualizationData.
-Every implemented member has qualified behavior; missing members remain absent.
+Every retained type and member identity is projected and qualified.
 
 Foundation 104 also completes the five-type Content reader family plus
 `ContentManager`'s reader-facing protected surface. It provides a real
@@ -150,6 +148,13 @@ uncompressed XNB loading with shared and external references, and
 `CNAResourceManager`/`ResourceContentManager` integration. The end-to-end XNB
 and resource fixtures are project-authored; no Microsoft runtime binary is
 packaged and compressed XNB is reported as unsupported.
+
+Foundation 105 completes all thirteen `Microsoft.Xna.Framework.Design` types.
+The value converters provide culture-aware text round trips, stable property
+descriptors and `CreateInstance`; their `InstanceDescriptor` conversion carries
+and invokes a real constructor identity. The selected .NET Framework 4.0
+ComponentModel/reflection support is implemented in Swift and adds no runtime
+dependency on Microsoft assemblies.
 
 ## BCL base classes
 

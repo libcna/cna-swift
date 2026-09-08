@@ -76,18 +76,21 @@ final class Foundation90DynamicSoundTests: XCTestCase {
         XCTAssertTrue(instance.IsDisposed)
     }
 
-    /// **The divergence this type carries**, stated as a test rather than only
-    /// in a comment: XNA redeclares `IsLooped` on the dynamic instance so that
-    /// reading it refuses, and Swift cannot express that over an infallible
-    /// base property. The inherited one answers instead.
-    func testIsLoopedIsInheritedBecauseSwiftCannotHideAMember() throws {
+    /// The redeclared property keeps its own XNA behavior even though Swift
+    /// needs a named getter to express its different throwing effect.
+    func testRedeclaredIsLoopedAccessorsPreserveDynamicBehavior() throws {
         let game = try DynamicProbeGame(readIsLooped: true)
         try game.Run()
         try game.Dispose()
         if let failure = game.failure { throw failure }
         guard game.createFailure == nil else { throw XCTSkip("no audio backend") }
         XCTAssertEqual(game.inheritedIsLooped, false,
-                       "the base's getter answers; XNA's redeclared one would throw")
+                       "the statically inherited base getter remains callable")
+        XCTAssertEqual(game.dynamicIsLooped, false)
+        XCTAssertEqual(game.messages["dynamicTrue"],
+                       "IsLooped property is not supported for "
+                       + "DynamicSoundEffectInstance.")
+        XCTAssertTrue(game.dynamicReadAfterDispose is CNAObjectDisposedException)
     }
 }
 
@@ -108,6 +111,8 @@ private final class DynamicProbeGame: Microsoft.Xna.Framework.Game {
     var nullBufferFailure: Error?
     var messages: [String: String] = [:]
     var inheritedIsLooped: Bool?
+    var dynamicIsLooped: Bool?
+    var dynamicReadAfterDispose: Error?
 
     init(exerciseRefusals: Bool = false, keepInstance: Bool = false,
          readIsLooped: Bool = false, fillTheQueue: Bool = false) throws {
@@ -139,7 +144,12 @@ private final class DynamicProbeGame: Microsoft.Xna.Framework.Game {
 
             if readIsLooped {
                 inheritedIsLooped = live.IsLooped
+                dynamicIsLooped = try live.GetIsLooped()
+                try live.SetIsLooped(false)
+                record("dynamicTrue") { try live.SetIsLooped(true) }
                 try live.Dispose()
+                do { _ = try live.GetIsLooped() }
+                catch { dynamicReadAfterDispose = error }
                 return
             }
 

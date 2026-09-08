@@ -657,6 +657,129 @@ extension Microsoft.Xna.Framework.Graphics {
             runtime.cachedRenderTargetBindings
         }
 
+        /// `GraphicsDevice.GetBackBufferData<T>(T[])`.
+        public func GetBackBufferData<T>(_ data: inout [T]) throws {
+            try GetBackBufferData(
+                nil, data: &data, startIndex: 0,
+                elementCount: Int32(data.count))
+        }
+
+        /// `GraphicsDevice.GetBackBufferData<T>(T[], Int32, Int32)`.
+        public func GetBackBufferData<T>(
+            _ data: inout [T], startIndex: Int32, elementCount: Int32
+        ) throws {
+            try GetBackBufferData(
+                nil, data: &data, startIndex: startIndex,
+                elementCount: elementCount)
+        }
+
+        /// `GraphicsDevice.GetBackBufferData<T>(Rectangle?, T[], Int32, Int32)`.
+        ///
+        /// XNA validates the device/profile, array window, active render
+        /// targets, element size, rectangle and total byte size in that order.
+        /// CNA returns RGBA8 pixels; the bytes are copied into the caller's T
+        /// window only after the complete native read succeeds.
+        public func GetBackBufferData<T>(
+            _ rect: Microsoft.Xna.Framework.Rectangle?,
+            data: inout [T], startIndex: Int32, elementCount: Int32
+        ) throws {
+            let live = try validatedHandle("GraphicsDevice.GetBackBufferData")
+            guard profileCapabilities.getBackBufferData else {
+                try profileCapabilities.throwNotSupported(
+                    ProfileCapabilities.profileFeatureNotSupported,
+                    "GetBackBufferData")
+            }
+            guard !data.isEmpty else {
+                throw CNAArgumentNullException(
+                    paramName: "data", message: GraphicsDevice.nullNotAllowedMessage)
+            }
+            try Microsoft.Xna.Framework.Graphics.validateCopyParameters(
+                dataLength: data.count, dataIndex: startIndex,
+                elementCount: elementCount)
+            guard runtime.cachedRenderTargetBindings.isEmpty else {
+                throw CNAInvalidOperationException(
+                    message: GraphicsDevice.cannotReadActiveRenderTargetMessage)
+            }
+            guard let parameters = runtime.cachedPresentationParameters,
+                  let formatSize = Microsoft.Xna.Framework.Graphics
+                    .expectedByteSize(of: parameters.BackBufferFormat) else {
+                throw CNANotSupportedException(
+                    message: "The active back buffer format cannot be read.")
+            }
+            let elementSize = Int32(MemoryLayout<T>.size)
+            if elementSize != formatSize {
+                guard formatSize > elementSize,
+                      formatSize % elementSize == 0 else {
+                    throw CNAArgumentException(message: invalidDataSizeMessage)
+                }
+            }
+
+            var width = parameters.BackBufferWidth
+            var height = parameters.BackBufferHeight
+            if let rect {
+                guard rect.X >= 0, rect.Width > 0,
+                      rect.Y >= 0, rect.Height > 0 else {
+                    throw CNAArgumentException(
+                        message: invalidRectangleMessage, paramName: "rect")
+                }
+                guard UInt32(bitPattern: rect.X &+ rect.Width)
+                        <= UInt32(bitPattern: parameters.BackBufferWidth),
+                      UInt32(bitPattern: rect.Y &+ rect.Height)
+                        <= UInt32(bitPattern: parameters.BackBufferHeight) else {
+                    throw CNAArgumentException(
+                        message: invalidRectangleMessage, paramName: "rect")
+                }
+                width = rect.Width
+                height = rect.Height
+            }
+            let byteCount = Int64(width) * Int64(height) * Int64(formatSize)
+            let destinationByteCount = Int64(elementSize) * Int64(elementCount)
+            guard byteCount == destinationByteCount else {
+                throw CNAArgumentException(message: invalidTotalSizeMessage)
+            }
+            guard formatSize == 4 else {
+                throw CNANotSupportedException(
+                    message: "The active back buffer format cannot be read as RGBA8.")
+            }
+
+            let pixelCount = Int64(width) * Int64(height)
+            guard pixelCount >= 0, pixelCount <= Int64(Int.max) else {
+                throw CNAArgumentException(message: invalidTotalSizeMessage)
+            }
+            var readback = CNASwift_BackBufferReadback()
+            readback.struct_size = UInt32(
+                MemoryLayout<CNASwift_BackBufferReadback>.size)
+            readback.struct_version = 1
+            readback.has_source_rectangle = rect == nil ? 0 : 1
+            if let rect {
+                readback.source_rectangle = CNASwift_Rectangle(
+                    x: rect.X, y: rect.Y, width: rect.Width,
+                    height: rect.Height)
+            }
+            readback.start_index = 0
+            readback.element_count = UInt64(pixelCount)
+            var pixels = [CNASwift_Color](
+                repeating: CNASwift_Color(), count: Int(pixelCount))
+            try runtime.functions.check(
+                withUnsafePointer(to: &readback) { descriptor in
+                    pixels.withUnsafeMutableBufferPointer { output in
+                        runtime.functions.graphicsDeviceGetBackBufferData(
+                            live, descriptor, output.baseAddress,
+                            UInt64(output.count))
+                    }
+                }, operation: "cna_graphics_device_get_backbuffer_data_window")
+
+            let destinationOffset = Int(startIndex) * Int(elementSize)
+            pixels.withUnsafeBytes { source in
+                data.withUnsafeMutableBytes { destination in
+                    guard let sourceBase = source.baseAddress,
+                          let destinationBase = destination.baseAddress else { return }
+                    destinationBase.advanced(by: destinationOffset).copyMemory(
+                        from: sourceBase, byteCount: Int(byteCount))
+                }
+            }
+        }
+
         /// The backbuffer branch both single-target overloads and the array
         /// overload share: `SetRenderTargets(null, 0)`.
         private func unbindRenderTargets(_ deviceHandle: UInt64) throws {
@@ -1275,6 +1398,8 @@ extension Microsoft.Xna.Framework.Graphics {
         /// `.ctor(String paramName, String message)`.
         internal static let nullNotAllowedMessage =
             "This method does not accept null for this parameter."
+        internal static let cannotReadActiveRenderTargetMessage =
+            "Cannot use GetBackBufferData when a render target is active."
 
         internal func validatedHandle(_ operation: String) throws -> UInt64 {
             try runtime.validateGeneration(generation)

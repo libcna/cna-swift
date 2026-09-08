@@ -61,6 +61,41 @@ final class Foundation48ClearTests: XCTestCase {
         return game
     }
 
+    func testEveryBackBufferReadbackOverloadPreservesReachRefusal() throws {
+        try requireNative()
+        _ = try run { _, device in
+            var pixels = [Microsoft.Xna.Framework.Color](
+                repeating: .Transparent, count: 4)
+            let calls: [() throws -> Void] = [
+                { try device.GetBackBufferData(&pixels) },
+                { try device.GetBackBufferData(
+                    &pixels, startIndex: 0, elementCount: 4) },
+                { try device.GetBackBufferData(
+                    Microsoft.Xna.Framework.Rectangle(0, 0, 2, 2),
+                    data: &pixels, startIndex: 0, elementCount: 4) },
+            ]
+            for call in calls {
+                XCTAssertThrowsError(try call()) { error in
+                    XCTAssertEqual(
+                        (error as? CNANotSupportedException)?.Message,
+                        "XNA Framework Reach profile does not support GetBackBufferData.")
+                }
+            }
+        }
+    }
+
+    func testReachRefusesBackBufferReadbackBeforeArrayValidation() throws {
+        try requireNative()
+        _ = try run { _, device in
+            var empty: [Microsoft.Xna.Framework.Color] = []
+            XCTAssertThrowsError(try device.GetBackBufferData(&empty)) { error in
+                XCTAssertEqual(
+                    (error as? CNANotSupportedException)?.Message,
+                    "XNA Framework Reach profile does not support GetBackBufferData.")
+            }
+        }
+    }
+
     private func target(
         _ device: G.GraphicsDevice, _ depth: G.DepthFormat
     ) throws -> G.RenderTarget2D {

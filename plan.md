@@ -1,7 +1,7 @@
 # CNA-Swift normative plan and status
 
 **Current state.** The native boundary is CNA C ABI **major 0, minor 21 or
-later**, qualified against `0.21.0`. Foundation Milestones 1 through 104 are
+later**, qualified against `0.21.0`. Foundation Milestones 1 through 106 are
 complete. Foundation 104 closes the selected XNA runtime-reader family:
 `ContentReader` is a real subclass of the admitted .NET Framework 4.0
 `BinaryReader` subset; `ContentTypeReader`, its generic subclass and the
@@ -9,7 +9,15 @@ manager form one typed runtime path; `ContentManager.OpenStream` and
 `ReadAsset<T>` now feed an uncompressed XNB parser; and
 `ResourceContentManager` reads the same bytes through the selected,
 self-contained `ResourceManager` projection. The deterministic test fixture is
-authored byte-for-byte in this project. No `Encoding` API was admitted, no
+authored byte-for-byte in this project. Foundation 105 closes all thirteen
+Design types with real `TypeConverter`, reflection-constructor and
+`InstanceDescriptor` support, including culture-aware text conversion and
+invocable constructor descriptors. Foundation 106 closes the complete retained
+XNA 4.0 public profile: the six XACT/microphone types use canonical CNA routes,
+the storage stream surface is a real duplex `InputStream` subclass, backbuffer
+readback has its three generic overloads, both pinned serialization constructors
+forward their admitted state, and the last redeclared dynamic-audio accessors
+match their IL. No `Encoding` API was admitted, no
 storage/save-game `cna_content_reader_*` route was misbound, and compressed XNB
 remains an explicit unsupported capability rather than a silent claim.
 
@@ -41,7 +49,7 @@ prose, that milestone's evidence file carries it still.
    pinned in `tools/api_compat/reference/xna40-selected-resource-strings.json`,
    and compared against the Swift source by the verifier. Foundation 49 made
    that literally true: five messages were byte-identical to the assembly's own
-   and yet unpinned, so nothing was comparing them. All 97 selected XNA
+   and yet unpinned, so nothing was comparing them. All 98 selected XNA
    resource strings are pinned now.
 3. **A complete type does not imply runtime capability.** Profile selection,
    presentation, primitives, vertex and index buffers, cube textures, effects,
@@ -148,24 +156,16 @@ Reproduced live on CNA 0.21.0 at the current HEAD.
 ```text
 REFERENCE_TYPES=257            REFERENCE_MEMBERS=2964
 EXPECTED_SWIFT_TYPES=257       EXPECTED_SWIFT_MEMBERS=2887
-TARGET_TYPES=238               TARGET_MEMBERS=2751
-COMPLETE_TYPES=231             PARTIAL_TYPES=7      MISSING_TYPE=19
-MISSING_MEMBER=14              TOTAL_DIAGNOSTICS=36
+TARGET_TYPES=257               TARGET_MEMBERS=2890
+COMPLETE_TYPES=257             PARTIAL_TYPES=0      MISSING_TYPE=0
+MISSING_MEMBER=0               TOTAL_DIAGNOSTICS=0
 ALLOWLIST_ENTRIES=0            UNMEASURED_STRUCTURAL_CATEGORY=0
 NONDERIVABLE_UNSEALED_CLASSES=0    PENDING_BCL_BASE_TYPES=0
-XNA_RESOURCE_STRING_PROJECTIONS=97 API_COMPAT_SELF_TESTS=2542
+XNA_RESOURCE_STRING_PROJECTIONS=103 API_COMPAT_SELF_TESTS=2684
 ```
 
-**Every remaining diagnostic is an absence.** Three categories are non-zero —
-`MISSING_TYPE=19`, `MISSING_MEMBER=14`, and `OVERLOAD_MAPPING_MISMATCH=3`,
-whose every entry reads *required overload is absent*: `SpriteBatch.Begin` (2,
-both taking an `Effect`) and the two serialization constructors of
-`ContentLoadException` and `StorageDeviceNotConnectedException`.
-`GraphicsDevice.SetRenderTarget`'s cube overload left this list in Foundation
-65. `GraphicsDeviceManager.Dispose` left this
-list in Foundation 52, all five `SpriteBatch.Draw` entries in Foundation 53, two
-of the four `SpriteBatch.Begin` entries in Foundation 54, and
-`Texture2D.FromStream`'s resizing overload in Foundation 59.
+The retained public profile is strict-complete: every one of the 257 types is
+complete and all structural, absence and leak diagnostic categories are zero.
 
 Every category that would mean the projection **disagrees** with XNA is 0:
 `TYPE_KIND_MISMATCH`, `BASE_MAPPING_MISMATCH`, `INTERFACE_MAPPING_MISMATCH`,
@@ -177,19 +177,19 @@ Every category that would mean the projection **disagrees** with XNA is 0:
 `INHERITANCE_MAPPING_MISMATCH`, `UNEXPECTED_TYPE`, `UNEXPECTED_MEMBER`,
 `UNMEASURED_STRUCTURAL_CATEGORY`, `INTERNAL_TYPE_LEAK`, `RAW_HANDLE_LEAK` and
 `PUBLIC_NATIVE_FFI_LEAK`. Wherever this binding has projected an XNA member it
-agrees with the pinned metadata; what remains is what has not been written.
+agrees with the pinned metadata.
 
 Native boundary:
 
 ```text
-BOUND_FUNCTIONS=705  ROUTE_PAIRINGS=705  PROTOTYPE_TYPE_POSITIONS=2386
-CANONICAL_DECLARATION_CHECKS=2386  C_SWIFT_MEASUREMENTS=2386
-LAYOUTS=67  LAYOUT_FIELDS=515  CALLBACKS=9  CONSTANTS=228  SCALAR_FACTS=3
+BOUND_FUNCTIONS=778  ROUTE_PAIRINGS=778  PROTOTYPE_TYPE_POSITIONS=2657
+CANONICAL_DECLARATION_CHECKS=2657  C_SWIFT_MEASUREMENTS=2657
+LAYOUTS=68  LAYOUT_FIELDS=522  CALLBACKS=9  CONSTANTS=228  SCALAR_FACTS=3
 MISSING_HEADER_SYMBOLS=0  MISSING_LIBRARY_SYMBOLS=0  ABI_MISMATCHES=0
 NATIVE_ABI_MUTATIONS=14  NATIVE_ABI_MUTATIONS_CAUGHT=14
 NATIVE_ABI_MUTATION_SURVIVORS=0
-PROJECTION_MUTATIONS=405  PROJECTION_MUTATIONS_LAST_FULL_RUN=405
-PROJECTION_MUTATIONS_CAUGHT=405  PROJECTION_MUTATION_SURVIVORS=0
+PROJECTION_MUTATIONS=413  PROJECTION_MUTATIONS_LAST_FULL_RUN=413
+PROJECTION_MUTATIONS_CAUGHT=413  PROJECTION_MUTATION_SURVIVORS=0
 PROJECTION_MUTATION_HUNG=0  PROJECTION_MUTATION_UNSCORED=0
 CONTENT_READER_MUTATIONS=11  CONTENT_READER_MUTATIONS_CAUGHT=11
 CONTENT_READER_MUTATION_SURVIVORS=0  CONTENT_READER_MUTATION_HUNG=0
@@ -198,8 +198,8 @@ WITHDRAWN_IN_SOURCE=27  REPLACED_NO_OPS_IN_SOURCE=3
 ```
 
 The projection-mutation count is what the harness holds; `CAUGHT` is what the
-latest **full run** proved. Foundation 104 executed all 405 declared mutations:
-all 405 were caught, with zero survivors, hangs and unscored entries. Eleven of
+latest **full run** proved. Foundation 106 executed all 413 declared mutations:
+all 413 were caught, with zero survivors, hangs and unscored entries. Eleven of
 those are the selected ContentReader defects. Three historical no-op mutations
 have been replaced in source by observable defects; no no-op mutant is scored.
 
@@ -210,9 +210,9 @@ is selected, which would report a coverage loss as sixteen projection defects.
 
 The seven registered reference assemblies reproduce 257 contract types and 2,964
 contract members exactly; calibration and the audit's mutation self-tests pass
-(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=97`). The BCL authority
+(`AUDIT_SELF_TESTS=80`, `RESOURCE_STRINGS_REPRODUCED=103`). The BCL authority
 carries `BCL_SENTINEL_CHECKS=651`, `BCL_MUTATION_SELF_TESTS=514`,
-`BCL_CROSS_CHECKS=247` against a second disassembler, and four negative
+`BCL_CROSS_CHECKS=297` against a second disassembler, and four negative
 controls that are still refused. The four are not the same four binaries as in
 earlier sessions -- this machine's Mono packages were upgraded since, and none
 of the previously recorded control digests exists on disk any more, so the set
@@ -220,7 +220,7 @@ was rebuilt from what is here now. One of the four is the strongest control the
 gate has had: a **genuine Microsoft** `mscorlib.dll` from another .NET 4.0
 install, refused by 2 of 21 checks rather than by 12 to 16. A control that only
 just fails is worth more than three that fail obviously.
-Two BCL assemblies are admitted, 49 types and 577 members between them.
+Two BCL assemblies are admitted, 59 types and 753 members between them.
 `mscorlib` `5634668d…acc63` now also supplies the exact `BinaryReader` and
 `ResourceManager` subsets used by Foundation 104, while `System.dll`
 `c3182e40…` was admitted at Foundation 100 for the five-type
@@ -229,16 +229,14 @@ converters are built from — `TypeConverter`, `ExpandableObjectConverter`,
 `ITypeDescriptorContext`, `PropertyDescriptor` and
 `PropertyDescriptorCollection`, 98 members — together with
 `Globalization.CultureInfo` and `Collections.IDictionary` from mscorlib, which
-those signatures reach for. The converters themselves are design-time IDE
-types unreachable from a running game — and the admitted authority then showed
-they are not projectable at all without a disagreement: `MathTypeConverter`
-advertises exactly one conversion target of its own,
-`ComponentModel.Design.Serialization.InstanceDescriptor`, which the base type
-also accepts as its only source. That type is a reflected `ConstructorInfo`
-plus an argument list, for a design-time source emitter. Swift has neither.
-`NEXT.md` records the measurement; the choice between projecting a reflection
-surface and answering `false` where XNA answers `true` is the project owner's,
-because the second trades away "nothing implemented disagrees".
+those signatures reach for. Foundation 105 completes that closure with
+`TextInfo`, the selected reflection constructor identities,
+`TypeConverter.StandardValuesCollection` and
+`ComponentModel.Design.Serialization.InstanceDescriptor`. The Swift
+`CNAInstanceDescriptor` carries a real `CNAConstructorInfo`, preserves its
+argument list and invokes the represented constructor; the projection therefore
+keeps XNA's advertised conversion behavior without a string-only identity or a
+false capability answer.
 
 The identity work found a defect worth recording: the audit read an assembly's
 own name with a regex that matched the FIRST `.assembly` line, which in any
@@ -256,20 +254,11 @@ claimed. Apple platforms, Windows, and Web/Wasm remain unqualified.
 
 ## The frontier
 
-The Foundation-104 selected scope is exhausted. None of its five Content types,
-neither protected `ContentManager` reader member, and neither selected BCL base
-remains on the frontier. The remaining owner decisions are unchanged:
-
-* the thirteen Design converters require choosing how to represent
-  `InstanceDescriptor` and its reflection/source-emission semantics;
-* the XACT/audio remainder requires an asset policy for project-owned `.xgs`
-  and bank fixtures, while the remaining microphone capability is external to
-  the managed reader work.
-
-Those are context for a later owner-selected campaign, not unfinished
-ContentReader work. The exact remaining absences are always derived in
-`docs/generated/dependency-graph.json` and
-`docs/generated/missing-type-inventory.md`.
+The retained XNA 4.0 public profile has no local structural frontier:
+`docs/generated/dependency-graph.json` reports no complete-dependency missing
+type and `docs/generated/missing-type-inventory.md` contains no missing or
+partial type. Runtime capability refusals that CNA cannot truthfully satisfy
+remain documented separately; they are not missing Swift API identities.
 
 Completion of a milestone requires debug and release builds and tests,
 warnings-as-errors including tests, Symbol Graph and its self-tests, the

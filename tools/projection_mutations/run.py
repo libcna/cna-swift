@@ -46,6 +46,7 @@ MODEL_BONES = ROOT / "Sources/CNA/Xna/Graphics/Model/ModelBoneCollection.swift"
 MODEL_SUPPORT = ROOT / "Sources/CNA/Xna/Graphics/Model/ModelSupport.swift"
 STORAGE_DEVICE = ROOT / "Sources/CNA/Xna/Storage/StorageDevice.swift"
 STORAGE_CONTAINER = ROOT / "Sources/CNA/Xna/Storage/StorageContainer.swift"
+STORAGE_STREAM = ROOT / "Sources/CNA/CNAStorageStream.swift"
 STORAGE_ASYNC = ROOT / "Sources/CNA/Xna/Storage/StorageAsyncResult.swift"
 OCCLUSION = ROOT / "Sources/CNA/Xna/Graphics/OcclusionQuery.swift"
 SOUND = ROOT / "Sources/CNA/Xna/Audio/SoundEffect.swift"
@@ -113,6 +114,8 @@ CONTENT_READER = ROOT / "Sources/CNA/Xna/Content/ContentReader.swift"
 TYPE_READER = ROOT / "Sources/CNA/Xna/Content/ContentTypeReader.swift"
 TYPE_READER_MANAGER = ROOT / "Sources/CNA/Xna/Content/ContentTypeReaderManager.swift"
 RESOURCE_CONTENT_MANAGER = ROOT / "Sources/CNA/Xna/Content/ResourceContentManager.swift"
+COMPONENT_MODEL = ROOT / "Sources/CNA/CNAComponentModel.swift"
+DESIGN = ROOT / "Sources/CNA/Xna/Design/DesignConverters.swift"
 
 # Two mutation harnesses editing the same working tree at once corrupts both.
 # `tools/native_abi/mutations.py` mutates NativeManifest.swift,
@@ -152,6 +155,82 @@ def acquire_tree_lock(name: str):
 # way.
 
 MUTATIONS: list[tuple[str, str, Path, str, str]] = [
+    # ---- Foundation 107: final strict-surface closure ----------------------
+    (
+        "dynamic-islooped-answers-true",
+        "the dynamic subclass reports looping even though XNA's redeclared "
+        "getter always answers false",
+        DYNAMIC_SOUND,
+        "        public func GetIsLooped() throws -> Bool {\n"
+        "            _ = try validatedDynamicHandle()\n"
+        "            return false\n"
+        "        }",
+        "        public func GetIsLooped() throws -> Bool {\n"
+        "            _ = try validatedDynamicHandle()\n"
+        "            return true\n"
+        "        }",
+    ),
+    (
+        "serialization-constructor-corrupts-hresult",
+        "the admitted serialization carrier changes the exception's restored "
+        "HRESULT instead of forwarding the serialized base state",
+        EXCEPTIONS,
+        "        self.HResult = info.hResult\n"
+        "        _ = context.state",
+        "        self.HResult = info.hResult &+ 1\n"
+        "        _ = context.state",
+    ),
+    (
+        "backbuffer-readback-skips-profile-refusal",
+        "GetBackBufferData continues into array validation on Reach instead of "
+        "raising XNA's profile refusal first",
+        DEVICE,
+        "            guard profileCapabilities.getBackBufferData else {\n"
+        "                try profileCapabilities.throwNotSupported(",
+        "            if false {\n"
+        "                try profileCapabilities.throwNotSupported(",
+    ),
+    (
+        "storage-stream-setlength-adds-one",
+        "the projected duplex stream resizes a storage file to one byte beyond "
+        "the requested length",
+        STORAGE_STREAM,
+        "            functions.storageStreamSetLength(live, value),",
+        "            functions.storageStreamSetLength(live, value &+ 1),",
+    ),
+    # ---- Foundation 105: Design converters and InstanceDescriptor ----------
+    (
+        "design-invalid-component-count-accepted",
+        "a vector string with one missing component is accepted",
+        DESIGN,
+        "    guard parts.count == names.count else {",
+        "    guard parts.count + 1 == names.count else {",
+    ),
+    (
+        "design-culture-list-separator-ignored",
+        "formatted values always use comma instead of the culture separator",
+        DESIGN,
+        "    values.joined(separator: culture.TextInfo.ListSeparator + \" \")",
+        "    values.joined(separator: \", \")",
+    ),
+    (
+        "design-instance-descriptor-not-invoked",
+        "TypeConverter.ConvertFrom returns a descriptor instead of invoking it",
+        COMPONENT_MODEL,
+        "        if let descriptor = value as? CNAInstanceDescriptor { return try descriptor.Invoke() }",
+        "        if let descriptor = value as? CNAInstanceDescriptor { return descriptor }",
+    ),
+    (
+        "design-property-order-reversed",
+        "Vector3 publishes its property descriptors in Z,Y,X order",
+        DESIGN,
+        "                (\"X\", Float.self, { ($0 as? Microsoft.Xna.Framework.Vector3)?.X }),\n"
+        "                (\"Y\", Float.self, { ($0 as? Microsoft.Xna.Framework.Vector3)?.Y }),\n"
+        "                (\"Z\", Float.self, { ($0 as? Microsoft.Xna.Framework.Vector3)?.Z }),",
+        "                (\"Z\", Float.self, { ($0 as? Microsoft.Xna.Framework.Vector3)?.Z }),\n"
+        "                (\"Y\", Float.self, { ($0 as? Microsoft.Xna.Framework.Vector3)?.Y }),\n"
+        "                (\"X\", Float.self, { ($0 as? Microsoft.Xna.Framework.Vector3)?.X }),",
+    ),
     # ---- Foundation 104: the managed ContentReader family -------------------
     (
         "binary-reader-endian-swap",
@@ -937,8 +1016,12 @@ MUTATIONS: list[tuple[str, str, Path, str, str]] = [
         "Present accepted while a render target is bound, so a caller presents "
         "the backbuffer they were not drawing into",
         DEVICE,
-        "            guard runtime.cachedRenderTargetBindings.isEmpty else {",
-        "            if false {",
+        "            guard runtime.cachedRenderTargetBindings.isEmpty else {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: GraphicsDevice.cannotPresentActiveRenderTargetsMessage)",
+        "            if false {\n"
+        "                throw CNAInvalidOperationException(\n"
+        "                    message: GraphicsDevice.cannotPresentActiveRenderTargetsMessage)",
     ),
     # ---- Foundation 88: the occlusion query --------------------------------
     (
@@ -4200,12 +4283,28 @@ TEST_TIMEOUT_SECONDS = 600
 # mutation a failure verdict without converting an already-caught defect into
 # a ten-minute HUNG verdict.
 MUTATION_TEST_FILTERS = {
+    "dynamic-islooped-answers-true":
+        "Foundation90DynamicSoundTests.testRedeclaredIsLoopedAccessorsPreserveDynamicBehavior",
+    "serialization-constructor-corrupts-hresult":
+        "PureValueTests.testXnaSerializationConstructorsRestoreObservableBaseState",
+    "backbuffer-readback-skips-profile-refusal":
+        "Foundation48ClearTests.testReachRefusesBackBufferReadbackBeforeArrayValidation",
+    "storage-stream-setlength-adds-one":
+        "Foundation102StorageTests.testDuplexStorageStreamWritesSeeksReadsAndResizes",
     "from-type-size-test-reads-the-wrong-size":
         "Foundation60BufferTests.testFromTypeAcceptsItsMatchingRegisteredSize",
     "nonempty-element-array-erased":
         "Foundation43VertexDeclarationTests.testTheStrideOnlyConstructorComputesTheStride",
     "vertex-element-quadruple-transposed":
         "Foundation44VertexTypeTests.testEachStaticDeclarationHasTheElementsTheCctorBuilds",
+    "design-invalid-component-count-accepted":
+        "Foundation105DesignTests.testInvalidStringsUseThePinnedXnaMessage",
+    "design-culture-list-separator-ignored":
+        "Foundation105DesignTests.testCultureControlsBothDecimalAndListSeparators",
+    "design-instance-descriptor-not-invoked":
+        "Foundation105DesignTests.testInstanceDescriptorCarriesConstructorIdentityAndInvokes",
+    "design-property-order-reversed":
+        "Foundation105DesignTests.testPropertyDescriptionsAreStableAndReadable",
 }
 
 
