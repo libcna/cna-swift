@@ -4204,6 +4204,8 @@ MUTATION_TEST_FILTERS = {
         "Foundation60BufferTests.testFromTypeAcceptsItsMatchingRegisteredSize",
     "nonempty-element-array-erased":
         "Foundation43VertexDeclarationTests.testTheStrideOnlyConstructorComputesTheStride",
+    "vertex-element-quadruple-transposed":
+        "Foundation44VertexTypeTests.testEachStaticDeclarationHasTheElementsTheCctorBuilds",
 }
 
 
