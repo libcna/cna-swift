@@ -82,7 +82,7 @@ extension Microsoft.Xna.Framework.Media {
                         operation: "MediaSource.MediaSourceType", result: 1,
                         message: "native media source type \(raw) is not an XNA MediaSourceType")
                 }
-                try list.Add(MediaSource(name: name, type: type, index: index))
+                list.Add(MediaSource(name: name, type: type, index: index))
             }
             return list
         }

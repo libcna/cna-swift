@@ -20,6 +20,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testABoneReportsTheNameAndIndexItWasMadeWith() throws {
         let game = try ModelProbeGame(probe: .boneIdentity)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertEqual(game.boneName, "root")
@@ -28,6 +29,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testTheTransformRoundTripsThroughTheRuntime() throws {
         let game = try ModelProbeGame(probe: .boneTransform)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertEqual(game.readBackTransform?.M11, 2)
@@ -38,6 +40,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testABoneWithoutAParentReportsNil() throws {
         let game = try ModelProbeGame(probe: .boneIdentity)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertTrue(game.rootHasNoParent,
@@ -49,6 +52,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testAnEmptyBoneCollectionCountsZero() throws {
         let game = try ModelProbeGame(probe: .emptyCollection)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertEqual(game.collectionCount, 0)
@@ -56,6 +60,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testTryGetValueWritesThroughItsInoutParameter() throws {
         let game = try ModelProbeGame(probe: .emptyCollection)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertFalse(
@@ -66,6 +71,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testTheEnumeratorOfAnEmptyCollectionNeverAdvances() throws {
         let game = try ModelProbeGame(probe: .emptyCollection)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertFalse(game.enumeratorMoved)
@@ -75,6 +81,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testADefaultModelHasEmptyBonesAndMeshes() throws {
         let game = try ModelProbeGame(probe: .defaultModel)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertEqual(game.modelBoneCount, 0)
@@ -83,6 +90,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testTheTagIsHeldOnTheSwiftSide() throws {
         let game = try ModelProbeGame(probe: .defaultModel)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertEqual(
@@ -94,6 +102,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testCopyingBoneTransformsWritesIntoTheCallersArray() throws {
         let game = try ModelProbeGame(probe: .defaultModel)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertTrue(
@@ -104,8 +113,10 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testStartIndexAndVertexOffsetAreDifferentRoutes() throws {
         let game = try ModelProbeGame(probe: .describedPart)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
+        game.effectAfterSet = nil
         XCTAssertEqual(game.describedStartIndex, 3)
         XCTAssertEqual(game.describedVertexOffset, 4,
                        "two small integers that mean different things")
@@ -113,15 +124,20 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testAnEffectSetOnAPartIsReadBack() throws {
         let game = try ModelProbeGame(probe: .describedPart)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertNotNil(game.effectAfterSet,
                         "a default part carries no effect, so reading one back "
                         + "proves the setter reached the runtime")
+        // The getter returns a callback-scoped facade. Do not retain that
+        // borrowed native identity into the parent game's explicit teardown.
+        game.effectAfterSet = nil
     }
 
     func testDrawingAMeshWhosePartHasNoEffectRaisesXNAsMessage() throws {
         let game = try ModelProbeGame(probe: .effectlessMesh)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         let refusal = try XCTUnwrap(
@@ -137,6 +153,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testADefaultMeshPartReadsItsCountsAsZero() throws {
         let game = try ModelProbeGame(probe: .meshPart)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertEqual(game.partNumVertices, 0)
@@ -147,6 +164,7 @@ final class Foundation103ModelTests: XCTestCase {
 
     func testADefaultMeshPartCarriesNoBuffersAndNoEffect() throws {
         let game = try ModelProbeGame(probe: .meshPart)
+        defer { XCTAssertNoThrow(try game.Dispose()) }
         try game.Run()
         if let failure = game.failure { throw failure }
         XCTAssertNil(game.partVertexBuffer)

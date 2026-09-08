@@ -121,7 +121,7 @@ internal enum ModelSupport {
             typeName: "VertexBuffer", declaration: declaration,
             vertexCount: info.vertex_count,
             usage: Microsoft.Xna.Framework.Graphics.BufferUsage(
-                rawValue: Int32(info.buffer_usage)) ?? .None)
+                rawValue: Int32(info.buffer_usage)))
     }
 
     static func adoptIndexBuffer(
@@ -139,7 +139,7 @@ internal enum ModelSupport {
             elementSize: Microsoft.Xna.Framework.Graphics.IndexElementSize(
                 rawValue: Int32(info.index_element_size)) ?? .SixteenBits,
             usage: Microsoft.Xna.Framework.Graphics.BufferUsage(
-                rawValue: Int32(info.buffer_usage)) ?? .None)
+                rawValue: Int32(info.buffer_usage)))
     }
 
     static func matrix(

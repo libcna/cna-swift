@@ -365,7 +365,7 @@ extension Microsoft.Xna.Framework {
             where try foundDevices.Item(existing).Equals(info) {
                 return
             }
-            try foundDevices.Add(info)
+            foundDevices.Add(info)
         }
 
         /// `Resources.NoCompatibleDevices`, a one-argument format naming the

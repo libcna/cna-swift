@@ -240,7 +240,7 @@ extension Microsoft.Xna.Framework.Audio {
             }
             let live = try validatedHandle("SoundEffectInstance.Apply3D")
             try requireNotYetPlayed()
-            var natives = listeners.map { $0.nativeDescriptor() }
+            let natives = listeners.map { $0.nativeDescriptor() }
             var nativeEmitter = emitter.nativeDescriptor()
             try runtime.functions.check(
                 natives.withUnsafeBufferPointer { buffer in
