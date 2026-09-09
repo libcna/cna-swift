@@ -78,6 +78,14 @@ caught all 413, including all eleven ContentReader mutations, with no survivor,
 hang or unscored entry. Remaining limitations are capability refusals, not a
 local missing-type or missing-member frontier.
 
+The post-restart consumer canary that had previously stalled before launch was
+rerun with Swift 6.0.3 (`x86_64-unknown-linux-gnu`) first on `PATH` and the
+build explicitly limited to three jobs. The template performed a fresh build
+and completed all 60 headless frames: exit code 0, 32 checks, zero findings and
+no skipped phase.
+The regenerated `consumer-canary-report.json` was byte-identical to the
+committed PASS report, and the template worktree remained clean.
+
 ## Foundation 105 — the Design/InstanceDescriptor decision is closed
 
 The owner selected completion of CNA-Swift, so the earlier Design decision is
