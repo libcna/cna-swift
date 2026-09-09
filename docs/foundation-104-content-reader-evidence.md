@@ -17,12 +17,11 @@ asset policy was reopened.
 
 ## 3. Filesystem safety
 
-The only external writable root used was the session-owned
-`/tmp/cna-swift-session-home-foundation104`, created before the work and passed
-as isolated `HOME`, `XDG_CACHE_HOME`, `XDG_DATA_HOME` and module-cache roots.
-Individual tests create uniquely named
-`/tmp/cna-swift-foundation-104-<UUID>` children and remove only the exact child
-they created. Repository-owned `build-asan`, `build-tsan` and consumer build
+A dedicated session temp root was created before the work and passed as the
+isolated `HOME`, `XDG_CACHE_HOME`, `XDG_DATA_HOME` and module-cache roots.
+Individual tests create uniquely named children beneath that root and remove
+only the exact child they created. Repository-owned `build-asan`, `build-tsan`
+and consumer build
 directories are documented build artifacts. Foreign paths touched: none.
 Foreign deletions: 0.
 

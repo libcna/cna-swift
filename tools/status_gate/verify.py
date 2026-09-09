@@ -649,6 +649,8 @@ def regenerate_and_compare(
                 [sys.executable, "tools/api_compat/pinned_assembly_audit.py",
                  "--assembly-dir", str(assembly_dir),
                  "--il-cache", str(il_cache),
+                 "--require-exact", "Microsoft.Xna.Framework.dll",
+                 "--require-exact", "Microsoft.Xna.Framework.Graphics.dll",
                  "--output", str(pinned)],
                 cwd=root, capture_output=True, text=True, check=False,
             )
